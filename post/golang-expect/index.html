@@ -23,7 +23,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="Golang的异常处理和单元测试 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复 2.在Golang" />
+  <meta name="description" content="Golang的异常处理和单元测试  1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复 2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理 3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现  注意事项
+ 1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码). 2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic. 3.recover处理异常后，业务逻辑会跑到defer之后的处理片段中 4.多个defer会形成defer栈 5.panic会等到整个goroutine退出才会报告错误 " />
 
   <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
 
@@ -35,7 +36,7 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="http://localhost:1313/post/golang-expect/" />
+<link rel="canonical" href="https://bgbiao.github.io/post/golang-expect/" />
 
 
 
@@ -60,13 +61,45 @@
 
 
 <meta property="og:title" content="Golang中的异常处理" />
-<meta property="og:description" content="Golang的异常处理和单元测试 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复 2.在Golang" />
+<meta property="og:description" content="Golang的异常处理和单元测试
+
+
+1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复
+2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理
+3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现
+
+
+注意事项
+
+
+1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码).
+2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic.
+3.recover处理异常后，业务逻辑会跑到defer之后的处理片段中
+4.多个defer会形成defer栈
+5.panic会等到整个goroutine退出才会报告错误
+" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/golang-expect/" />
+<meta property="og:url" content="https://bgbiao.github.io/post/golang-expect/" />
 <meta property="article:published_time" content="2019-03-06T16:01:23+08:00" />
 <meta property="article:modified_time" content="2019-11-07T16:01:23+08:00" />
 <meta itemprop="name" content="Golang中的异常处理">
-<meta itemprop="description" content="Golang的异常处理和单元测试 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复 2.在Golang">
+<meta itemprop="description" content="Golang的异常处理和单元测试
+
+
+1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复
+2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理
+3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现
+
+
+注意事项
+
+
+1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码).
+2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic.
+3.recover处理异常后，业务逻辑会跑到defer之后的处理片段中
+4.多个defer会形成defer栈
+5.panic会等到整个goroutine退出才会报告错误
+">
 
 
 <meta itemprop="datePublished" content="2019-03-06T16:01:23&#43;08:00" />
@@ -78,7 +111,23 @@
 <meta itemprop="keywords" content="Golang,Exception," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Golang中的异常处理"/>
-<meta name="twitter:description" content="Golang的异常处理和单元测试 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复 2.在Golang"/>
+<meta name="twitter:description" content="Golang的异常处理和单元测试
+
+
+1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复
+2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理
+3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现
+
+
+注意事项
+
+
+1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码).
+2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic.
+3.recover处理异常后，业务逻辑会跑到defer之后的处理片段中
+4.多个defer会形成defer栈
+5.panic会等到整个goroutine退出才会报告错误
+"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -110,35 +159,35 @@
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/">首页</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/post/">全部文章</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/categories/">分类</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/about/">关于BGBiao</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
           
         
       </li>
@@ -230,7 +279,7 @@
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/">首页</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
           
 
         
@@ -241,7 +290,7 @@
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/post/">全部文章</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
           
 
         
@@ -252,7 +301,7 @@
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
           
 
         
@@ -263,7 +312,7 @@
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/categories/">分类</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
           
 
         
@@ -274,7 +323,7 @@
         
           
           
-            <a class="menu-item-link" href="http://localhost:1313/about/">关于BGBiao</a>
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
           
 
         
@@ -305,8 +354,8 @@
           2019-03-06
         </time>
         <div class="post-category">
-            <a href="http://localhost:1313/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-            <a href="http://localhost:1313/categories/golang/"> Golang </a>
+            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
+            <a href="https://bgbiao.github.io/categories/golang/"> Golang </a>
             
           </div>
         
@@ -337,9 +386,7 @@
 
     
     <div class="post-content">
-      
-
-<h2 id="golang的异常处理和单元测试">Golang的异常处理和单元测试</h2>
+      <h2 id="golang的异常处理和单元测试">Golang的异常处理和单元测试</h2>
 
 <ul>
 <li>1.Golang语言中没有其他语言中的<code>try...catch...</code>语句来捕获异常和异常恢复</li>
@@ -510,7 +557,6 @@ func main() {
 }
 
 </code></pre>
-
     </div>
 
     
@@ -540,14 +586,27 @@ func main() {
 
     <footer class="post-footer">
       <div class="post-tags">
-          <a href="http://localhost:1313/tags/golang/">Golang</a>
-          <a href="http://localhost:1313/tags/exception/">Exception</a>
+          <a href="https://bgbiao.github.io/tags/golang/">Golang</a>
+          <a href="https://bgbiao.github.io/tags/exception/">Exception</a>
           
         </div>
 
       
       <nav class="post-nav">
         
+          <a class="prev" href="/post/go-unit-test/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">Golang中的单元测试、基准测试、覆盖测试</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
         
       </nav>
     </footer>
@@ -604,7 +663,7 @@ func main() {
     </a>
 
 
-<a href="http://localhost:1313/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
     class="iconfont" title="rss" target="_blank">
     <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
