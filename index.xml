@@ -1,14 +1,225 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>BGBiao的运维人生</title>
-    <link>http://bgbiao.github.io/</link>
-    <description>Recent content on BGBiao的运维人生</description>
+    <title>BGBiao的Ops人生</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-CN</language>
+    <language>en</language>
+    <lastBuildDate>Wed, 06 Mar 2019 16:01:23 +0800</lastBuildDate>
     
-	<atom:link href="http://bgbiao.github.io/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang中的异常处理</title>
+      <link>http://localhost:1313/post/golang-expect/</link>
+      <pubDate>Wed, 06 Mar 2019 16:01:23 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/golang-expect/</guid>
+      
+        <description>
+
+&lt;h2 id=&#34;golang的异常处理和单元测试&#34;&gt;Golang的异常处理和单元测试&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.Golang语言中没有其他语言中的&lt;code&gt;try...catch...&lt;/code&gt;语句来捕获异常和异常恢复&lt;/li&gt;
+&lt;li&gt;2.在Golang中我们通常会使用&lt;code&gt;panic&lt;/code&gt;关键字来抛出异常，在&lt;code&gt;defer&lt;/code&gt;中使用&lt;code&gt;recover&lt;/code&gt;来捕获异常进行具体逻辑处理&lt;/li&gt;
+&lt;li&gt;3.Golang中我们通常会在函数或方法中返回&lt;code&gt;error&lt;/code&gt;结构对象来判断是否有异常出现&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意事项&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.利用&lt;code&gt;recover&lt;/code&gt;和&lt;code&gt;panic&lt;/code&gt;指令，&lt;code&gt;defer&lt;/code&gt;必须放在panic之前定义(&lt;code&gt;panic会终止其后要执行的代码&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;2.&lt;code&gt;recover&lt;/code&gt;只有在&lt;code&gt;defer&lt;/code&gt;调用的函数中才有效，否则&lt;code&gt;recover&lt;/code&gt;无法捕获到&lt;code&gt;panic&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;3.&lt;code&gt;recover&lt;/code&gt;处理异常后，业务逻辑会跑到&lt;code&gt;defer&lt;/code&gt;之后的处理片段中&lt;/li&gt;
+&lt;li&gt;4.多个&lt;code&gt;defer&lt;/code&gt;会形成&lt;code&gt;defer栈&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;5.panic会等到整个&lt;code&gt;goroutine&lt;/code&gt;退出才会报告错误&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;常规使用&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;panic&lt;/code&gt;以及&lt;code&gt;recover&lt;/code&gt;参数类型为空接口(可存储任何类型对象)&lt;code&gt;interface{}&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/*
+func panic(v interface{})
+func recover() interface{}
+执行顺序:panic()-&amp;gt;带recover的defer
+输出结果:
+oh my god!panic.
+解释:
+defer中的recover成功捕获到了panic的异常
+*/
+
+package main
+import (
+&amp;quot;fmt&amp;quot;
+)
+func main() {
+defer func() {
+    if err := recover(); err != nil {
+        fmt.Println(err)    
+    }
+}()
+panic(&amp;quot;oh my god!panic.&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;延迟调用中引发的错误，可被后续延迟调用捕获(&lt;code&gt;仅最后一个错误被捕获&lt;/code&gt;)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/*
+执行顺序:panic()-&amp;gt;带panic的defer匿名函数-&amp;gt;带recover()的defer匿名函数
+输出结果:
+catch the panic
+解释:
+defer中的recover仅能捕获最后一个错误
+package main
+import (
+&amp;quot;fmt&amp;quot;
+)
+func main() {
+defer func() {
+    if err := recover();err != nil {
+        fmt.Println(&amp;quot;catch the panic&amp;quot;)
+    }
+}()
+defer func() {
+    panic(&amp;quot;oh my god! panic.&amp;quot;)
+}()
+
+panic(&amp;quot;something panic!&amp;quot;)
+
+}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;捕获函数&lt;code&gt;recover()&lt;/code&gt;只有在&lt;code&gt;defer&lt;/code&gt;调用内直接调用才会终止，否则返回&lt;code&gt;nil&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/*
+代码执行顺序:panic-&amp;gt;在匿名函数中嵌套recover的defer函数-&amp;gt;带fmt的defer-&amp;gt;带recover的defer-&amp;gt;在匿名函数中调用recover的defer
+输出结果:
+defer inner
+&amp;lt;nil&amp;gt;
+defer recover panic error
+解释: 多个defer之间形成defer栈，最底部的defer优先执行;第三个defer打印了recover()的零值`nil`，仅有第一个defer成功捕获了最底部的panic(&amp;quot;panic error&amp;quot;)
+*/
+package main
+import &amp;quot;fmt&amp;quot;
+func main() {
+defer func() {
+    fmt.Println(&amp;quot;defer recover&amp;quot;,recover())
+}()
+defer recover()
+defer fmt.Println(recover())
+defer func() {
+    func(){
+        fmt.Println(&amp;quot;defer inner&amp;quot;)
+        recover()
+    }()
+}()
+panic(&amp;quot;panic error&amp;quot;)
+}      
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;将代码块放置在匿名函数中可实现在函数逻辑中进行异常恢复，而不影响主函数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/*
+代码执行顺序:匿名函数中的panic语句-&amp;gt;匿名函数中i自加运算-&amp;gt;匿名函数中的fmt-&amp;gt;匿名函数中的defer-&amp;gt;主函数中的fmt
+输出结果:
+i is: 2
+解释:panic会终止其之后的执行，因此优先执行匿名函数中的panic之后便被defer中的recover捕获，将i赋值为2，其后匿名函数退出开始继续执行主函数中的fmt.Println语句
+*/
+package main
+import &amp;quot;fmt&amp;quot;
+func main() {
+test()
+}
+func test() {
+var i int
+func() {
+    defer func(){
+        if err := recover();err != nil {
+            i = 2
+        }
+    }()
+    panic(&amp;quot;something panic!&amp;quot;)
+    i += 8
+    fmt.Println(&amp;quot;no panic, i is:&amp;quot;,i)
+}()
+fmt.Println(&amp;quot;i is:&amp;quot;,i)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;goroutine中的recover&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;如果一个没有&lt;code&gt;recover&lt;/code&gt;的&lt;code&gt;goroutine&lt;/code&gt;发生了panic，那么整个进程都会挂掉&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/*
+sync.WaitGroup用来等待一组goroutine的结束,Add方法用来设置等待的goroutine数量,Done方法表示一个goroutine运行结束,使用Wait方法将全部的goroutine阻塞住,直到全部goroutine执行完毕
+
+代码执行顺序:goroutine中的逻辑-&amp;gt;wg.Wait()-&amp;gt;fmt.Println
+输出结果:
+panic recover assignment to entry in nil map
+donw
+解释:
+在goroutine中我们声明了一个info的map[string]string类型，我们都知道在map,slice,channel都是引用类型，需要使用make函数进行初始化操作之后进行赋值。而这里直接使用info[&amp;quot;name&amp;quot;] = &amp;quot;BGBiao&amp;quot;进行赋值导致panic，fmt.Println函数就会被终止执行，从而执行带recover的defer，之后执行带wg.Done()的defer并退出goroutine执行主程序逻辑
+*/
+package main
+import (
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;sync&amp;quot;
+)
+func main() {
+    var wg sync.WaitGroup
+    wg.Add(4)
+    go func() {
+        defer wg.Done()
+        defer func() {
+            if err := recover();err != nil {
+                fmt.Println(&amp;quot;panic recover&amp;quot;,err)
+            }
+        }()
+        var info map[string]string
+        info[&amp;quot;name&amp;quot;] = &amp;quot;BGBiao&amp;quot;
+        fmt.Println(info)
+    }()
+    wg.Wait()
+    fmt.Println(&amp;quot;done&amp;quot;)
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>关于BGBiao</title>
+      <link>http://localhost:1313/about/</link>
+      <pubDate>Sun, 20 Aug 2017 21:38:52 +0800</pubDate>
+      
+      <guid>http://localhost:1313/about/</guid>
+      
+        <description>&lt;p&gt;非专业出身的专业SRE，专治各种疑难杂症。&lt;/p&gt;
+
+&lt;p&gt;毕业的前四年在&lt;a href=&#34;https://jddglobal.com/&#34;&gt;京东数字科技&lt;/a&gt;担任一线运维工作，目前在一家创业公司担任SRE，主要负责内部DevOps体系建设以及一些基础运维工作。&lt;/p&gt;
+
+&lt;p&gt;对应用运维，SRE，DevOps，Kubernetes，Cloud Native，大数据以及Golang相关技术比较感兴趣。&lt;/p&gt;
+
+&lt;p&gt;喜欢交朋友，也喜欢不断学习和分享技术文章，可以在以下途径联系到我，感兴趣的话，不妨一起交流交流.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://my.oschina.net/xxbAndy&#34;&gt;开源中国&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.jianshu.com/u/9c46ece5b7bd&#34;&gt;简书&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/BGBiao/&#34;&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/Golang运维者.jpg&#34; alt=&#34;欢迎关注我的公众号&#34; /&gt;&lt;/p&gt;
+</description>
+      
+    </item>
     
   </channel>
 </rss>

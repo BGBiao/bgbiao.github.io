@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on BGBiao的运维人生</title>
-    <link>http://bgbiao.github.io/categories/</link>
-    <description>Recent content in Categories on BGBiao的运维人生</description>
+    <title>Categories on BGBiao的Ops人生</title>
+    <link>http://localhost:1313/categories/</link>
+    <description>Recent content in Categories on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-CN</language>
+    <language>en</language>
+    <lastBuildDate>Wed, 06 Mar 2019 16:01:23 +0800</lastBuildDate>
     
-	<atom:link href="http://bgbiao.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang</title>
+      <link>http://localhost:1313/categories/golang/</link>
+      <pubDate>Wed, 06 Mar 2019 16:01:23 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/golang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>运维开发</title>
+      <link>http://localhost:1313/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/</link>
+      <pubDate>Wed, 06 Mar 2019 16:01:23 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>
