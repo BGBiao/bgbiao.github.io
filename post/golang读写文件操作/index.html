@@ -36,7 +36,7 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.github.io/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" />
+<link rel="canonical" href="https://bgbiao.top/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" />
 
 
 
@@ -63,7 +63,7 @@
 <meta property="og:title" content="Golang读写文件操作" />
 <meta property="og:description" content="最近在使用Golang进行文件读写的过程中，遇到几个细节问题导致程序写入数据时有一定脏数据的残留，最后发现是使用os.OpenFile在进行文件操作的时候没有使用正确的flag造成的。因此专门去学习了下Golang中读写文件的几种方式方法,在此记录下一些简单的操作，防止以后遗忘。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.github.io/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" />
+<meta property="og:url" content="https://bgbiao.top/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" />
 <meta property="article:published_time" content="2017-12-17T23:25:25+00:00" />
 <meta property="article:modified_time" content="2017-12-17T23:25:25+00:00" />
 <meta itemprop="name" content="Golang读写文件操作">
@@ -97,7 +97,7 @@
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的运维人生</a>
+    <a href="/" class="logo">BGBiao的Ops人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -111,35 +111,35 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
       </li>
@@ -218,7 +218,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的运维人生
+      BGBiao的Ops人生
     
   </a>
 </div>
@@ -231,7 +231,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
           
 
         
@@ -242,7 +242,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
           
 
         
@@ -253,7 +253,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
           
 
         
@@ -264,7 +264,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
           
 
         
@@ -275,7 +275,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
 
         
@@ -306,7 +306,7 @@
           2017-12-17
         </time>
         <div class="post-category">
-            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             
           </div>
         
@@ -952,7 +952,7 @@ func WriteWithBufio(name,content string) {
 
     <footer class="post-footer">
       <div class="post-tags">
-          <a href="https://bgbiao.github.io/tags/golang/">Golang</a>
+          <a href="https://bgbiao.top/tags/golang/">Golang</a>
           
         </div>
 
@@ -1041,7 +1041,7 @@ func WriteWithBufio(name,content string) {
     </a>
 
 
-<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
     class="iconfont" title="rss" target="_blank">
     <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"

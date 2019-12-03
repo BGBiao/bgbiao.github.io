@@ -2,192 +2,192 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on BGBiao的Ops人生</title>
-    <link>https://bgbiao.github.io/tags/</link>
+    <link>https://bgbiao.top/tags/</link>
     <description>Recent content in Tags on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 20 Oct 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://bgbiao.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Golang</title>
-      <link>https://bgbiao.github.io/tags/golang/</link>
+      <link>https://bgbiao.top/tags/golang/</link>
       <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/golang/</guid>
+      <guid>https://bgbiao.top/tags/golang/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Testing</title>
-      <link>https://bgbiao.github.io/tags/testing/</link>
+      <link>https://bgbiao.top/tags/testing/</link>
       <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/testing/</guid>
+      <guid>https://bgbiao.top/tags/testing/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Docker</title>
-      <link>https://bgbiao.github.io/tags/docker/</link>
+      <link>https://bgbiao.top/tags/docker/</link>
       <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/docker/</guid>
+      <guid>https://bgbiao.top/tags/docker/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Grafana</title>
-      <link>https://bgbiao.github.io/tags/grafana/</link>
+      <link>https://bgbiao.top/tags/grafana/</link>
       <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/grafana/</guid>
+      <guid>https://bgbiao.top/tags/grafana/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Prometheus</title>
-      <link>https://bgbiao.github.io/tags/prometheus/</link>
+      <link>https://bgbiao.top/tags/prometheus/</link>
       <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/prometheus/</guid>
+      <guid>https://bgbiao.top/tags/prometheus/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Exception</title>
-      <link>https://bgbiao.github.io/tags/exception/</link>
+      <link>https://bgbiao.top/tags/exception/</link>
       <pubDate>Wed, 06 Mar 2019 16:01:23 +0800</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/exception/</guid>
+      <guid>https://bgbiao.top/tags/exception/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Hadoop</title>
-      <link>https://bgbiao.github.io/tags/hadoop/</link>
+      <link>https://bgbiao.top/tags/hadoop/</link>
       <pubDate>Sun, 28 Oct 2018 14:14:39 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/hadoop/</guid>
+      <guid>https://bgbiao.top/tags/hadoop/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Hive</title>
-      <link>https://bgbiao.github.io/tags/hive/</link>
+      <link>https://bgbiao.top/tags/hive/</link>
       <pubDate>Sun, 28 Oct 2018 14:14:39 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/hive/</guid>
+      <guid>https://bgbiao.top/tags/hive/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Python</title>
-      <link>https://bgbiao.github.io/tags/python/</link>
+      <link>https://bgbiao.top/tags/python/</link>
       <pubDate>Sun, 28 Oct 2018 14:14:39 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/python/</guid>
+      <guid>https://bgbiao.top/tags/python/</guid>
       <description></description>
     </item>
     
     <item>
       <title>MySQL</title>
-      <link>https://bgbiao.github.io/tags/mysql/</link>
+      <link>https://bgbiao.top/tags/mysql/</link>
       <pubDate>Sat, 27 Oct 2018 13:53:40 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/mysql/</guid>
+      <guid>https://bgbiao.top/tags/mysql/</guid>
       <description></description>
     </item>
     
     <item>
       <title>GPU</title>
-      <link>https://bgbiao.github.io/tags/gpu/</link>
+      <link>https://bgbiao.top/tags/gpu/</link>
       <pubDate>Mon, 20 Aug 2018 14:34:43 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/gpu/</guid>
+      <guid>https://bgbiao.top/tags/gpu/</guid>
       <description></description>
     </item>
     
     <item>
       <title>NVIDIA</title>
-      <link>https://bgbiao.github.io/tags/nvidia/</link>
+      <link>https://bgbiao.top/tags/nvidia/</link>
       <pubDate>Mon, 20 Aug 2018 14:34:43 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/nvidia/</guid>
+      <guid>https://bgbiao.top/tags/nvidia/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Protobuf</title>
-      <link>https://bgbiao.github.io/tags/protobuf/</link>
+      <link>https://bgbiao.top/tags/protobuf/</link>
       <pubDate>Tue, 03 Apr 2018 15:01:07 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/protobuf/</guid>
+      <guid>https://bgbiao.top/tags/protobuf/</guid>
       <description></description>
     </item>
     
     <item>
       <title>AI</title>
-      <link>https://bgbiao.github.io/tags/ai/</link>
+      <link>https://bgbiao.top/tags/ai/</link>
       <pubDate>Tue, 02 Jan 2018 10:14:32 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/ai/</guid>
+      <guid>https://bgbiao.top/tags/ai/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Nvidia-digits</title>
-      <link>https://bgbiao.github.io/tags/nvidia-digits/</link>
+      <link>https://bgbiao.top/tags/nvidia-digits/</link>
       <pubDate>Tue, 02 Jan 2018 10:14:32 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/nvidia-digits/</guid>
+      <guid>https://bgbiao.top/tags/nvidia-digits/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Regexp</title>
-      <link>https://bgbiao.github.io/tags/regexp/</link>
+      <link>https://bgbiao.top/tags/regexp/</link>
       <pubDate>Sun, 24 Dec 2017 16:39:14 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/regexp/</guid>
+      <guid>https://bgbiao.top/tags/regexp/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OCR</title>
-      <link>https://bgbiao.github.io/tags/ocr/</link>
+      <link>https://bgbiao.top/tags/ocr/</link>
       <pubDate>Sat, 09 Dec 2017 15:59:29 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/ocr/</guid>
+      <guid>https://bgbiao.top/tags/ocr/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Tesseract4.0</title>
-      <link>https://bgbiao.github.io/tags/tesseract4.0/</link>
+      <link>https://bgbiao.top/tags/tesseract4.0/</link>
       <pubDate>Sat, 09 Dec 2017 15:59:29 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/tesseract4.0/</guid>
+      <guid>https://bgbiao.top/tags/tesseract4.0/</guid>
       <description></description>
     </item>
     
     <item>
       <title>工具</title>
-      <link>https://bgbiao.github.io/tags/%E5%B7%A5%E5%85%B7/</link>
+      <link>https://bgbiao.top/tags/%E5%B7%A5%E5%85%B7/</link>
       <pubDate>Tue, 28 Nov 2017 14:17:54 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/%E5%B7%A5%E5%85%B7/</guid>
+      <guid>https://bgbiao.top/tags/%E5%B7%A5%E5%85%B7/</guid>
       <description></description>
     </item>
     
     <item>
       <title>效能管理</title>
-      <link>https://bgbiao.github.io/tags/%E6%95%88%E8%83%BD%E7%AE%A1%E7%90%86/</link>
+      <link>https://bgbiao.top/tags/%E6%95%88%E8%83%BD%E7%AE%A1%E7%90%86/</link>
       <pubDate>Tue, 28 Nov 2017 14:17:54 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/tags/%E6%95%88%E8%83%BD%E7%AE%A1%E7%90%86/</guid>
+      <guid>https://bgbiao.top/tags/%E6%95%88%E8%83%BD%E7%AE%A1%E7%90%86/</guid>
       <description></description>
     </item>
     

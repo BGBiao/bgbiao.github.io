@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://bgbiao.github.io/sitemap.xml
+Sitemap: https://bgbiao.top/sitemap.xml

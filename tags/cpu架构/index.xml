@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>CPU架构 on BGBiao的Ops人生</title>
-    <link>https://bgbiao.github.io/tags/cpu%E6%9E%B6%E6%9E%84/</link>
+    <link>https://bgbiao.top/tags/cpu%E6%9E%B6%E6%9E%84/</link>
     <description>Recent content in CPU架构 on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Thu, 09 Nov 2017 21:57:45 +0000</lastBuildDate>
     
-	<atom:link href="https://bgbiao.github.io/tags/cpu%E6%9E%B6%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bgbiao.top/tags/cpu%E6%9E%B6%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>CPU虚拟化技术探究</title>
-      <link>https://bgbiao.github.io/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</link>
+      <link>https://bgbiao.top/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</link>
       <pubDate>Thu, 09 Nov 2017 21:57:45 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</guid>
+      <guid>https://bgbiao.top/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</guid>
       <description>&lt;p&gt;KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
 内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。&lt;/p&gt;</description>
     </item>

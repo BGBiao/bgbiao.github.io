@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Testing on BGBiao的Ops人生</title>
-    <link>https://bgbiao.github.io/tags/testing/</link>
+    <link>https://bgbiao.top/tags/testing/</link>
     <description>Recent content in Testing on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 20 Oct 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://bgbiao.github.io/tags/testing/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bgbiao.top/tags/testing/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Golang中的单元测试、基准测试、覆盖测试</title>
-      <link>https://bgbiao.github.io/post/go-unit-test/</link>
+      <link>https://bgbiao.top/post/go-unit-test/</link>
       <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/post/go-unit-test/</guid>
+      <guid>https://bgbiao.top/post/go-unit-test/</guid>
       <description>&lt;h2 id=&#34;单元测试-基准测试-覆盖测试&#34;&gt;单元测试、基准测试、覆盖测试&lt;/h2&gt;
 
 &lt;blockquote&gt;

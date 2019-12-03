@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Kubernetes on BGBiao的Ops人生</title>
-    <link>https://bgbiao.github.io/tags/kubernetes/</link>
+    <link>https://bgbiao.top/tags/kubernetes/</link>
     <description>Recent content in Kubernetes on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 05 Nov 2017 22:30:59 +0000</lastBuildDate>
     
-	<atom:link href="https://bgbiao.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>容器生态技术</title>
-      <link>https://bgbiao.github.io/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
+      <link>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
       <pubDate>Sun, 05 Nov 2017 22:30:59 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
+      <guid>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
       <description>&lt;p&gt;2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。&lt;/p&gt;</description>
     </item>
     

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OverlayFS on BGBiao的Ops人生</title>
-    <link>https://bgbiao.github.io/tags/overlayfs/</link>
+    <link>https://bgbiao.top/tags/overlayfs/</link>
     <description>Recent content in OverlayFS on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Thu, 09 Nov 2017 21:36:58 +0000</lastBuildDate>
     
-	<atom:link href="https://bgbiao.github.io/tags/overlayfs/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bgbiao.top/tags/overlayfs/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Overlayfs技术探究以及Docker环境中的使用</title>
-      <link>https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <link>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
       <pubDate>Thu, 09 Nov 2017 21:36:58 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      <guid>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
       <description>&lt;h3 id=&#34;overlayfs-基本概念&#34;&gt;overlayfs 基本概念&lt;/h3&gt;
 
 &lt;p&gt;一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。

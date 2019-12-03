@@ -36,7 +36,7 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/" />
+<link rel="canonical" href="https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/" />
 
 
 
@@ -66,7 +66,7 @@
 一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/" />
+<meta property="og:url" content="https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/" />
 <meta property="article:published_time" content="2017-11-09T21:36:58+00:00" />
 <meta property="article:modified_time" content="2017-11-09T21:36:58+00:00" />
 <meta itemprop="name" content="Overlayfs技术探究以及Docker环境中的使用">
@@ -106,7 +106,7 @@
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的运维人生</a>
+    <a href="/" class="logo">BGBiao的Ops人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -120,35 +120,35 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
           
         
       </li><li class="mobile-menu-item">
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
       </li>
@@ -227,7 +227,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的运维人生
+      BGBiao的Ops人生
     
   </a>
 </div>
@@ -240,7 +240,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
           
 
         
@@ -251,7 +251,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
           
 
         
@@ -262,7 +262,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
           
 
         
@@ -273,7 +273,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
           
 
         
@@ -284,7 +284,7 @@
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
 
         
@@ -315,7 +315,7 @@
           2017-11-09
         </time>
         <div class="post-category">
-            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
         
@@ -640,8 +640,8 @@ lower-id  merged/   upper/
 
     <footer class="post-footer">
       <div class="post-tags">
-          <a href="https://bgbiao.github.io/tags/docker/">Docker</a>
-          <a href="https://bgbiao.github.io/tags/overlayfs/">OverlayFS</a>
+          <a href="https://bgbiao.top/tags/docker/">Docker</a>
+          <a href="https://bgbiao.top/tags/overlayfs/">OverlayFS</a>
           
         </div>
 
@@ -730,7 +730,7 @@ lower-id  merged/   upper/
     </a>
 
 
-<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
     class="iconfont" title="rss" target="_blank">
     <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
