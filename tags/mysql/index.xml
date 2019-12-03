@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MySQL on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/mysql/</link>
+    <description>Recent content in MySQL on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 27 Oct 2018 13:53:40 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用Python操作MySQL</title>
+      <link>https://bgbiao.github.io/post/operatemysqlwithpython/</link>
+      <pubDate>Sat, 27 Oct 2018 13:53:40 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/operatemysqlwithpython/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

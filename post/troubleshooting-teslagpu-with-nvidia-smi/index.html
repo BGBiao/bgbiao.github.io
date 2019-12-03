@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>使用nvidia-smi来对Tesla-GPU进行故障排查 - BGBiao的Ops人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。
+" />
+
+  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.github.io/post/troubleshooting-teslagpu-with-nvidia-smi/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="使用nvidia-smi来对Tesla-GPU进行故障排查" />
+<meta property="og:description" content="
+背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.github.io/post/troubleshooting-teslagpu-with-nvidia-smi/" />
+<meta property="article:published_time" content="2018-08-20T14:34:43+00:00" />
+<meta property="article:modified_time" content="2018-08-20T14:34:43+00:00" />
+<meta itemprop="name" content="使用nvidia-smi来对Tesla-GPU进行故障排查">
+<meta itemprop="description" content="
+背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。
+">
+
+
+<meta itemprop="datePublished" content="2018-08-20T14:34:43&#43;00:00" />
+<meta itemprop="dateModified" content="2018-08-20T14:34:43&#43;00:00" />
+<meta itemprop="wordCount" content="2056">
+
+
+
+<meta itemprop="keywords" content="NVIDIA,GPU," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="使用nvidia-smi来对Tesla-GPU进行故障排查"/>
+<meta name="twitter:description" content="
+背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的运维人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的运维人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">使用nvidia-smi来对Tesla-GPU进行故障排查</h1>
+      
+      <div class="post-meta">
+        <time datetime="2018-08-20" class="post-time">
+          2018-08-20
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#gpu卡异常现象">GPU卡异常现象</a></li>
+<li><a href="#问题排查">问题排查</a></li>
+<li><a href="#临时修复">临时修复</a></li>
+<li><a href="#善后处理">善后处理</a></li>
+<li><a href="#参考文章">参考文章</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。</p>
+</blockquote>
+
+<h3 id="gpu卡异常现象">GPU卡异常现象</h3>
+
+<p><img src="http://oyep1jupk.bkt.clouddn.com/issue_with_p40.png" alt="gpu卡异常测试" /><br />
+如上的的<code>bandwidthTest</code>是nvidia-cuda官方提供的测试样例，具体可以查看<a href="https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/">GPU环境的构建</a>.当然用户也可以使用<code>tensorflow-gpu</code>的如下代码来测试程序是否可以识别到GPU设备:</p>
+
+<pre><code>import tensorflow as tf 
+import os
+os.environ[&quot;CUDA_VISIBLE_DEVICES&quot;] = &quot;3&quot;
+tf.test.gpu_device_name()
+段错误(吐核)
+</code></pre>
+
+<h3 id="问题排查">问题排查</h3>
+
+<p>由于问题出现原因仅为服务器的其中一块卡，因此我们可以使用<code>nvidia-smi</code>命令对多卡之间的信息进行对比排查.</p>
+
+<p><strong>1.使用<code>nvidia-smi -q -d PERFORMANCE</code>查看GPU设备的性能</strong></p>
+
+<pre><code>## 经对比各个GPU卡设备性能够发现仅有id=3这块卡的`SW Power Cap`参数为active
+# nvidia-smi -q -d PERFORMANCE -i 3
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Aug 20 15:08:18 2018
+Driver Version                      : 384.81
+
+Attached GPUs                       : 8
+GPU 00000000:11:00.0
+    Performance State               : P8
+    Clocks Throttle Reasons
+        Idle                        : Not Active
+        Applications Clocks Setting : Not Active
+        SW Power Cap                : Active
+        HW Slowdown                 : Not Active
+        Sync Boost                  : Not Active
+        SW Thermal Slowdown         : Not Active
+</code></pre>
+
+<p>但是在性能参数中有<code>Active</code>其实并不能说明很大的问题，但看到这里其实也可以发现该卡的确是比较慢一些了，详细可以看<a href="https://xxbandy.github.io/2017/10/30/Manager-your-GPUs/">manage-your-gpus</a>中的<code>监控和管理GPU Boost</code>部分.</p>
+
+<p>原文为:
+&gt; If any of the GPU clocks is running at a slower speed, one or more of the above Clocks Throttle Reasons will be marked as active. The most concerning condition would be if HW Slowdown or Unknown are active, as these would most likely indicate a power or cooling issue. The remaining conditions typically indicate that the card is idle or has been manually set into a slower mode by a system administrator.</p>
+
+<p>大概意思是只要GPU的时钟频率以一个比较低的速度运行的话，在<code>Clocks Throttle Reasons</code>列就会有一个或多个被设置为<code>active</code>状态。而如果<code>HW Slowdown</code>和<code>Unknown</code>只要不是<code>active</code>就说明硬件其实还好啦，起码电源是没问题的。其他几个选项需要继续排查下是否为管理员手动设置的或GPU卡正在使用中。</p>
+
+<p>由刚开始的测试程序可以看出，我们<code>id=3</code>的这块卡其实已经无法检测，那既没有人手动设置，也没有程序在使用该卡，说明该卡其实还是有些问题的。</p>
+
+<p>至于为什么会出现<code>SW Power Cap: Active</code>,在<a href="http://international.download.nvidia.com/tesla/pdf/gpu-boost-tesla-k40-app-note.pdf">gpu-boost-tesla-k40</a>中看到如下一句话:</p>
+
+<pre><code>When the GPU is in a lower performance (idle) state, the GPU clock is fixed. However,
+when the GPU is operating in a high performance state (P0), the highest GPU
+performance is typically desired. NVIDIA GPU Boost maximizes the GPU performance
+by automatically raising the GPU clock when there is thermal and power headroom
+available. Likewise, if the power or thermal limit is reached, the GPU clock scales down
+to the next available clock setting so that the board remains below the power and
+thermal limit.
+NVIDIA products that support NVIDIA GPU Boost have multiple high-performance
+GPU clocks defined. That is, when the GPU is operating in its high performance mode
+(P0 state; determined automatically by the driver software), it has an array of GPU
+clocks available.
+</code></pre>
+
+<p>也就是在程序运行过程中可能会导致<code>SW Power Cap</code>状态进行变化。</p>
+
+<p><strong>2.使用<code>nvidia-smi -q -d ecc</code>查看GPU的ecc信息</strong></p>
+
+<pre><code>nvidia-smi -i 3 -q -d ecc
+
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Aug 20 15:34:05 2018
+Driver Version                      : 384.81
+
+Attached GPUs                       : 8
+GPU 00000000:11:00.0
+    Ecc Mode
+        Current                     : Enabled
+        Pending                     : Enabled
+    ECC Errors
+        Volatile
+            Single Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+            Double Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+        Aggregate
+            Single Bit
+                Device Memory       : 524
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 524
+            Double Bit
+                Device Memory       : 36
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 36
+</code></pre>
+
+<p>发现该卡<code>ECC Errors</code>的<code>Aggregate</code>有<code>Device Memory</code>错误信息.</p>
+
+<p>而<code>nvidia-smi</code>有一个<code>nvidia-smi -r</code>参数用来进行对GPU卡进行重置，相关说明如下:</p>
+
+<pre><code>    -r    --gpu-reset           Trigger reset of the GPU.
+                                Can be used to reset the GPU HW state in situations
+                                that would otherwise require a machine reboot.
+                                Typically useful if a double bit ECC error has
+                                occurred.
+                                Reset operations are not guarenteed to work in
+                                all cases and should be used with caution.
+</code></pre>
+
+<p>也就是说当<code>a double bit ECC error</code>出现时，gpu卡的重置是很有效的.</p>
+
+<p><strong>3.尝试使用<code>nvidia-smi -r</code>对异常的GPU卡进行恢复</strong></p>
+
+<pre><code># nvidia-smi -r -i 3
+Unable to reset GPU 00000000:11:00.0 because it's being used by some other process (e.g. CUDA application, graphics application like X server, monitoring application like other instance of nvidia-smi). Please first kill all processes using this GPU and all compute applications running in the system (even when they are running on other GPUs) and then try to reset the GPU again.
+</code></pre>
+
+<p>意思是在对GPU卡进行重置之前，建议kill掉服务器上的所有使用GPU卡的程序，所以停止掉程序后继续执行。</p>
+
+<h3 id="临时修复">临时修复</h3>
+
+<p>在临时关闭服务器上其他使用GPU资源的程序后，再次对id=3的GPU卡进行重置操作.</p>
+
+<pre><code>$ nvidia-smi -r -i 3
+</code></pre>
+
+<p><strong>再次测试GPU卡检测程序</strong></p>
+
+<pre><code>&gt;&gt;&gt; tf.test.gpu_device_name()
+2018-08-20 14:52:27.958572: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+name: Tesla P40
+major: 6 minor: 1 memoryClockRate (GHz) 1.531
+pciBusID 0000:11:00.0
+Total memory: 22.38GiB
+Free memory: 22.21GiB
+2018-08-20 14:52:27.958641: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0
+2018-08-20 14:52:27.958651: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y
+2018-08-20 14:52:27.958668: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla P40, pci bus id: 0000:11:00.0)
+u'/gpu:0'
+&gt;&gt;&gt;
+</code></pre>
+
+<p>可以看到，重置GPU后可以正常识别到GPU设备。</p>
+
+<h3 id="善后处理">善后处理</h3>
+
+<p>其实找了这么多，虽然临时将异常的GPU卡恢复使用了，但是对于底层具体的原因其实还有待排查，因为需要设计到cuda以及Tesla不同型号产品的配置以及参数优化调整。但为了便于问题的排查和修复以及对于业务使用的快速反应，我们需要尽快恢复资源使用。因此建议将<code>ECC Errors</code>进行归零操作，以便后期问题的继续排查.</p>
+
+<p><strong>将ECC Errors置零操作</strong>
+<code>CUDA_ERROR_ECC_UNCORRECTABLE</code></p>
+
+<pre><code># nvidia-smi -p 1 -i 3
+Reset aggregate ECC errors to zero for GPU 00000000:11:00.0.
+All done.
+
+# nvidia-smi -i 3 -q -d ecc
+
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Aug 20 15:50:22 2018
+Driver Version                      : 384.81
+
+Attached GPUs                       : 8
+GPU 00000000:11:00.0
+    Ecc Mode
+        Current                     : Enabled
+        Pending                     : Enabled
+    ECC Errors
+        Volatile
+            Single Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+            Double Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+        Aggregate
+            Single Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+            Double Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+
+</code></pre>
+
+<h3 id="参考文章">参考文章</h3>
+
+<p><a href="https://www.ibm.com/support/knowledgecenter/en/SSFHY8_5.5.0/com.ibm.cluster.essl.v5r5.essl100.doc/am5gr_nvidcap.htm">GPU-Power-Cap</a><br />
+<a href="http://international.download.nvidia.com/tesla/pdf/gpu-boost-tesla-k40-app-note.pdf">gpu-boost-tesla-k40</a></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2018-08-20
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+    
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.github.io/tags/nvidia/">NVIDIA</a>
+          <a href="https://bgbiao.github.io/tags/gpu/">GPU</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/operatemysqlwithpython/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">使用Python操作MySQL</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/">
+            <span class="next-text nav-default">Golang下的protobuf初体验</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

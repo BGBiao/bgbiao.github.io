@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>开源OCR引擎tesseract的构建使用 - BGBiao的Ops人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="简介 OCR 光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。
+" />
+
+  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="开源OCR引擎tesseract的构建使用" />
+<meta property="og:description" content="简介
+
+OCR
+
+光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" />
+<meta property="article:published_time" content="2017-12-09T15:59:29+00:00" />
+<meta property="article:modified_time" content="2017-12-09T15:59:29+00:00" />
+<meta itemprop="name" content="开源OCR引擎tesseract的构建使用">
+<meta itemprop="description" content="简介
+
+OCR
+
+光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。">
+
+
+<meta itemprop="datePublished" content="2017-12-09T15:59:29&#43;00:00" />
+<meta itemprop="dateModified" content="2017-12-09T15:59:29&#43;00:00" />
+<meta itemprop="wordCount" content="2903">
+
+
+
+<meta itemprop="keywords" content="OCR,Tesseract4.0,Docker," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="开源OCR引擎tesseract的构建使用"/>
+<meta name="twitter:description" content="简介
+
+OCR
+
+光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的运维人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的运维人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">开源OCR引擎tesseract的构建使用</h1>
+      
+      <div class="post-meta">
+        <time datetime="2017-12-09" class="post-time">
+          2017-12-09
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#简介">简介</a>
+<ul>
+<li><a href="#ocr">OCR</a></li>
+<li><a href="#tesseract">tesseract</a></li>
+<li><a href="#场景">场景</a></li>
+</ul></li>
+<li><a href="#部署安装">部署安装</a>
+<ul>
+<li><a href="#使用yum安装">使用yum安装</a></li>
+<li><a href="#2-源码编译最新版本-4-00-00alpha版本">2.源码编译最新版本(4.00.00alpha版本)</a></li>
+</ul></li>
+<li><a href="#简单使用">简单使用</a></li>
+<li><a href="#可能遇到的问题">可能遇到的问题</a></li>
+<li><a href="#福利">福利</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h3 id="简介">简介</h3>
+
+<h4 id="ocr">OCR</h4>
+
+<p>光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。</p>
+
+<h4 id="tesseract">tesseract</h4>
+
+<p>Tesseract的OCR引擎最先由HP实验室于1985年开始研发，至1995年时已经成为OCR业内最准确的三款识别引擎之一。然而，HP不久便决定放弃OCR业务，Tesseract也从此尘封。
+数年以后，HP意识到，与其将Tesseract束之高阁，不如贡献给开源软件业，让其重焕新生－－2005年，Tesseract由美国内华达州信息技术研究所获得，并求诸于Google对Tesseract进行改进、消除Bug、优化工作。</p>
+
+<p><a href="https://github.com/tesseract-ocr/tesseract">tesseract官方地址</a></p>
+
+<p>需要注意的是，tesseract3.0以上才支持中文，而且从官方文档上看4.0版本（2017年1月左右发布）显著的提高了识别率，同时也加大了性能的消耗。</p>
+
+<h4 id="场景">场景</h4>
+
+<p>一个亲身经历的场景就是以前去开户可能需要带上身份证资料各种去打印复印件进行物理备份，而使用OCR等相关人工智能技术后就可以通过手机摄像头快速识别身份证相关信息来存储个人资料，整个开户体验相当高效简单。</p>
+
+<p>另外一个常见的场景可能就是我们手写的文章需要扫描成电子版，在以前我们可能需要专业的打印机设备才能够进行电子扫描，而当OCR相关技术普及到普通业务场景后，我们就可以使用手持设备进行纸质版的文件进行电子扫描。[个人之前尝试使用有道云笔记中的电子扫描功能还是相当不错的]</p>
+
+<h3 id="部署安装">部署安装</h3>
+
+<p>tesseract需要<a href="http://www.leptonica.org/download.html">Leptonica</a>的支持，leptonica是一个开源的面向教学的软件，通常被用来作为图像处理和图像分析的一个底层库支持。</p>
+
+<h4 id="使用yum安装">使用yum安装</h4>
+
+<p>Centos7中的epel源中包含了tesseract的3.05版本的包，可以直接安装使用。而在tesseract的github官方项目中最新版本也只到<a href="https://github.com/tesseract-ocr/tesseract/releases">3.05.01</a></p>
+
+<pre><code>$ sudo yum install epel-release
+ -y
+# 查看epel源
+$ cat /etc/yum.repos.d/epel.repo 
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+#baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&amp;arch=$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+#baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch/debug
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&amp;arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+[epel-source]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+#baseurl=http://download.fedoraproject.org/pub/epel/7/SRPMS
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&amp;arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+
+# 安装tesseract 以及相关的库依赖
+$ sudo yum install tesseract tesseract-devel -y 
+
+# 安装中文库支持
+$ sudo yum install -y tesseract-langpack-chi_sim.noarch tesseract-langpack-chi_tra.noarch
+
+
+# 查看默认的配置以及语言库
+$ ls /usr/share/tesseract/tessdata
+chi_sim.traineddata  chi_tra.traineddata
+
+# 默认只支持eng英语一种语言，安装中文包之后查看语言支持
+$ tesseract --list-langs
+List of available languages (3):
+eng
+chi_sim
+chi_tra
+
+</code></pre>
+
+<h4 id="2-源码编译最新版本-4-00-00alpha版本">2.源码编译最新版本(4.00.00alpha版本)</h4>
+
+<p>从官网上看，4.0版本在识别率以及性能等各方面上要比3.0版本高好多，但是官方又没有提供4.0的release版本，因此接下来使用github上的源码来手动编译<a href="https://github.com/tesseract-ocr/tesseract/tree/4.00.00alpha">tesseract4.00.00alpha</a>版本。同时由于对底层Leptonica的依赖，需要优先编译该库的依赖。</p>
+
+<p><code>注意：宿主操作系统仍然是一个纯净的Centos7.3.1611的OS</code></p>
+
+<pre><code># 安装基础依赖
+# sudo yum install gcc git gcc-c++ make automake libtool libpng-devel libjpeg-devel libtiff-devel zlib-devel -y
+
+# 安装leptonica-1.74.4
+# wget http://www.leptonica.org/source/leptonica-1.74.4.tar.gz  &amp;&amp; tar -zxf leptonica-1.74.4.tar.gz &amp;&amp; cd  leptonica ;./configure &amp;&amp; make &amp;&amp; make install
+
+........
+ /usr/bin/mkdir -p '/usr/local/lib'
+ /bin/sh ../libtool   --mode=install /usr/bin/install -c   liblept.la '/usr/local/lib'
+libtool: install: /usr/bin/install -c .libs/liblept.so.5.0.1 /usr/local/lib/liblept.so.5.0.1
+libtool: install: (cd /usr/local/lib &amp;&amp; { ln -s -f liblept.so.5.0.1 liblept.so.5 || { rm -f liblept.so.5 &amp;&amp; ln -s liblept.so.5.0.1 liblept.so.5; }; })
+libtool: install: (cd /usr/local/lib &amp;&amp; { ln -s -f liblept.so.5.0.1 liblept.so || { rm -f liblept.so &amp;&amp; ln -s liblept.so.5.0.1 liblept.so; }; })
+libtool: install: /usr/bin/install -c .libs/liblept.lai /usr/local/lib/liblept.la
+libtool: install: /usr/bin/install -c .libs/liblept.a /usr/local/lib/liblept.a
+libtool: install: chmod 644 /usr/local/lib/liblept.a
+libtool: install: ranlib /usr/local/lib/liblept.a
+libtool: finish: PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&quot; ldconfig -n /usr/local/lib
+----------------------------------------------------------------------
+
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+ /usr/bin/mkdir -p '/usr/local/include/leptonica'
+ /usr/bin/mkdir -p '/usr/local/bin'
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c convertfilestopdf convertfilestops convertformat convertsegfilestopdf convertsegfilestops converttopdf converttops fileinfo printimage printsplitimage printtiff splitimage2pdf xtractprotos '/usr/local/bin'
+......
+
+make[2]: Nothing to be done for `install-data-am'.
+make[2]: Leaving directory `/export/servers/leptonica-1.74.4/prog'
+make[1]: Leaving directory `/export/servers/leptonica-1.74.4/prog'
+make[1]: Entering directory `/export/servers/leptonica-1.74.4'
+make[2]: Entering directory `/export/servers/leptonica-1.74.4'
+make[2]: Nothing to be done for `install-exec-am'.
+ /usr/bin/mkdir -p '/usr/local/lib/pkgconfig'
+ /usr/bin/install -c -m 644 lept.pc '/usr/local/lib/pkgconfig'
+
+# 以上输出显示leptonica已经成功编译，并给出相关提示知名动态链接库的地址以及头文件等相关地址，需要注意的在使用之前一定要加载动态链接库/usr/local/lib
+# ldconfig -n /usr/local/lib
+
+# 安装tesseract，由于作者在github上设置了tag来区分各个版本，因此我们需要切换到源码的指定分支进行源码编译
+# git clone https://github.com/tesseract-ocr/tesseract.git；
+cd tesseract &amp;&amp; git checkout -b biaoge 4.00.00alpha &amp;&amp; ./configure &amp;&amp; make &amp;&amp; make install
+
+ /usr/bin/mkdir -p '/usr/local/include/tesseract
+
+ /usr/bin/mkdir -p '/usr/local/lib'
+
+libtool: finish: PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&quot; ldconfig -n /usr/local/lib
+
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /usr/bin/mkdir -p '/usr/local/bin'
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c tesseract '/usr/local/bin'
+libtool: install: /usr/bin/install -c .libs/tesseract /usr/local/bin/tesseract
+ /usr/bin/mkdir -p '/usr/local/include/tesseract'
+ /usr/bin/install -c -m 644 apitypes.h baseapi.h capi.h renderer.h '/usr/local/include/tesseract'
+
+ /usr/bin/mkdir -p '/usr/local/lib/pkgconfig'
+ /usr/bin/install -c -m 644 tesseract.pc '/usr/local/lib/pkgconfig'
+
+ /usr/bin/mkdir -p '/usr/local/share/tessdata/configs'
+ /usr/bin/install -c -m 644 inter makebox box.train unlv ambigs.train api_config kannada box.train.stderr quiet logfile digits hocr tsv linebox pdf rebox strokewidth bigram txt '/usr/local/share/tessdata/configs'
+
+
+ /usr/bin/mkdir -p '/usr/local/share/tessdata/tessconfigs'
+ /usr/bin/install -c -m 644 batch batch.nochop nobatch matdemo segdemo msdemo '/usr/local/share/tessdata/tessconfigs'
+
+
+ /usr/bin/mkdir -p '/usr/local/share/tessdata'
+ /usr/bin/install -c -m 644 pdf.ttf '/usr/local/share/tessdata'
+
+
+ /usr/bin/mkdir -p '/usr/local/share/man/man1'
+ /usr/bin/install -c -m 644 cntraining.1 combine_tessdata.1 mftraining.1 tesseract.1 unicharset_extractor.1 wordlist2dawg.1 ambiguous_words.1 shapeclustering.1 dawg2wordlist.1 '/usr/local/share/man/man1'
+ /usr/bin/mkdir -p '/usr/local/share/man/man5'
+ /usr/bin/install -c -m 644 unicharambigs.5 unicharset.5 '/usr/local/share/man/man5'
+ 
+# 以上输出也标明tesseract已经成功安装在了/usr/local/lib目录，并给出了一些tesseract相关的配置路径以及注意事项。特别需要注意的是，也需要加载动态链接库，否则程序可能无法识别相关的库文件。
+
+# ldconfig -n /usr/local/lib
+
+# 安装成功，即可使用tesseract命令(默认在/usr/local/bin/)
+# tesseract --version
+tesseract 4.00.00alpha
+ leptonica-1.74.4
+
+
+# 查看当前的语言库支持
+# tesseract --list-langs
+Error opening data file /usr/local/share/tessdata/eng.traineddata
+Please make sure the TESSDATA_PREFIX environment variable is set to the parent directory of your &quot;tessdata&quot; directory.
+Failed loading language 'eng'
+Tesseract couldn't load any languages!
+Could not initialize tesseract.
+
+# 提示已经很明显，需要配置TESSDATA_PREFIX环境变量
+
+# 配置环境变量和相关的语言库
+# export TESSDATA_PREFIX=/usr/local/share/
+# cd $TESSDATA_PREFIX/tessdata 
+# for font in chi_sim chi_tra eng ;do wget https://github.com/tesseract-ocr/tessdata/raw/master/$font.traineddata;done 
+
+# 再次查看语言支持
+# tesseract --list-langs
+List of available languages (3):
+chi_sim
+eng
+chi_tra
+
+
+</code></pre>
+
+<p>至此，环境中已经能够正常使用<code>tesseract</code>命令了，基本上可以认为tesseract环境已经编译完成，接下来就是具体看看如何去使用tesseract了</p>
+
+<h3 id="简单使用">简单使用</h3>
+
+<p><img src="https://img.alicdn.com/simba/img/TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg" alt="" /></p>
+
+<pre><code>$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v3.04.00 with Leptonica
+
+
+$ cat test.txt 
+走心特惠
+不玩套路
+
+
+
+</code></pre>
+
+<p>可以看出来对比较规范的字体还是可以正常识别的。</p>
+
+<h3 id="可能遇到的问题">可能遇到的问题</h3>
+
+<pre><code># 测试使用
+# tesseract 5a0178d2N01754832.jpg test -l chi_sim 
+Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
+pixReadStreamJpeg: function not present
+Error in fopenReadStream: file not found
+Error in findFileFormat: image file not found
+Error during processing.
+
+# 以上提示是因为Leptonica不支持某些图片格式
+# yum install ImageMagick -y 
+# 重新编译Leptonica(增加--with-libpng参数)
+# cd /export/servers/leptonica-1.74 ;./configure --with-libpng &amp;&amp; make &amp;&amp; make install 
+
+ 
+# 再次测试
+$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v3.04.00 with Leptonica
+
+
+$ cat test.txt 
+走心特惠
+不玩套路
+
+
+</code></pre>
+
+<h3 id="福利">福利</h3>
+
+<p>由于目前tesseract官方并未直接提供4.0的软件包，并且tesseract环境的构建也是稍微比较复杂，为了秉承造福群众的理念，我将以上环境封装成Docker image供各位网友使用。具体使用方式如下：</p>
+
+<p><code>前提：需要有一个可用的Docker环境，任何版本都可以</code></p>
+
+<pre><code># 下载镜像(稍微有点大1.6G)
+# docker pull xxbandy123/tesseract-ocr4.00.00alpha:17-12-05
+
+# 运行tesseract环境
+# docker run -itd  xxbandy123/tesseract-ocr4.00.00alpha:17-12-05
+2b4df1a1e9d20426aefa32ba79066b561fe66c623986b76634012ac9cae40e64
+
+# 进入环境测试运行
+# docker exec -it $(docker ps -a -q -l) bash
+[root@2b4df1a1e9d2 /]# tesseract
+Usage:
+  tesseract --help | --help-psm | --version
+  tesseract --list-langs [--tessdata-dir PATH]
+  tesseract --print-parameters [options...] [configfile...]
+  tesseract imagename|stdin outputbase|stdout [options...] [configfile...]
+  
+# 测试环境运行
+# wget https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg
+[root@2b4df1a1e9d2 /]# tesseract TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
+[root@2b4df1a1e9d2 /]# cat test.txt
+一天猫电器全新服务保障
+
+胁 售后无忧
+
+</code></pre>
+
+<p>测试原图<img src="https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg" alt="" /></p>
+
+<p>由此可见，开源的tesseract目前并不能完全识别所有的图片文字，如果需要借助于开源去做业务场景，可能还需要更多的二次改造才能够有所应用。</p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2017-12-09
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+    
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.github.io/tags/ocr/">OCR</a>
+          <a href="https://bgbiao.github.io/tags/tesseract4.0/">Tesseract4.0</a>
+          <a href="https://bgbiao.github.io/tags/docker/">Docker</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">Golang读写文件操作</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/post/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7%E6%8A%80%E5%B7%A7/">
+            <span class="next-text nav-default">效率工具技巧</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OCR on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/ocr/</link>
+    <description>Recent content in OCR on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 09 Dec 2017 15:59:29 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/ocr/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>开源OCR引擎tesseract的构建使用</title>
+      <link>https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sat, 09 Dec 2017 15:59:29 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</guid>
+      <description>&lt;h3 id=&#34;简介&#34;&gt;简介&lt;/h3&gt;
+
+&lt;h4 id=&#34;ocr&#34;&gt;OCR&lt;/h4&gt;
+
+&lt;p&gt;光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

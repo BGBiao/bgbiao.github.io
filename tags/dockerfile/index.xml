@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dockerfile on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/dockerfile/</link>
+    <description>Recent content in Dockerfile on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 09 Nov 2017 21:40:51 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/dockerfile/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dockerfile最佳实践</title>
+      <link>https://bgbiao.github.io/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Thu, 09 Nov 2017 21:40:51 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。&lt;/p&gt;
+
+&lt;p&gt;2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。&lt;/p&gt;
+
+&lt;p&gt;3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>手把手构建Etcd镜像</title>
+      <link>https://bgbiao.github.io/post/dockerfile-etcd/</link>
+      <pubDate>Sat, 26 Aug 2017 17:56:15 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/dockerfile-etcd/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

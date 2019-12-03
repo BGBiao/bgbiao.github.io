@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PCIe on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/pcie/</link>
+    <description>Recent content in PCIe on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 09 Nov 2017 21:27:07 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/pcie/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>基于PCIe体系结构的处理器结构组成</title>
+      <link>https://bgbiao.github.io/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/</link>
+      <pubDate>Thu, 09 Nov 2017 21:27:07 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/</guid>
+      <description>&lt;h2 id=&#34;pcie体系结构的组成部件&#34;&gt;PCIe体系结构的组成部件&lt;/h2&gt;
+
+&lt;p&gt;PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
+在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

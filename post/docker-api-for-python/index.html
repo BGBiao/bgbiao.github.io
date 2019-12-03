@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Docker的Python版API使用 - BGBiao的Ops人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 使用Docker API for Python来更好的管理容器！
+" />
+
+  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.github.io/post/docker-api-for-python/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="Docker的Python版API使用" />
+<meta property="og:description" content="
+使用Docker API for Python来更好的管理容器！
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.github.io/post/docker-api-for-python/" />
+
+<meta itemprop="name" content="Docker的Python版API使用">
+<meta itemprop="description" content="
+使用Docker API for Python来更好的管理容器！
+">
+
+
+
+<meta itemprop="wordCount" content="4473">
+
+
+
+<meta itemprop="keywords" content="Docker,Python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Docker的Python版API使用"/>
+<meta name="twitter:description" content="
+使用Docker API for Python来更好的管理容器！
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的运维人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的运维人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Docker的Python版API使用</h1>
+      
+      <div class="post-meta">
+        <time datetime="0001-01-01" class="post-time">
+          0001-01-01
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#一-初始化客户端">一、初始化客户端</a>
+<ul>
+<li><a href="#1-docker客户端的初始化工作">1.Docker客户端的初始化工作</a></li>
+</ul></li>
+<li><a href="#二-api方法使用示例">二、api方法使用示例</a>
+<ul>
+<li><a href="#1-login方法定义">1. login方法定义</a></li>
+<li><a href="#2-images-类定义">2.images 类定义：</a></li>
+<li><a href="#3-docker管理容器相关">3.docker管理容器相关</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>使用Docker API for Python来更好的管理容器！</p>
+</blockquote>
+
+<p><code>客户端初始化的三种方法</code></p>
+
+<pre><code>import docker
+docker.api()
+docker.APIClient()
+docker.client()
+docker.DockerClient() 其实就是docker.client()的一个子集
+docker.from_env() 其实也是docker.client()的一个子集
+
+</code></pre>
+
+<h3 id="一-初始化客户端">一、初始化客户端</h3>
+
+<h4 id="1-docker客户端的初始化工作">1.Docker客户端的初始化工作</h4>
+
+<pre><code>&gt;&gt;&gt; import docker
+&gt;&gt;&gt; client = docker.APIClient(base_url='unix://var/run/docker.sock’,version='1.21',timeout=5)
+&gt;&gt;&gt; client.version()
+{u'ApiVersion': u'1.21’,
+ u'Arch': u'amd64',
+ u'BuildTime': u'2016-09-27T23:38:15.810178467+00:00',
+ u'Experimental': True,
+ u'GitCommit': u'45bed2c',
+ u'GoVersion': u'go1.6.3',
+ u'KernelVersion': u'4.4.22-moby',
+ u'Os': u'linux',
+ u'Version': u'1.12.2-rc1'}
+</code></pre>
+
+<pre><code>   Args:
+      base_url (str): 指定链接路径，可以通过socket或者tcp方式链接
+          ``unix:///var/run/docker.sock`` or ``tcp://127.0.0.1:1234``.
+      version (str): 指定API使用的版本(docker=2.0.0默认的api版本是1.24,最低支持1.21,docker1.9+的api是1.21),因此在使用python的docker模块时一定要注意docker的api以及docker模块的api是否兼容。当然如果设置为 ``auto`` 降回去自动检测server的版本
+      timeout (int): 使用API调用的默认超时时间，默认单位为秒
+      tls (bool or :py:class:`~docker.tls.TLSConfig`): Enable TLS. Pass
+          ``True`` to enable it with default options, or pass a
+          :py:class:`~docker.tls.TLSConfig` object to use custom
+          configuration.
+</code></pre>
+
+<p><strong>查看docker引擎当前版本:</strong></p>
+
+<pre><code>$ sudo docker version
+Client:
+ Version:      1.9.1
+ API version:  1.21
+ Go version:   go1.4.3
+ Git commit:   a34a1d5-dirty
+ Built:        Tue Mar 28 15:39:19 UTC 2017
+ OS/Arch:      linux/amd64
+
+Server:
+ Version:      1.9.1
+ API version:  1.21
+ Go version:   go1.4.3
+ Git commit:   a34a1d5-dirty
+ Built:        Tue Mar 28 15:39:19 UTC 2017
+ OS/Arch:      linux/amd64
+</code></pre>
+
+<p><strong>The sdk of docker for python&ndash;docker==2.0.0:</strong></p>
+
+<pre><code>1.丢弃了python2.6的支持
+2.最低支持API版本为1.12(Engine version 1.9.0+)
+3.`docker.Client`被替换成`docker.APIClient`
+4.`docker.from_env`初始化一个docker客户端实例代替了`APIClient `实例 
+5.从`APIClient.start`中移除了HostConfig参数
+6.开始由之前的docker-py模块变为docker
+7.`docker.ssladapter`替换为`docker.transport.ssladapter`
+</code></pre>
+
+<p>####2.Docker客户端的具体方法</p>
+
+<pre><code>import docker
+C  = docker.DockerClient(base_url='unix://var/run/docker.sock',version='auto',timeout=10)
+
+##docker相关的方法使用
+使用DockerClient对象，会有以下方法：
+C.api,
+C.containers,
+C.events,
+C.from_env,
+C.images,
+C.info,
+C.login,
+C.networks,
+C.nodes,
+C.ping,
+C.services,
+C.swarm,
+C.version,
+C.volumes,
+
+
+#输出docker的相关信息，相当于docker info
+C.info()
+</code></pre>
+
+<h3 id="二-api方法使用示例">二、api方法使用示例</h3>
+
+<h4 id="1-login方法定义">1. login方法定义</h4>
+
+<pre><code>C.login()
+login(*args, **kwargs) method of docker.client.DockerClient instance
+    Authenticate with a registry. Similar to the ``docker login`` command.
+    
+    Args:
+        username (str): The registry username
+        password (str): The plaintext password
+        email (str): The email for the registry account
+        registry (str): URL to the registry.  E.g.
+            ``https://index.docker.io/v1/``
+        reauth (bool): Whether refresh existing authentication on the
+            Docker server.
+        dockercfg_path (str): Use a custom path for the ``.dockercfg`` file
+    (default ``$HOME/.dockercfg``)
+    
+    Returns:返回的错误日志信息
+        (dict): The response from the login request
+
+          Raises:
+        :py:class:`docker.errors.APIError`
+            If the server returns an error.
+
+##使用login方法登录
+C.login('xxbandy123','nslalla')
+
+</code></pre>
+
+<h4 id="2-images-类定义">2.images 类定义：</h4>
+
+<pre><code>build方法
+get方法：
+get(self, name)
+    Gets an image.
+    
+    Args:
+        name (str): The name of the image.
+    
+    Returns:
+        (:py:class:`Image`): The image.
+    
+    Raises:
+        :py:class:`docker.errors.ImageNotFound` If the image does not
+        exist.
+        :py:class:`docker.errors.APIError`
+            If the server returns an error.
+list方法：
+   list(self, name=None, all=False, filters=None)
+    List images on the server.
+    
+    Args:
+        name (str): Only show images belonging to the repository ``name``
+        all (bool): Show intermediate image layers. By default, these are
+            filtered out.
+        filters (dict): Filters to be processed on the image list.
+            Available filters:
+            - ``dangling`` (bool)
+            - ``label`` (str): format either ``key`` or ``key=value``
+    
+    Returns:
+        (list of :py:class:`Image`): The images.
+    
+    Raises:
+        :py:class:`docker.errors.APIError`
+            If the server returns an error.
+</code></pre>
+
+<p>示例：</p>
+
+<pre><code>查看默认所有的镜像文件，以image-id进行区分
+In [34]: C.images.list()
+Out[34]: 
+[&lt;Image: 'busybox:latest'&gt;,
+ &lt;Image: 'rancher-server:latest', 'rancher/server:latest'&gt;,
+ &lt;Image: 'singleuser:latest'&gt;,
+ &lt;Image: 'registry:2'&gt;,
+ &lt;Image: 'rancher-agent:latest', 'rancher/agent:v1.0.2'&gt;]
+</code></pre>
+
+<pre><code>load方法：相当于docker load
+
+pull方法：下载镜像文件
+ pull(self, name, **kwargs)
+    Pull an image of the given name and return it. Similar to the
+    ``docker pull`` command.
+    
+    If you want to get the raw pull output, use the
+    :py:meth:`~docker.api.image.ImageApiMixin.pull` method in the
+    low-level API.
+    
+    Args:
+        repository (str): The repository to pull
+        tag (str): The tag to pull
+        insecure_registry (bool): Use an insecure registry
+        auth_config (dict): Override the credentials that
+            :py:meth:`~docker.client.DockerClient.login` has set for
+            this request. ``auth_config`` should contain the ``username``
+            and ``password`` keys to be valid.
+    
+    Returns:
+        (:py:class:`Image`): The image that has been pulled.
+
+需要注意的是：使用pull的时候，会弱匹配所有的tag标签
+
+push方法：上传镜像文件
+
+push(self, repository, tag=None, **kwargs)
+    Push an image or a repository to the registry. Similar to the ``docker
+    push`` command.
+    
+    Args:
+        repository (str): The repository to push to
+        tag (str): An optional tag to push
+        stream (bool): Stream the output as a blocking generator
+        insecure_registry (bool): Use ``http://`` to connect to the
+            registry
+        auth_config (dict): Override the credentials that
+            :py:meth:`~docker.api.daemon.DaemonApiMixin.login` has set for
+            this request. ``auth_config`` should contain the ``username``
+            and ``password`` keys to be valid.
+    
+    Returns:
+        (generator or str): The output from the server.
+    
+    Raises:
+        :py:class:`docker.errors.APIError`
+
+remove方法：docker rmi 
+ remove(self, *args, **kwargs)
+    Remove an image. Similar to the ``docker rmi`` command.
+    
+    Args:
+        image (str): The image to remove
+        force (bool): Force removal of the image
+        noprune (bool): Do not delete untagged parents
+
+search方法：
+search(self, *args, **kwargs)
+    Search for images on Docker Hub. Similar to the ``docker search``
+    command.
+    
+    Args:
+        term (str): A term to search for.
+    
+    Returns:
+        (list of dicts): The response of the search.
+
+</code></pre>
+
+<h4 id="3-docker管理容器相关">3.docker管理容器相关</h4>
+
+<p>C.containers类，下面有相关的方法：
+* client
+* create
+* get
+* list
+* model
+* run &hellip;</p>
+
+<p>列出当前存活的容器：</p>
+
+<pre><code>C.containers.list()
+</code></pre>
+
+<p>列出指定容器：</p>
+
+<pre><code>C.containers.get('')
+</code></pre>
+
+<p>创建容器：</p>
+
+<pre><code>C.containers.create
+create(image, command=None, **kwargs) method of docker.models.containers.ContainerCollection instance
+    Create a container without starting it. Similar to ``docker create``.
+    
+    Takes the same arguments as :py:meth:`run`, except for ``stdout``,
+    ``stderr``, and ``remove``.
+    
+    Returns:
+        A :py:class:`Container` object.
+    
+    Raises:
+        :py:class:`docker.errors.ImageNotFound`
+            If the specified image does not exist.
+        :py:class:`docker.errors.APIError`
+            If the server returns an error.
+
+
+run一个容器：类似于命令行的docker run方法
+run(image, command=None, stdout=True, stderr=False, remove=False, **kwargs) method of docker.models.containers.ContainerCollection instance
+    Run a container. By default, it will wait for the container to finish
+    and return its logs, similar to ``docker run``.
+    
+    如果'detach'参数设置为'True',他将立即返回一个Container对象，类似于'docker run -d'    
+    实例:
+        运行一个容器并获取输出。
+    
+        &gt;&gt;&gt; import docker
+        &gt;&gt;&gt; client = docker.from_env()
+        &gt;&gt;&gt; client.containers.run('alpine', 'echo hello world')
+        b'hello world\n'
+    
+        后台运行一个容器:
+        &gt;&gt;&gt; container = client.containers.run('bfirsh/reticulate-splines',
+                                              detach=True)
+        获取该容器的日志信息
+        &gt;&gt;&gt; container.logs()
+        'Reticulating spline 1...\nReticulating spline 2...\n'
+
+   参数介绍:
+        image (str): run一个容器所需要的镜像(str类型)
+        command (str or list): 容器启动默认运行的命令(字符串或者列表类型).
+
+        blkio_weight_device: 设置设备Block IO 权重：``[{&quot;Path&quot;: &quot;device_path&quot;, &quot;Weight&quot;: weight}]``.
+        blkio_weight: 设置block IO 的权重 范围10-1000.
+        cap_add (list of str): 增加内核特性 比如：``[&quot;SYS_ADMIN&quot;, &quot;MKNOD&quot;]``.
+        cap_drop (list of str): 删除内核特性
+        cpu_group (int): 每颗cpu的长度
+        cpu_period (int): 容器在每一个cpu的时间周期内可以得到多少的的cpu时间(ms)
+        cpu_shares (int): 共享cpu权重CPU 相对权重
+        cpuset_cpus (str): 绑定cpu的执行 (``0-3``,``0,1``).
+
+        detach (bool): 后台运行一个容器，布尔类型值.相当于docker run -d选项
+
+        device_read_bps: 从一个设备上限制读速率(bytes/s) `[{&quot;Path&quot;: &quot;device_path&quot;, &quot;Rate&quot;: rate}]`
+        device_read_iops: 从一个设备中限制读取速率(IO/s)
+        device_write_bps: 从一个设备上限制写速率(bytes/s)
+        device_write_iops: 从一个设备中限制读取速率(IO/s)
+        devices (list): 映射主机的设备到容器中``&lt;path_on_host&gt;:&lt;path_in_container&gt;:&lt;cgroup_permissions&gt;``.
+        dns (list): 配置当前的dns-server
+        dns_opt (list): 添加额外的dns参数选项到容器内部，比如resolv.conf文件
+        dns_search (list): 设置dns搜索域
+        domainname (str or list): 设置当前dns搜索域名
+
+        entrypoint (str or list): 为容器设置入口,覆盖镜像中的entrypoint
+
+        environment (dict or list): 内部环境变量[&quot;SOMEVARIABLE=xxx&quot;]``
+        extra_hosts (dict): 在容器内部添加额外的主机名解析(本地hosts文件)
+        group_add (list): 设置容器内部进程运行时额外的组名（gid）
+
+        hostname (str): 容器设置额外的主机名.相当于docker run -h/--hostname 选项
+
+        ipc_mode (str): 为容器设置ipc模式
+        isolation (str): 隔离技术的使用Default: `None`.
+        labels (dict or list): 一个k/v类型的标签存储``{&quot;label1&quot;: &quot;value1&quot;, &quot;label2&quot;: &quot;value2&quot;}``)或一个列表类型的k/v存储``[&quot;label1&quot;, &quot;label2&quot;]``
+        links (dict or list of tuples): 为容器映射一个别名``(name, alias)`` 
+        log_config (dict): 容器的日志配置。
+            keys:
+            - ``type`` The logging driver name.
+            - ``config`` A dictionary of configuration for the logging
+              driver.
+        mac_address (str): 绑定mac地址.
+
+        mem_limit (float or str): 内存限制，允许浮点型数据或单位区分的字符串(``100000b``, ``1000k``, ``128m``, ``1g``). 如果一个字符串没有指定单位，默认会使用字节(bytes)
+        mem_limit (str or int): 容器可以使用的最大内存数量(e.g. ``1G``).
+
+        mem_swappiness (int): 调整容器内存的swappiness行为状态，允许的数值为0-100 
+        memswap_limit (str or int): 最大内存限制，容器可用的内存为(memory+swap)
+        networks (list): 设置连接到该容器网络的名称
+        name (str): 为容器设置名字
+        network_disabled (bool): 禁用容器网络
+        network_mode (str): 网络模式 相当于docker run --net='none'
+    
+            - ``bridge`` 默认使用桥接模式
+            - ``none`` 无网络模式
+            - ``container:&lt;name|id&gt;`` 重用另外一个容器的网络
+            - ``host`` 使用本机的网络栈
+
+
+        oom_kill_disable (bool): 是否启用OOM
+        oom_score_adj (int): 一个整数，以调整OOM的整体性能.
+        pid_mode (str): pid模式，如果设置为'host',在容器内部将会使用宿主机的host pid
+        pids_limit (int): 调整容器的pid的限制。'-1'表示不限制
+
+        ports (dict): 为容器内部绑定端口 相当于docker run -p 
+    		实例：
+              ``{'2222/tcp': 3333}`` 暴露容器内部的2222端口到本机的3333端
+              ``{'2222/tcp': None}`` 将容器内部的2222随机映射到本机
+              ``{'1111/tcp': ('127.0.0.1', 1111)}``.
+              ``{'1111/tcp': [1234, 4567]}`` 绑定多个端口
+
+
+		privileged (bool): 给容器额外的特权
+
+        publish_all_ports (bool): 开放所有的端口到本机上 相当于docker run -P 
+
+        read_only (bool): 以只读方式挂载容器的根文件系统
+        remove (bool): 当容器退出的时候删除，默认是'False'
+        restart_policy (dict): 当容器退出时重启容器
+            配置参数如下：
+            - ``Name`` One of ``on-failure``, or ``always``.
+            - ``MaximumRetryCount`` 容器失败多少次后进行重启
+            实例:
+            ``{&quot;Name&quot;: &quot;on-failure&quot;, &quot;MaximumRetryCount&quot;: 5}``
+    
+        security_opt (list): 设置安全标签，类似于selinux
+        shm_size (str or int): /dev/shm 的大小(e.g. ``1G``).
+
+        stdin_open (bool): 保持 ``STDIN`` 打开即使没有attach到容器内部相当于docker run -i
+
+        stdout (bool): 当detach=False的时候，从'STDOUT'返回日志。默认为True
+        stdout (bool): 当detach=False的时候，从'STDERR'返回日志，默认为False
+        stop_signal (str): 设置用于停止容器的信号。(e.g. ``SIGINT``).
+        sysctls (dict): 容器内部设置内核参数
+        tmpfs (dict): 挂载临时文件系统 
+                        .. code-block:: python
+    
+                {
+                    '/mnt/vol2': '',
+                    '/mnt/vol1': 'size=3G,uid=1000'
+                }
+    
+        tty (bool): 分配一个tty 相当于docker run -t
+
+        ulimits (list): 在容器内部设置ulimits值，一个字典类型的列表
+        user (str or int): 设置容器启动的用户名以及id
+
+        userns_mode (str): 为容器设置用户的命名空间模式，当用户的namespace的remapping参数被启用的时候，支持参数有'host'
+            values are: ``host``
+        volume_driver (str): 数据卷挂载驱动名
+        volumes (dict or list): 一个字典配置，将外部数据卷挂载到容器内部，key是主机或者数据卷的名字，value是带有key的字典：
+        		实例：
+                {'/home/user1/': {'bind': '/mnt/vol2', 'mode': 'rw'},
+                 '/var/www': {'bind': '/mnt/vol1', 'mode': 'ro'}}
+    
+        volumes_from (list): 获取容器名或者id标识。
+        working_dir (str): 容器默认的工作目录
+    
+    返回参数:
+        容器的日志，包含 ``STDOUT``, ``STDERR``
+        If ``detach`` is ``True``, a :py:class:`Container` object is
+        returned instead.
+    
+    异常信息:
+    	如果容器以非0状态退出，或者`detach`参数为`False`
+        :py:class:`docker.errors.ContainerError`
+        如果指定的镜像不存在
+        :py:class:`docker.errors.ImageNotFound`
+        如果是服务返回一个错误
+        :py:class:`docker.errors.APIError`
+            If the server returns an error.
+</code></pre>
+
+<p>示例：
+一个完整的创建容器的例子：</p>
+
+<pre><code>Command line:
+$ docker run -itd -P --cpuset_cpus='0,1' --cpu_shares=2 --cpu_period=10000 --hostname=xxbandy --mem_limit=512m --net=none --oom_kill_disable=True -P -u admin busybox /bin/sh
+
+Python API:
+c1 = C.containers.run('busybox',command='/bin/sh',name='xxb-test',detach=True,tty=True,stdin_open=True,cpuset_cpus='0,1',cpu_shares=2,cpu_period=10000,hostname='xxbandy',mem_limit='512m',network_mode='none',oom_kill_disable=True,publish_all_ports=True,user='root')
+
+查看容器相关信息：
+容器id，64位的字符
+In [20]: c1.id
+Out[20]: '499db0824206d61d09db2f36c70aa84bdb1a4b6d508b001a618d2010a23fea7e'
+
+
+c1.logs 
+c1.name      获取容器名信息
+c1.reload
+c1.remove    删除容器信息，相当于docker rm 参数：c1.remove(v=True,link=True,force=True)
+c2.rename	 重命名容器名，相当于docker renmame oldname newname
+c1.resize	 设置tty session信息
+c1.restart   重启容器信息
+c1.start     启动容器信息
+c1.stats     容器状态
+
+c1.update    动态调整容器内部信息（blkio_weight，cpu_period，cpu_quota，cpu_shares，cpuset_cpus，cpuset_mems，mem_limit，mem_reservation）
+    Args:
+        blkio_weight (int): 块IO权重比例（10-100）
+        cpu_period (int): 限制cpu公平调度周期
+        cpu_quota (int): 限制cpu公平调度配额
+        cpu_shares (int): 设置cpu共享权重
+        cpuset_cpus (str): 指定cpu执行(0-3, 0,1)
+        cpuset_mems (str): 指定cpu内存的执行(0-3, 0,1)
+        mem_limit (int or str): 内存限制
+        mem_reservation (int or str): 内存软限制
+        memswap_limit (int or str): swap限制总的可使用内存限制(memory + swap)，-1表示关闭swap
+        kernel_memory (int or str): 内核内存限制
+        restart_policy (dict): 重启策略
+</code></pre>
+
+<p><code>注意:</code>update方法在docker1.10之后才增加了改功能</p>
+
+<pre><code>查看容器相关信息：
+容器id，64位的字符
+In [20]: c1.id
+Out[20]: '499db0824206d61d09db2f36c70aa84bdb1a4b6d508b001a618d2010a23fea7e'
+
+可以在/sys/fs/cgroup/memory/docker目录下面查看到每个容器的相关cgroup配置信息。
+查看内存信息：
+# grep hierarchical memory.stat     分别显示容器的内存限制和swap限制
+hierarchical_memory_limit 536870912
+hierarchical_memsw_limit 1073741824
+
+#cat memory.limit_in_bytes
+536870912
+
+可以在/sys/fs/cgroup/cpuset/docker目录下面查看到容器cpu的相关配置
+# cat cpuset.cpus       显示当前绑定的cpu信息
+0-1
+使用docker update动态调整内存信息:
+docker update -m 1024M xuxuebiao-test
+
+# cat memory.limit_in_bytes 
+1073741824
+# grep hierarchical_memory_limit memory.stat 
+hierarchical_memory_limit 1073741824
+</code></pre>
+
+<p>个人博客：<a href="https://my.oschina.net/xxbAndy/blog">https://my.oschina.net/xxbAndy/blog</a>
+微信公众号：</p>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/2577135-5d2191eacf61c6dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="wechat.png" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      0001-01-01
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+    
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.github.io/tags/docker/">Docker</a>
+          <a href="https://bgbiao.github.io/tags/python/">Python</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/ansible-etcd-cluster/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">使用Ansible快速部署Etcd集群</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

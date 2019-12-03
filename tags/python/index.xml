@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/python/</link>
+    <description>Recent content in Python on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 28 Oct 2018 14:14:39 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用Python来操作Hive中的数据</title>
+      <link>https://bgbiao.github.io/post/operatehivewithpython/</link>
+      <pubDate>Sun, 28 Oct 2018 14:14:39 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/operatehivewithpython/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了&lt;a href=&#34;http://hive.apache.org/&#34;&gt;Hive&lt;/a&gt;作为数据仓库工具，同时使用&lt;a href=&#34;https://github.com/cloudera/hue&#34;&gt;Hue&lt;/a&gt;来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;本篇简单记录下使用Python操作Hive。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>使用Python操作MySQL</title>
+      <link>https://bgbiao.github.io/post/operatemysqlwithpython/</link>
+      <pubDate>Sat, 27 Oct 2018 13:53:40 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/operatemysqlwithpython/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Docker的Python版API使用</title>
+      <link>https://bgbiao.github.io/post/docker-api-for-python/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/docker-api-for-python/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;使用Docker API for Python来更好的管理容器！&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

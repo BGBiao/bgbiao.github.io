@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Etcd on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/etcd/</link>
+    <description>Recent content in Etcd on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 03 Nov 2017 09:11:57 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/etcd/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用Docker镜像快速启动Etcd集群</title>
+      <link>https://bgbiao.github.io/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</link>
+      <pubDate>Fri, 03 Nov 2017 09:11:57 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</guid>
+      <description>&lt;p&gt;本篇文章上接&lt;a href=&#34;https://xxbandy.github.io/2017/08/26/Dockerfile-etcd/&#34;&gt;自构建etcd镜像&lt;/a&gt;来使用systemd工具利用自构建的etcd镜像快速的搭建一套高可用的etcd集群。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>手把手构建Etcd镜像</title>
+      <link>https://bgbiao.github.io/post/dockerfile-etcd/</link>
+      <pubDate>Sat, 26 Aug 2017 17:56:15 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/dockerfile-etcd/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>使用Ansible快速部署Etcd集群</title>
+      <link>https://bgbiao.github.io/post/ansible-etcd-cluster/</link>
+      <pubDate>Sat, 26 Aug 2017 15:51:12 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/ansible-etcd-cluster/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本篇文章记录一下使用&lt;code&gt;ansible-playbooks&lt;/code&gt;进行快速构建一个可用的etcd集群。在阅读并实践本文章之前，请确保您有一个可用的&lt;code&gt;ansible&lt;/code&gt;环境。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

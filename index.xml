@@ -386,6 +386,412 @@ $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
     </item>
     
     <item>
+      <title>Prometheus入门实践</title>
+      <link>https://bgbiao.github.io/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</guid>
+      
+        <description>&lt;h2 id=&#34;prometheus入门实践&#34;&gt;Prometheus入门实践&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
+&lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
+&lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;一-基本原理&#34;&gt;一、基本原理&lt;/h3&gt;
+
+&lt;p&gt;通过&lt;code&gt;HTTP协议周期性抓取被监控组件的状态&lt;/code&gt;,任意组件只要提供对应的HTTP接口就可以接入监控。&lt;/p&gt;
+
+&lt;p&gt;输出被监控组件信息的HTTP接口被叫做&lt;code&gt;exporter&lt;/code&gt;,也就是数据采集端，通常来说，最需要接入改造的就是expoter. 当前互联网上已经有很多成熟的&lt;code&gt;exporter&lt;/code&gt;组件，当然用户也可用根据官方提供的sdk自行编写exporter.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.bookstack.cn/read/prometheus-manual/instrumenting-exporters.md&#34;&gt;开箱即用的exporter&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://prometheus.io/docs/instrumenting/clientlibs/&#34;&gt;官方的sdk&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/oliver006/redis_exporter&#34;&gt;redis-exporter&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:prometheus的时间序列数据分为四种类型&lt;/code&gt;
+- Counter: 收集的数据是按照某个趋势（增加／减少）一直变化的，我们往往用它记录服务请求总量，错误总数等
+- Gauge: 搜集的数据是一个瞬时的，与时间没有关系，可以任意变高变低，往往可以用来记录内存使用率、磁盘使用率等
+- Histogram: 用于表示一段时间范围内对数据进行采样,并能够对其指定区间以及总数进行统计，通常我们用它计算分位数的直方图。
+- Summary: 和Histogram类似，用于表示一段时间内数据采样结果。它直接存储了 quantile 数据，而不是根据统计区间计算出来的&lt;/p&gt;
+
+&lt;h3 id=&#34;二-组件介绍&#34;&gt;二、组件介绍&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1. Prometheus-server: 负责&lt;code&gt;数据采集和存储(TSDB)&lt;/code&gt;,提供PromQL查询语言的支持&lt;/li&gt;
+&lt;li&gt;2. Alertmanager: 警告管理器，用来进行报警&lt;/li&gt;
+&lt;li&gt;3. Push Gateway: 支持临时性Job主动推送指标的中间网关(通常对应于短声明周期的任务监控)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;三-服务过程&#34;&gt;三、服务过程&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1. &lt;code&gt;Prometheus Daemon&lt;/code&gt;定时去目标上抓取&lt;code&gt;metrics(指标)数据&lt;/code&gt;,每个抓取目标需要暴露一个http服务的接口给server进行定时获取。支持配置文件、文本文件、Zookeeper、Consul、DNS SRV Lookup方式抓取目标；对于长生命周期的服务，采用Pull模式定期拉取数据，对于段生命周期的任务，通过push-gateway来主动推送数据&lt;/li&gt;
+&lt;li&gt;2. &lt;code&gt;Prometheus&lt;/code&gt;本地存储抓取的所有数据，并通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。&lt;/li&gt;
+&lt;li&gt;3. Prometheus通过PromQL和其他API可视化地展示收集的数据. 可以作为&lt;code&gt;Grafana&lt;/code&gt;的数据源进行图标输出，也可通过API对外提供数据展示&lt;/li&gt;
+&lt;li&gt;4. &lt;code&gt;PushGateway&lt;/code&gt;支持client主动推送metrics到push-gateway(相当于是一个常驻的exporter服务),prometheus定期去push-gateway中获取数据&lt;/li&gt;
+&lt;li&gt;5. &lt;code&gt;Alertmanager&lt;/code&gt;是独立于prometheus的一个组件，支持PromQL查询语句，提供灵活的报警功能&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;四-pronetheus服务构建使用&#34;&gt;四、pronetheus服务构建使用&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;下载地址&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;源码安装&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 三个组件
+$ wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz -O node_exporter-0.18.1.tar.gz
+
+$ wget https://github.com/prometheus/prometheus/releases/download/v2.10.0/prometheus-2.10.0.linux-amd64.tar.gz -O prometheus-2.10.0.linux-amd64.tar.gz
+
+$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;docker方式安装&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:prometheus默认使用yaml格式来定义配置文件&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 编写prometheus默认配置文件
+$ cat prometheus.yml
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - &amp;quot;first.rules&amp;quot;
+  # - &amp;quot;second.rules&amp;quot;
+
+scrape_configs:
+  # 会在每个metrics数据中增加job=&amp;quot;prometheus&amp;quot;和instance=&amp;quot;localhost:9090&amp;quot;的基本数据
+  - job_name: prometheus
+    static_configs:
+      - targets: [&#39;localhost:9090&#39;]
+
+# 热启动prometheus服务
+$ docker run --name=prometheus -d -p 9090:9090  -v /Users/xuxuebiao/Desktop/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
+
+$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+5e1698a320b2        prom/prometheus     &amp;quot;/bin/prometheus -...&amp;quot;   3 days ago          Up 2 minutes        0.0.0.0:9090-&amp;gt;9090/tcp   prometheus
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; prometheus为golang编写的程序，因此只有一个二进制文件，使用&amp;ndash;config.file来制定配置文件，使用&amp;ndash;web.enable-lifecycle来启用远程热加载配置文件. 调用指令&lt;code&gt;curl -X POST http://localhost:9090/-/reload&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;此时可以访问&lt;a href=&#34;http://localhost:9090&#34;&gt;prometheus-web&lt;/a&gt;即可查看prometheus的状态页面。此时它会每30s对自己暴露的http metrics数据进行采集。可以访问prometheus本身的&lt;a href=&#34;http://localhost:9090/metrics&#34;&gt;metrics数据&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e6e1d386fcd43a0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus-graph&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-64dcaa81e432aa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus-metrics&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-746ef7f040089d80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus-当前收集上来的指标项&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-5d97ef27b313ef6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;go-info指标&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-943befcf74a6d6a0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;单metrics指标数据&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;通过node exporter提供metrics&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 启动node-exporter
+$ docker run -d --name=node-exporter -p 9100:9100  prom/node-exporter
+$ docker ps -l
+CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                    NAMES
+0f60bcce1ea6        prom/node-exporter   &amp;quot;/bin/node_exporter&amp;quot;   3 days ago          Up 42 seconds       0.0.0.0:9100-&amp;gt;9100/tcp   node-exporter
+# 查看服务暴露的metrics
+$ curl http://localhost:9100/metrics
+
+# 将配置暴露给prometheus，并重载prometheus
+$ cat prometheus.yml
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - &amp;quot;first.rules&amp;quot;
+  # - &amp;quot;second.rules&amp;quot;
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: [&#39;localhost:9090&#39;]
+			# 增加一个target 并附加一个label来标记该metrics
+      # 注意:在prometheus启动时增加了一些参数,因此target不需要写协议和uri(http和/metrics)
+      - targets: [&#39;10.13.13.60:9100&#39;]
+        labels:
+          group: &amp;quot;client-node-exporter&amp;quot;
+
+
+# prometheus服务重载
+$ curl -X POST http://localhost:9090/-/reload
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-0daae077328b80f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;node-exporter数据采集到prometheus&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-4461cc2d08501e1f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;node-exporter采集的15分钟平均负载&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:如果需要同时查找多个项，其实需要熟悉prometheus的表达式编写&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;五-安装pushgateway&#34;&gt;五、安装pushgateway&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:push-gateway服务启动后也需要将endpoint加入prometheus中&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 启动push-gateway服务
+docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
+
+# 查看push-gateway服务
+$ curl localhost:9091
+
+# 测试push一条metrics数据到Push-gateway
+echo &amp;quot;tps 100&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+
+# 多指标推送
+cat &amp;lt;&amp;lt;EOF | curl --data-binary @- http://localhost:9091/metrics/job/xxb/instance/bgbiao
+tps{label=&amp;quot;xxb&amp;quot;} 8800
+tps1 100
+tps2 160
+tps3 160
+EOF
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e7a94dd04483137d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;push-gateway服务&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-1956a56a26dda95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus增加push-gateway&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-1b3319b62dfd036d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;push-gateway采集上来的数据&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e2e614fc197f2a50.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus上查看push-gateway上报的数据&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;六-安装grafana进行图标展示&#34;&gt;六、安装Grafana进行图标展示&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;# 创建grafana服务
+$ docker run -d -p 3000:3000 --name grafana grafana/grafana
+
+$ curl localhost:3000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;添加数据源，以及基本数据验证&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 向prometheus的push-gateway上主动push数据模拟数据上报
+➜  Desktop echo &amp;quot;tps 10&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &amp;quot;tps 9&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &amp;quot;tps 20&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &amp;quot;tps 30&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &amp;quot;tps 310&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &amp;quot;tps 222&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-d442c89b5796b2da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;grafana数据源配置&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-6f234d69ad8ff8e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;grafana查看prometheus中收集的metrics数据&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;七-安装altermanager&#34;&gt;七、安装AlterManager&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;Prometheus&lt;/code&gt;中的告警由独立的两部分组成
+- 1. Prometheus服务中的警告规则发送警告到Alertmanager
+- 2. Alertmanager管理这些警告.包含:silencing, inhibition, aggregation 并通过一些方式发送通知&lt;/p&gt;
+
+&lt;p&gt;建立告警和通知的基本步骤:
+- 1. 创建和配置alertmanager
+- 2. 启动prometheus服务时，通过alertmanager.url 配置报警服务alertmanager服务，prometheus和alertmanager通信连接&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;启动altermanager服务&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 编辑alertmanager配置文件
+$cat alertmanager.yml
+global:
+  resolve_timeout: 5m
+route:
+  group_by: [&#39;cqh&#39;]
+  group_wait: 10s #组报警等待时间
+  group_interval: 10s #组报警间隔时间
+  repeat_interval: 1m #重复报警间隔时间
+  receiver: &#39;web.hook&#39;
+receivers:
+  - name: &#39;web.hook&#39;
+    webhook_configs:
+      - url: &#39;http://10.13.118.71:8889/open/test&#39;
+inhibit_rules:
+  - source_match:
+      severity: &#39;critical&#39;
+    target_match:
+      severity: &#39;warning&#39;
+    equal: [&#39;alertname&#39;, &#39;dev&#39;, &#39;instance&#39;]
+
+# 启动服务
+$ docker run -d -p 9093:9093 --name alertmanager -v /Users/xuxuebiao/Desktop/alertmanager.yml:/etc/alertmanager/alertmanager.yml prom/alertmanager
+
+$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+c6ba74bfd03b        prom/alertmanager   &amp;quot;/bin/alertmanager...&amp;quot;   3 days ago          Up 7 seconds        0.0.0.0:9093-&amp;gt;9093/tcp   alertmanager
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-f2e6dec465c35f4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;alertmanager服务&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;在prometheus中配置altermanager服务&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 编辑rule配置
+$ cat rules.yml
+groups:
+  # tps 超过150 并且持续10s就报警告通知
+  - name: bgbiao
+    rules:
+      - alert: bgbiao测试
+        expr: tps &amp;gt; 150
+        for: 10s
+        labels:
+          status: warning
+        annotations:
+          summary: &amp;quot;{{$labels.instance}}:tps 超过阈值150.&amp;quot;
+          description: &amp;quot;{{$labels.instance}}:tps 超过阈值!. 当前值: {{ $value }}&amp;quot;
+
+
+
+# 修改prometheus主配置文件
+$ cat prometheus.yml
+global:
+  # 默认抓取时间间隔为15s
+  scrape_interval:     15s
+  # 计算rule的间隔
+  evaluation_interval: 15s
+  # 定义额外的label
+  external_labels:
+    monitor: &amp;quot;bgbiao-monitor&amp;quot;
+
+rule_files:
+  - /etc/prometheus/rules.yml
+  # - &amp;quot;first.rules&amp;quot;
+  # - &amp;quot;second.rules&amp;quot;
+
+# 抓取对象
+scrape_configs:
+  - job_name: prometheus
+    # 重写数据抓取时间(局部生效)
+    scrape_interval: 5s
+    static_configs:
+      - targets: [&#39;localhost:9090&#39;]
+        labels:
+          group: &amp;quot;prom&amp;quot;
+      - targets: [&#39;10.13.118.71:9100&#39;]
+        labels:
+          group: &amp;quot;node-exporter&amp;quot;
+      - targets: [&#39;10.13.118.71:9091&#39;]
+        labels:
+          group: &amp;quot;push-gateway&amp;quot;
+
+# 配置报警对象
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: [&amp;quot;10.13.118.71:9093&amp;quot;]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;重载prometheus服务&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -X POST http://localhost:9090/-/reload
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;重新导入数据测试&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 循环向push-gateway推送数据
+$ cat test-abc.sh
+#!/bin/bash
+#Author_by:Andy_xu @JR-OPS
+num=`date +%s | cut -c10-13`
+metrics=`date +%s | cut -c${num}-13`
+echo $metrics
+echo &amp;quot;tps $metrics&amp;quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-b710723c6e4f9e9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;模拟报警数据&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-2e90930e7db5d1e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;alertmanager中显示的报警规则&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e3fb656620be40e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus中已出现红色报警&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-1e0a57bafbb71e5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus报警详细内容&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;八-后续优化&#34;&gt;八、后续优化&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 此时使用prometheus可以监控到基础服务的资源使用情况，并且也可用借用&lt;code&gt;alertmanager&lt;/code&gt;服务对相关报警规则进行检测和报警，那么需要如何把相关报警及时的通知到相关负责人呢。我们前面在&lt;code&gt;alertmanager&lt;/code&gt;服务中配置了一个web-hook,即&lt;code&gt;http://10.13.118.71:8889/open/test&lt;/code&gt;，可以在alertmanager服务的&lt;code&gt;status&lt;/code&gt;中找到。我们可以很好的借助这个web-hook来对相关的报警发送。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 一个临时用来测试的web-hook服务
+$ cat test-web-hook.go
+/**
+ * @File Name: test-web-hook.go
+ * @Author: xxbandy @http://xxbandy.github.io
+ * @Email:
+ * @Create Date: 2019-06-19 14:06:48
+ * @Last Modified: 2019-06-19 15:06:13
+ * @Description: 一个临时用来测试的web-hook服务
+ * @build:
+ GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags &#39;-w -s&#39; -o prometheus-web-hook test-web-hook.go
+ */
+
+package main
+import (
+    &amp;quot;github.com/gin-gonic/gin&amp;quot;
+    &amp;quot;net/http&amp;quot;
+    &amp;quot;io/ioutil&amp;quot;
+    &amp;quot;fmt&amp;quot;
+)
+
+
+func main() {
+   router := gin.Default()
+   router.GET(&amp;quot;/open/test&amp;quot;, CollectData)
+   router.POST(&amp;quot;/open/test&amp;quot;, CollectData)
+
+   router.Run(&amp;quot;:8889&amp;quot;)
+
+}
+
+func CollectData(c *gin.Context) {
+    alertdata,_ := ioutil.ReadAll(c.Request.Body)
+    fmt.Println(string(alertdata))
+    c.JSON(http.StatusOK,nil)
+
+}
+
+# 构建成二进制文件
+$ GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags &#39;-w -s&#39; -o prometheus-web-hook test-web-hook.go
+$ chmod a+x prometheus-web-hook
+
+# 运行web-hook并收集报警信息
+➜  ./prometheus-web-hook
+[GIN-debug] [WARNING] Now Gin requires Go 1.6 or later and Go 1.7 will be required soon.
+
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in &amp;quot;debug&amp;quot; mode. Switch to &amp;quot;release&amp;quot; mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/test                --&amp;gt; main.CollectData (3 handlers)
+[GIN-debug] POST   /open/test                --&amp;gt; main.CollectData (3 handlers)
+[GIN-debug] Listening and serving HTTP on :8889
+{&amp;quot;receiver&amp;quot;:&amp;quot;web\\.hook&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;firing&amp;quot;,&amp;quot;alerts&amp;quot;:[{&amp;quot;status&amp;quot;:&amp;quot;firing&amp;quot;,&amp;quot;labels&amp;quot;:{&amp;quot;alertname&amp;quot;:&amp;quot;bgbiao测试&amp;quot;,&amp;quot;exported_job&amp;quot;:&amp;quot;xxb&amp;quot;,&amp;quot;group&amp;quot;:&amp;quot;push-gateway&amp;quot;,&amp;quot;instance&amp;quot;:&amp;quot;10.13.118.71:9091&amp;quot;,&amp;quot;job&amp;quot;:&amp;quot;prometheus&amp;quot;,&amp;quot;monitor&amp;quot;:&amp;quot;bgbiao-monitor&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;warning&amp;quot;},&amp;quot;annotations&amp;quot;:{&amp;quot;description&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;quot;,&amp;quot;summary&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值150.&amp;quot;},&amp;quot;startsAt&amp;quot;:&amp;quot;2019-06-19T06:17:19.247257311Z&amp;quot;,&amp;quot;endsAt&amp;quot;:&amp;quot;0001-01-01T00:00:00Z&amp;quot;,&amp;quot;generatorURL&amp;quot;:&amp;quot;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&amp;quot;}],&amp;quot;groupLabels&amp;quot;:{},&amp;quot;commonLabels&amp;quot;:{&amp;quot;alertname&amp;quot;:&amp;quot;bgbiao测试&amp;quot;,&amp;quot;exported_job&amp;quot;:&amp;quot;xxb&amp;quot;,&amp;quot;group&amp;quot;:&amp;quot;push-gateway&amp;quot;,&amp;quot;instance&amp;quot;:&amp;quot;10.13.118.71:9091&amp;quot;,&amp;quot;job&amp;quot;:&amp;quot;prometheus&amp;quot;,&amp;quot;monitor&amp;quot;:&amp;quot;bgbiao-monitor&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;warning&amp;quot;},&amp;quot;commonAnnotations&amp;quot;:{&amp;quot;description&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;quot;,&amp;quot;summary&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值150.&amp;quot;},&amp;quot;externalURL&amp;quot;:&amp;quot;http://c6ba74bfd03b:9093&amp;quot;,&amp;quot;version&amp;quot;:&amp;quot;4&amp;quot;,&amp;quot;groupKey&amp;quot;:&amp;quot;{}:{}&amp;quot;}
+
+[GIN] 2019/06/19 - 15:24:10 | 200 |     727.873µs |    10.13.118.71 | POST     /open/test
+{&amp;quot;receiver&amp;quot;:&amp;quot;web\\.hook&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;firing&amp;quot;,&amp;quot;alerts&amp;quot;:[{&amp;quot;status&amp;quot;:&amp;quot;firing&amp;quot;,&amp;quot;labels&amp;quot;:{&amp;quot;alertname&amp;quot;:&amp;quot;bgbiao测试&amp;quot;,&amp;quot;exported_job&amp;quot;:&amp;quot;xxb&amp;quot;,&amp;quot;group&amp;quot;:&amp;quot;push-gateway&amp;quot;,&amp;quot;instance&amp;quot;:&amp;quot;10.13.118.71:9091&amp;quot;,&amp;quot;job&amp;quot;:&amp;quot;prometheus&amp;quot;,&amp;quot;monitor&amp;quot;:&amp;quot;bgbiao-monitor&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;warning&amp;quot;},&amp;quot;annotations&amp;quot;:{&amp;quot;description&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;quot;,&amp;quot;summary&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值150.&amp;quot;},&amp;quot;startsAt&amp;quot;:&amp;quot;2019-06-19T06:17:19.247257311Z&amp;quot;,&amp;quot;endsAt&amp;quot;:&amp;quot;0001-01-01T00:00:00Z&amp;quot;,&amp;quot;generatorURL&amp;quot;:&amp;quot;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&amp;quot;}],&amp;quot;groupLabels&amp;quot;:{},&amp;quot;commonLabels&amp;quot;:{&amp;quot;alertname&amp;quot;:&amp;quot;bgbiao测试&amp;quot;,&amp;quot;exported_job&amp;quot;:&amp;quot;xxb&amp;quot;,&amp;quot;group&amp;quot;:&amp;quot;push-gateway&amp;quot;,&amp;quot;instance&amp;quot;:&amp;quot;10.13.118.71:9091&amp;quot;,&amp;quot;job&amp;quot;:&amp;quot;prometheus&amp;quot;,&amp;quot;monitor&amp;quot;:&amp;quot;bgbiao-monitor&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;warning&amp;quot;},&amp;quot;commonAnnotations&amp;quot;:{&amp;quot;description&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;quot;,&amp;quot;summary&amp;quot;:&amp;quot;10.13.118.71:9091:tps 超过阈值150.&amp;quot;},&amp;quot;externalURL&amp;quot;:&amp;quot;http://c6ba74bfd03b:9093&amp;quot;,&amp;quot;version&amp;quot;:&amp;quot;4&amp;quot;,&amp;quot;groupKey&amp;quot;:&amp;quot;{}:{}&amp;quot;}
+
+[GIN] 2019/06/19 - 15:25:20 | 200 |     129.897µs |    10.13.118.71 | POST     /open/test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意:我们这里的web-hook服务其实是将报警信息临时全部打印出来了，其实可以根据用户关心程度，将相关值取出来直接发送至用户终端，比如钉钉，微信，或者短信&lt;/code&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>Golang中的异常处理</title>
       <link>https://bgbiao.github.io/post/golang-expect/</link>
       <pubDate>Wed, 06 Mar 2019 16:01:23 +0800</pubDate>
@@ -567,28 +973,3965 @@ func main() {
     </item>
     
     <item>
-      <title>关于BGBiao</title>
-      <link>https://bgbiao.github.io/about/</link>
-      <pubDate>Sun, 20 Aug 2017 21:38:52 +0800</pubDate>
+      <title>使用Python来操作Hive中的数据</title>
+      <link>https://bgbiao.github.io/post/operatehivewithpython/</link>
+      <pubDate>Sun, 28 Oct 2018 14:14:39 +0000</pubDate>
       
-      <guid>https://bgbiao.github.io/about/</guid>
+      <guid>https://bgbiao.github.io/post/operatehivewithpython/</guid>
       
-        <description>&lt;p&gt;非专业出身的专业SRE，专治各种疑难杂症。&lt;/p&gt;
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了&lt;a href=&#34;http://hive.apache.org/&#34;&gt;Hive&lt;/a&gt;作为数据仓库工具，同时使用&lt;a href=&#34;https://github.com/cloudera/hue&#34;&gt;Hue&lt;/a&gt;来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.&lt;/p&gt;
+&lt;/blockquote&gt;
 
-&lt;p&gt;毕业的前四年在&lt;a href=&#34;https://jddglobal.com/&#34;&gt;京东数字科技&lt;/a&gt;担任一线运维工作，目前在一家创业公司担任SRE，主要负责内部DevOps体系建设以及一些基础运维工作。&lt;/p&gt;
+&lt;p&gt;本篇简单记录下使用Python操作Hive。&lt;/p&gt;
 
-&lt;p&gt;对应用运维，SRE，DevOps，Kubernetes，Cloud Native，大数据以及Golang相关技术比较感兴趣。&lt;/p&gt;
+&lt;h3 id=&#34;前言&#34;&gt;前言&lt;/h3&gt;
 
-&lt;p&gt;喜欢交朋友，也喜欢不断学习和分享技术文章，可以在以下途径联系到我，感兴趣的话，不妨一起交流交流.&lt;/p&gt;
+&lt;p&gt;我们当前整个&lt;a href=&#34;https://baike.baidu.com/item/ETL/1251949&#34;&gt;ETL&lt;/a&gt;过程大概如下:
+- 1.使用Python程序对各个维度的运维数据进行采集、加工和初步的清洗处理,按照一定的数据标准和数仓模型进行数据存储
+- 2.将上述抽取出来的相对结构化的数据存储到HDFS集群中
+- 3.使用Hive定期从HDFS集群中加载数据，并根据已有数据进行再次加工处理，并提取价值信息&lt;/p&gt;
+
+&lt;p&gt;ETL的质量问题具体表现为正确性、完整性、一致性、完备性、有效性、时效性和可获取性等几个特性。由于我们构建的运维数据仓库需要涉及到不同的数据源，且数据源的数据模型各不相同，为保证数据的正确性和完整性，数据加工过程选择在源数据库端执行，进行初步清洗加工后再进行转储到目标数据仓库中。&lt;/p&gt;
+
+&lt;h3 id=&#34;python操作hive&#34;&gt;Python操作Hive&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:想要使用hive，必须要有一个可用的hive集群，同时为了保证可用使用API操作hive，我们需要要求提供hiveserver2服务&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;假设我们的hiveserver2地址为&lt;code&gt;10.0.1.18:10000&lt;/code&gt;,且用户为&lt;code&gt;hdfs&lt;/code&gt;.使用&lt;a href=&#34;https://pypi.org/project/PyHive/&#34;&gt;PyHive&lt;/a&gt;库链接Hive.&lt;/p&gt;
+
+&lt;h4 id=&#34;安装pyhive模块&#34;&gt;安装pyhive模块&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;# 过程中可能需要依赖sasl，thrift等相关服务，如有需要可以使用系统的包管理器安装(apt-get或yum)
+pip install sasl thrift thrift-sasl PyHive
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;python链接hive以及基本使用&#34;&gt;Python链接Hive以及基本使用&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat pytest_hive.py
+# 导入hive模块
+from pyhive import hive
+
+# 获取一个hive链接对象(链接到HiveServer2上)
+## Connection类的__init__方法:__init__(self, host=None, port=None, username=None, database=u&#39;default&#39;, auth=None, configuration=None, kerberos_service_name=None, password=None, thrift_transport=None)
+hiveconn = hive.Connection(host=&#39;10.0.1.18&#39;, port=10000, username=&#39;hdfs&#39;, database=&#39;aiops&#39;)
+
+# 使用连接的cursor()方法获取一个游标对象
+hivecur = hiveconn.cursor()
+
+# 使用游标对象的execute()方法进行执行hivesql语句
+## execute(self, operation, parameters=None, **kwargs)
+hivecur.execute(&amp;quot;show databases&amp;quot;)
+## executemany(self, operation, seq_of_parameters) method of pyhive.hive.Cursor instance 参数是一个序列
+hivecur.executemany()
+
+# 使用游标对象的fetch类方法获取执行结果(fetchone和fetchall以及fetchmany)
+onedata = hivecur.fetchone()
+alldata = hivecur.fetchall()
+## fetchmany(self, size=None) method of pyhive.hive.Cursor instance
+manydata = hivecur.fetchmany()
+
+# 关闭cursor游标对象和conn连接对象
+hivecur.close()
+hiveconn.close()
+
+# hive的回滚操作
+hiveconn.rollback()
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;尝试用python脚本进行数据库操作&#34;&gt;尝试用python脚本进行数据库操作&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;1. 数据库查询操作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 首先我们使用pyhive库链接hive并查看指定数据库下的表
+$ cat pyhive_test.py
+import sys
+reload(sys)
+sys.setdefaultencoding(&#39;utf-8&#39;)
+from pyhive import hive
+
+class hiveObj:
+    def __init__(self,host,user,dbname=u&#39;default&#39;,port=10000):
+        self.host = host
+        self.dbname = dbname
+        self.user = user
+        self.port = port
+    def hiveConIns(self):
+        conn = hive.Connection(host=self.host, port=self.port, username=self.user, database=self.dbname)
+        return conn
+    #通常查询个别数量的数据建议在sql中进行优化，可以仅使用cursor的fetchall()方法进行批量操作
+    def querydata(self,sql,args=None):
+        conn = self.hiveConIns()
+        cur = conn.cursor()
+        cur.execute(sql,args)
+        alldata = cur.fetchall()
+        cur.close()
+        #cur.fetch类方法返回一个[tuple,tuple]
+        for data in alldata:
+            print(data)
+        conn.close()
+
+if __name__ == &#39;__main__&#39;:
+    #默认database为default,默认port为10000
+    hiveobj = hiveObj(&amp;quot;10.0.1.18&amp;quot;,&amp;quot;hdfs&amp;quot;)
+    #查询数据
+    sql = &#39;&#39;&#39;show tables&#39;&#39;&#39;
+    hiveobj.querydata(sql)
+
+$ python pyhive_test.py
+(u&#39;asset&#39;,)
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;2. 数据库更新操作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;思考:其实数据库可以分为两种操作(读和写)，一种为单纯的查询操作，不会对库表结构和数据造成变更，也即为读操作;另外一种为写操作，会对库表结构和数据造成的变更操作，也即写操作.&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 给我们的hiveObj类增加一个写数据操作方法
+$ cat pyhive_test.py
+....
+....
+    def changedata(self,sql,args=None):
+        conn = self.hiveConIns()
+        cur = conn.cursor()
+        try:
+            #做一个粗暴的判断当args是list时就进行批量插入
+            if isinstance(args,list):
+                #executemany(sql,args)方法args支持tuple或者list类型
+                cur.executemany(sql,args)
+            else:
+                #execute(sql,args)方法args支持string,tuple,list,dict
+                cur.execute(sql,args)
+            conn.commit()
+        except Exception as e:
+            #因为hive不支持事务，因此虽然提供了rollback()但是是没用的
+            #conn.rollback()
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
+
+
+
+# 使用创建表来模拟库表变更(实际上库的变更操作应该由专业的管理员进行审核后操作)
+if __name__ == &#39;__main__&#39;:
+    #默认database为default,默认port为10000
+    hiveobj = hiveObj(&amp;quot;10.0.1.18&amp;quot;,&amp;quot;hdfs&amp;quot;)
+    #查询数据
+    sql = &#39;&#39;&#39;show tables&#39;&#39;&#39;
+    hiveobj.querydata(sql)
+
+    #hive库表变更操作
+    tabledesc = &#39;&#39;&#39;
+     create table appinfo (
+        appname string,
+        level string,
+        leader string,
+        dep string,
+        ips  array&amp;lt;string&amp;gt;)
+     ROW FORMAT DELIMITED
+     FIELDS TERMINATED BY &#39;|&#39;
+     COLLECTION ITEMS TERMINATED BY &#39;,&#39;
+    &#39;&#39;&#39;
+    print(&amp;quot;creating a table....&amp;quot;)
+    hiveobj.changedata(tabledesc)
+    hiveobj.querydata(sql)
+
+$ python pyhive_test.py
+(u&#39;asset&#39;,)
+creating a table....
+(u&#39;appinfo&#39;,)
+(u&#39;asset&#39;,) 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;3. 进行数据加载和读取操作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:上面其实我们已经封装了两个抽象的读写方法，可以对hive表进行数据加载和读取操作了&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 假如我们的hdfs上已经存在一份如下结构化的数据
+$ hdfs dfs -cat /ips.txt;
+data-web|p0|bgbiao|ops1|10.0.0.1,10.0.0.2
+data-api|p0|biaoge|sre1|192.168.0.1,192.168.0.2
+data-models|p1|xxbandy|sre1|10.0.0.3,192.168.0.3
+
+$ cat pyhive_test.py
+...
+...
+if __name__ == &#39;__main__&#39;:
+		#首先进行将hdfs中的数据加载到appinfo表中,加载完成后查询appinfo表
+    sql1 = &amp;quot;load data  inpath &#39;hdfs://hdfs-name/ips.txt&#39; overwrite into table appinfo&amp;quot;
+    hiveobj.changedata(sql1)
+    hiveobj.querydata(&#39;select * from appinfo&#39;)
+
+$ python pyhive_test.py
+(u&#39;data-web&#39;, u&#39;p0&#39;, u&#39;bgbiao&#39;, u&#39;ops1&#39;, u&#39;[&amp;quot;10.0.0.1&amp;quot;,&amp;quot;10.0.0.2&amp;quot;]&#39;)
+(u&#39;data-api&#39;, u&#39;p0&#39;, u&#39;biaoge&#39;, u&#39;sre1&#39;, u&#39;[&amp;quot;192.168.0.1&amp;quot;,&amp;quot;192.168.0.2&amp;quot;]&#39;)
+(u&#39;data-models&#39;, u&#39;p1&#39;, u&#39;xxbandy&#39;, u&#39;sre1&#39;, u&#39;[&amp;quot;10.0.0.3&amp;quot;,&amp;quot;192.168.0.3&amp;quot;]&#39;)
+
+# 接下来我们对上述表进行一个拆分查询
+$ cat pyhive_test.py
+...
+...
+if __name__ == &#39;__main__&#39;:
+    #对array对象中的元素进行遍历查询
+    sql = &amp;quot;select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    hiveobj.querydata(sql)
+
+# 这样子我们就知道每个ip对应的关联关系了
+$ python pyhive_test.py
+(u&#39;10.0.0.1&#39;, u&#39;data-web&#39;, u&#39;bgbiao&#39;, u&#39;ops1&#39;)
+(u&#39;10.0.0.2&#39;, u&#39;data-web&#39;, u&#39;bgbiao&#39;, u&#39;ops1&#39;)
+(u&#39;192.168.0.1&#39;, u&#39;data-api&#39;, u&#39;biaoge&#39;, u&#39;sre1&#39;)
+(u&#39;192.168.0.2&#39;, u&#39;data-api&#39;, u&#39;biaoge&#39;, u&#39;sre1&#39;)
+(u&#39;10.0.0.3&#39;, u&#39;data-models&#39;, u&#39;xxbandy&#39;, u&#39;sre1&#39;)
+(u&#39;192.168.0.3&#39;, u&#39;data-models&#39;, u&#39;xxbandy&#39;, u&#39;sre1&#39;)
+
+# 临时表的创建和使用
+    #对array对象中的元素进行遍历查询[临时表的创建第一次必须使用create table name as select ],更新数据需要使用[insert into|overwrite table name select] into是追加数据，overwrite是覆盖数据
+    #sql = &amp;quot;create  table tmpapp as select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    #sql = &amp;quot;insert into table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    sql = &amp;quot;insert overwrite table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    hiveobj.changedata(sql)
+    hiveobj.querydata(&#39;select * from tmpapp limit 1&#39;)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;4. 源码文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat pyhive_test.py
+import sys
+reload(sys)
+sys.setdefaultencoding(&#39;utf-8&#39;)
+from pyhive import hive
+
+class hiveObj:
+    def __init__(self,host,user,dbname=u&#39;default&#39;,port=10000):
+        self.host = host
+        self.dbname = dbname
+        self.user = user
+        self.port = port
+    def hiveConIns(self):
+        conn = hive.Connection(host=self.host, port=self.port, username=self.user, database=self.dbname)
+        return conn
+    #通常查询个别数量的数据建议在sql中进行优化，可以仅使用cursor的fetchall()方法进行批量操作
+    def querydata(self,sql,args=None):
+        conn = self.hiveConIns()
+        cur = conn.cursor()
+        cur.execute(sql,args)
+        alldata = cur.fetchall()
+        cur.close()
+        #cur.fetch类方法返回一个[tuple,tuple]
+        for data in alldata:
+            print(data)
+        conn.close()
+    #注意:hivesql的execute类方法的args是执行过程的参数，而不是sql的参数.比如cursor.execute(&#39;SELECT * FROM my_awesome_data LIMIT 10&#39;, async=True)表示异步执行
+    def changedata(self,sql,args=None):
+        conn = self.hiveConIns()
+        cur = conn.cursor()
+        try:
+            #做一个粗暴的判断当args是list时就进行批量插入
+            if isinstance(args,list):
+                #executemany(sql,args)方法args支持tuple或者list类型
+                cur.executemany(sql,args)
+            else:
+                #execute(sql,args)方法args支持string,tuple,list,dict
+                cur.execute(sql,args)
+            conn.commit()
+        except Exception as e:
+            #因为hive不支持事务，因此虽然提供了rollback()但是是没用的
+            #conn.rollback()
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
+
+if __name__ == &#39;__main__&#39;:
+    #默认database为default,默认port为10000
+    hiveobj = hiveObj(&amp;quot;10.0.1.18&amp;quot;,&amp;quot;hdfs&amp;quot;)
+    &#39;&#39;&#39;
+    #查询数据
+    sql = &amp;quot;show tables&amp;quot;
+    hiveobj.querydata(sql)
+
+    #hive创建表
+    tabledesc = &amp;quot;create table appinfo (appname string,level string,leader string,dep string,ips  array&amp;lt;string&amp;gt;) ROW FORMAT DELIMITED FIELDS TERMINATED BY &#39;|&#39; COLLECTION ITEMS TERMINATED BY &#39;,&#39; &amp;quot;
+    print(&amp;quot;creating a table....&amp;quot;)
+    hiveobj.changedata(tabledesc)
+    hiveobj.querydata(sql)
+
+    #插入数据
+    sql1 = &amp;quot;load data  inpath &#39;hdfs://hdfs-name/ips.txt&#39; overwrite into table appinfo&amp;quot;
+    hiveobj.changedata(sql1)
+    hiveobj.querydata(&#39;select * from appinfo&#39;)
+    &#39;&#39;&#39;
+    #对array对象中的元素进行遍历查询[临时表的创建第一次必须使用create table name as select ],更新数据需要使用[insert into|overwrite table name select] into是追加数据，overwrite是覆盖数据
+    #sql = &amp;quot;create  table tmpapp as select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    #sql = &amp;quot;insert into table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    sql = &amp;quot;insert overwrite table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&amp;quot;
+    hiveobj.changedata(sql)
+    hiveobj.querydata(&#39;select * from tmpapp limit 1&#39;)
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>使用Python操作MySQL</title>
+      <link>https://bgbiao.github.io/post/operatemysqlwithpython/</link>
+      <pubDate>Sat, 27 Oct 2018 13:53:40 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/operatemysqlwithpython/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;mysql数据库环境准备&#34;&gt;MySQL数据库环境准备&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:在当前容器化基础设施已经全面覆盖的时代，为了快速验证效果，我们及其推荐使用以Docker为代表的容器化基础设施来快速构建你的基础环境。&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;在&lt;a href=&#34;https://hub.docker.com/&#34;&gt;DockerHub&lt;/a&gt;上有丰富的基础中间件的镜像，我们可以使用Docker快速的构建我们的MySQL基础环境，而不必每次重新安装各种复杂的中间件环境，因为我们只是使用者，我相信每个团队都会有专门的中间件维护者。好吧，如果没有，那你依然可以自己根据实际的需求和标准进行构建Docker镜像，这样就为我们创造了一个未来很长一段时间可复用的组件。总之，想说的一件事就是，下面的MySQL环境是用Docker容器跑的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 确保docker环境正常
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+
+# 下载MySQL指定版本的镜像
+$ docker pull mysql:5.6
+$ docker images | grep mysql
+mysql                                     5.6                 d1f491b20727        2 days ago          256 MB
+
+# 创建一个mysql实例[需要指定至少一个环境变量:MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD]
+$ docker run -itd --name mysql -e MYSQL_ROOT_PASSWORD=&amp;quot;123456&amp;quot;  -P mysql:5.6
+6c4428b341516c7eeec48cbc5b658a464f76b5f7d42b3e689151392f5cd8ac56
+
+# MySQL密码为123456,端口为32773
+$ docker ps
+CONTAINER ID        IMAGE                                          COMMAND                  CREATED             STATUS              PORTS                                               NAMES
+6c4428b34151        mysql:5.6                                      &amp;quot;docker-entrypoint.sh&amp;quot;   5 seconds ago       Up 3 seconds        0.0.0.0:32773-&amp;gt;3306/tcp                             mysql
+
+# mysql数据库登录测试
+$ mysql -h 127.0.0.1 -uroot -P 32773 -p123456
+...
+Server version: 5.6.42 MySQL Community Server (GPL)
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
+...
+mysql&amp;gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
++--------------------+
+3 rows in set (0.00 sec)
+
+# 查看数据库字符编码格式
+mysql&amp;gt; show variables like &#39;%char%&#39;;
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client     | utf8                       |
+| character_set_connection | utf8                       |
+| character_set_database   | utf8                       |
+| character_set_filesystem | binary                     |
+| character_set_results    | utf8                       |
+| character_set_server     | utf8                       |
+| character_set_system     | utf8                       |
+| character_sets_dir       | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+8 rows in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，一个MySQL数据库已经准备好，需要我们注意的是，因为使用的是官方的Docker image，我们需要进行相关配置的检查和设置，否则可能会为后期的操作造成一定麻烦，比如设置数据库的字符编码.&lt;br /&gt;
+让MySQL支持中文，一般而言需要关注以下几个点:
+- 1. 修改MySQL配置中客户端和服务端的字符编码为&lt;code&gt;utf8&lt;/code&gt;，分别为[mysqld的default-character-set和character-set-server参数以及client的default-character-set参数]
+- 2. 创建表时指定表的字符编码(default charset=utf8;)
+- 3. 链接数据库的时候指定链接字符编码(charset=utf8)
+- 4. 使用Python操作数据库时需要对Python文件进行utf8支持(#encoding=utf-8和sys.setdefaultencoding(utf-8))
+- 5. 使用&lt;code&gt;show variables like &#39;%char%&#39;;&lt;/code&gt;命令检查mysql字符集是否为&lt;code&gt;utf8格式&lt;/code&gt;，并使用&lt;code&gt;SET NAMES UTF8; 或者set character_set_server = utf8;&lt;/code&gt;进行设置&lt;/p&gt;
+
+&lt;h3 id=&#34;使用python进行操作mysql&#34;&gt;使用Python进行操作MySQL&lt;/h3&gt;
+
+&lt;p&gt;首先，在使用之前我们需要对Python版的MySQL库有一个了解，当前主流的库有&lt;code&gt;MySQLdb&lt;/code&gt;,&lt;code&gt;PyMySQL&lt;/code&gt;和&lt;code&gt;SQLAlchemy&lt;/code&gt;.&lt;br /&gt;
+- &lt;code&gt;MySQLdb&lt;/code&gt;:一般是Linux系统发行版中默认支持的，通常包名为&lt;code&gt;Python-MySQL&lt;/code&gt;，核心由C语言打造，接口精炼，性能最棒，缺点是环境依赖较多，安装复杂，近两年已停止更新，只支持Python2，不支持Python3
+- &lt;code&gt;PyMySQL&lt;/code&gt;:纯python打造，接口与Python-MySQL兼容，安装方便，支持Python3
+- &lt;code&gt;SQLAlchemy&lt;/code&gt;: 一个ORM框架，它并不提供底层的数据库操作，而是要借助于MySQLdb、PyMySQL等第三方库来完成，目前SQLAlchemy在Web编程领域应用广泛
+&lt;code&gt;备注:其实还有类似mysqlclient之类的库，主要集成在一些web框架中作为依赖&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;由于为了快速实现业务逻辑，在接下来的操作中主要使用&lt;code&gt;PyMySQL&lt;/code&gt;库进行操作数据库，虽然性能不及&lt;code&gt;MySQLdb&lt;/code&gt;，但是可以使用&lt;code&gt;pymysql.install_as_MySQLdb()&lt;/code&gt;来兼容&lt;code&gt;MySQLdb&lt;/code&gt;，在业务正式上线时可以不改变业务代码逻辑而平滑的使用&lt;code&gt;MySQLdb&lt;/code&gt;库。&lt;/p&gt;
+
+&lt;h4 id=&#34;安装pymysql库&#34;&gt;安装pymysql库&lt;/h4&gt;
+
+&lt;p&gt;在&lt;code&gt;Linux&lt;/code&gt;环境下，大多数系统工具使用Python语言进行编写，因此在安装额外的Python模块时，通常会有几种选择:
+- 1. 使用系统自带工具安装&lt;code&gt;apt-get install or yum install&lt;/code&gt;，该种方式会将模块默认安装的系统环境，可能会影响系统环境
+- 2. 使用Python原声的包管理工具&lt;code&gt;pip install&lt;/code&gt; ，该种方式会默认安装到&lt;code&gt;pip&lt;/code&gt;命令所在的Python解释环境下，因此取决于Python环境是否独立于系统环境的Python，通常情况下会使用&lt;code&gt;pyenv&lt;/code&gt;之类的工具进行环境隔离
+- 3. 使用包管理工具&lt;code&gt;conda&lt;/code&gt;相关工具进行管理python，可以有效管理python多环境依赖，并且可以很方便构建数据科学相关环境.&lt;a href=&#34;https://www.jianshu.com/c/d2372cb5978e&#34;&gt;conda使用指南&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 安装pymysql库
+$ pip install pymysql
+or 
+$ conda install pymysql
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;python链接mysql以及基本使用&#34;&gt;python链接MySQL以及基本使用&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;使用pymysql库操作mysql&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat pytest_mysql.py
+import pymysql
+# 获取一个mysql链接对象
+conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, charset=&#39;utf8&#39;)
+# 使用数据库链接的cursor()方法获取一个游标对象
+cursor = conn.cursor()
+# 使用游标对象的execute()方法进行执行sql语句
+cursor.execute(&amp;quot;SELECT VERSION()&amp;quot;)
+## execute方法的定义如下,其中args可以是tuple, list or dict,如果是list or tuple的话，%s会被当做查询的一个占位符;如果是dict的话%(name)s会被当做一个占位符
+## execute(self, query, args=None) 
+
+
+# 使用游标对象的fetch类方法获取数据
+## fetchone返回一条数据,fetchall返回查询的所有数据。fetch类方法会返回一个list类型的tuple结构类型对象.[(),()...]
+onedata = cursor.fetchone()
+alldata = cursor.fetchall()
+
+# 提交数据库操作[一般在更新数据库操作时需要注意执行]
+conn.commit()
+
+# 及时关闭数据库链接以及打开的游标[以防止在并发情况下系统打开连接数过多]
+cursor.close()
+conn.close()
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;尝试用python脚本进行数据库操作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat test_show_table.py
+import sys
+reload(sys)
+sys.setdefaultencoding(&#39;utf-8&#39;)
+import pymysql
+
+class mysqlObj:
+    def __init__(self,host,dbname,user,passwd,port=3306):
+        self.host = host
+        self.dbname = dbname
+        self.user = user
+        self.passwd = passwd
+        self.port = port
+    def mysqlConIns(self):
+        conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.dbname, charset=&#39;utf8&#39;)
+        return conn
+    def querydata(self,sql,args=None):
+        conn = self.mysqlConIns()
+        cur = conn.cursor()
+        cur.execute(sql,args)
+        alldata = cur.fetchall()
+        cur.close()
+        for data in alldata:
+            print(data)
+        conn.close()
+
+
+if __name__ == &#39;__main__&#39;:
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;mysql&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    mysqlobj.querydata(&amp;quot;show tables;&amp;quot;)
+
+# 对mysql库进行查看tables操作，返回的是一个tuple
+$ python test_show_table.py
+(u&#39;columns_priv&#39;,)
+(u&#39;db&#39;,)
+(u&#39;event&#39;,)
+(u&#39;func&#39;,)
+(u&#39;general_log&#39;,)
+(u&#39;help_category&#39;,)
+(u&#39;help_keyword&#39;,)
+(u&#39;help_relation&#39;,)
+(u&#39;help_topic&#39;,)
+(u&#39;innodb_index_stats&#39;,)
+(u&#39;innodb_table_stats&#39;,)
+(u&#39;ndb_binlog_index&#39;,)
+(u&#39;plugin&#39;,)
+(u&#39;proc&#39;,)
+(u&#39;procs_priv&#39;,)
+(u&#39;proxies_priv&#39;,)
+(u&#39;servers&#39;,)
+(u&#39;slave_master_info&#39;,)
+(u&#39;slave_relay_log_info&#39;,)
+(u&#39;slave_worker_info&#39;,)
+(u&#39;slow_log&#39;,)
+(u&#39;tables_priv&#39;,)
+(u&#39;time_zone&#39;,)
+(u&#39;time_zone_leap_second&#39;,)
+(u&#39;time_zone_name&#39;,)
+(u&#39;time_zone_transition&#39;,)
+(u&#39;time_zone_transition_type&#39;,)
+(u&#39;user&#39;,)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;mysql数据库常用的一些操作&#34;&gt;MySQL数据库常用的一些操作&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;注意:在之前我们创建的MySQL实例中仅是一个空的数据库，在实际使用之前，我们需要进行数据库的库表结构创建，以及相关的数据库授权，而这一部分操作通常会由专业的数据库管理员(DBA)进行操作和处理&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;接下来对一个&lt;code&gt;website&lt;/code&gt;数据库和&lt;code&gt;use&lt;/code&gt;表进行操作:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mysql&amp;gt; create database website;
+Query OK, 1 row affected (0.00 sec)
+mysql&amp;gt; CREATE TABLE  IF NOT EXISTS useinfo (userid int(10) primary key not null auto_increment,username varchar(20) not null,usersite varchar(50),other varchar(50)) DEFAULT CHARSET=utf8;
+Query OK, 0 rows affected (0.02 sec)
+mysql&amp;gt; describe useinfo;
++----------+-------------+------+-----+---------+----------------+
+| Field    | Type        | Null | Key | Default | Extra          |
++----------+-------------+------+-----+---------+----------------+
+| userid   | int(10)     | NO   | PRI | NULL    | auto_increment |
+| username | varchar(20) | NO   |     | NULL    |                |
+| usersite | varchar(50) | YES  |     | NULL    |                |
+| other    | varchar(50) | YES  |     | NULL    |                |
++----------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+# 数据库授权[授权所有的主机可以以root用户,123456的密码去操作website库]
+mysql&amp;gt; grant all on website.* to root@&#39;%&#39; identified by &amp;quot;123456&amp;quot;;
+Query OK, 0 rows affected (0.00 sec)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;对指定数据库进行相关查询操作&#34;&gt;对指定数据库进行相关查询操作&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;# 依然是上面那个test_show_table.py脚本,不过我们改变一下`__main__`
+$ cat test_show_table.py
+.....
+if __name__ == &#39;__main__&#39;:
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;website&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    args = [&amp;quot;show tables;&amp;quot;,&amp;quot;describe useinfo;&amp;quot;]
+    for arg in args:
+        mysqlobj.querydata(arg)
+
+# 可以看到我们的website库下有useinfo一张表，并且该表包含userid,username,usersite,other4个字段
+$ python test_show_table.py
+(u&#39;useinfo&#39;,)
+(u&#39;userid&#39;, u&#39;int(10)&#39;, u&#39;NO&#39;, u&#39;PRI&#39;, None, u&#39;auto_increment&#39;)
+(u&#39;username&#39;, u&#39;varchar(20)&#39;, u&#39;NO&#39;, u&#39;&#39;, None, u&#39;&#39;)
+(u&#39;usersite&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)
+(u&#39;other&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;对mysql数据库进行插入操作&#34;&gt;对MySQL数据库进行插入操作&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;注意:插入操作分为单条记录插入和批量插入,一般数据库都支持批量插入方法,在pysql中为cursor.executemany(sql,args)&lt;/code&gt;
+&lt;code&gt;为我们的mysqlObj类增加一个插入操作:&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat test_show_table.py
+....
+....
+    #注意插入数据时单条记录使用tuple()类型;批量插入数据时使用list()类型
+    def changedata(self,sql,args=None):
+        conn = self.mysqlConIns()
+        cur = conn.cursor()
+        try:
+            #做一个粗暴的判断当args是list时就进行批量插入
+            if isinstance(args,list):
+                #executemany(sql,args)方法args支持tuple或者list类型
+                cur.executemany(sql,args)
+            else:
+                #execute(sql,args)方法args支持string,tuple,list,dict
+                cur.execute(sql,args)
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
+....
+...
+if __name__ == &#39;__main__&#39;:
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;website&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    &#39;&#39;&#39;
+    args = [&amp;quot;show tables;&amp;quot;,&amp;quot;describe useinfo;&amp;quot;]
+    for arg in args:
+        mysqlobj.querydata(arg)
+    &#39;&#39;&#39;
+    #插入一条数据
+    sql = &amp;quot;insert into  useinfo (username) values(%s)&amp;quot;
+    arg = &amp;quot;彪哥&amp;quot;
+    mysqlobj.changedata(sql,arg)
+    sql1 = &amp;quot;insert into  useinfo (username,usersite) values(%s,%s)&amp;quot;
+    arg1 = (&amp;quot;xxbandy&amp;quot;,&amp;quot;http://xxbandy.github.io&amp;quot;)
+    mysqlobj.changedata(sql1,arg1)
+    #批量插入数据
+
+    argslist = [(&amp;quot;彪哥&amp;quot;,&amp;quot;http://xxbandy.github.io&amp;quot;),(&amp;quot;bgbiao&amp;quot;,&amp;quot;https://www.jianshu.com/u/9c46ece5b7bd&amp;quot;)]
+    mysqlobj.changedata(sql1,argslist)
+    #查询数据
+    mysqlobj.querydata(&amp;quot;select * from useinfo&amp;quot;)
+	
+		print(&amp;quot;updating the data&amp;quot;)
+		#更新数据[需要注意的是指定了字段之后由于usersite是varchar类型，占位符必须是&amp;quot;%s&amp;quot;,如果是&#39;%s&#39;会有问题]
+    data = &amp;quot;https://my.oschina.net/xxbAndy&amp;quot;
+    mysqlobj.changedata(&#39;update useinfo set usersite=%s where userid = 1&#39;,data)
+    mysqlobj.querydata(&amp;quot;select * from useinfo&amp;quot;)
+
+# 插入数据并查看数据
+$ python /tmp/abc.py
+(1, u&#39;\u5f6a\u54e5&#39;, None, None)
+(2, u&#39;xxbandy&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(3, u&#39;\u5f6a\u54e5&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(4, u&#39;bgbiao&#39;, u&#39;https://www.jianshu.com/u/9c46ece5b7bd&#39;, None)
+updating the data
+(1, u&#39;\u5f6a\u54e5&#39;, u&#39;https://my.oschina.net/xxbAndy&#39;, None)
+(2, u&#39;xxbandy&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(3, u&#39;\u5f6a\u54e5&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(4, u&#39;bgbiao&#39;, u&#39;https://www.jianshu.com/u/9c46ece5b7bd&#39;, None)
+
+# 数据库查询记录
+mysql&amp;gt; select * from website.useinfo;
++--------+----------+----------------------------------------+-------+
+| userid | username | usersite                               | other |
++--------+----------+----------------------------------------+-------+
+|      1 | 彪哥   | https://my.oschina.net/xxbAndy         | NULL  |
+|      2 | xxbandy  | http://xxbandy.github.io               | NULL  |
+|      3 | 彪哥   | http://xxbandy.github.io               | NULL  |
+|      4 | bgbiao   | https://www.jianshu.com/u/9c46ece5b7bd | NULL  |
++--------+----------+----------------------------------------+-------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;源码&#34;&gt;源码&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;import sys
+reload(sys)
+sys.setdefaultencoding(&#39;utf-8&#39;)
+import pymysql
+
+class mysqlObj:
+    def __init__(self,host,dbname,user,passwd,port=3306):
+        self.host = host
+        self.dbname = dbname
+        self.user = user
+        self.passwd = passwd
+        self.port = port
+    def mysqlConIns(self):
+        conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.dbname, charset=&#39;utf8&#39;)
+        return conn
+    def querydata(self,sql,args=None):
+        conn = self.mysqlConIns()
+        cur = conn.cursor()
+        cur.execute(sql,args)
+        alldata = cur.fetchall()
+        cur.close()
+        for data in alldata:
+            print(data)
+        conn.close()
+    #注意插入数据时单条记录使用tuple()类型;批量插入数据时使用list()类型
+    def changedata(self,sql,args=None):
+        conn = self.mysqlConIns()
+        cur = conn.cursor()
+        try:
+            #做一个粗暴的判断当args是list时就进行批量插入
+            if isinstance(args,list):
+                #executemany(sql,args)方法args支持tuple或者list类型
+                cur.executemany(sql,args)
+            else:
+                #execute(sql,args)方法args支持string,tuple,list,dict
+                cur.execute(sql,args)
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print(e)
+        finally:
+            cur.close()
+            conn.close()
+
+
+
+if __name__ == &#39;__main__&#39;:
+
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;website&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    &#39;&#39;&#39;
+    args = [&amp;quot;show tables;&amp;quot;,&amp;quot;describe useinfo;&amp;quot;]
+    for arg in args:
+        mysqlobj.querydata(arg)
+    &#39;&#39;&#39;
+    #插入一条数据
+    sql = &amp;quot;insert into  useinfo (username) values(%s)&amp;quot;
+    arg = &amp;quot;彪哥&amp;quot;
+    mysqlobj.changedata(sql,arg)
+    sql1 = &amp;quot;insert into  useinfo (username,usersite) values(%s,%s)&amp;quot;
+    arg1 = (&amp;quot;xxbandy&amp;quot;,&amp;quot;http://xxbandy.github.io&amp;quot;)
+    mysqlobj.changedata(sql1,arg1)
+    #批量插入数据
+
+    argslist = [(&amp;quot;彪哥&amp;quot;,&amp;quot;http://xxbandy.github.io&amp;quot;),(&amp;quot;bgbiao&amp;quot;,&amp;quot;https://www.jianshu.com/u/9c46ece5b7bd&amp;quot;)]
+    mysqlobj.changedata(sql1,argslist)
+
+
+    #查询数据
+    mysqlobj.querydata(&amp;quot;select * from useinfo&amp;quot;)
+    print(&amp;quot;updating the data&amp;quot;)
+    #更新数据
+    data = &amp;quot;https://my.oschina.net/xxbAndy&amp;quot;
+    mysqlobj.changedata(&#39;&#39;&#39;update useinfo set usersite=%s where userid = 1&#39;&#39;&#39;,data)
+    mysqlobj.querydata(&amp;quot;select * from useinfo&amp;quot;)
+
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>使用nvidia-smi来对Tesla-GPU进行故障排查</title>
+      <link>https://bgbiao.github.io/post/troubleshooting-teslagpu-with-nvidia-smi/</link>
+      <pubDate>Mon, 20 Aug 2018 14:34:43 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/troubleshooting-teslagpu-with-nvidia-smi/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;gpu卡异常现象&#34;&gt;GPU卡异常现象&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/issue_with_p40.png&#34; alt=&#34;gpu卡异常测试&#34; /&gt;&lt;br /&gt;
+如上的的&lt;code&gt;bandwidthTest&lt;/code&gt;是nvidia-cuda官方提供的测试样例，具体可以查看&lt;a href=&#34;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/&#34;&gt;GPU环境的构建&lt;/a&gt;.当然用户也可以使用&lt;code&gt;tensorflow-gpu&lt;/code&gt;的如下代码来测试程序是否可以识别到GPU设备:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import tensorflow as tf 
+import os
+os.environ[&amp;quot;CUDA_VISIBLE_DEVICES&amp;quot;] = &amp;quot;3&amp;quot;
+tf.test.gpu_device_name()
+段错误(吐核)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;问题排查&#34;&gt;问题排查&lt;/h3&gt;
+
+&lt;p&gt;由于问题出现原因仅为服务器的其中一块卡，因此我们可以使用&lt;code&gt;nvidia-smi&lt;/code&gt;命令对多卡之间的信息进行对比排查.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1.使用&lt;code&gt;nvidia-smi -q -d PERFORMANCE&lt;/code&gt;查看GPU设备的性能&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;## 经对比各个GPU卡设备性能够发现仅有id=3这块卡的`SW Power Cap`参数为active
+# nvidia-smi -q -d PERFORMANCE -i 3
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Aug 20 15:08:18 2018
+Driver Version                      : 384.81
+
+Attached GPUs                       : 8
+GPU 00000000:11:00.0
+    Performance State               : P8
+    Clocks Throttle Reasons
+        Idle                        : Not Active
+        Applications Clocks Setting : Not Active
+        SW Power Cap                : Active
+        HW Slowdown                 : Not Active
+        Sync Boost                  : Not Active
+        SW Thermal Slowdown         : Not Active
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是在性能参数中有&lt;code&gt;Active&lt;/code&gt;其实并不能说明很大的问题，但看到这里其实也可以发现该卡的确是比较慢一些了，详细可以看&lt;a href=&#34;https://xxbandy.github.io/2017/10/30/Manager-your-GPUs/&#34;&gt;manage-your-gpus&lt;/a&gt;中的&lt;code&gt;监控和管理GPU Boost&lt;/code&gt;部分.&lt;/p&gt;
+
+&lt;p&gt;原文为:
+&amp;gt; If any of the GPU clocks is running at a slower speed, one or more of the above Clocks Throttle Reasons will be marked as active. The most concerning condition would be if HW Slowdown or Unknown are active, as these would most likely indicate a power or cooling issue. The remaining conditions typically indicate that the card is idle or has been manually set into a slower mode by a system administrator.&lt;/p&gt;
+
+&lt;p&gt;大概意思是只要GPU的时钟频率以一个比较低的速度运行的话，在&lt;code&gt;Clocks Throttle Reasons&lt;/code&gt;列就会有一个或多个被设置为&lt;code&gt;active&lt;/code&gt;状态。而如果&lt;code&gt;HW Slowdown&lt;/code&gt;和&lt;code&gt;Unknown&lt;/code&gt;只要不是&lt;code&gt;active&lt;/code&gt;就说明硬件其实还好啦，起码电源是没问题的。其他几个选项需要继续排查下是否为管理员手动设置的或GPU卡正在使用中。&lt;/p&gt;
+
+&lt;p&gt;由刚开始的测试程序可以看出，我们&lt;code&gt;id=3&lt;/code&gt;的这块卡其实已经无法检测，那既没有人手动设置，也没有程序在使用该卡，说明该卡其实还是有些问题的。&lt;/p&gt;
+
+&lt;p&gt;至于为什么会出现&lt;code&gt;SW Power Cap: Active&lt;/code&gt;,在&lt;a href=&#34;http://international.download.nvidia.com/tesla/pdf/gpu-boost-tesla-k40-app-note.pdf&#34;&gt;gpu-boost-tesla-k40&lt;/a&gt;中看到如下一句话:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;When the GPU is in a lower performance (idle) state, the GPU clock is fixed. However,
+when the GPU is operating in a high performance state (P0), the highest GPU
+performance is typically desired. NVIDIA GPU Boost maximizes the GPU performance
+by automatically raising the GPU clock when there is thermal and power headroom
+available. Likewise, if the power or thermal limit is reached, the GPU clock scales down
+to the next available clock setting so that the board remains below the power and
+thermal limit.
+NVIDIA products that support NVIDIA GPU Boost have multiple high-performance
+GPU clocks defined. That is, when the GPU is operating in its high performance mode
+(P0 state; determined automatically by the driver software), it has an array of GPU
+clocks available.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也就是在程序运行过程中可能会导致&lt;code&gt;SW Power Cap&lt;/code&gt;状态进行变化。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.使用&lt;code&gt;nvidia-smi -q -d ecc&lt;/code&gt;查看GPU的ecc信息&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nvidia-smi -i 3 -q -d ecc
+
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Aug 20 15:34:05 2018
+Driver Version                      : 384.81
+
+Attached GPUs                       : 8
+GPU 00000000:11:00.0
+    Ecc Mode
+        Current                     : Enabled
+        Pending                     : Enabled
+    ECC Errors
+        Volatile
+            Single Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+            Double Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+        Aggregate
+            Single Bit
+                Device Memory       : 524
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 524
+            Double Bit
+                Device Memory       : 36
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 36
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;发现该卡&lt;code&gt;ECC Errors&lt;/code&gt;的&lt;code&gt;Aggregate&lt;/code&gt;有&lt;code&gt;Device Memory&lt;/code&gt;错误信息.&lt;/p&gt;
+
+&lt;p&gt;而&lt;code&gt;nvidia-smi&lt;/code&gt;有一个&lt;code&gt;nvidia-smi -r&lt;/code&gt;参数用来进行对GPU卡进行重置，相关说明如下:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    -r    --gpu-reset           Trigger reset of the GPU.
+                                Can be used to reset the GPU HW state in situations
+                                that would otherwise require a machine reboot.
+                                Typically useful if a double bit ECC error has
+                                occurred.
+                                Reset operations are not guarenteed to work in
+                                all cases and should be used with caution.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也就是说当&lt;code&gt;a double bit ECC error&lt;/code&gt;出现时，gpu卡的重置是很有效的.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.尝试使用&lt;code&gt;nvidia-smi -r&lt;/code&gt;对异常的GPU卡进行恢复&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# nvidia-smi -r -i 3
+Unable to reset GPU 00000000:11:00.0 because it&#39;s being used by some other process (e.g. CUDA application, graphics application like X server, monitoring application like other instance of nvidia-smi). Please first kill all processes using this GPU and all compute applications running in the system (even when they are running on other GPUs) and then try to reset the GPU again.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;意思是在对GPU卡进行重置之前，建议kill掉服务器上的所有使用GPU卡的程序，所以停止掉程序后继续执行。&lt;/p&gt;
+
+&lt;h3 id=&#34;临时修复&#34;&gt;临时修复&lt;/h3&gt;
+
+&lt;p&gt;在临时关闭服务器上其他使用GPU资源的程序后，再次对id=3的GPU卡进行重置操作.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nvidia-smi -r -i 3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;再次测试GPU卡检测程序&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; tf.test.gpu_device_name()
+2018-08-20 14:52:27.958572: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+name: Tesla P40
+major: 6 minor: 1 memoryClockRate (GHz) 1.531
+pciBusID 0000:11:00.0
+Total memory: 22.38GiB
+Free memory: 22.21GiB
+2018-08-20 14:52:27.958641: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0
+2018-08-20 14:52:27.958651: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y
+2018-08-20 14:52:27.958668: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&amp;gt; (device: 0, name: Tesla P40, pci bus id: 0000:11:00.0)
+u&#39;/gpu:0&#39;
+&amp;gt;&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到，重置GPU后可以正常识别到GPU设备。&lt;/p&gt;
+
+&lt;h3 id=&#34;善后处理&#34;&gt;善后处理&lt;/h3&gt;
+
+&lt;p&gt;其实找了这么多，虽然临时将异常的GPU卡恢复使用了，但是对于底层具体的原因其实还有待排查，因为需要设计到cuda以及Tesla不同型号产品的配置以及参数优化调整。但为了便于问题的排查和修复以及对于业务使用的快速反应，我们需要尽快恢复资源使用。因此建议将&lt;code&gt;ECC Errors&lt;/code&gt;进行归零操作，以便后期问题的继续排查.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;将ECC Errors置零操作&lt;/strong&gt;
+&lt;code&gt;CUDA_ERROR_ECC_UNCORRECTABLE&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# nvidia-smi -p 1 -i 3
+Reset aggregate ECC errors to zero for GPU 00000000:11:00.0.
+All done.
+
+# nvidia-smi -i 3 -q -d ecc
+
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Aug 20 15:50:22 2018
+Driver Version                      : 384.81
+
+Attached GPUs                       : 8
+GPU 00000000:11:00.0
+    Ecc Mode
+        Current                     : Enabled
+        Pending                     : Enabled
+    ECC Errors
+        Volatile
+            Single Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+            Double Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+        Aggregate
+            Single Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+            Double Bit
+                Device Memory       : 0
+                Register File       : N/A
+                L1 Cache            : N/A
+                L2 Cache            : N/A
+                Texture Memory      : N/A
+                Texture Shared      : N/A
+                CBU                 : N/A
+                Total               : 0
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;参考文章&#34;&gt;参考文章&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.ibm.com/support/knowledgecenter/en/SSFHY8_5.5.0/com.ibm.cluster.essl.v5r5.essl100.doc/am5gr_nvidcap.htm&#34;&gt;GPU-Power-Cap&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;http://international.download.nvidia.com/tesla/pdf/gpu-boost-tesla-k40-app-note.pdf&#34;&gt;gpu-boost-tesla-k40&lt;/a&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Golang下的protobuf初体验</title>
+      <link>https://bgbiao.github.io/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
+      <pubDate>Tue, 03 Apr 2018 15:01:07 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
+      
+        <description>&lt;h3 id=&#34;protpbuf简介&#34;&gt;protpbuf简介&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。&lt;br /&gt;
+google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。&lt;br /&gt;
+可以把它用于分布式应用之间的数据通信或者异构环境下的&lt;code&gt;数据交换&lt;/code&gt;。&lt;br /&gt;
+作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;准备工作&#34;&gt;准备工作&lt;/h3&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://my.oschina.net/xxbAndy&#34;&gt;开源中国&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.jianshu.com/u/9c46ece5b7bd&#34;&gt;简书&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/BGBiao/&#34;&gt;GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;准备golang的基础环境，GOPATH等等&lt;/li&gt;
+&lt;li&gt;准备protobuf底层库环境(conda或者源码编译)&lt;/li&gt;
+&lt;li&gt;准备protobuf相关包和插件&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://bgbiao.github.io/images/Golang运维者.jpg&#34; alt=&#34;欢迎关注我的公众号&#34; /&gt;&lt;/p&gt;
-</description>
+&lt;h3 id=&#34;准备基础环境&#34;&gt;准备基础环境&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.2# go version
+go version go1.8.3 linux/amd64
+sh-4.2# go env
+....
+GOROOT=&amp;quot;/usr/lib/golang&amp;quot;
+GOPATH=&amp;quot;/root/go&amp;quot;
+....
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;准备protobuf底层库环境&#34;&gt;准备protobuf底层库环境&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;# 因为工作原因会使用conda管理一些基础包，所以可以使用conda去安装基础模块
+
+$ source /export/python2.7/setenv.sh
+$ conda install libprotobuf -y
+$ protoc --version
+libprotoc 3.0.0
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;准备protobuf模块以及插件&#34;&gt;准备protobuf模块以及插件&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;# protoc-gen-go是用来将protobuf的的代码转换成go语言代码的一个插件
+$ go get -u github.com/golang/protobuf/protoc-gen-go
+# proto是protobuf在golang中的接口模块
+$ go get -u github.com/golang/protobuf/proto
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;使用protobuf构造golang的模块代码&#34;&gt;使用protobuf构造golang的模块代码&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://segmentfault.com/a/1190000007917576&#34;&gt;Protobuf语法&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 创建项目
+$ mkdir -p &amp;quot;${GOPATH}/src/protobuf-study&amp;quot;
+
+# 生成protobuf和相应的golang代码
+$ mkdir -p &amp;quot;${GOPATH}/src/protobuf-study/protobuf&amp;quot; &amp;amp;&amp;amp; pushd &amp;quot;${GOPATH}/src/protobuf-study/goprotobuf&amp;quot;
+
+# 定义protobuf消息格式
+sh-4.2# cat test.proto
+//这里的语法必须使用proto2,在proto3的版本中和optional参数冲突了
+syntax = &amp;quot;proto2&amp;quot;;
+//显式生命报名，在其他消息格式定义中可以使用package.message的方式来使用类型
+//比如goprotobuf.HelloWorld
+package goprotobuf;
+//声明一个消息体描述一个请求或者响应的消息格式
+message HelloWorld {
+    required int32     id = 1;
+    required string    name = 2;
+    optional int32     opt = 3;
+}
+
+# 生成对应的golang模块代码(会将protobuf消息格式转换为对应golang结构体)
+sh-4.2# protoc --go_out=./ test.proto
+sh-4.2# ls
+test.pb.go  test.proto
+
+# 看一下生成的test.pd.go的核心代码
+// 声明一个消息体描述一个请求或者响应的消息格式
+type HelloWorld struct {
+	Id               *int32  `protobuf:&amp;quot;varint,1,req,name=id&amp;quot; json:&amp;quot;id,omitempty&amp;quot;`
+	Name             *string `protobuf:&amp;quot;bytes,2,req,name=name&amp;quot; json:&amp;quot;name,omitempty&amp;quot;`
+	Opt              *int32  `protobuf:&amp;quot;varint,3,opt,name=opt&amp;quot; json:&amp;quot;opt,omitempty&amp;quot;`
+	XXX_unrecognized []byte  `json:&amp;quot;-&amp;quot;`
+}
+
+func (m *HelloWorld) Reset()                    { *m = HelloWorld{} }
+func (m *HelloWorld) String() string            { return proto.CompactTextString(m) }
+func (*HelloWorld) ProtoMessage()               {}
+func (*HelloWorld) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+func (m *HelloWorld) GetId() int32 {
+	if m != nil &amp;amp;&amp;amp; m.Id != nil {
+		return *m.Id
+	}
+	return 0
+}
+
+func (m *HelloWorld) GetName() string {
+	if m != nil &amp;amp;&amp;amp; m.Name != nil {
+		return *m.Name
+	}
+	return &amp;quot;&amp;quot;
+}
+
+func (m *HelloWorld) GetOpt() int32 {
+	if m != nil &amp;amp;&amp;amp; m.Opt != nil {
+		return *m.Opt
+	}
+	return 0
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;使用-goprotobuf-包中定义的protobuf数据格式进行通信&#34;&gt;使用&lt;code&gt;goprotobuf&lt;/code&gt;包中定义的protobuf数据格式进行通信&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ pushd $GOPATH/src/protobuf-study
+
+# 一个简单使用protobuf进行读写文件的例子
+$ cat write.go
+package main
+import (
+    protobuf &amp;quot;github.com/golang/protobuf/proto&amp;quot;
+    &amp;quot;protobuf-study/goprotobuf&amp;quot;
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;os&amp;quot;
+)
+
+func main() {
+    //初始化protobuf数据格式
+    msg := &amp;amp;goprotobuf.HelloWorld{
+        Id:     protobuf.Int32(17),
+        Name:   protobuf.String(&amp;quot;BGbiao&amp;quot;),
+        Opt:    protobuf.Int32(18),
+
+    }
+
+    filename := &amp;quot;./protobuf-test.txt&amp;quot;
+    fmt.Printf(&amp;quot;使用protobuf创建文件 %s\n&amp;quot;,filename)
+    fObj,_ := os.Create(filename)
+    defer fObj.Close()
+    buffer,_ := protobuf.Marshal(msg)
+    fObj.Write(buffer)
+
+}
+
+# 测试执行写文件程序
+sh-4.2# go run write.go
+使用protobuf创建文件 ./protobuf-test.txt
+sh-4.2# cat -A protobuf-test.txt
+^H^Q^R^FBGbiao^X^R
+sh-4.2#
+
+# 一个简单的通过之前定义的protobuf格式进行读取文件内容的例子
+sh-4.2# cat read.go
+package main
+import (
+    protobuf &amp;quot;github.com/golang/protobuf/proto&amp;quot;
+    &amp;quot;protobuf-study/goprotobuf&amp;quot;
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;io&amp;quot;
+    &amp;quot;os&amp;quot;
+)
+
+func checkError(err error) {
+    if err != nil {
+        fmt.Println(err.Error())
+        os.Exit(-1)
+    }
+}
+
+func main() {
+    filename := &amp;quot;protobuf-test.txt&amp;quot;
+    file,fileErr := os.Open(filename)
+    checkError(fileErr)
+
+    defer file.Close()
+    fs,fsErr := file.Stat()
+    checkError(fsErr)
+    buffer := make([]byte,fs.Size())
+    //把file文件内容读取到buffer
+    _,readErr := io.ReadFull(file,buffer)
+    checkError(readErr)
+
+    //初始化pb结构体对象并将buffer中的文件内容读取到pb结构体中
+    msg := &amp;amp;goprotobuf.HelloWorld{}
+    pbErr := protobuf.Unmarshal(buffer, msg)
+    checkError(pbErr)
+    fmt.Printf(&amp;quot;读取文件:%s \r\nname:%s\nid:%d\nopt:%d\n&amp;quot;,filename,msg.GetName(),msg.GetId(),msg.GetOpt())
+}
+sh-4.2# go run read.go
+读取文件:protobuf-test.txt
+name:BGbiao
+id:17
+opt:18
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;相关链接&#34;&gt;相关链接&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://segmentfault.com/a/1190000007917576&#34;&gt;Protobuf语法&lt;/a&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>NVIDIA-DIGITS测试使用</title>
+      <link>https://bgbiao.github.io/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 02 Jan 2018 10:14:32 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</guid>
+      
+        <description>&lt;h3 id=&#34;digits简介&#34;&gt;DIGITS简介&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/DIGITS&#34;&gt;DIGITS&lt;/a&gt;: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司开发的第一个交互式深度学习GPU训练系统。目的在于整合现有的Deep Learning开发工具，实现深度神经网络（Deep Neural Network，DNN）设计、训练和可视化等任务变得简单化。DIGITS是基于浏览器的接口，因而通过实时的网络行为的可视化，可以快速设计最优的DNN。DIGITS是开源软件，可在GitHub上找到，因而开发人员可以扩展和自定义DIGITS。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://devblogs.nvidia.com/parallelforall/digits-deep-learning-gpu-training-system/&#34;&gt;英文介绍&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;digits特性&#34;&gt;DIGITS特性&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;提供了友好的用户界面，只需简单的点击即完成DNNs的训练。DIGITS是一个Web应用，用浏览器访问，上图是典型的工作流程图。&lt;/li&gt;
+&lt;li&gt;DIGITS用户接口提供了DNN优化工具。主控制台列出了现有的数据库和机器上可用的先前训练好的网络模型以及正在进行的训练活动。&lt;/li&gt;
+&lt;li&gt;DIGITS使可视化网络和快速对比精度变得简单。你选择一个模型，DIGITS显示训练状态和精度，并提供在网络训练时或训练完毕后加载和分类图像的选项。&lt;/li&gt;
+&lt;li&gt;由于DIGITS运行在一个web服务器上，团队用户可以很方便地分享数据库和网络配置，以及测试和分享结果。&lt;/li&gt;
+&lt;li&gt;DIGITS集成了流行的Caffe deep learning framework，并支持使用cudnn进行GPU加速。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;尝试使用DIGITS进行模型训练后，不得不说，这个平台功能做的真心不错。&lt;/p&gt;
+
+&lt;h3 id=&#34;部署测试&#34;&gt;部署测试&lt;/h3&gt;
+
+&lt;p&gt;官方给了基于&lt;code&gt;Ubuntu&lt;/code&gt;发行版的部署指南(估计是因为ubuntu上比较好处理python的各种依赖吧)，不过官方也构建的相关的Docker image来帮助用户进行部署。用户可以&lt;code&gt;docker pull nvidia/digits&lt;/code&gt;直接下载最新版本。&lt;/p&gt;
+
+&lt;p&gt;容器镜像中使用5000端口来暴露web服务，因此需要将5000端口映射出来。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# docker run -itd --name digits -p 5000:5000 nvidia/digits:6.0
+# docker logs digits 
+  ___ ___ ___ ___ _____ ___
+ |   \_ _/ __|_ _|_   _/ __|
+ | |) | | (_ || |  | | \__ \
+ |___/___\___|___| |_| |___/ 6.0.0
+
+libdc1394 error: Failed to initialize libdc1394
+/usr/local/lib/python2.7/dist-packages/matplotlib/font_manager.py:273: UserWarning: Matplotlib is building the font cache using fc-list. This may take a moment.
+  warnings.warn(&#39;Matplotlib is building the font cache using fc-list. This may take a moment.&#39;)
+2017-12-27 13:24:54 [INFO ] Loaded 0 jobs.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看日志如上环境即部署成功。&lt;/p&gt;
+
+&lt;h3 id=&#34;环境测试&#34;&gt;环境测试&lt;/h3&gt;
+
+&lt;p&gt;官方也给了一份测试数据以及文档来运行模型训练。
+&lt;a href=&#34;https://github.com/NVIDIA/DIGITS/blob/master/docs/GettingStarted.md&#34;&gt;doc&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;下载模型数据&#34;&gt;下载模型数据&lt;/h4&gt;
+
+&lt;p&gt;可以登录到&lt;code&gt;digits&lt;/code&gt;容器内部执行以下命令进行模型数据初始化。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ python -m digits.download_data mnist ~/mnist
+Downloading url=http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz ...
+Downloading url=http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz ...
+Downloading url=http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz ...
+Downloading url=http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz ...
+Uncompressing file=train-images-idx3-ubyte.gz ...
+Uncompressing file=train-labels-idx1-ubyte.gz ...
+Uncompressing file=t10k-images-idx3-ubyte.gz ...
+Uncompressing file=t10k-labels-idx1-ubyte.gz ...
+Reading labels from /home/username/mnist/train-labels.bin ...
+Reading images from /home/username/mnist/train-images.bin ...
+Reading labels from /home/username/mnist/test-labels.bin ...
+Reading images from /home/username/mnist/test-images.bin ...
+Dataset directory is created successfully at &#39;/home/username/mnist&#39;
+Done after 16.722807169 seconds.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然如果容器内部无法访问外网，也可以将相关模型数据下载后进行解压。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+# ls dataset/
+  t10k-images-idx3-ubyte.gz  t10k-labels-idx1-ubyte.gz  train-images-idx3-ubyte.gz  train-labels-idx1-ubyte.gz 
+# docker cp dataset digits:/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;需要注意的是，该模型文件好像不能直接解压。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# docker exec -it digits bash
+root@aa3e7a2437af:/# cd dataset/
+root@aa3e7a2437af:/dataset# ls
+t10k-images-idx3-ubyte.gz  t10k-labels-idx1-ubyte.gz  train-images-idx3-ubyte.gz  train-labels-idx1-ubyte.gz
+root@aa3e7a2437af:/dataset# python -m digits.download_data mnist .
+Uncompressing file=train-images-idx3-ubyte.gz ...
+Uncompressing file=train-labels-idx1-ubyte.gz ...
+Uncompressing file=t10k-images-idx3-ubyte.gz ...
+Uncompressing file=t10k-labels-idx1-ubyte.gz ...
+Reading labels from ./train-labels.bin ...
+Reading images from ./train-images.bin ...
+Reading labels from ./test-labels.bin ...
+Reading images from ./test-images.bin ...
+Dataset directory is created successfully at &#39;.&#39;
+Done after 18.2706720829 seconds.
+root@aa3e7a2437af:/dataset#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用webapp&#34;&gt;使用WebApp&lt;/h4&gt;
+
+&lt;p&gt;使用浏览器访问容器宿主机的5000端口，即可看到首页数据&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/index.png&#34; alt=&#34;index&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;登录&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;点击右上角的&lt;code&gt;login&lt;/code&gt;按钮进行登录。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;这里其实没有认证信息，用户随便输入就可以登录&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/login.png&#34; alt=&#34;login&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;创建DataSet&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;登录后点击&amp;rdquo;New Image Classification Dataset&amp;rdquo;
+并进行相关设置。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/dataset.png&#34; alt=&#34;dataset&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当job运行时，就可以在右侧看到运行的时间，以及结果。
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/dataset1.png&#34; alt=&#34;dataset1&#34; /&gt;
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/dataset2.png&#34; alt=&#34;dataset2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当运行完成之后，点击左上角的&lt;code&gt;DIGITS&lt;/code&gt;,可以看到创建的&lt;code&gt;dataset&lt;/code&gt;
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/dataset-final.png&#34; alt=&#34;dataset-final&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;训练模型&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;点击 &lt;code&gt;Models &amp;gt; New Model &amp;gt; Images &amp;gt; Classification&lt;/code&gt;.将引导你到&lt;code&gt;New Image Classification Model&lt;/code&gt; 页面。&lt;/p&gt;
+
+&lt;p&gt;按照以下步骤进行操作&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;在&lt;code&gt;Select Dataset field&lt;/code&gt;选择 &amp;ldquo;testbiaoge&amp;rdquo; 数据集&lt;/li&gt;
+&lt;li&gt;在&lt;code&gt;Standard Networks&lt;/code&gt;窗口选择&lt;code&gt;LeNet&lt;/code&gt;网络&lt;/li&gt;
+&lt;li&gt;填写GPU卡数量以及模型名称&lt;/li&gt;
+&lt;li&gt;点击&lt;code&gt;Create&lt;/code&gt;按钮进行创建&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/model.png&#34; alt=&#34;model-1&#34; /&gt;
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/model2.png&#34; alt=&#34;model-2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在训练过程中用户可以看到悬链环境以及训练时间等相关信息。&lt;/p&gt;
+
+&lt;p&gt;训练完成的状态：
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/model-train.png&#34; alt=&#34;model-train&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;为了测试这个模型，可以拉到页面最底部&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;点击&lt;code&gt;Upload image&lt;/code&gt; 按钮选择一个文件，测试过程中选择&lt;code&gt;/dataset/test/2/00035.png&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;或者在网络上找一张图片，黏贴URL到&lt;code&gt;Image URL&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;选中&lt;code&gt;Show visualizations and statistics&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;点击&lt;code&gt;Classify One&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在页面顶部，展示了五个分类以及相关的值。&lt;code&gt;DIGITS&lt;/code&gt;也提供了一些可视化以及网络中每个层的权重和激活统计信息。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/test-model-1.png&#34; alt=&#34;test-model&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/test-model.png&#34; alt=&#34;test-model2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;查看最终任务运行的过程信息：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;2017-12-29 06:50:54 [20171229-065052-5cc9] [INFO ] Infer Model task started.
+2017-12-29 06:50:54 [20171229-065052-5cc9] [INFO ] Task subprocess args: &amp;quot;/usr/bin/python /usr/local/lib/python2.7/dist-packages/digits/tools/inference.py /jobs/20171229-065052-5cc9/tmpctzfnI.txt /jobs/20171229-065052-5cc9 20171229-064432-4c8a --jobs_dir=/jobs --epoch=30.0 --layers=all --gpu=0&amp;quot;
+2017-12-29 06:50:54 [20171229-065052-5cc9] [WARNING] Infer Model unrecognized output: libdc1394 error: Failed to initialize libdc1394
+
+
+
+2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Infer Model task completed.
+2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Job complete.
+2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Job deleted.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，使用NVIDIA-DIGITS已经完成了一个模型训练。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Golang中GBK和UTF-8格式互相转换</title>
+      <link>https://bgbiao.github.io/post/golang%E4%B8%ADgbk%E5%92%8Cutf-8%E6%A0%BC%E5%BC%8F%E7%94%BB%E5%83%8F%E8%BD%AC%E6%8D%A2/</link>
+      <pubDate>Sun, 24 Dec 2017 17:36:14 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/golang%E4%B8%ADgbk%E5%92%8Cutf-8%E6%A0%BC%E5%BC%8F%E7%94%BB%E5%83%8F%E8%BD%AC%E6%8D%A2/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 刚开始学习&lt;code&gt;Golang&lt;/code&gt;的时候，做一些简单数据处理发现总是会出现乱码，通常是因为字符集的问题，这里记录下如何在&lt;code&gt;GBK&lt;/code&gt;和&lt;code&gt;UTF-8&lt;/code&gt;之间进行格式转换&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;直接上代码&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * @File Name: gb2312-utf8.go
+ * @Author:
+ * @Email:
+ * @Create Date: 2017-12-18 14:12:25
+ * @Last Modified: 2017-12-18 14:12:00
+ * @Description:
+ */
+package main
+import (
+    &amp;quot;bytes&amp;quot;
+    &amp;quot;golang.org/x/text/encoding/simplifiedchinese&amp;quot;
+    &amp;quot;golang.org/x/text/transform&amp;quot;
+    &amp;quot;io/ioutil&amp;quot;
+    &amp;quot;fmt&amp;quot;
+)
+
+func GbkToUtf8(s []byte) ([]byte, error) {
+    reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewDecoder())
+    d, e := ioutil.ReadAll(reader)
+    if e != nil {
+        return nil, e
+    }
+    return d, nil
+}
+
+func Utf8ToGbk(s []byte) ([]byte, error) {
+    reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
+    d, e := ioutil.ReadAll(reader)
+    if e != nil {
+        return nil, e
+    }
+    return d, nil
+}
+
+func main() {
+
+    s := &amp;quot;GBK 与 UTF-8 编码转换测试&amp;quot;
+    gbk, err := Utf8ToGbk([]byte(s))
+    if err != nil {
+        fmt.Println(err)
+    } else {
+        fmt.Println(string(gbk))
+    }
+
+    utf8, err := GbkToUtf8(gbk)
+    if err != nil {
+        fmt.Println(err)
+    } else {
+        fmt.Println(string(utf8))
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go run gbktoutf-8.go
+GBK �� UTF-8 ����ת������
+GBK 与 UTF-8 编码转换测试
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Golang正则模块使用</title>
+      <link>https://bgbiao.github.io/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sun, 24 Dec 2017 16:39:14 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/</guid>
+      
+        <description>&lt;p&gt;最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的&lt;code&gt;regexp&lt;/code&gt;模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为&lt;code&gt;string&lt;/code&gt;类型的方法。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;regexp&lt;/code&gt;模块的结构体和方法定义&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//正则结构体
+type Regexp struct {
+        // contains filtered or unexported fields
+}
+
+//初始化结构体对象的方法
+func Compile(expr string) (*Regexp, error)
+func CompilePOSIX(expr string) (*Regexp, error)
+func MustCompile(str string) *Regexp
+func MustCompilePOSIX(str string) *Regexp
+
+
+//结构体方法.常用的几个
+//在字符串s中查找完全匹配正则表达式re的字符串.如果匹配到就停止不进行全部匹配，如果匹配不到就输出空字符串
+func (re *Regexp) FindString(s string) string
+
+//在字符串s中匹配re表达式，n表示匹配的次数，-1表示匹配整个字符串。返回字符串切片
+func (re *Regexp) FindAllString(s string, n int) []string
+
+//在src中匹配re，并替换为repl，该种方式中repl中的$符号会展开实际的变量，通常用在回溯查找中
+func (re *Regexp) ReplaceAllString(src, repl string) string
+
+//在src中匹配re，并替换为repl,该方法会按照repl中的字面意思进行替换，不支持高级变量匹配，比如回溯等等
+func (re *Regexp) ReplaceAllLiteralString(src, repl string) string
+ 
+ 
+//在字符串中是否匹配到re定义的字符串，匹配返回true
+func (re *Regexp) MatchString(s string) bool
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;简单示例&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat regexp-test.go
+/**
+ * @File Name: test.go
+ * @Author:
+ * @Email:
+ * @Create Date: 2017-12-24 15:12:31
+ * @Last Modified: 2017-12-24 16:12:12
+ * @Description:
+ */
+package main
+
+import (
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;regexp&amp;quot;
+)
+
+func main() {
+  testString := &amp;quot;k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io&amp;quot;
+	re := regexp.MustCompile(&amp;quot;k8s?&amp;quot;)
+  fmt.Println(&amp;quot;src string:&amp;quot;,testString)
+  fmt.Println(&amp;quot;regular expression:&amp;quot;,re)
+
+  fmt.Println(&amp;quot;FindAllString matching all:&amp;quot;,re.FindAllString(testString,-1))
+  fmt.Println(&amp;quot;FindAllString matching twice:&amp;quot;,re.FindAllString(testString,2))
+  fmt.Println(&amp;quot;FindString:&amp;quot;,re.FindString(testString))
+  fmt.Println(&amp;quot;ReplaceAllString:&amp;quot;,re.ReplaceAllString(testString,&amp;quot;biaoge&amp;quot;))
+  fmt.Println(&amp;quot;ReplaceAllLiteralString:&amp;quot;,re.ReplaceAllLiteralString(testString,&amp;quot;BIAOGE&amp;quot;))
+  fmt.Println(&amp;quot;Match String:&amp;quot;,re.MatchString(testString))
+}
+
+$ go run regexp-test.go
+src string: k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io
+regular expression: k8s?
+FindAllString matching all: [k8s k8 k8s k8s]
+FindAllString matching twice: [k8s k8]
+FindString: k8s
+ReplaceAllString: biaoge-test-pod-12343biaoge11sadsxsakxz-test-biaoge-container.biaoge-@xxbandy.github.io
+ReplaceAllLiteralString: BIAOGE-test-pod-12343BIAOGE11sadsxsakxz-test-BIAOGE-container.BIAOGE-@xxbandy.github.io
+Match String: true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;不论是哪种语言的正则模块，个人认为语法都不是最重要的，最重要我认为还是正则表达式本身，如果对正则表达式本身认识比较深的话，不论用哪种语言工具都可以很灵活的处理各种业务场景。这里附上一篇当年写的正则表达式相关的&lt;a href=&#34;https://my.oschina.net/xxbAndy/blog/370806&#34;&gt;文章&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;看到另外一篇文章的正则总结的挺好，分享下来.
+&lt;a href=&#34;http://blog.csdn.net/zfy1355/article/details/52959803&#34;&gt;http://blog.csdn.net/zfy1355/article/details/52959803&lt;/a&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Golang读写文件操作</title>
+      <link>https://bgbiao.github.io/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Sun, 17 Dec 2017 23:25:25 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</guid>
+      
+        <description>&lt;p&gt;最近在使用Golang进行文件读写的过程中，遇到几个细节问题导致程序写入数据时有一定脏数据的残留，最后发现是使用os.OpenFile在进行文件操作的时候没有使用正确的flag造成的。因此专门去学习了下Golang中读写文件的几种方式方法,在此记录下一些简单的操作，防止以后遗忘。&lt;/p&gt;
+
+&lt;h3 id=&#34;读文件&#34;&gt;读文件&lt;/h3&gt;
+
+&lt;p&gt;使用golang语言去读取一个文件默认会有多种方式，这里主要介绍以下几种。&lt;/p&gt;
+
+&lt;h4 id=&#34;使用-ioutil-直接读取&#34;&gt;使用&lt;code&gt;ioutil&lt;/code&gt;直接读取&lt;/h4&gt;
+
+&lt;p&gt;需要引入&lt;code&gt;io/ioutil&lt;/code&gt;包，该包默认拥有以下函数供用户调用。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func NopCloser(r io.Reader) io.ReadCloser
+func ReadAll(r io.Reader) ([]byte, error)
+func ReadDir(dirname string) ([]os.FileInfo, error)
+func ReadFile(filename string) ([]byte, error)
+func TempDir(dir, prefix string) (name string, err error)
+func TempFile(dir, prefix string) (f *os.File, err error)
+func WriteFile(filename string, data []byte, perm os.FileMode) error
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;读文件，我们可以看以下三个函数:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//从一个io.Reader类型中读取内容直到返回错误或者EOF时返回读取的数据，当err == nil时，数据成功读取到[]byte中
+//ReadAll函数被定义为从源中读取数据直到EOF，它是不会去从返回数据中去判断EOF来作为读取成功的依据
+func ReadAll(r io.Reader) ([]byte, error)
+
+//读取一个目录，并返回一个当前目录下的文件对象列表和错误信息
+func ReadDir(dirname string) ([]os.FileInfo, error)
+
+//读取文件内容，并返回[]byte数据和错误信息。err == nil时，读取成功
+func ReadFile(filename string) ([]byte, error)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;读取文件示例:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat readfile.go
+package main
+import (
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;io/ioutil&amp;quot;
+    &amp;quot;strings&amp;quot;
+)
+func main() {
+   Ioutil(&amp;quot;mytestfile.txt&amp;quot;)
+    }
+
+func Ioutil(name string) {
+    if contents,err := ioutil.ReadFile(name);err == nil {
+        //因为contents是[]byte类型，直接转换成string类型后会多一行空格,需要使用strings.Replace替换换行符
+        result := strings.Replace(string(contents),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1)
+        fmt.Println(result)
+        }
+    }
+    
+$ go run readfile.go
+xxbandy.github.io @by Andy_xu
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;借助-os-open-进行读取文件&#34;&gt;借助&lt;code&gt;os.Open&lt;/code&gt;进行读取文件&lt;/h4&gt;
+
+&lt;p&gt;由于&lt;code&gt;os.Open&lt;/code&gt;是打开一个文件并返回一个文件对象，因此其实可以结合&lt;code&gt;ioutil.ReadAll(r io.Reader)&lt;/code&gt;来进行读取。
+&lt;code&gt;io.Reader&lt;/code&gt;其实是一个包含&lt;code&gt;Read&lt;/code&gt;方法的接口类型，而文件对象本身是实现了了&lt;code&gt;Read&lt;/code&gt;方法的。&lt;/p&gt;
+
+&lt;p&gt;我们先来看下&lt;code&gt;os.Open&lt;/code&gt;家族的相关函数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//打开一个需要被读取的文件，如果成功读取，返回的文件对象将可用被读取，该函数默认的权限为O_RDONLY，也就是只对文件有只读权限。如果有错误，将返回*PathError类型
+func Open(name string) (*File, error)
+
+//大部分用户会选择该函数来代替Open or Create函数。该函数主要用来指定参数(os.O_APPEND|os.O_CREATE|os.O_WRONLY)以及文件权限(0666)来打开文件，如果打开成功返回的文件对象将被用作I/O操作
+func OpenFile(name string, flag int, perm FileMode) (*File, error)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使用&lt;code&gt;os.Open&lt;/code&gt;家族函数和&lt;code&gt;ioutil.ReadAll()&lt;/code&gt;读取文件示例:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func OsIoutil(name string) {
+      if fileObj,err := os.Open(name);err == nil {
+      //if fileObj,err := os.OpenFile(name,os.O_RDONLY,0644); err == nil {
+        defer fileObj.Close()
+        if contents,err := ioutil.ReadAll(fileObj); err == nil {
+            result := strings.Replace(string(contents),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1)
+            fmt.Println(&amp;quot;Use os.Open family functions and ioutil.ReadAll to read a file contents:&amp;quot;,result)
+            }
+
+        }
+}
+
+# 在main函数中调用OsIoutil(name)函数就可以读取文件内容了
+$ go run readfile.go
+Use os.Open family functions and ioutil.ReadAll to read a file contents: xxbandy.github.io @by Andy_xu
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然而上述方式会比较繁琐一些，因为使用了&lt;code&gt;os&lt;/code&gt;的同时借助了&lt;code&gt;ioutil&lt;/code&gt;,但是在读取大文件的时候还是比较有优势的。不过读取小文件可以直接使用文件对象的一些方法。&lt;/p&gt;
+
+&lt;p&gt;不论是上边说的&lt;code&gt;os.Open&lt;/code&gt;还是&lt;code&gt;os.OpenFile&lt;/code&gt;他们最终都返回了一个&lt;code&gt;*File&lt;/code&gt;文件对象，而该文件对象默认是有很多方法的，其中读取文件的方法有如下几种:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//从文件对象中读取长度为b的字节，返回当前读到的字节数以及错误信息。因此使用该方法需要先初始化一个符合内容大小的空的字节列表。读取到文件的末尾时，该方法返回0，io.EOF
+func (f *File) Read(b []byte) (n int, err error)
+
+//从文件的off偏移量开始读取长度为b的字节。返回读取到字节数以及错误信息。当读取到的字节数n小于想要读取字节的长度len(b)的时候，该方法将返回非空的error。当读到文件末尾时，err返回io.EOF
+func (f *File) ReadAt(b []byte, off int64) (n int, err error)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使用文件对象的&lt;code&gt;Read&lt;/code&gt;方法读取：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func FileRead(name string) {
+    if fileObj,err := os.Open(name);err == nil {
+        defer fileObj.Close()
+        //在定义空的byte列表时尽量大一些，否则这种方式读取内容可能造成文件读取不完整
+        buf := make([]byte, 1024)
+        if n,err := fileObj.Read(buf);err == nil {
+               fmt.Println(&amp;quot;The number of bytes read:&amp;quot;+strconv.Itoa(n),&amp;quot;Buf length:&amp;quot;+strconv.Itoa(len(buf)))
+               result := strings.Replace(string(buf),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1)
+               fmt.Println(&amp;quot;Use os.Open and File&#39;s Read method to read a file:&amp;quot;,result)
+            }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用-os-open-和-bufio-reader-读取文件内容&#34;&gt;使用&lt;code&gt;os.Open&lt;/code&gt;和&lt;code&gt;bufio.Reader&lt;/code&gt;读取文件内容&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;bufio&lt;/code&gt;包实现了缓存IO,它本身包装了&lt;code&gt;io.Reader&lt;/code&gt;和&lt;code&gt;io.Writer&lt;/code&gt;对象，创建了另外的Reader和Writer对象，不过该种方式是带有缓存的，因此对于文本I/O来说，该包是提供了一些便利的。&lt;/p&gt;
+
+&lt;p&gt;先看下&lt;code&gt;bufio&lt;/code&gt;模块下的相关的&lt;code&gt;Reader&lt;/code&gt;函数方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//首先定义了一个用来缓冲io.Reader对象的结构体，同时该结构体拥有以下相关的方法
+type Reader struct {
+}
+
+//NewReader函数用来返回一个默认大小buffer的Reader对象(默认大小好像是4096) 等同于NewReaderSize(rd,4096)
+func NewReader(rd io.Reader) *Reader
+
+//该函数返回一个指定大小buffer(size最小为16)的Reader对象，如果 io.Reader参数已经是一个足够大的Reader，它将返回该Reader
+func NewReaderSize(rd io.Reader, size int) *Reader
+
+
+//该方法返回从当前buffer中能被读到的字节数
+func (b *Reader) Buffered() int
+
+//Discard方法跳过后续的 n 个字节的数据，返回跳过的字节数。如果0 &amp;lt;= n &amp;lt;= b.Buffered(),该方法将不会从io.Reader中成功读取数据。
+func (b *Reader) Discard(n int) (discarded int, err error)
+
+//Peekf方法返回缓存的一个切片，该切片只包含缓存中的前n个字节的数据
+func (b *Reader) Peek(n int) ([]byte, error)
+
+//把Reader缓存对象中的数据读入到[]byte类型的p中，并返回读取的字节数。读取成功，err将返回空值
+func (b *Reader) Read(p []byte) (n int, err error)
+
+//返回单个字节，如果没有数据返回err
+func (b *Reader) ReadByte() (byte, error)
+
+//该方法在b中读取delimz之前的所有数据，返回的切片是已读出的数据的引用，切片中的数据在下一次的读取操作之前是有效的。如果未找到delim，将返回查找结果并返回nil空值。因为缓存的数据可能被下一次的读写操作修改，因此一般使用ReadBytes或者ReadString，他们返回的都是数据拷贝
+func (b *Reader) ReadSlice(delim byte) (line []byte, err error)
+
+//功能同ReadSlice，返回数据的拷贝
+func (b *Reader) ReadBytes(delim byte) ([]byte, error)
+
+//功能同ReadBytes,返回字符串
+func (b *Reader) ReadString(delim byte) (string, error)
+
+//该方法是一个低水平的读取方式，一般建议使用ReadBytes(&#39;\n&#39;) 或 ReadString(&#39;\n&#39;)，或者使用一个 Scanner来代替。ReadLine 通过调用 ReadSlice 方法实现，返回的也是缓存的切片，用于读取一行数据，不包括行尾标记（\n 或 \r\n）
+func (b *Reader) ReadLine() (line []byte, isPrefix bool, err error)
+
+//读取单个UTF-8字符并返回一个rune和字节大小
+func (b *Reader) ReadRune() (r rune, size int, err error)
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func BufioRead(name string) {
+    if fileObj,err := os.Open(name);err == nil {
+        defer fileObj.Close()
+        //一个文件对象本身是实现了io.Reader的 使用bufio.NewReader去初始化一个Reader对象，存在buffer中的，读取一次就会被清空
+        reader := bufio.NewReader(fileObj)
+        //使用ReadString(delim byte)来读取delim以及之前的数据并返回相关的字符串.
+        if result,err := reader.ReadString(byte(&#39;@&#39;));err == nil {
+            fmt.Println(&amp;quot;使用ReadSlince相关方法读取内容:&amp;quot;,result)
+        }
+        //注意:上述ReadString已经将buffer中的数据读取出来了，下面将不会输出内容
+        //需要注意的是，因为是将文件内容读取到[]byte中，因此需要对大小进行一定的把控
+        buf := make([]byte,1024)
+        //读取Reader对象中的内容到[]byte类型的buf中
+        if n,err := reader.Read(buf); err == nil {
+            fmt.Println(&amp;quot;The number of bytes read:&amp;quot;+strconv.Itoa(n))
+            //这里的buf是一个[]byte，因此如果需要只输出内容，仍然需要将文件内容的换行符替换掉
+            fmt.Println(&amp;quot;Use bufio.NewReader and os.Open read file contents to a []byte:&amp;quot;,string(buf))
+        }
+
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;读文件所有方式示例&#34;&gt;读文件所有方式示例&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * @File Name: readfile.go
+ * @Author:
+ * @Email:
+ * @Create Date: 2017-12-16 16:12:01
+ * @Last Modified: 2017-12-17 12:12:02
+ * @Description:读取指定文件的几种方法，需要注意的是[]byte类型在转换成string类型的时候，都会在最后多一行空格，需要使用result := strings.Replace(string(contents),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1) 方式替换换行符
+ */
+package main
+import (
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;io/ioutil&amp;quot;
+    &amp;quot;strings&amp;quot;
+    &amp;quot;os&amp;quot;
+    &amp;quot;strconv&amp;quot;
+    &amp;quot;bufio&amp;quot;
+)
+
+func main() {
+   Ioutil(&amp;quot;mytestfile.txt&amp;quot;)
+   OsIoutil(&amp;quot;mytestfile.txt&amp;quot;)
+   FileRead(&amp;quot;mytestfile.txt&amp;quot;)
+   BufioRead(&amp;quot;mytestfile.txt&amp;quot;)
+    }
+
+
+func Ioutil(name string) {
+    if contents,err := ioutil.ReadFile(name);err == nil {
+        //因为contents是[]byte类型，直接转换成string类型后会多一行空格,需要使用strings.Replace替换换行符
+        result := strings.Replace(string(contents),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1)
+        fmt.Println(&amp;quot;Use ioutil.ReadFile to read a file:&amp;quot;,result)
+        }
+    }
+
+func OsIoutil(name string) {
+      if fileObj,err := os.Open(name);err == nil {
+      //if fileObj,err := os.OpenFile(name,os.O_RDONLY,0644); err == nil {
+        defer fileObj.Close()
+        if contents,err := ioutil.ReadAll(fileObj); err == nil {
+            result := strings.Replace(string(contents),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1)
+            fmt.Println(&amp;quot;Use os.Open family functions and ioutil.ReadAll to read a file :&amp;quot;,result)
+            }
+
+        }
+}
+
+
+func FileRead(name string) {
+    if fileObj,err := os.Open(name);err == nil {
+        defer fileObj.Close()
+        //在定义空的byte列表时尽量大一些，否则这种方式读取内容可能造成文件读取不完整
+        buf := make([]byte, 1024)
+        if n,err := fileObj.Read(buf);err == nil {
+               fmt.Println(&amp;quot;The number of bytes read:&amp;quot;+strconv.Itoa(n),&amp;quot;Buf length:&amp;quot;+strconv.Itoa(len(buf)))
+               result := strings.Replace(string(buf),&amp;quot;\n&amp;quot;,&amp;quot;&amp;quot;,1)
+               fmt.Println(&amp;quot;Use os.Open and File&#39;s Read method to read a file:&amp;quot;,result)
+            }
+    }
+}
+
+func BufioRead(name string) {
+    if fileObj,err := os.Open(name);err == nil {
+        defer fileObj.Close()
+        //一个文件对象本身是实现了io.Reader的 使用bufio.NewReader去初始化一个Reader对象，存在buffer中的，读取一次就会被清空
+        reader := bufio.NewReader(fileObj)
+        //使用ReadString(delim byte)来读取delim以及之前的数据并返回相关的字符串.
+        if result,err := reader.ReadString(byte(&#39;@&#39;));err == nil {
+            fmt.Println(&amp;quot;使用ReadSlince相关方法读取内容:&amp;quot;,result)
+        }
+        //注意:上述ReadString已经将buffer中的数据读取出来了，下面将不会输出内容
+        //需要注意的是，因为是将文件内容读取到[]byte中，因此需要对大小进行一定的把控
+        buf := make([]byte,1024)
+        //读取Reader对象中的内容到[]byte类型的buf中
+        if n,err := reader.Read(buf); err == nil {
+            fmt.Println(&amp;quot;The number of bytes read:&amp;quot;+strconv.Itoa(n))
+            //这里的buf是一个[]byte，因此如果需要只输出内容，仍然需要将文件内容的换行符替换掉
+            fmt.Println(&amp;quot;Use bufio.NewReader and os.Open read file contents to a []byte:&amp;quot;,string(buf))
+        }
+
+
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;写文件&#34;&gt;写文件&lt;/h3&gt;
+
+&lt;p&gt;那么上述几种方式来读取文件的方式也支持文件的写入，相关的方法如下:&lt;/p&gt;
+
+&lt;h4 id=&#34;使用-ioutil-包进行文件写入&#34;&gt;使用&lt;code&gt;ioutil&lt;/code&gt;包进行文件写入&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;// 写入[]byte类型的data到filename文件中，文件权限为perm
+func WriteFile(filename string, data []byte, perm os.FileMode) error
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;示例:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat writefile.go
+/**
+ * @File Name: writefile.go
+ * @Author:
+ * @Email:
+ * @Create Date: 2017-12-17 12:12:09
+ * @Last Modified: 2017-12-17 12:12:30
+ * @Description:使用多种方式将数据写入文件
+ */
+package main
+import (
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;io/ioutil&amp;quot;
+)
+
+func main() {
+      name := &amp;quot;testwritefile.txt&amp;quot;
+      content := &amp;quot;Hello, xxbandy.github.io!\n&amp;quot;
+      WriteWithIoutil(name,content)
+}
+
+//使用ioutil.WriteFile方式写入文件,是将[]byte内容写入文件,如果content字符串中没有换行符的话，默认就不会有换行符
+func WriteWithIoutil(name,content string) {
+    data :=  []byte(content)
+    if ioutil.WriteFile(name,data,0644) == nil {
+        fmt.Println(&amp;quot;写入文件成功:&amp;quot;,content)
+        }
+    }
+ 
+# 会有换行符    
+$ go run writefile.go
+写入文件成功: Hello, xxbandy.github.io!
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用-os-open-相关函数进行文件写入&#34;&gt;使用&lt;code&gt;os.Open&lt;/code&gt;相关函数进行文件写入&lt;/h4&gt;
+
+&lt;p&gt;因为&lt;code&gt;os.Open&lt;/code&gt;系列的函数会打开文件，并返回一个文件对象指针，而该文件对象是一个定义的结构体，拥有一些相关写入的方法。&lt;/p&gt;
+
+&lt;p&gt;文件对象结构体以及相关写入文件的方法:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//写入长度为b字节切片到文件f中，返回写入字节号和错误信息。当n不等于len(b)时，将返回非空的err
+func (f *File) Write(b []byte) (n int, err error)
+//在off偏移量出向文件f写入长度为b的字节
+func (f *File) WriteAt(b []byte, off int64) (n int, err error)
+//类似于Write方法，但是写入内容是字符串而不是字节切片
+func (f *File) WriteString(s string) (n int, err error)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意：&lt;/code&gt;使用WriteString()j进行文件写入发现经常新内容写入时无法正常覆盖全部新内容。(是因为字符串长度不一样)&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//使用os.OpenFile()相关函数打开文件对象，并使用文件对象的相关方法进行文件写入操作
+func WriteWithFileWrite(name,content string){
+    fileObj,err := os.OpenFile(name,os.O_RDWR|os.O_CREATE|os.O_TRUNC,0644)
+    if err != nil {
+        fmt.Println(&amp;quot;Failed to open the file&amp;quot;,err.Error())
+        os.Exit(2)
+    }
+    defer fileObj.Close()
+    if _,err := fileObj.WriteString(content);err == nil {
+        fmt.Println(&amp;quot;Successful writing to the file with os.OpenFile and *File.WriteString method.&amp;quot;,content)
+    }
+    contents := []byte(content)
+    if _,err := fileObj.Write(contents);err == nil {
+        fmt.Println(&amp;quot;Successful writing to thr file with os.OpenFile and *File.Write method.&amp;quot;,content)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;使用&lt;code&gt;os.OpenFile(name string, flag int, perm FileMode)&lt;/code&gt;打开文件并进行文件内容更改，需要注意&lt;code&gt;flag&lt;/code&gt;相关的参数以及含义。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;const (
+        O_RDONLY int = syscall.O_RDONLY // 只读打开文件和os.Open()同义
+        O_WRONLY int = syscall.O_WRONLY // 只写打开文件
+        O_RDWR   int = syscall.O_RDWR   // 读写方式打开文件
+        O_APPEND int = syscall.O_APPEND // 当写的时候使用追加模式到文件末尾
+        O_CREATE int = syscall.O_CREAT  // 如果文件不存在，此案创建
+        O_EXCL   int = syscall.O_EXCL   // 和O_CREATE一起使用, 只有当文件不存在时才创建
+        O_SYNC   int = syscall.O_SYNC   // 以同步I/O方式打开文件，直接写入硬盘.
+        O_TRUNC  int = syscall.O_TRUNC  // 如果可以的话，当打开文件时先清空文件
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用-io-包中的相关函数写入文件&#34;&gt;使用&lt;code&gt;io&lt;/code&gt;包中的相关函数写入文件&lt;/h4&gt;
+
+&lt;p&gt;在&lt;code&gt;io&lt;/code&gt;包中有一个&lt;code&gt;WriteString()&lt;/code&gt;函数，用来将字符串写入一个&lt;code&gt;Writer&lt;/code&gt;对象中。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//将字符串s写入w(可以是一个[]byte)，如果w实现了一个WriteString方法，它可以被直接调用。否则w.Write会再一次被调用
+func WriteString(w Writer, s string) (n int, err error)
+
+//Writer对象的定义
+type Writer interface {
+        Write(p []byte) (n int, err error)
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;示例:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//使用io.WriteString()函数进行数据的写入
+func WriteWithIo(name,content string) {
+    fileObj,err := os.OpenFile(name,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644)
+    if err != nil {
+        fmt.Println(&amp;quot;Failed to open the file&amp;quot;,err.Error())
+        os.Exit(2)
+    }
+    if  _,err := io.WriteString(fileObj,content);err == nil {
+        fmt.Println(&amp;quot;Successful appending to the file with os.OpenFile and io.WriteString.&amp;quot;,content)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用-bufio-包中的相关函数写入文件&#34;&gt;使用&lt;code&gt;bufio&lt;/code&gt;包中的相关函数写入文件&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;bufio&lt;/code&gt;和&lt;code&gt;io&lt;/code&gt;包中很多操作都是相似的，唯一不同的地方是&lt;code&gt;bufio&lt;/code&gt;提供了一些缓冲的操作，如果对文件I/O操作比较频繁的，使用&lt;code&gt;bufio&lt;/code&gt;还是能增加一些性能的。&lt;/p&gt;
+
+&lt;p&gt;在&lt;code&gt;bufio&lt;/code&gt;包中，有一个&lt;code&gt;Writer&lt;/code&gt;结构体，而其相关的方法也支持一些写入操作。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//Writer是一个空的结构体，一般需要使用NewWriter或者NewWriterSize来初始化一个结构体对象
+type Writer struct {
+        // contains filtered or unexported fields
+}
+
+//NewWriterSize和NewWriter函数
+//返回默认缓冲大小的Writer对象(默认是4096)
+func NewWriter(w io.Writer) *Writer
+
+//指定缓冲大小创建一个Writer对象
+func NewWriterSize(w io.Writer, size int) *Writer
+
+//Writer对象相关的写入数据的方法
+
+//把p中的内容写入buffer,返回写入的字节数和错误信息。如果nn&amp;lt;len(p),返回错误信息中会包含为什么写入的数据比较短
+func (b *Writer) Write(p []byte) (nn int, err error)
+//将buffer中的数据写入 io.Writer
+func (b *Writer) Flush() error
+
+//以下三个方法可以直接写入到文件中
+//写入单个字节
+func (b *Writer) WriteByte(c byte) error
+//写入单个Unicode指针返回写入字节数错误信息
+func (b *Writer) WriteRune(r rune) (size int, err error)
+//写入字符串并返回写入字节数和错误信息
+func (b *Writer) WriteString(s string) (int, error)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意：如果需要再写入文件时利用缓冲的话只能使用bufio包中的Write方法&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;示例:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//使用bufio包中Writer对象的相关方法进行数据的写入
+func WriteWithBufio(name,content string) {
+    if fileObj,err := os.OpenFile(name,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644);err == nil {
+        defer fileObj.Close()
+        writeObj := bufio.NewWriterSize(fileObj,4096)
+        //
+       if _,err := writeObj.WriteString(content);err == nil {
+              fmt.Println(&amp;quot;Successful appending buffer and flush to file with bufio&#39;s Writer obj WriteString method&amp;quot;,content)
+           }
+
+        //使用Write方法,需要使用Writer对象的Flush方法将buffer中的数据刷到磁盘
+        buf := []byte(content)
+        if _,err := writeObj.Write(buf);err == nil {
+            fmt.Println(&amp;quot;Successful appending to the buffer with os.OpenFile and bufio&#39;s Writer obj Write method.&amp;quot;,content)
+            if  err := writeObj.Flush(); err != nil {panic(err)}
+            fmt.Println(&amp;quot;Successful flush the buffer data to file &amp;quot;,content)
+        }
+        }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;写文件全部示例&#34;&gt;写文件全部示例&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * @File Name: writefile.go
+ * @Author:
+ * @Email:
+ * @Create Date: 2017-12-17 12:12:09
+ * @Last Modified: 2017-12-17 23:12:10
+ * @Description:使用多种方式将数据写入文件
+ */
+package main
+import (
+    &amp;quot;os&amp;quot;
+    &amp;quot;io&amp;quot;
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;io/ioutil&amp;quot;
+    &amp;quot;bufio&amp;quot;
+)
+
+func main() {
+      name := &amp;quot;testwritefile.txt&amp;quot;
+      content := &amp;quot;Hello, xxbandy.github.io!\n&amp;quot;
+      WriteWithIoutil(name,content)
+      contents := &amp;quot;Hello, xuxuebiao\n&amp;quot;
+      //清空一次文件并写入两行contents
+      WriteWithFileWrite(name,contents)
+      WriteWithIo(name,content)
+      //使用bufio包需要将数据先读到buffer中，然后在flash到磁盘中
+      WriteWithBufio(name,contents)
+}
+
+//使用ioutil.WriteFile方式写入文件,是将[]byte内容写入文件,如果content字符串中没有换行符的话，默认就不会有换行符
+func WriteWithIoutil(name,content string) {
+    data :=  []byte(content)
+    if ioutil.WriteFile(name,data,0644) == nil {
+        fmt.Println(&amp;quot;写入文件成功:&amp;quot;,content)
+        }
+    }
+
+//使用os.OpenFile()相关函数打开文件对象，并使用文件对象的相关方法进行文件写入操作
+//清空一次文件
+func WriteWithFileWrite(name,content string){
+    fileObj,err := os.OpenFile(name,os.O_RDWR|os.O_CREATE|os.O_TRUNC,0644)
+    if err != nil {
+        fmt.Println(&amp;quot;Failed to open the file&amp;quot;,err.Error())
+        os.Exit(2)
+    }
+    defer fileObj.Close()
+    if _,err := fileObj.WriteString(content);err == nil {
+        fmt.Println(&amp;quot;Successful writing to the file with os.OpenFile and *File.WriteString method.&amp;quot;,content)
+    }
+    contents := []byte(content)
+    if _,err := fileObj.Write(contents);err == nil {
+        fmt.Println(&amp;quot;Successful writing to thr file with os.OpenFile and *File.Write method.&amp;quot;,content)
+    }
+}
+
+
+//使用io.WriteString()函数进行数据的写入
+func WriteWithIo(name,content string) {
+    fileObj,err := os.OpenFile(name,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644)
+    if err != nil {
+        fmt.Println(&amp;quot;Failed to open the file&amp;quot;,err.Error())
+        os.Exit(2)
+    }
+    if  _,err := io.WriteString(fileObj,content);err == nil {
+        fmt.Println(&amp;quot;Successful appending to the file with os.OpenFile and io.WriteString.&amp;quot;,content)
+    }
+}
+
+//使用bufio包中Writer对象的相关方法进行数据的写入
+func WriteWithBufio(name,content string) {
+    if fileObj,err := os.OpenFile(name,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644);err == nil {
+        defer fileObj.Close()
+        writeObj := bufio.NewWriterSize(fileObj,4096)
+        //
+       if _,err := writeObj.WriteString(content);err == nil {
+              fmt.Println(&amp;quot;Successful appending buffer and flush to file with bufio&#39;s Writer obj WriteString method&amp;quot;,content)
+           }
+
+        //使用Write方法,需要使用Writer对象的Flush方法将buffer中的数据刷到磁盘
+        buf := []byte(content)
+        if _,err := writeObj.Write(buf);err == nil {
+            fmt.Println(&amp;quot;Successful appending to the buffer with os.OpenFile and bufio&#39;s Writer obj Write method.&amp;quot;,content)
+            if  err := writeObj.Flush(); err != nil {panic(err)}
+            fmt.Println(&amp;quot;Successful flush the buffer data to file &amp;quot;,content)
+        }
+        }
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>开源OCR引擎tesseract的构建使用</title>
+      <link>https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sat, 09 Dec 2017 15:59:29 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</guid>
+      
+        <description>&lt;h3 id=&#34;简介&#34;&gt;简介&lt;/h3&gt;
+
+&lt;h4 id=&#34;ocr&#34;&gt;OCR&lt;/h4&gt;
+
+&lt;p&gt;光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。&lt;/p&gt;
+
+&lt;h4 id=&#34;tesseract&#34;&gt;tesseract&lt;/h4&gt;
+
+&lt;p&gt;Tesseract的OCR引擎最先由HP实验室于1985年开始研发，至1995年时已经成为OCR业内最准确的三款识别引擎之一。然而，HP不久便决定放弃OCR业务，Tesseract也从此尘封。
+数年以后，HP意识到，与其将Tesseract束之高阁，不如贡献给开源软件业，让其重焕新生－－2005年，Tesseract由美国内华达州信息技术研究所获得，并求诸于Google对Tesseract进行改进、消除Bug、优化工作。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/tesseract-ocr/tesseract&#34;&gt;tesseract官方地址&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;需要注意的是，tesseract3.0以上才支持中文，而且从官方文档上看4.0版本（2017年1月左右发布）显著的提高了识别率，同时也加大了性能的消耗。&lt;/p&gt;
+
+&lt;h4 id=&#34;场景&#34;&gt;场景&lt;/h4&gt;
+
+&lt;p&gt;一个亲身经历的场景就是以前去开户可能需要带上身份证资料各种去打印复印件进行物理备份，而使用OCR等相关人工智能技术后就可以通过手机摄像头快速识别身份证相关信息来存储个人资料，整个开户体验相当高效简单。&lt;/p&gt;
+
+&lt;p&gt;另外一个常见的场景可能就是我们手写的文章需要扫描成电子版，在以前我们可能需要专业的打印机设备才能够进行电子扫描，而当OCR相关技术普及到普通业务场景后，我们就可以使用手持设备进行纸质版的文件进行电子扫描。[个人之前尝试使用有道云笔记中的电子扫描功能还是相当不错的]&lt;/p&gt;
+
+&lt;h3 id=&#34;部署安装&#34;&gt;部署安装&lt;/h3&gt;
+
+&lt;p&gt;tesseract需要&lt;a href=&#34;http://www.leptonica.org/download.html&#34;&gt;Leptonica&lt;/a&gt;的支持，leptonica是一个开源的面向教学的软件，通常被用来作为图像处理和图像分析的一个底层库支持。&lt;/p&gt;
+
+&lt;h4 id=&#34;使用yum安装&#34;&gt;使用yum安装&lt;/h4&gt;
+
+&lt;p&gt;Centos7中的epel源中包含了tesseract的3.05版本的包，可以直接安装使用。而在tesseract的github官方项目中最新版本也只到&lt;a href=&#34;https://github.com/tesseract-ocr/tesseract/releases&#34;&gt;3.05.01&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo yum install epel-release
+ -y
+# 查看epel源
+$ cat /etc/yum.repos.d/epel.repo 
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+#baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&amp;amp;arch=$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+#baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch/debug
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&amp;amp;arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+[epel-source]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+#baseurl=http://download.fedoraproject.org/pub/epel/7/SRPMS
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&amp;amp;arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+
+
+# 安装tesseract 以及相关的库依赖
+$ sudo yum install tesseract tesseract-devel -y 
+
+# 安装中文库支持
+$ sudo yum install -y tesseract-langpack-chi_sim.noarch tesseract-langpack-chi_tra.noarch
+
+
+# 查看默认的配置以及语言库
+$ ls /usr/share/tesseract/tessdata
+chi_sim.traineddata  chi_tra.traineddata
+
+# 默认只支持eng英语一种语言，安装中文包之后查看语言支持
+$ tesseract --list-langs
+List of available languages (3):
+eng
+chi_sim
+chi_tra
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;2-源码编译最新版本-4-00-00alpha版本&#34;&gt;2.源码编译最新版本(4.00.00alpha版本)&lt;/h4&gt;
+
+&lt;p&gt;从官网上看，4.0版本在识别率以及性能等各方面上要比3.0版本高好多，但是官方又没有提供4.0的release版本，因此接下来使用github上的源码来手动编译&lt;a href=&#34;https://github.com/tesseract-ocr/tesseract/tree/4.00.00alpha&#34;&gt;tesseract4.00.00alpha&lt;/a&gt;版本。同时由于对底层Leptonica的依赖，需要优先编译该库的依赖。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意：宿主操作系统仍然是一个纯净的Centos7.3.1611的OS&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 安装基础依赖
+# sudo yum install gcc git gcc-c++ make automake libtool libpng-devel libjpeg-devel libtiff-devel zlib-devel -y
+
+# 安装leptonica-1.74.4
+# wget http://www.leptonica.org/source/leptonica-1.74.4.tar.gz  &amp;amp;&amp;amp; tar -zxf leptonica-1.74.4.tar.gz &amp;amp;&amp;amp; cd  leptonica ;./configure &amp;amp;&amp;amp; make &amp;amp;&amp;amp; make install
+
+........
+ /usr/bin/mkdir -p &#39;/usr/local/lib&#39;
+ /bin/sh ../libtool   --mode=install /usr/bin/install -c   liblept.la &#39;/usr/local/lib&#39;
+libtool: install: /usr/bin/install -c .libs/liblept.so.5.0.1 /usr/local/lib/liblept.so.5.0.1
+libtool: install: (cd /usr/local/lib &amp;amp;&amp;amp; { ln -s -f liblept.so.5.0.1 liblept.so.5 || { rm -f liblept.so.5 &amp;amp;&amp;amp; ln -s liblept.so.5.0.1 liblept.so.5; }; })
+libtool: install: (cd /usr/local/lib &amp;amp;&amp;amp; { ln -s -f liblept.so.5.0.1 liblept.so || { rm -f liblept.so &amp;amp;&amp;amp; ln -s liblept.so.5.0.1 liblept.so; }; })
+libtool: install: /usr/bin/install -c .libs/liblept.lai /usr/local/lib/liblept.la
+libtool: install: /usr/bin/install -c .libs/liblept.a /usr/local/lib/liblept.a
+libtool: install: chmod 644 /usr/local/lib/liblept.a
+libtool: install: ranlib /usr/local/lib/liblept.a
+libtool: finish: PATH=&amp;quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&amp;quot; ldconfig -n /usr/local/lib
+----------------------------------------------------------------------
+
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR&#39;
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH&#39; environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH&#39; environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR&#39; linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf&#39;
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+ /usr/bin/mkdir -p &#39;/usr/local/include/leptonica&#39;
+ /usr/bin/mkdir -p &#39;/usr/local/bin&#39;
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c convertfilestopdf convertfilestops convertformat convertsegfilestopdf convertsegfilestops converttopdf converttops fileinfo printimage printsplitimage printtiff splitimage2pdf xtractprotos &#39;/usr/local/bin&#39;
+......
+
+make[2]: Nothing to be done for `install-data-am&#39;.
+make[2]: Leaving directory `/export/servers/leptonica-1.74.4/prog&#39;
+make[1]: Leaving directory `/export/servers/leptonica-1.74.4/prog&#39;
+make[1]: Entering directory `/export/servers/leptonica-1.74.4&#39;
+make[2]: Entering directory `/export/servers/leptonica-1.74.4&#39;
+make[2]: Nothing to be done for `install-exec-am&#39;.
+ /usr/bin/mkdir -p &#39;/usr/local/lib/pkgconfig&#39;
+ /usr/bin/install -c -m 644 lept.pc &#39;/usr/local/lib/pkgconfig&#39;
+
+# 以上输出显示leptonica已经成功编译，并给出相关提示知名动态链接库的地址以及头文件等相关地址，需要注意的在使用之前一定要加载动态链接库/usr/local/lib
+# ldconfig -n /usr/local/lib
+
+# 安装tesseract，由于作者在github上设置了tag来区分各个版本，因此我们需要切换到源码的指定分支进行源码编译
+# git clone https://github.com/tesseract-ocr/tesseract.git；
+cd tesseract &amp;amp;&amp;amp; git checkout -b biaoge 4.00.00alpha &amp;amp;&amp;amp; ./configure &amp;amp;&amp;amp; make &amp;amp;&amp;amp; make install
+
+ /usr/bin/mkdir -p &#39;/usr/local/include/tesseract
+
+ /usr/bin/mkdir -p &#39;/usr/local/lib&#39;
+
+libtool: finish: PATH=&amp;quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&amp;quot; ldconfig -n /usr/local/lib
+
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/local/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR&#39;
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH&#39; environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH&#39; environment variable
+     during linking
+   - use the `-Wl,-rpath -Wl,LIBDIR&#39; linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf&#39;
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /usr/bin/mkdir -p &#39;/usr/local/bin&#39;
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c tesseract &#39;/usr/local/bin&#39;
+libtool: install: /usr/bin/install -c .libs/tesseract /usr/local/bin/tesseract
+ /usr/bin/mkdir -p &#39;/usr/local/include/tesseract&#39;
+ /usr/bin/install -c -m 644 apitypes.h baseapi.h capi.h renderer.h &#39;/usr/local/include/tesseract&#39;
+
+ /usr/bin/mkdir -p &#39;/usr/local/lib/pkgconfig&#39;
+ /usr/bin/install -c -m 644 tesseract.pc &#39;/usr/local/lib/pkgconfig&#39;
+
+ /usr/bin/mkdir -p &#39;/usr/local/share/tessdata/configs&#39;
+ /usr/bin/install -c -m 644 inter makebox box.train unlv ambigs.train api_config kannada box.train.stderr quiet logfile digits hocr tsv linebox pdf rebox strokewidth bigram txt &#39;/usr/local/share/tessdata/configs&#39;
+
+
+ /usr/bin/mkdir -p &#39;/usr/local/share/tessdata/tessconfigs&#39;
+ /usr/bin/install -c -m 644 batch batch.nochop nobatch matdemo segdemo msdemo &#39;/usr/local/share/tessdata/tessconfigs&#39;
+
+
+ /usr/bin/mkdir -p &#39;/usr/local/share/tessdata&#39;
+ /usr/bin/install -c -m 644 pdf.ttf &#39;/usr/local/share/tessdata&#39;
+
+
+ /usr/bin/mkdir -p &#39;/usr/local/share/man/man1&#39;
+ /usr/bin/install -c -m 644 cntraining.1 combine_tessdata.1 mftraining.1 tesseract.1 unicharset_extractor.1 wordlist2dawg.1 ambiguous_words.1 shapeclustering.1 dawg2wordlist.1 &#39;/usr/local/share/man/man1&#39;
+ /usr/bin/mkdir -p &#39;/usr/local/share/man/man5&#39;
+ /usr/bin/install -c -m 644 unicharambigs.5 unicharset.5 &#39;/usr/local/share/man/man5&#39;
+ 
+# 以上输出也标明tesseract已经成功安装在了/usr/local/lib目录，并给出了一些tesseract相关的配置路径以及注意事项。特别需要注意的是，也需要加载动态链接库，否则程序可能无法识别相关的库文件。
+
+# ldconfig -n /usr/local/lib
+
+# 安装成功，即可使用tesseract命令(默认在/usr/local/bin/)
+# tesseract --version
+tesseract 4.00.00alpha
+ leptonica-1.74.4
+
+
+# 查看当前的语言库支持
+# tesseract --list-langs
+Error opening data file /usr/local/share/tessdata/eng.traineddata
+Please make sure the TESSDATA_PREFIX environment variable is set to the parent directory of your &amp;quot;tessdata&amp;quot; directory.
+Failed loading language &#39;eng&#39;
+Tesseract couldn&#39;t load any languages!
+Could not initialize tesseract.
+
+# 提示已经很明显，需要配置TESSDATA_PREFIX环境变量
+
+# 配置环境变量和相关的语言库
+# export TESSDATA_PREFIX=/usr/local/share/
+# cd $TESSDATA_PREFIX/tessdata 
+# for font in chi_sim chi_tra eng ;do wget https://github.com/tesseract-ocr/tessdata/raw/master/$font.traineddata;done 
+
+# 再次查看语言支持
+# tesseract --list-langs
+List of available languages (3):
+chi_sim
+eng
+chi_tra
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，环境中已经能够正常使用&lt;code&gt;tesseract&lt;/code&gt;命令了，基本上可以认为tesseract环境已经编译完成，接下来就是具体看看如何去使用tesseract了&lt;/p&gt;
+
+&lt;h3 id=&#34;简单使用&#34;&gt;简单使用&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://img.alicdn.com/simba/img/TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v3.04.00 with Leptonica
+
+
+$ cat test.txt 
+走心特惠
+不玩套路
+
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看出来对比较规范的字体还是可以正常识别的。&lt;/p&gt;
+
+&lt;h3 id=&#34;可能遇到的问题&#34;&gt;可能遇到的问题&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;# 测试使用
+# tesseract 5a0178d2N01754832.jpg test -l chi_sim 
+Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
+pixReadStreamJpeg: function not present
+Error in fopenReadStream: file not found
+Error in findFileFormat: image file not found
+Error during processing.
+
+# 以上提示是因为Leptonica不支持某些图片格式
+# yum install ImageMagick -y 
+# 重新编译Leptonica(增加--with-libpng参数)
+# cd /export/servers/leptonica-1.74 ;./configure --with-libpng &amp;amp;&amp;amp; make &amp;amp;&amp;amp; make install 
+
+ 
+# 再次测试
+$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v3.04.00 with Leptonica
+
+
+$ cat test.txt 
+走心特惠
+不玩套路
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;福利&#34;&gt;福利&lt;/h3&gt;
+
+&lt;p&gt;由于目前tesseract官方并未直接提供4.0的软件包，并且tesseract环境的构建也是稍微比较复杂，为了秉承造福群众的理念，我将以上环境封装成Docker image供各位网友使用。具体使用方式如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;前提：需要有一个可用的Docker环境，任何版本都可以&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 下载镜像(稍微有点大1.6G)
+# docker pull xxbandy123/tesseract-ocr4.00.00alpha:17-12-05
+
+# 运行tesseract环境
+# docker run -itd  xxbandy123/tesseract-ocr4.00.00alpha:17-12-05
+2b4df1a1e9d20426aefa32ba79066b561fe66c623986b76634012ac9cae40e64
+
+# 进入环境测试运行
+# docker exec -it $(docker ps -a -q -l) bash
+[root@2b4df1a1e9d2 /]# tesseract
+Usage:
+  tesseract --help | --help-psm | --version
+  tesseract --list-langs [--tessdata-dir PATH]
+  tesseract --print-parameters [options...] [configfile...]
+  tesseract imagename|stdin outputbase|stdout [options...] [configfile...]
+  
+# 测试环境运行
+# wget https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg
+[root@2b4df1a1e9d2 /]# tesseract TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
+[root@2b4df1a1e9d2 /]# cat test.txt
+一天猫电器全新服务保障
+
+胁 售后无忧
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;测试原图&lt;img src=&#34;https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;由此可见，开源的tesseract目前并不能完全识别所有的图片文字，如果需要借助于开源去做业务场景，可能还需要更多的二次改造才能够有所应用。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>效率工具技巧</title>
+      <link>https://bgbiao.github.io/post/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7%E6%8A%80%E5%B7%A7/</link>
+      <pubDate>Tue, 28 Nov 2017 14:17:54 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7%E6%8A%80%E5%B7%A7/</guid>
+      
+        <description>&lt;h3 id=&#34;yaml语法检测&#34;&gt;Yaml语法检测&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.yamllint.com/&#34;&gt;yaml语法在线检测&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;json字符串解析&#34;&gt;Json字符串解析&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.kjson.com/&#34;&gt;json格式化在线校验工具&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;restful-api-文档-设计&#34;&gt;Restful API 文档+设计&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://app.apiary.io&#34;&gt;在线api设计&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;url转pdf&#34;&gt;URL转PDF&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://pdfmyurl.com/&#34;&gt;在线URL转换PDF工具&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://smallpdf.com/&#34;&gt;pdf在线转换工具&lt;/a&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>CPU虚拟化技术探究</title>
+      <link>https://bgbiao.github.io/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</link>
+      <pubDate>Thu, 09 Nov 2017 21:57:45 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</guid>
+      
+        <description>&lt;p&gt;KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
+内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://blog.csdn.net/ustc_dylan/article/details/45667227&#34;&gt;NUMA架构理解&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;numa技术与应用&#34;&gt;NUMA技术与应用&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;多CPU共同工作技术的架构：SMP,MPP,NUMA&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.1 SMP技术：
+多个cpu通过一个总线访问存储器，因此SMP系统有时也被称为一致性内存访问(UMA)结构体系。一致性指无论在什么时候，处理器只能为内存的每个数据保持或共享唯一一个数值。(多个cpu通过总线访问共同的内存)。缺点是扩展性有限，存储器接口达到饱和的时候，增加处理器不能获得更高的性能，因此SMP方式支持的CPU个数有限啊&lt;/p&gt;
+
+&lt;p&gt;1.2 MPP模式：
+一种分布式存储器模式，能够将更多的处理器纳入一个系统的存储器,一个分布式存储器模式具有多个节点，每个节点都有自己的存储器，可以配置为SMP模式。单个节点相互连接起来形成一个总系统。MPP可以近似理解成一个SMP的横向扩展集群。MPP一般依靠软件实现。&lt;/p&gt;
+
+&lt;p&gt;1.3 NUMA技术：
+每个处理器都有自己的存储器，每个处理器也可以访问别的处理器的存储器。
+多核NUMA CPU架构：
+NUMA node1:                     NUMA node2:
+Core1 Core2                     Core1 Core2
+   CPU0                               CPU1
+Core3 Core4                     Core3 Core4&lt;/p&gt;
+
+&lt;p&gt;查看cpu详情&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# lscpu
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                32                   //共有32个逻辑CPU（threads）
+On-line CPU(s) list:   0-31
+Thread(s) per core:    2                    //每个core有2个threads
+Core(s) per socket:    8                    //每个socket有8个cores
+Socket(s):             2                    //共有2个sockets
+NUMA node(s):          2                    //共有2个NUMA nodes
+Vendor ID:             GenuineIntel
+CPU family:            6
+Model:                 63
+Stepping:              2
+CPU MHz:               2600.014
+BogoMIPS:              5199.25
+Virtualization:        VT-x
+L1d cache:             32K
+L1i cache:             32K
+L2 cache:              256K
+L3 cache:              20480K
+NUMA node0 CPU(s):     0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
+NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
+
+# 2(node/socket)*8(8cores/socket)*2(2threads/core)
+2 Sockets 2 CPUs ,1Socket 1 numa node,1 numa node 8 cores,1 core 2 threads
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;kvm虚拟机numa调优&#34;&gt;KVM虚拟机NUMA调优&lt;/h3&gt;
+
+&lt;h4 id=&#34;宿主机的numa信息查看和配置&#34;&gt;宿主机的NUMA信息查看和配置：&lt;/h4&gt;
+
+&lt;p&gt;因为NUMA架构每个处理器都可以访问自己和别的处理器的存储器，访问自己的存储器要比访问别的存储器快很多，相差10~100倍，所以NUMA调优的目标就是让处理器尽量访问自己的存储器。
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/kvm/cpu/CPU-numa.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# sh getcpuinfo.sh
+===== CPU Topology Table =====
+
++--------------+---------+-----------+
+| Processor ID | Core ID | Socket ID |
++--------------+---------+-----------+
+| 0            | 0       | 0         |
++--------------+---------+-----------+
+| 1            | 0       | 1         |
++--------------+---------+-----------+
+| 2            | 1       | 0         |
++--------------+---------+-----------+
+| 3            | 1       | 1         |
++--------------+---------+-----------+
+| 4            | 2       | 0         |
++--------------+---------+-----------+
+| 5            | 2       | 1         |
++--------------+---------+-----------+
+| 6            | 3       | 0         |
++--------------+---------+-----------+
+| 7            | 3       | 1         |
++--------------+---------+-----------+
+| 8            | 4       | 0         |
++--------------+---------+-----------+
+| 9            | 4       | 1         |
++--------------+---------+-----------+
+| 10           | 5       | 0         |
++--------------+---------+-----------+
+| 11           | 5       | 1         |
++--------------+---------+-----------+
+| 12           | 6       | 0         |
++--------------+---------+-----------+
+| 13           | 6       | 1         |
++--------------+---------+-----------+
+| 14           | 7       | 0         |
++--------------+---------+-----------+
+| 15           | 7       | 1         |
++--------------+---------+-----------+
+| 16           | 0       | 0         |
++--------------+---------+-----------+
+| 17           | 0       | 1         |
++--------------+---------+-----------+
+| 18           | 1       | 0         |
++--------------+---------+-----------+
+| 19           | 1       | 1         |
++--------------+---------+-----------+
+| 20           | 2       | 0         |
++--------------+---------+-----------+
+| 21           | 2       | 1         |
++--------------+---------+-----------+
+| 22           | 3       | 0         |
++--------------+---------+-----------+
+| 23           | 3       | 1         |
++--------------+---------+-----------+
+| 24           | 4       | 0         |
++--------------+---------+-----------+
+| 25           | 4       | 1         |
++--------------+---------+-----------+
+| 26           | 5       | 0         |
++--------------+---------+-----------+
+| 27           | 5       | 1         |
++--------------+---------+-----------+
+| 28           | 6       | 0         |
++--------------+---------+-----------+
+| 29           | 6       | 1         |
++--------------+---------+-----------+
+| 30           | 7       | 0         |
++--------------+---------+-----------+
+| 31           | 7       | 1         |
++--------------+---------+-----------+
+
+Socket 0: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
+Socket 1: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
+
+===== CPU Info Summary =====
+
+Logical processors: 32
+Physical socket: 2
+Siblings in one socket:  16
+Cores in one socket:  8
+Cores in total: 16
+Hyper-Threading: on
+
+===== END =====
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看numa架构模式&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# cat /sys/bus/pci/devices/0000\:07\:00.0/numa_node
+0
+
+使用numactl --hardware查看当前CPU硬件的情况：
+
+由以下信息可以看到，当前CPU有两颗，每颗CPU8核，每颗CPU有64G内存可以使用
+# numactl --hardware
+available: 2 nodes (0-1)
+node 0 cpus: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
+node 0 size: 65490 MB
+node 0 free: 501 MB
+node 1 cpus: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
+node 1 size: 65536 MB
+node 1 free: 185 MB
+node distances:
+node   0   1
+  0:  10  20
+  1:  20  10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看每个node的内存情况&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;使用numastat命令可以查看每个节点的内存情况：
+# numastat
+                           node0           node1
+numa_hit             11541910709      7342897046		#使用本节点内存次数
+numa_miss               10973455        14712396		#计划使用本节点而被调度到其他节点次数
+numa_foreign            14712396        10973455		#计划使用其他节点内存而被使用本地内存次数
+interleave_hit             32651           32580		#交叉分配使用的内存中使用本节点的内存次数
+local_node           11540101051      7342503537		#在本节点运行的程序使用本节点内存的次数
+other_node              12783113        15105905		#在其他节点运行的程序使用本节点内存次数
+
+
+
+使用numastat -c 查看相关进程的NUMA内存使用情况：
+# numastat -c qemu-kvm
+
+Per-node process memory usage (in MBs)
+PID              Node 0 Node 1  Total
+---------------  ------ ------ ------
+27822 (qemu-kvm)   5786   2449   8236
+27947 (qemu-kvm)   5503   2729   8232
+28108 (qemu-kvm)   4154   4116   8269
+28295 (qemu-kvm)   5845   2410   8255
+32840 (qemu-kvm)   5652   2749   8401
+32994 (qemu-kvm)   6229   2095   8324
+33235 (qemu-kvm)   3086   5287   8373
+33453 (qemu-kvm)   3577   4817   8394
+33620 (qemu-kvm)   5112   3326   8438
+33893 (qemu-kvm)   5529   2863   8391
+34141 (qemu-kvm)   4745   3689   8434
+34318 (qemu-kvm)   2414   5989   8404
+---------------  ------ ------ ------
+Total             57632  42519 100151
+
+Liunx系统默认是自动NUMA平衡策略，如果需要关闭Linux系统的自动平衡，可以使用如下命令：
+echo 0 &amp;gt; /proc/sys/kernel/numa_balancing
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;虚拟机numa信息查看与配置&#34;&gt;虚拟机NUMA信息查看与配置&lt;/h4&gt;
+
+&lt;p&gt;查看虚拟机VCPU和物理CPU的对应关系：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# virsh vcpuinfo xxbandy.github.io
+VCPU:           0
+CPU:            12
+State:          running
+CPU time:       466238.9s
+CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+
+VCPU:           1
+CPU:            5
+State:          running
+CPU time:       387815.5s
+CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+
+VCPU:           2
+CPU:            4
+State:          running
+CPU time:       397013.3s
+CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+
+VCPU:           3
+CPU:            31
+State:          running
+CPU time:       389255.3s
+CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+最后一行CPU亲和性：
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;透明大页技术与应用&#34;&gt;透明大页技术与应用&lt;/h4&gt;
+
+&lt;p&gt;X86默认的内存页大小是4KB，也可以使用2MB或者1GB的巨型页，系统的巨型页可以传输过虚拟机，kvm虚拟机可以通过分配巨型页提高性能。
+使用巨型页可以提高内存的分配效率，提升系统性能。&lt;/p&gt;
+
+&lt;p&gt;使用透明大页的好处：
+    可以使用swap，内存页默认2MB，需要使用swap的时候，内存被分割为4KB。
+    对用户透明，不需要用户做特殊配置。
+    不需要root权限
+    不需要依赖某种库文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;透明大页内存配置：
+# cat /sys/kernel/mm/transparent_hugepage/enabled
+[always] madvise never
+修改配置：
+echo never &amp;gt; /sys/kernel/mm/transparent_hugepage/enabled
+参数说明：
+	never：关闭，不使用透明内存
+	alway:尽量使用透明内存，扫描内存，有512个4KB页面可以整合，就整合成一个2MB的页面。
+	madvise:避免改变内存占用
+
+使用情况监控：
+$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan 默认(4096=16MB)一个扫描周期被扫描的内存页数
+4096
+$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/scan_sleep_millisecs 默认(10000=10s)多长时间扫描一次
+10000
+$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/alloc_sleep_millisecs 默认(60000=60s)多长时间整理一次碎片
+60000
+也可以查看meminfo信息；查看当前的巨型页值：
+$ grep Huge /proc/meminfo
+AnonHugePages:  102537216 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+
+查看当前巨型页使用情况
+$ cat /proc/sys/vm/nr_hugepages
+0
+巨型页默认大小是2MB，可以修改使用的巨型页数量：
+echo 25000 &amp;gt; /proc/sys/vm/nr_hugepages
+或者：
+sysctl vm.nr_hugepages = N
+
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>如何更加优雅的使用Docker</title>
+      <link>https://bgbiao.github.io/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/</link>
+      <pubDate>Thu, 09 Nov 2017 21:45:25 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;在使用docker过程中，我们经常发现管理维护是一个很复杂过程，因为我们在使用docker commands的过程中，我们只会去使用我们认为简单并且熟悉的命令，然而docker本身其实是提供给我们很多便捷且人性化的工具的，如果掌握这些使用技巧，也许你的维护管理工作将会事半功倍，并且给人看起来会很牛逼的样子。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;创建容器时传入环境变量&#34;&gt;创建容器时传入环境变量&lt;/h3&gt;
+
+&lt;p&gt;在实际应用场景中，不论是从安全还是可配置方面去考虑，很多参数是比较适合用环境变量加载进去的，比如数据库的连接信息，时区，还有字体支持等等，在创建容器的时候其实都可以使用-e 指定key/value进行传递环境变量进去。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.2# docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; 172.25.46.9:5001/centos6.8-jdjr-test-app 
+ee20b44301e27c16eae63dab243d293054178dd5f819c23d44bd9e534208bb42
+sh-4.2# docker exec -it test-env date
+2017年 01月 17日 星期二 10:35:17 CST
+sh-4.2# date
+Tue Jan 17 10:35:21 CST 2017
+可以看到加了时区环境变量的容器已经和宿主机在同一个时区(CST)，并且时间和宿主机基本同步
+
+sh-4.2# docker run -itd --name test  172.25.46.9:5001/centos6.8-jdjr-test-app
+d6a02874b999ff4eea79e3b302148b42043af01c89a5d31e5d858e0806f9077a
+sh-4.2# docker exec -it test date
+2017年 01月 20日 星期五 01:43:48 Asia
+默认没有加时区环境变量的容器还是Asia
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;调整宿主机和容器的时间差异&#34;&gt;调整宿主机和容器的时间差异&lt;/h3&gt;
+
+&lt;p&gt;首先我们需要弄清几个概念：在类unix系统中有硬件时钟与系统时钟，硬件时钟是指主机板上的时钟设备，也就是通常可在BIOS画面设定的时钟，系统时钟则是指kernel中的时钟。unix以及linux系统时间是从格林威治时间到当前的秒数，即1970年1月1日凌晨零点零分零秒到当前的时间，全球都一样，这是绝对值；而时区则是由于地理位置差异、行政区划导致各地显示时间的差异，为了克服时间上的混乱，规定将全球划分为24个时区，我们国家属于东八区标识为CST。&lt;/p&gt;
+
+&lt;p&gt;因此，对于 Docker 容器而言，根本不存在宿主和容器的时间差异问题，因为他们使用的是同一个内核、同一个时钟，二者完全一样，所以根本不存在同步问题。一般来说这个问题是由时区导致的，可以使用date命令查看下容器当前的时间时区是啥。UTC(通用协调时)表示使用的是国际标准0时区，UTC与格林尼治平均时(GMT, Greenwich Mean Time)一样，都与英国伦敦的本地时相同。CST表示中国标准时间时区一般是中国上海&amp;rdquo;Aisa/Shanghai&amp;rdquo;，也就是说UTC和CST相差了8个小时。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;解决办法：
+创建容器的时候，使用-e 将时区信息传入到容器内部。
+sh-4.2# docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; images
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意：其实使用单纯的环境变量来改变容器内部的TIME ZONE，只会影响当前容器用户的时区，一旦切换到真正的root用户就会发现时区依然是不正确的，比如以下栗子：&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; images
+$ docker exec -it test-env bash
+bash-4.1# date
+2017年 09月 20日 星期三 20:45:54 CST
+bash-4.1# sudo su -c date
+2017年 09月 20日 星期三 08:46:02 EDT
+bash-4.1# 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;那么如何真正解决时区这个问题呢？其实是&lt;code&gt;/etc/localtime&lt;/code&gt;在作怪，用户只需要将容器内部的localtime改成你想要的时区就行了。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;bash-4.1# ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+bash-4.1# date
+2017年 09月 20日 星期三 20:54:35 CST
+bash-4.1# sudo su -c date
+2017年 09月 20日 星期三 20:54:39 CST
+bash-4.1# 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So,在使用Dockerfile构建镜像的时候将&lt;code&gt;/usr/share/zoneinfo/Asia/Shanghai&lt;/code&gt;强制软连接到&lt;code&gt;/etc/localtime&lt;/code&gt;就可以永久修复时区的问题了。&lt;/p&gt;
+
+&lt;p&gt;####指定容器的rootfs的大小
+在使用docker的过程中，会发现cpu和memory可以很随意的动态调整，但是默认的rootfs却是不能随意调整的，默认是10g大小，当然如果对于数据有需求，可以通过挂载voulme进行扩展存储。如果用户执意想要调整rootfs的大小，在docker1.12版本默认提供了两种方式：在启动docker 的时候加载参数&lt;code&gt;--storage-opt dm.basesize=40G&lt;/code&gt;用来调整默认容器的rootfs大小；在创建容器的时候使用参数&lt;code&gt;--storage-opt size=70G&lt;/code&gt;来设置改容器的rootfs大小。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;喜讯：在docker最近发布的1.13版本中，支持了磁盘的配额，不过还未测试&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.2# docker run -itd --name volume-test --storage-opt size=70G 172.25.46.9:5001/centos6.8-jdjr-test-app
+18d47e69802aa84df00182885b256c50ebc56e15d8e6990fc1e187ffe254171e
+
+sh-4.2# docker exec -it volume-test df -H | grep rootfs
+rootfs                 76G  1.5G   74G   2% /
+sh-4.2# docker exec -it test-env df -H | grep rootfs
+rootfs                 11G  1.5G  9.3G  14% /
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;快速管理容器和镜像&#34;&gt;快速管理容器和镜像&lt;/h4&gt;
+
+&lt;p&gt;在docker中删除容器需要指定容器名或者容器id，但是在容器比较多，并且状态不一的情况下删除容器还是需要走下心的。不过好处是docker ps默认提供了很多好用的功能，可以很方便地管理容器(创建容器的时候如果加上label后更方便哦)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;原理：先用docker ps -a -q 输出所有容器的container id(-f 表示过滤参数或者输出格式)，然后作为docker rm 的参数进行批量删除
+输出所有容器的name：
+sh-4.2# docker ps --format=&#39;{{.Names}}&#39;
+test-env
+test-args
+test-run
+输出所有容器名包含test的容器，并打印容器名
+sh-4.2# docker ps -f name=test --format=&#39;{{.Names}}&#39;
+test-env
+test-args
+test-run
+查看退出状态的容器，并打印容器名
+sh-4.2# docker ps -f status=exited --format=&amp;quot;{{.Names}}&amp;quot;
+thirsty_brahmagupta
+clever_mestorf
+hopeful_morse
+stoic_morse
+elated_williams
+tender_jepsen
+reverent_mirzakhani
+
+删除所有容器：
+sh-4.2# docker rm -f -v $(docker ps -a -q)
+删除/启动所有退出的容器：
+sh-4.2# docker rm/start $(docker ps -qf status=exited)
+删除所有镜像：
+sh-4.2# docker rmi $(docker images -q)
+
+查看悬挂镜像:
+sh-4.1# docker  images -qf dangling=true
+
+只查看镜像或者容器指定的信息(在docker1.10之后才支持的)
+
+只列出镜像的id以及仓库名称：
+sh-4.2# docker images --format &amp;quot;{{.ID}}: {{.Repository}}&amp;quot;
+67591570dd29: centos
+0a18f1c0ead2: rancher/server
+
+只列出容器的相关id,image,status和name
+sh-4.2# docker ps --format &amp;quot;{{.ID}}: {{.Image}} : {{.Status}} : {{.Names}}&amp;quot;
+66b60b72f00e: centos : Up 7 days : pensive_poincare
+或者自己重新定义列,就和原生差不多:
+sh-4.2# docker ps --format &amp;quot;table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}&amp;quot;
+CONTAINER ID        IMAGE                                         STATUS              NAMES
+66b60b72f00e        centos                                        Up 7 days           pensive_poincare
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;其实上面的&amp;ndash;format利用的就是go语言中的模版语法，所有容器的组织信息都在结构体中：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;*formatter.containerContext&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;容器label的使用&#34;&gt;容器label的使用&lt;/h4&gt;
+
+&lt;p&gt;在实际运维过程中，大量的容器可能会一些运维上的挑战，通过使用label，可以很好的将容器分类。label贯穿于docker的整个过程。
+这个label可以作为你区分业务，区分模板各种区分容器的标识，通过标识，可以将容器更好的进行分组&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.2# docker run -itd --name volume-test --storage-opt size=70G --label zone=test 172.25.46.9:5001/centos6.8-jdjr-test-app
+c3772397e58e663095c2c0fd8d688b3d41b494097999ec2b6d6b7c509d23a138
+创建容器的时候定义一个label，表示该容器在test这个区域
+使用定义的label进行快速检索容器，并进行下一步操作(比如删除啦，更新啦)
+sh-4.2# docker ps -qf label=zone=test
+c3772397e58e
+sh-4.2# docker ps -f label=zone=test --format=&#39;{{.Names}}&#39;
+volume-test
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;快速查看容器的相关配置信息&#34;&gt;快速查看容器的相关配置信息&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;查看容器的devicemapper设备：
+sh-4.2# docker inspect -f &#39;{{.GraphDriver.Data.DeviceName}}&#39; nginx 
+docker-8:1-67411759-7c9d6d3327b02659c81bcb70bf6a4c7a45df6a589af2a2d42a387dc0e90d4913
+查看容器的PID：
+sh-4.2# docker inspect -f &#39;{{.State.Pid}}&#39; nginx 
+27521
+查看容器name：
+sh-4.2# docker inspect -f &#39;{{.Name}}&#39; nginx 
+/nginx
+获取容器的ID：
+sh-4.2# docker inspect --format {{.Id}} nginx
+53214bc9cd001f2c548edcce0c42fe51f1a118c08941406d43122a8348055843
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用alias来预定义常用的命令&#34;&gt;使用alias来预定义常用的命令&lt;/h4&gt;
+
+&lt;p&gt;docker管理命令经常需要指定各种参数，通过linux的alias命令将默认的参数预定义起来，可以很方便的进行管理容器。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.2# alias dockerrm=&#39;docker rm -f -v&#39;
+sh-4.2# alias dockerexec=&#39;docker exec -it&#39;
+sh-4.2# alias dockerrmimage=&#39;docker rmi&#39;
+
+sh-4.2# dockerrm volume-test
+volume-test
+
+sh-4.2# dockerexec volume-test ls
+bin   dev  export  lib	  media  opt   root  selinux  sys  usr
+boot  etc  home    lib64  mnt	 proc  sbin  srv      tmp  var
+sh-4.2# dockerexec volume-test bash
+bash-4.1# 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使容器随着docker-daemon的启动一同启动&#34;&gt;使容器随着docker daemon的启动一同启动&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;docker run 的时候加参数--restart=always
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;如何动态修改容器的内存和cpu限制-docker1-10之后才支持的动态调整&#34;&gt;如何动态修改容器的内存和cpu限制&lt;code&gt;docker1.10之后才支持的动态调整&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
+9223372036854775807
+sh-4.2# cat /sys/fs/cgroup/memory/memory.limit_in_bytes 
+9223372036854775807
+可以看到，默认没有给容器限制内存，它会共享宿主机的所有内存
+动态调整内存为2014M：
+sh-4.2# docker update -m 2014M test-env
+test-env
+sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
+2111832064
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;docker容器中真实用户的隔离&#34;&gt;docker容器中真实用户的隔离&lt;/h4&gt;
+
+&lt;p&gt;注意：默认docker容器内部的用户会继承宿主机的用户id，也就是说容器外部有一个uid为500的用户test，容器内部有一个uid为500的用户admin，容器内部运行的程序如果在宿主机上查看的时候会发现程序的启动用户会是外部宿主机的test用户。
+这是因为默认情况下容器的 user namespace 并未开启，所以容器内的用户和宿主用户共享 uid 空间。容器内的 uid 为 0 的 root，就被系统视为 uid=0 的宿主 root，因此磁盘读写时，具有宿主 root 同等读写权限。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;开启user namespace：
+启动docker的时候加参数--userns-remap=default
+https://docs.docker.com/engine/reference/commandline/dockerd/#/daemon-user-namespace-options
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;在docker-container和物理机中双向拷贝文件&#34;&gt;在docker container和物理机中双向拷贝文件&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;容器内部文件拷贝到宿主机：
+sh-4.2# docker cp jupyter-70002111:/home/70002111/教程-研究功能介绍.ipynb .
+sh-4.2# ls
+Dockerfile  教程-研究功能介绍.ipynb
+宿主机文件拷贝到容器：
+sh-4.2# docker cp Dockerfile jupyter-70002111:/home/70002111/
+sh-4.2# docker exec -it jupyter-70002188 ls 
+Dockerfile
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;向容器内部程序发送signal&#34;&gt;向容器内部程序发送signal&lt;/h4&gt;
+
+&lt;p&gt;注意：在给容器进程发送SIGTERM信号时只会发给主进程，也就是容器内 PID 为 1 的进程。至于说主进程启动的那些子进程，完全看主进程是否愿意转发SIGTERM 给子进程了。所以那些把 Docker当做虚拟机用的，主进程跑了个bash，然后exec 进去启动程序的，或者来个&amp;amp;让程序跑后台的情况，应用进程必然无法收到SIGTERM。
+&lt;/br&gt;还有一种可能是在Dockerfile中的CMD那行用的是 shell 格式写的命令，而不是 exec 格式。在镜像中使用CMD启动的容器会加一个 sh -c 来去执行，因此使用 shell 格式写 CMD 的时候，PID 为 1 的进程是 sh，而它不转发信号，所以主程序收不到。&lt;/p&gt;
+
+&lt;p&gt;所以在写CMD哪行命令的时候，最好按照exec格式去写。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;划重点: 由于在容器内部是没有init进程的，所以容器的整个生命周期会和容器内部PID为1的进程紧密相连，用户在使用过程中经常会发现容器更新版本之后，业务调用方经常会有一些请求异常，这其实也是因为容器内部的1号进程的设置有关，导致容器在停止时可能直接发送SIGKILL信号，导致容器当前正在处理中的业务也会立即断开连接，这样可能会导致一些业务异常&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;总而言之，向容器内部程序发送合适的信号是非常有必要的，这样可以使你的容器很优雅的退出。&lt;code&gt;docker stop操作会让容器在10s后进行优雅的退出&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://segmentfault.com/a/1190000008233992&#34;&gt;如何优雅的关闭容器&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;容器的cache不释放&#34;&gt;容器的cache不释放&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;$ echo 1 &amp;gt; /proc/sys/vm/drop_caches
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;桥接网络连入下层网络并使用ipam-没有nat-端口映射&#34;&gt;桥接网络连入下层网络并使用IPAM (没有NAT/端口映射)&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;注意:docker network是1.12版本加进来的，支持了多种网络插件&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker network create \
+	-d bridge \
+	--subnet=192.168.57.0/24 \
+	--ip-range=192.168.57.32/28 \
+	--gateway=192.168.57.11 \
+	--aux-address DefaultGatewayIPv4=192.168.57.1 \
+	-o com.docker.network.bridge.name=brnet \
+	brnet
+$ brctl addif brnet eth2
+$ docker run --net=brnet -it busybox ifconfig
+
+注意其它主机的 --ip-range 和 --gateway 需要做对应调整。
+
+这种拓扑是，容器内 eth0 连接 brnet 接口，该接口直接通过 eth2 访问交换。
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;docker查看某个容器绑定的cpu内核&#34;&gt;Docker查看某个容器绑定的cpu内核&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;容器内部第一个进程编号一般为1&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker exec -it container-name taskset -c -p 1 
+pid 1&#39;s current affinity list:0-3
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;给docker配置hosts&#34;&gt;给docker配置hosts&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker run --add-host biaoge-ops:192.168.0.1 centos cat /etc/hosts
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+192.168.0.1	biaoge-ops
+10.0.0.3	6ff3ea7114b4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;个人博客：&lt;a href=&#34;https://my.oschina.net/xxbAndy/blog&#34;&gt;https://my.oschina.net/xxbAndy/blog&lt;/a&gt;
+微信公众号：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://upload-images.jianshu.io/upload_images/2577135-5d2191eacf61c6dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;wechat.png&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Dockerfile最佳实践</title>
+      <link>https://bgbiao.github.io/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Thu, 09 Nov 2017 21:40:51 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</guid>
+      
+        <description>&lt;p&gt;&lt;strong&gt;在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。&lt;/p&gt;
+
+&lt;p&gt;2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。&lt;/p&gt;
+
+&lt;p&gt;3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;问题：如果我们构建业务镜像中默认需要启动多个服务，比如需要启动sshd和tomcat或者是一个nginx，那么就不能通过构建镜像的时候去使用CMD命令，因为CMD命令会继承上层images的CMD命令，从而导致上层的CMD命令失效。那么想要既继承上层的sshd，又需要启动业务进程，普通的方式可以采用脚本定义，并在业务镜像层进行RUN脚本。&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;所以比较好的方法：使用supervisord来管理images中的多个服务进程。可以在基本镜像层进行构建supervisord镜像，然后在上层业务层通过配置supervisord.conf来管理对个进程，实现一个容器中启动多个服务进程。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;构建无需启动服务的pass层镜像&#34;&gt;构建无需启动服务的pass层镜像&lt;/h3&gt;
+
+&lt;p&gt;该环节是提供给用户基本的软件运行环境，用户可以通过bash登录去启动业务程序。而根据业务的变化特征，以及基础服务的抽象程度，我们可以将该层的image镜像分成以下三个image进行叠加。&lt;/p&gt;
+
+&lt;h4 id=&#34;构建符合实际业务场景的base镜像&#34;&gt;构建符合实际业务场景的base镜像&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;注意：&lt;/code&gt;给image中打入sshd服务的主要原因还是想尽可能的满足用户当前的使用习惯，同时又能够充分利用docker image的特性&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM centos6.8-base
+MAINTAINER xuxuebiao
+RUN ssh-keygen -q -N &amp;quot;&amp;quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+    ssh-keygen -q -N &amp;quot;&amp;quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
+    mkdir -p /root/.ssh &amp;amp;&amp;amp; chown root.root /root &amp;amp;&amp;amp; chmod 700 /root/.ssh ;\
+    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+    echo &#39;root:redhat&#39; | chpasswd
+EXPOSE 52568
+ENV LANG=zh_CN.UTF-8;\
+    LC_ALL=zh_CN.UTF-8;\
+    TZ &amp;quot;Asia/Shanghai&amp;quot;;\
+    TERM xterm
+CMD /usr/sbin/sshd -D
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;#docker build -t centos6.8-sshd .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&#34;构建上层基本软件环境&#34;&gt;构建上层基本软件环境&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;注意：上层SSHD镜像默认使用CMD启动了一个sshd服务，因此这层PAAS层无法直接启动nginx和tomcat，本层只是构建了一个基本环境，容器启动后需要登录bash中执行脚本进行启动。这样交付的环境其实就相当于PAAS层的环境&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;构建一个基于jdk7tomcat6的基本镜像：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM centos6.8-sshd
+MAINTAINER &amp;quot;xuxuebiao&amp;quot;
+ENV TZ &amp;quot;Asia/Shanghai&amp;quot;;\
+    PATH $PATH:/export/data/
+
+RUN useradd admin;\
+    mkdir -p /export/servers/{jdk1.7.0_71,tomcat6.0.33,nginx};\
+    mkdir -p /export/{App,auto_deploy,Config,data,Data,Domains,home,Logs,servers,Shell};
+WORKDIR /export/data/
+EXPOSE 80
+EXPOSE 8080
+ADD jdk1.7.0_71  /export/servers/jdk1.7.0_71
+ADD tomcat6.0.33 /export/servers/tomcat6.0.33
+ADD profile /etc/profile
+ADD nginx  /export/servers/nginx
+ADD auto-add-tomcat /home/admin/
+COPY start_nginx /etc/init.d/nginx
+COPY init_nginx.sh /export/Shell/
+RUN chmod a+x /etc/init.d/nginx;\
+    chmod a+x /export/Shell/init_nginx.sh;\
+    chown admin.admin -R /export/ /home/admin/
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;构建一个基于python27的基本环境，环境中本身已经安装各种第三方程序库：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM centos6.8-sshd
+MAINTAINER biaoge
+ADD python27 /usr/local/python27
+RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
+    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
+    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;
+
+EXPOSE 8000
+EXPOSE 8081
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;构建本层的镜像Dockerfile中不能指定新的应用进程，否则基本镜像中的sshd就会失效&lt;/code&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;构建开箱即用的saas层镜像-容器启动之后即可提供相应的服务-比如nginx-sshd等&#34;&gt;构建开箱即用的SaaS层镜像(容器启动之后即可提供相应的服务。比如nginx，sshd等)&lt;/h3&gt;
+
+&lt;h4 id=&#34;首先使用base镜像构建一层的supervisord基本镜像&#34;&gt;首先使用base镜像构建一层的supervisord基本镜像&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;由于supervisord是有python写的，所以可以直接在python模块包中使用&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM centos6.8-base
+MAINTAINER biaoge
+ENV LANG=zh_CN.UTF-8;\
+    LC_ALL=zh_CN.UTF-8;\
+    TZ=&amp;quot;Asia/Shanghai&amp;quot;;\
+    TERM=xterm
+ADD python27 /usr/local/python27
+RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
+    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
+    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;\
+    ln -s /usr/local/python27/bin/supervisord /usr/local/bin/supervisord;
+
+ADD supervisord.conf /etc/supervisord.conf
+EXPOSE 8000 8001 
+
+CMD [&amp;quot;/usr/local/bin/supervisord&amp;quot;,&amp;quot;-c&amp;quot;,&amp;quot;/etc/supervisord.conf&amp;quot;]
+#这里其实比较建议使用ENTRYPOINT
+#ENTRYPOINT通常情况下和CMD会一起使用，区别是CMD定义的执行命令会被container创建的时候的command取代。一般情况下ENTRYPOINT会定义命令执行的主体,CMD中增加默认的参数，而实际的参数可以通过创建container的时候用command进行优化选择
+#ENTRYPOINT  [&amp;quot;/usr/local/bin/supervisord&amp;quot;,&amp;quot;-c&amp;quot;,&amp;quot;/etc/supervisord.conf&amp;quot;]
+#文末会有演示一个ENTRYPOINT的例子
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;启动之后就会默认启动supervisord.conf中配的服务。&lt;/p&gt;
+
+&lt;p&gt;默认的supervisord.conf文件配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[supervisord]
+http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
+logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
+logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
+logfile_backups=10          ; (num of main logfile rotation backups;default 10)
+loglevel=info               ; (logging level;default info; others: debug,warn)
+pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+nodaemon=true              ; (start in foreground if true;default false)
+minfds=1024                 ; (min. avail startup file descriptors;default 1024)
+minprocs=200                ; (min. avail process descriptors;default 200)
+
+
+[supervisorctl]
+serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+
+#额外管理的服务
+#[program:httpd]
+#command = /usr/sbin/httpd
+#[program:sshd]
+#command = /usr/sbin/sshd -D
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;使用上面构建的supervisord镜像进行构建服务镜像&#34;&gt;使用上面构建的supervisord镜像进行构建服务镜像&lt;/h4&gt;
+
+&lt;p&gt;镜像可自启动包含sshd和rabbitmq的服务&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM supversord
+MAINTAINER biaoge
+
+#需要如下相关的包
+#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
+COPY *.rpm /usr/local/
+RUN yum localinstall /usr/local/*.rpm -y 
+RUN ssh-keygen -q -N &amp;quot;&amp;quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+    ssh-keygen -q -N &amp;quot;&amp;quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
+    mkdir -p /root/.ssh &amp;amp;&amp;amp; chown root.root /root &amp;amp;&amp;amp; chmod 700 /root/.ssh ;\
+    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+    echo &#39;root:redhat&#39; | chpasswd
+EXPOSE 52568 5672 4369 
+
+#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
+ADD supervisord.conf /etc/supervisord.conf
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用来启动sshd和rabbitmq服务的&lt;code&gt;supervisord.conf&lt;/code&gt;配置文件。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[supervisord]
+http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
+logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
+logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
+logfile_backups=10          ; (num of main logfile rotation backups;default 10)
+loglevel=info               ; (logging level;default info; others: debug,warn)
+pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+nodaemon=true              ; (start in foreground if true;default false)
+minfds=1024                 ; (min. avail startup file descriptors;default 1024)
+minprocs=200                ; (min. avail process descriptors;default 200)
+
+
+[supervisorctl]
+serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+
+#额外管理的服务
+[program:rabbitmq]
+command = rabbitmq-server
+[program:sshd]
+command = /usr/sbin/sshd -D
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;测试访问：&lt;/strong&gt;
+使用上面Dockerfile创建images进行构建容器：
+&amp;gt;$docker run -itd &amp;ndash;name test-ssh sshd-rabbitmq&lt;/p&gt;
+
+&lt;p&gt;发现创建的容器，已经通过上面的supervisord.conf中定义好的，启动了rabbitmq和sshd服务。&lt;/p&gt;
+
+&lt;h3 id=&#34;构建基于paas层的其他基本镜像&#34;&gt;构建基于PaaS层的其他基本镜像&lt;/h3&gt;
+
+&lt;p&gt;基本sshd镜像：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM supervisord
+MAINTAINER 371990778@qq.com
+#配置相关的ssh需要的文件，以及相关的用户密码
+RUN ssh-keygen -q -N &amp;quot;&amp;quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+    ssh-keygen -q -N &amp;quot;&amp;quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
+    mkdir -p /root/.ssh &amp;amp;&amp;amp; chown root.root /root &amp;amp;&amp;amp; chmod 700 /root/.ssh ;\
+    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+    echo &#39;root:redhat&#39; | chpasswd
+EXPOSE 52568
+
+#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
+ADD supervisord.conf /etc/supervisord.conf 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;相应的supervisord.conf文件中只需要增加相应的额服务启动命令&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;基本redis镜像：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM sshd-base
+MAINTAINER biaoge
+ADD redis-2.8.9 /usr/local/redis-2.8.9 
+#ADD redis.conf /etc/redis.conf
+RUN ln -s /usr/local/redis-2.8.9/src/redis-cli /usr/local/bin/redis-cli ;\
+    ln -s /usr/local/redis-2.8.9/src/redis-server /usr/local/bin/redis-server;\
+    ln -s /usr/local/redis-2.8.9/redisd.sh /usr/local/bin/redisd.sh
+
+EXPOSE 3679 
+ADD supervisord.conf /etc/supervisord.conf
+#CMD /usr/local/bin/redis-server 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;基本rabbit镜像：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM sshd-base
+MAINTAINER biaoge
+
+#需要如下相关的包
+#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
+COPY *.rpm /usr/local/
+RUN yum localinstall /usr/local/*.rpm -y 
+EXPOSE 5672 4369 
+
+#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
+ADD supervisord.conf /etc/supervisord.conf 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;其他案例示范：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM centos:6.8
+MAINTAINER &amp;quot;Andy_xu&amp;quot;
+
+ENV TZ &amp;quot;Asia/Shanghai&amp;quot;
+#ENV PATH $PATH:/export/data/
+ENV TERM xterm
+
+RUN mkdir -p /export/package
+COPY * /export/package 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意：上面dockerfile文件构建的环境没有默认的ps，需要加载export PS1=&#39;[\u@\h \W]\$&#39;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;ENTRYPOINT 指令详解&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat Dockerfile
+FROM centos6.8
+ENTRYPOINT [&amp;quot;curl&amp;quot;,&amp;quot;-s&amp;quot;,&amp;quot;10.0.0.1:2379/info&amp;quot;]
+#cmd 可以只定义参数
+#CMD [&amp;quot;-v&amp;quot;]
+$ docker build -t curl .
+$ docker  run curl  (执行ENTRYPOINT定义的内容)
+{&amp;quot;ID&amp;quot;:&amp;quot;RDTS:INFK:VAZI:5X75:EYAP:DBTC:AQ42:A5WH:IVJX:K4L2:RJ2R:CZS2&amp;quot;,&amp;quot;Containers&amp;quot;:21,&amp;quot;Images&amp;quot;:150,&amp;quot;Driver&amp;quot;:&amp;quot;overlay&amp;quot;,&amp;quot;DriverStatus&amp;quot;:[[&amp;quot;Backing Filesystem&amp;quot;,&amp;quot;extfs&amp;quot;]],&amp;quot;MemoryLimit&amp;quot;:true,&amp;quot;SwapLimit&amp;quot;:true,&amp;quot;CpuCfsPeriod&amp;quot;:true,&amp;quot;CpuCfsQuota&amp;quot;:true,&amp;quot;IPv4Forwarding&amp;quot;:true,&amp;quot;BridgeNfIptables&amp;quot;:true,&amp;quot;BridgeNfIp6tables&amp;quot;:true,&amp;quot;Debug&amp;quot;:false,&amp;quot;NFd&amp;quot;:42,&amp;quot;OomKillDisable&amp;quot;:true,&amp;quot;NGoroutines&amp;quot;:84,&amp;quot;SystemTime&amp;quot;:&amp;quot;2017-05-19T10:51:57.545371359+08:00&amp;quot;,&amp;quot;ExecutionDriver&amp;quot;:&amp;quot;native-0.2&amp;quot;,&amp;quot;LoggingDriver&amp;quot;:&amp;quot;json-file&amp;quot;,&amp;quot;NEventsListener&amp;quot;:0,&amp;quot;KernelVersion&amp;quot;:&amp;quot;2.6.32-431.wy39.el6.x86_64&amp;quot;,&amp;quot;OperatingSystem&amp;quot;:&amp;quot;\u003cunknown\u003e&amp;quot;,&amp;quot;IndexServerAddress&amp;quot;:&amp;quot;https://index.docker.io/v1/&amp;quot;,&amp;quot;RegistryConfig&amp;quot;:{&amp;quot;InsecureRegistryCIDRs&amp;quot;:[&amp;quot;127.0.0.0/8&amp;quot;],&amp;quot;IndexConfigs&amp;quot;:{&amp;quot;xxbandy123&amp;quot;:{&amp;quot;Name&amp;quot;:&amp;quot;172.25.46.9:5001&amp;quot;,&amp;quot;Mirrors&amp;quot;:[],&amp;quot;Secure&amp;quot;:false,&amp;quot;Official&amp;quot;:false},&amp;quot;docker.io&amp;quot;:{&amp;quot;Name&amp;quot;:&amp;quot;docker.io&amp;quot;,&amp;quot;Mirrors&amp;quot;:null,&amp;quot;Secure&amp;quot;:true,&amp;quot;Official&amp;quot;:true}},&amp;quot;Mirrors&amp;quot;:null},&amp;quot;InitSha1&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;InitPath&amp;quot;:&amp;quot;/usr/bin/docker&amp;quot;,&amp;quot;NCPU&amp;quot;:40,&amp;quot;MemTotal&amp;quot;:135282294784,&amp;quot;DockerRootDir&amp;quot;:&amp;quot;/export/lib/docker&amp;quot;,&amp;quot;HttpProxy&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;HttpsProxy&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;NoProxy&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;Name&amp;quot;:&amp;quot;HC-25-28-12.h.chinabank.com.cn&amp;quot;,&amp;quot;Labels&amp;quot;:null,&amp;quot;ExperimentalBuild&amp;quot;:false,&amp;quot;ServerVersion&amp;quot;:&amp;quot;1.9.1&amp;quot;,&amp;quot;ClusterStore&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;ClusterAdvertise&amp;quot;:&amp;quot;&amp;quot;}
+
+$ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆盖掉Dockerfile中掉CMD指令)
+* About to connect() to 10.0.0.1 port 5256 (#0)
+*   Trying 10.0.0.1... connected
+* Connected to 10.0.0.1 (10.0.0.1) port 5256 (#0)
+&amp;gt; HEAD /info HTTP/1.1
+&amp;gt; User-Agent: curl/7.19.7 (x86_64-redhat-linux-gnu) libcurl/7.19.7 NSS/3.21 Basic ECC zlib/1.2.3 libidn/1.18 libssh2/1.4.2
+&amp;gt; Host: 10.0.0.1:5256
+&amp;gt; Accept: */*
+&amp;gt;
+&amp;lt; HTTP/1.1 404 Not Found
+&amp;lt; Content-Type: text/plain; charset=utf-8
+&amp;lt; Date: Fri, 19 May 2017 02:53:36 GMT
+&amp;lt; Content-Length: 19
+&amp;lt;
+* Connection #0 to host 10.0.0.1 left intact
+* Closing connection #0
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+Date: Fri, 19 May 2017 02:53:36 GMT
+Content-Length: 19
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Overlayfs技术探究以及Docker环境中的使用</title>
+      <link>https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Thu, 09 Nov 2017 21:36:58 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      
+        <description>&lt;h3 id=&#34;overlayfs-基本概念&#34;&gt;overlayfs 基本概念&lt;/h3&gt;
+
+&lt;p&gt;一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
+当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://upload-images.jianshu.io/upload_images/2577135-efb7ae4b8b44c1c1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;overlayfs存储架构&#34; /&gt;
+&lt;code&gt;可以看到镜像层和容器层可以保存相同的文件，容器层的文件会覆盖镜像层的文件&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;在overlayfs中每个镜像层都会在&lt;code&gt;/var/lib/docker/overlay&lt;/code&gt;有对应的目录，使用硬链接与底层数据进行关联。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;优势劣势&#34;&gt;优势劣势&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1.OverlayFS支持页缓存共享，多个容器访问同一个文件能共享一个页缓存，以此提高内存使用&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2.OverlayFS消耗inode，随着镜像和容器增加，inode会遇到瓶颈。Overlay2能解决这个问题。在Overlay下，为了解决inode问题，可以考虑将/var/lib/docker挂在单独的文件系统上，或者增加系统inode设置。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;overlay中的读写&#34;&gt;overlay中的读写&lt;/h3&gt;
+
+&lt;h4 id=&#34;在容器中读取文件&#34;&gt;在容器中读取文件&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;(1)目标文件不在容器层内，overlay会从镜像层读取文件，此时，对容器性能的影响很小。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;(2)目标文件在容器层内，overlay直接从容器层读取。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;(3)目标文件在容器层和镜像层同时存在，overlay读入容器层中的文件，此时容器层的文件会覆盖镜像层的文件。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;在容器中修改文件&#34;&gt;在容器中修改文件&lt;/h4&gt;
+
+&lt;p&gt;在容器中第一次修改文件，此时文件不在容器层中。overlay会把文件从镜像层复制到容器层，所有该文件中的修改都保存在容器层中。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意：&lt;/code&gt;overlay工作文件系统层(devicemapper工作再块层面)，因此复制文件会复制整个文件，因此在频繁读写会很消耗资源&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;(1)只是在第一次修改文件时，需要把文件从镜像层复制到容器层，后续操作都是在容器层中完成。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;(2)overlayfs只有两层，lowerdir和upperdir，因此在很深的目录树中，搜索文件会相对比较快&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;在容器中删除文件和目录&#34;&gt;在容器中删除文件和目录&lt;/h4&gt;
+
+&lt;p&gt;在容器中删除文件时，overlay存储驱动在容器层中新建一个without文件，该文件用语隐藏镜像层中的目标文件。在容器层删除目录时，overlay存储驱动在容器层新建一个opaque目录，该目录用于隐藏镜像层中的目标目录。
+需要明白的一点是，任何存储驱动都不会删除底层image中的目标文件和目录的。&lt;/p&gt;
+
+&lt;h4 id=&#34;overlayfs的原理测试&#34;&gt;overlayfs的原理测试&lt;/h4&gt;
+
+&lt;p&gt;overlayfs挂载后系统文件的page cache是全部共享的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# mkdir low upper work
+# ls
+low  upper  work
+# echo &#39;abs&#39; &amp;gt; low/11.txt
+# echo &#39;xuxuebiao&#39; &amp;gt; upper/22.txt
+# mkdir merged
+# mount -t overlay overlay -olowerdir=./low,upperdir=./upper,workdir=./work ./merged
+# ls
+low  merged  upper  work
+# cd merged/
+# ls
+11.txt  22.txt
+# ll
+total 8
+-rw-r--r--. 1 root root  4 Mar 27 18:57 11.txt
+-rw-r--r--. 1 root root 10 Mar 27 18:58 22.txt
+
+# tree
+.
+├── low
+│   └── 11.txt
+├── merged
+│   ├── 11.txt
+│   └── 22.txt
+├── upper
+│   └── 22.txt
+└── work
+    └── work
+
+5 directories, 4 files
+可以看到，merged目录中时low和upper目录联合的结果
+
+
+分别修改文件：
+# cat 11.txt
+abs
+# cat 22.txt
+xuxuebiao
+# vim 11.txt
+# cat 11.txt
+Hello ,overlayfs!
+# cat ../low/11.txt
+abs
+# cat ../upper/
+11.txt   11.txt~  22.txt
+# cat ../upper/11.txt
+Hello ,overlayfs!
+# cat ../upper/11.txt~
+cat: ../upper/11.txt~: No such device or address
+# cat ../upper/11.txt
+11.txt   11.txt~
+# cat ../upper/11.txt~
+cat: ../upper/11.txt~: No such device or address
+
+可以看到low目录下的文件没有变化，但是upper里面的文件内容已经改变，并且有了一个11.txt~文件
+
+
+# ls -i ../upper/11.txt 11.txt
+143902921 11.txt  143902921 ../upper/11.txt
+可以看到upper和merged目录中的两个文件11.txt的inode其实是一致的，其实是硬链接
+
+# ls -i ../low/11.txt 11.txt
+143902921 11.txt  143902918 ../low/11.txt
+merged目录文件和low目录文件对比
+
+
+删除文件测试：
+# rm 11.txt
+rm: remove regular file ‘11.txt’? y
+# ls
+ls: cannot access 11.txt: No such file or directory
+ls: cannot access 11.txt~: No such file or directory
+11.txt  11.txt~  22.txt
+
+# cat ../upper/11.txt~
+cat: ../upper/11.txt~: No such device or address
+# ls -l ../upper/11.txt
+c---------. 1 root root 0, 0 Mar 27 19:08 ../upper/11.txt
+
+删除文件后发现文件无法访问，底层变成了一个大小为0，且没有任何人有权限的一个空文件。
+overlayfs用这种删除标记的方式标识文件被删除，（如果upper中没有该文件的话，则底层low中的同名文件又恢复出来显示了，因此需要有这个空文件来标识删除，并且覆盖底层的文件）
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;overlayfs在docker中的使用&#34;&gt;overlayfs在docker中的使用&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;首先，overlayfs是在高版本的内核上才支持的存储驱动，因此不管使用的官方内核，还是自己patch的内核，首先需要检查overlayfs是否被加载&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://mp.weixin.qq.com/s?__biz=MzA4OTMxODQwNA==&amp;amp;mid=2650978252&amp;amp;idx=1&amp;amp;sn=4e5040d70d5656d9b937eb7e9dbc672a&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=0327J9rVlXF0m4VU4b0raAJQ&amp;amp;key=7601aed56c2d62eb663f9c44acf41d0f3071fe13b7a35bd0e12641eef7aa201e53e5b9c680e04104a3c41e77eb9d2507aa4613cfac95837e6ae6a7e52710866fd11284eb8814fcf5ab872552099d0a8c&amp;amp;ascene=0&amp;amp;uin=MjUxNzI2NjE2Mg%3D%3D&amp;amp;devicetype=iMac+MacBookAir7%2C2+OSX+OSX+10.10.5+build(14F1021)&amp;amp;version=11020201&amp;amp;pass_ticket=gNSbIAbFM0u3hxIEr27nbXmZMTLnAbzlRuhwjwSUx8jm0iwFbqx9VvM799FvRrSB&#34;&gt;overlayfs&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;并且同样重要的是，对于aufs和overlay的实现，用来读取或执行共享库的共享内存也在所有运行的容器之间共享，大大的减少了通用库如’libc’的内存占用。这是一个分层策略的巨大优势，同时也是Docker的graphdriver是引擎中相当重要的一部分的原因之一。graphdriver的功能作用。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;1.检查overlay是否被加载&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;查看overlay是否被加载
+$ lsmod | grep overlay
+查看内核是否支持overlay模块
+$ modinfo overlayfs
+加载内核模块
+$ modprobe overlayfs
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;2.docker启动参数修改&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;检测overlayfs释放被识别，成功启动后修改参数到默认的配置文件中
+$ docker daemon(dockerd) -s overlay(--storage-driver=overlay) 
+
+修改配置文件
+$ cat /etc/sysconfig/docker.conf
+DOCKER_OPTS=&amp;quot;--storage-driver=overlay&amp;quot;
+
+模拟配置:
+other_args=&amp;quot;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.sock --bip 10.0.0.1/24 -H 0.0.0.0:5256  --api-enable-cors=true&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;3.检验overlayfs是否成功启动&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo /etc/init.d/docker restart
+成功启动，查看存储信息：
+$ sudo docker info
+Containers: 11
+Images: 5
+Server Version: 1.9.1
+Storage Driver: overlay
+Backing Filesystem: extfs
+Execution Driver: native-0.2
+Logging Driver: json-file
+Kernel Version: 2.6.32-431.wy38.el6.x86_64
+Operating System: &amp;lt;unknown&amp;gt;
+CPUs: 32
+Total Memory: 126 GiB
+Name: －－－－－
+ID: 2IER:NO5S:4NKX:ULDJ:THGQ:GBNR:NIN6:SCXG:SMFX:PG72:JAQF:GRZW
+
+可用看到相关存储驱动是overlay，文件系统是extfs
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;4.overlay在docker上面的使用&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;默认docker会将容器以及镜像相关的文件存储在/var/lib/docker/overlay目录下&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sh-4.1# docker  images
+REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+xxbandy123/centos6.8-sshd   latest              42c75e16533e        12 weeks ago        402 MB
+sh-4.1# pwd  （这里我们是配置了存储路径）
+/export/lib/docker/overlay
+
+sh-4.1# ll -t
+total 28
+drwx------ 4 root root 4096 Mar 31 10:37 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527
+drwx------ 4 root root 4096 Mar 31 10:37 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527-init
+drwx------ 3 root root 4096 Mar 31 10:35 42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e
+drwx------ 3 root root 4096 Mar 31 10:35 b46ba152cc17054229bc0099e7fda8b34958d518ce687c0d378b4832c4d8c91e
+drwx------ 3 root root 4096 Mar 31 10:35 9016bb11dc9b4a3ee23fbef484cf5b3c9b80491e87d67092febec45759baeb4f
+drwx------ 3 root root 4096 Mar 31 10:35 ea80c789cb2b3bcc1d12b9b3226c8482a06f28e94a4a49f8e201b5e9cdbdf0cc
+drwx------ 3 root root 4096 Mar 31 10:35 e444e2175366cd3507bc9278d9a68a7b7ca5759b364bfe960fc12a87f219e847
+
+可用看到我们现在有一个image，id为42c75e16533e,overlay会把该镜像的所有父镜像存储到本地(image的分层缓存)，该image共5层。
+sh-4.1# docker  inspect 42c75e16533e | grep b46ba152cc1
+    &amp;quot;Parent&amp;quot;: &amp;quot;b46ba152cc17054229bc0099e7fda8b34958d518ce687c0d378b4832c4d8c91e&amp;quot;,
+sh-4.1# docker  inspect b46ba152cc1 | grep 9016bb11dc9b4a
+    &amp;quot;Parent&amp;quot;: &amp;quot;9016bb11dc9b4a3ee23fbef484cf5b3c9b80491e87d67092febec45759baeb4f&amp;quot;,
+sh-4.1# docker  inspect 9016bb11dc9b4a | grep ea80c789cb2
+    &amp;quot;Parent&amp;quot;: &amp;quot;ea80c789cb2b3bcc1d12b9b3226c8482a06f28e94a4a49f8e201b5e9cdbdf0cc&amp;quot;,
+sh-4.1# docker  inspect ea80c789cb2 | grep e444e2175366cd35
+    &amp;quot;Parent&amp;quot;: &amp;quot;e444e2175366cd3507bc9278d9a68a7b7ca5759b364bfe960fc12a87f219e847&amp;quot;,
+sh-4.1# docker  inspect e444e2175366cd35 | grep Parent
+    &amp;quot;Parent&amp;quot;: &amp;quot;&amp;quot;,
+sh-4.1#
+
+
+由下面示例可以看到容器id 8ab8690b07，实际上是使用image 42c75e16533e 启动起来的一个container，并给出了container 的LowerDir:`/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root`
+
+sh-4.1# docker inspect 8ab8690b07 | grep Parent
+        &amp;quot;CgroupParent&amp;quot;: &amp;quot;&amp;quot;,
+sh-4.1# docker inspect 8ab8690b07 | grep 42c75e1653
+    &amp;quot;Image&amp;quot;: &amp;quot;42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e&amp;quot;,
+            &amp;quot;LowerDir&amp;quot;: &amp;quot;/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root&amp;quot;,
+        &amp;quot;Image&amp;quot;: &amp;quot;42c75e16533e&amp;quot;,
+sh-4.1#
+
+查看容器内部的存储结构：
+sh-4.1# ls 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527/
+lower-id  merged/   upper/
+容器的存储里面默认会存放三个文件，lower-id纪录的是image的id，也就是上面提到的LowerDir,其次存在merged和upper目录，分别为容器层，和容器最终看到的merged层。overlayfs中的lower,upper,merged三者的关系看文首。
+
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>基于PCIe体系结构的处理器结构组成</title>
+      <link>https://bgbiao.github.io/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/</link>
+      <pubDate>Thu, 09 Nov 2017 21:27:07 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/</guid>
+      
+        <description>&lt;h2 id=&#34;pcie体系结构的组成部件&#34;&gt;PCIe体系结构的组成部件&lt;/h2&gt;
+
+&lt;p&gt;PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
+在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。&lt;/p&gt;
+
+&lt;h2 id=&#34;基于pcie总线的通用处理器结构&#34;&gt;基于PCIe总线的通用处理器结构&lt;/h2&gt;
+
+&lt;p&gt;PCIe总线控制器即为RC(Root Complex).如果该处理器需要连接更多的PCIe设备时，需要使用Switch扩展PCIe链路。&lt;/p&gt;
+
+&lt;p&gt;在不同的处理器系统中，RC的实现有较大差异。PCIe总线规范并没有规定RC的实现细则。在有些处理器系统中，RC相当于PCIe主桥，也有的处理器系统也将PCIe主桥称为PCIe总线控制器。而在x86处理器系统中，RC除了包含PCIe总线控制器之外，还包含一些其他组成部件，因此RC并不等同于PCIe总线控制器。&lt;/p&gt;
+
+&lt;p&gt;如果一个RC中可以提供多个PCIe端口，这种RC也被称为多端口RC。如MPC8572处理器的RC可以直接提供3条PCIe链路，因此可以直接连接3个EP。如果MPC8572处理器需要连接更多EP时，需要使用Switch进行链路扩展。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/%E5%9F%BA%E4%BA%8EPCIe%E7%9A%84%E9%80%9A%E7%94%A8%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;上图所示的结构将PCIe总线端口、存储器控制器等一系列与外部设备有关的接口都集成在一起，并统称为RC。RC具有一个或者多个PCIe端口，可以连接各类PCIe设备。PCIe设备包括EP(如网卡、显卡等设备)、Switch和PCIe桥。PCIe总线采用端到端的连接方式，每一个PCIe端口只能连接一个EP，当然PCIe端口也可以连接Switch进行链路扩展。通过Switch扩展出的PCIe链路可以继续挂接EP或者其他Switch。所谓的PCIe Bridge，用以将PCIe总线转换成PCI总线&lt;/p&gt;
+
+&lt;p&gt;当前4颗GPU环境的架构：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$  nvidia-smi topo -m
+	GPU0	GPU1	GPU2	GPU3	CPU Affinity
+GPU0	 X 	PIX	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
+GPU1	PIX	 X 	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
+GPU2	PIX	PIX	 X 	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
+GPU3	PIX	PIX	PIX	 X 	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
+Legend:
+  X   = Self
+  SOC  = Connection traversing PCIe as well as the SMP link between CPU sockets(e.g. QPI)
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe switches (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing a single PCIe switch
+  NV#  = Connection traversing a bonded set of # NVLinks
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-topo.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nvidia-smi topo --matrix
+
+        GPU0    GPU1    GPU2    GPU3    mlx4_0  CPU Affinity
+GPU0     X      PIX     PHB     PHB     PHB     0-11
+GPU1    PIX      X      PHB     PHB     PHB     0-11
+GPU2    PHB     PHB      X      PIX     PHB     0-11
+GPU3    PHB     PHB     PIX      X      PHB     0-11
+mlx4_0  PHB     PHB     PHB     PHB      X 
+
+Legend:
+
+  X   = Self
+  SOC = Path traverses a socket-level link (e.g. QPI)(CPU插槽之间直连,跨物理CPU)
+  PHB = Path traverses a PCIe host bridge(跨PCIe host bridge设备)
+  PXB = Path traverses multiple PCIe internal switches (通过内部多个Switch上进行互联的EP)
+  PIX = Path traverses a PCIe internal switch(同一个Switch上的EP)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面的GPU拓扑可以看出来GPU0和GPU1以及GPU2和GPU3分别处于一个&lt;code&gt;switch&lt;/code&gt;和&lt;code&gt;PCIe host bridge&lt;/code&gt;上，也即GPU0和GPU1(GPU2和GPU3)可以通过直连的&lt;code&gt;switch&lt;/code&gt;相互通信，而GPU0和GPU2(GPU3)通信均需要经过一个&lt;code&gt;PCIe Host Bridge&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;个人理解:
+- SOC相当于是通过物理CPU之间的SMP Link通信的(该种方式跨了CPU核心);
+- PHB相当于是通过PCIe host bridge 的PCIe设备下的EP和Switch下的EP进行互联的结构
+- PXB相当于是同一颗物理CPU下的多个Switch下的EP互联
+- PIX相当于是一个Switch内部的多个EP互相连接(效率最高)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;参考文章&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.mianbaoban.cn/blog/post/193694&#34;&gt;PCIe体系结构组成部件&lt;/a&gt;
+&lt;a href=&#34;http://www.ssdfans.com/%E8%80%81%E7%94%B7%E5%AD%A9%E8%AF%BBpcie%E4%B9%8B%E4%BA%8C%EF%BC%9Apcie%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/&#34;&gt;PCIe拓扑结构&lt;/a&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>容器生态技术</title>
+      <link>https://bgbiao.github.io/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
+      <pubDate>Sun, 05 Nov 2017 22:30:59 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
+      
+        <description>&lt;p&gt;2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。&lt;/p&gt;
+
+&lt;p&gt;容器云生态图谱
+&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/container/tech/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E7%94%9F%E6%80%81%E5%9B%BE%E8%B0%B1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;容器引擎&#34;&gt;容器引擎&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.docker.com/&#34;&gt;Docker&lt;/a&gt;
+&lt;a href=&#34;https://github.com/moby/moby&#34;&gt;Moby&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/rkt/rkt&#34;&gt;Rkt&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/lxc/lxc&#34;&gt;Lxc&lt;/a&gt;
+&lt;a href=&#34;https://github.com/lxc/lxd&#34;&gt;Lxd&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/opencontainers/runc&#34;&gt;OCI&lt;/a&gt;
+&lt;a href=&#34;https://www.opencontainers.org/&#34;&gt;OCI官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/hyperhq/hyperd&#34;&gt;Hyperd&lt;/a&gt;
+&lt;a href=&#34;http://www.hypercontainer.io&#34;&gt;Hyper官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;编排调度&#34;&gt;编排调度&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes&#34;&gt;Kubernetes&lt;/a&gt;
+&lt;a href=&#34;http://kubernetes.io&#34;&gt;k8s官网&lt;/a&gt;
+&lt;a href=&#34;k8smeetup.github.io&#34;&gt;k8s官网翻译&lt;/a&gt;
+&lt;a href=&#34;https://www.kubernetes.org.cn/&#34;&gt;k8s中文站&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/apache/mesos&#34;&gt;Mesos&lt;/a&gt;
+&lt;a href=&#34;https://github.com/mesosphere/marathon&#34;&gt;Marathon&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/docker/swarm&#34;&gt;Swarm&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/rancher/rancher&#34;&gt;Rancher&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;网络&#34;&gt;网络&lt;/h4&gt;
+
+&lt;h5 id=&#34;cni&#34;&gt;CNI&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/containernetworking/cni&#34;&gt;CNI&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/projectcalico/calico&#34;&gt;Calico&lt;/a&gt;
+&lt;a href=&#34;https://www.projectcalico.org/&#34;&gt;Calico官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/weaveworks/weave&#34;&gt;Weave&lt;/a&gt;
+&lt;a href=&#34;https://www.weave.works&#34;&gt;Weave官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/contiv/netplugin&#34;&gt;Contiv&lt;/a&gt;
+&lt;a href=&#34;http://contiv.io&#34;&gt;Contiv官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/openvswitch/ovs&#34;&gt;ovs&lt;/a&gt;
+&lt;a href=&#34;http://openvswitch.org/&#34;&gt;ovs官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5 id=&#34;cnm&#34;&gt;CNM&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/docker/libnetwork&#34;&gt;libnetwork&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/projectcalico/libnetwork-plugin&#34;&gt;Calico-libnetwork&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/contiv/netplugin&#34;&gt;Contiv&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/weaveworks/weave&#34;&gt;Weave&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;存储&#34;&gt;存储&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/ceph/ceph&#34;&gt;Ceph&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/gluster/glusterfs&#34;&gt;GlusterFS&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/ipdcode/containerfs&#34;&gt;ContainerFS&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/coreos/torus&#34;&gt;Torus&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;日志&#34;&gt;日志&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/elasticsearch&#34;&gt;ElasticSearch&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/beats&#34;&gt;Filebeat&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/fluent/fluentd&#34;&gt;Fluentd&lt;/a&gt;
+&lt;a href=&#34;http://www.fluentd.org/&#34;&gt;Fluentd官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/logstash&#34;&gt;Logstash&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/kibana&#34;&gt;Kibana&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;监控&#34;&gt;监控&lt;/h4&gt;
+
+&lt;h5 id=&#34;数据采集&#34;&gt;数据采集&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/influxdata/telegraf&#34;&gt;Telegraf&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/firehol/netdata&#34;&gt;Netdata&lt;/a&gt;
+&lt;a href=&#34;https://my-netdata.io/&#34;&gt;Netdata官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/google/cadvisor&#34;&gt;cAdivisor&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/heapster&#34;&gt;Heapster&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/prometheus/prometheus&#34;&gt;Prometheus&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;数据存储&#34;&gt;数据存储&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/influxdata/influxdb&#34;&gt;Influxdb&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/OpenTSDB/opentsdb&#34;&gt;OpenTSDB&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;数据展示&#34;&gt;数据展示&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/grafana/grafana&#34;&gt;Grafana&lt;/a&gt;
+&lt;a href=&#34;https://grafana.com&#34;&gt;Grafana官网&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;镜像存储和安全&#34;&gt;镜像存储和安全&lt;/h3&gt;
+
+&lt;h4 id=&#34;镜像存储&#34;&gt;镜像存储&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/vmware/harbor&#34;&gt;Harbor&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/jcloudpub/speedy&#34;&gt;Speedy&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;安全扫描&#34;&gt;安全扫描&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/coreos/clair&#34;&gt;Clair&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/future-architect/vuls&#34;&gt;Vuls&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;域名解析&#34;&gt;域名解析&lt;/h3&gt;
+
+&lt;p&gt;[bind]()
+&lt;a href=&#34;https://github.com/coredns/coredns&#34;&gt;coredns&lt;/a&gt;
+[skydns]()&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>使用Docker镜像快速启动Etcd集群</title>
+      <link>https://bgbiao.github.io/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</link>
+      <pubDate>Fri, 03 Nov 2017 09:11:57 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</guid>
+      
+        <description>&lt;p&gt;本篇文章上接&lt;a href=&#34;https://xxbandy.github.io/2017/08/26/Dockerfile-etcd/&#34;&gt;自构建etcd镜像&lt;/a&gt;来使用systemd工具利用自构建的etcd镜像快速的搭建一套高可用的etcd集群。&lt;/p&gt;
+
+&lt;h3 id=&#34;核心配置文件&#34;&gt;核心配置文件&lt;/h3&gt;
+
+&lt;p&gt;测试集群使用3节点的etcd集群进行搭建测试，以下为node1节点配置示例，其他两个节点类似，仅需要修改&lt;code&gt;NAME&lt;/code&gt;
+&lt;a href=&#34;http://blog.csdn.net/peterxiaoq/article/details/72831866&#34;&gt;systemd添加自定义服务&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# cat /etc/etcd/etcd.conf
+NAME=&amp;quot;etcd-1&amp;quot;
+DATADIR=&amp;quot;/export/etcd_data&amp;quot;
+MYHOST=&amp;quot;http://10.0.0.1&amp;quot;
+PORT=&amp;quot;2379&amp;quot;
+CLUSTER_PORT=&amp;quot;2380&amp;quot;
+CLUSTER=&amp;quot;etcd-1=http://10.0.0.1:2380,etcd-2=http://10.0.0.2:2380,etcd-3=http://10.0.0.3:2380&amp;quot;
+CLUSTER_TOKEN=&amp;quot;my-etcd-token&amp;quot;
+CLUSTER_STATE=&amp;quot;new&amp;quot;
+
+# cat /etc/systemd/system/etcd-node.service
+[Unit]
+Description=etcd node
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+EnvironmentFile=-/etc/etcd/etcd.conf
+PermissionsStartOnly=true
+ExecStart=/usr/bin/docker run -itd --net=host   --name=etcd-node -e NAME=${NAME} -e DATADIR=${DATADIR} -e MYHOST=${MYHOST} -e PORT=${PORT} -e CLUSTER_PORT$=${CLUSTER_PORT} -e CLUSTER=${CLUSTER} -e CLUSTER_TOKEN=${CLUSTER_TOKEN} -e CLUSTER_STATE=${CLUSTER_STATE} xxbandy123/etcd:3.0.10
+
+#ExecStop=/usr/bin/docker rm -f etcd-node
+#Restart=always
+#RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意1&lt;/code&gt;:需要分别修改每个节点上/etc/etcd/etcd.conf配置文件中的NAME和MYHOST、CLUSTER三个变量
+&lt;code&gt;注意2&lt;/code&gt;:在编写systemctl服务管理配置的时候，一定不要设置重启策略并且设置&lt;code&gt;ExecStop&lt;/code&gt;,因为初始化集群时需要多个节点同时进行启动并互相发现，当重启某个实例的时候，重新选举注册时，就会发现该节点已经存在与集群中，因此无法正常加入集群，而导致实例启动失败。正常的做法应该是某个实例异常后，先在集群内部摘除该节点，其后将该节点按照当前状态加入到集群后根据相关信息再次启动实例
+&lt;a href=&#34;https://segmentfault.com/a/1190000003976539&#34;&gt;etcd运维&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;启动验证&#34;&gt;启动验证&lt;/h3&gt;
+
+&lt;p&gt;分别启动三个docker实例&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;systemctl daemon-reload
+systemctl start etcd-node
+
+# etcdctl cluster-health
+2017-11-03 09:15:49.006358 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+2017-11-03 09:15:49.007093 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+member 911c5e15a35cdb8f is healthy: got healthy result from http://10.0.0.1:2379
+member b01d138087dbe547 is healthy: got healthy result from http://10.0.0.3:2379
+member c22c1c7b5a4c9f9b is healthy: got healthy result from http://10.0.0.2:2379
+cluster is healthy
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;集群维护&#34;&gt;集群维护&lt;/h3&gt;
+
+&lt;p&gt;模拟集群某个节点宕机，并恢复集群&lt;/p&gt;
+
+&lt;h4 id=&#34;查看当前集群状态信息以及可用性&#34;&gt;查看当前集群状态信息以及可用性&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;etcdctl member list
+2017-11-04 09:04:14.150103 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+9923f8b86d3ce7a6: name=etcd-1 peerURLs=http://10.0.0.1:2380 clientURLs=http://172.25.44.6:2379 isLeader=false
+b01d138087dbe547: name=etcd-3 peerURLs=http://10.0.0.3:2380 clientURLs=http://172.25.47.78:2379 isLeader=false
+c22c1c7b5a4c9f9b: name=etcd-2 peerURLs=http://10.0.0.2:2380 clientURLs=http://172.25.47.77:2379 isLeader=true
+[root@hc-25-44-6 pe]# etcdctl set bgops biaoge
+2017-11-04 09:04:40.234434 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+biaoge
+
+# etcdctl get bgops
+2017-11-04 09:05:22.059435 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+biaoge
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;删除node2节点上的容器实例&#34;&gt;删除node2节点上的容器实例&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;# docker rm -f -v etcd-node
+# etcdctl cluster-health
+member 9923f8b86d3ce7a6 is healthy: got healthy result from http://10.0.0.1:2379
+member b01d138087dbe547 is healthy: got healthy result from http://10.0.0.3:2379
+failed to check the health of member c22c1c7b5a4c9f9b on http://10.0.0.2:2379: Get http://172.25.47.77:2379/health: dial tcp 172.25.47.77:2379: getsockopt: connection refused
+member c22c1c7b5a4c9f9b is unreachable: [http://10.0.0.2:2379] are all unreachable
+cluster is healthy
+
+# etcdctl get bgops
+2017-11-04 09:10:40.658013 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+biaoge
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如上显示，其中node2节点的已经失联，而由于当前etcd集群是3实例集群，因此集群整体仍然是健康状态，并且能够正常使用&lt;/p&gt;
+
+&lt;h4 id=&#34;恢复node2节点实例到集群中&#34;&gt;恢复node2节点实例到集群中&lt;/h4&gt;
+
+&lt;p&gt;注意：如果单纯的去按照原始配置启动node2上的实例的话，会提示无法加入集群(因为实例id已经注册上去了c22c1c7b5a4c9f9b)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# docker logs etcd-node
+ ....
+2017-11-04 01:12:25.307452 C | etcdmain: member c22c1c7b5a4c9f9b has already been bootstrapped
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;正确的恢复姿势
+1.在集群中移除异常节点
+2.在集群中增加集群节点(异常节点也作为新节点加入集群)
+3.根据集群反馈信息进行异常节点重启&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# etcdctl member remove c22c1c7b5a4c9f9b
+2017-11-04 09:15:48.488427 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+Removed member c22c1c7b5a4c9f9b from cluster
+
+# etcdctl member add etcd-2 http://10.0.0.2:2380
+2017-11-04 09:16:50.704247 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+Added member named etcd-2 with ID 51e807366fadaded to cluster
+
+ETCD_NAME=&amp;quot;etcd-2&amp;quot;
+ETCD_INITIAL_CLUSTER=&amp;quot;etcd-2=http://10.0.0.2:2380,etcd-1=http://10.0.0.1:2380,etcd-3=http://10.0.0.3:2380&amp;quot;
+ETCD_INITIAL_CLUSTER_STATE=&amp;quot;existing&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;根据反馈信息进行异常节点恢复(给出了name,cluster,state三个参数)
+由于我们是根据原有集群进行恢复节点，所以需要修改node2节点的状态,并启动实例&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# grep STATE  /etc/etcd/etcd.conf
+CLUSTER_STATE=&amp;quot;existing&amp;quot;
+# systemctl restart  etcd-node
+# docker ps
+CONTAINER ID        IMAGE                               COMMAND                  CREATED             STATUS              PORTS               NAMES
+9fb8b1544642        xxbandy123/etcd:3.0.10   &amp;quot;/docker-entrypoint.s&amp;quot;   33 seconds ago      Up 32 seconds                           etcd-node
+
+# etcdctl cluster-health
+2017-11-04 09:23:44.053605 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+2017-11-04 09:23:44.054497 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+member 51e807366fadaded is healthy: got healthy result from http://10.0.0.2:2379
+member 9923f8b86d3ce7a6 is healthy: got healthy result from http://10.0.0.1:2379
+member b01d138087dbe547 is healthy: got healthy result from http://10.0.0.3:2379
+cluster is healthy
+# etcdctl get bgops
+2017-11-04 09:23:38.541355 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
+biaoge
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;至此，node2节点成功恢复到etcd集群中，并可以提供正常服务&lt;/p&gt;</description>
       
     </item>
     

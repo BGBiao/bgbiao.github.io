@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NVIDIA-Docker on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/tags/nvidia-docker/</link>
+    <description>Recent content in NVIDIA-Docker on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 30 Oct 2017 22:08:39 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/tags/nvidia-docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GPU环境下玩转Docker(三)</title>
+      <link>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%89/</link>
+      <pubDate>Mon, 30 Oct 2017 22:08:39 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%89/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 在前面两个章节中已经介绍了如何构建GPU的基础环境以及使用Docker方式来优雅的运行GPU应用，单纯的使用Docker这种方式是无法满足大规模的应用调度和管理的，对于集群调度以及容器化管理方面，我们也采用了业界比较知名的容器编排调度管理工具Kubernetes，本篇文章简单介绍GPU业务容器在Kubernetes上的运行。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>GPU环境下玩转Docker(二)</title>
+      <link>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/</link>
+      <pubDate>Thu, 26 Oct 2017 10:07:46 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言:
+在一节中[](&lt;a href=&#34;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/),我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&#34;&gt;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/),我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>GPU环境下玩转Docker(一)</title>
+      <link>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/</link>
+      <pubDate>Thu, 26 Oct 2017 10:07:34 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/</guid>
+      <description>&lt;h3 id=&#34;背景&#34;&gt;背景：&lt;/h3&gt;
+
+&lt;p&gt;随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.jianshu.com/p/e72a352a2bd7&#34;&gt;从GPU到GPGPU&lt;/a&gt;
+&lt;a href=&#34;http://www.jianshu.com/p/609e0530a19c&#34;&gt;CPU与GPU&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

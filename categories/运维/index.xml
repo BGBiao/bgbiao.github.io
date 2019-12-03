@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>运维 on BGBiao的Ops人生</title>
+    <link>https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/</link>
+    <description>Recent content in 运维 on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 20 Jun 2019 17:33:14 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Prometheus入门实践</title>
+      <link>https://bgbiao.github.io/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</guid>
+      <description>&lt;h2 id=&#34;prometheus入门实践&#34;&gt;Prometheus入门实践&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
+&lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
+&lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>使用nvidia-smi来对Tesla-GPU进行故障排查</title>
+      <link>https://bgbiao.github.io/post/troubleshooting-teslagpu-with-nvidia-smi/</link>
+      <pubDate>Mon, 20 Aug 2018 14:34:43 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/troubleshooting-teslagpu-with-nvidia-smi/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>NVIDIA-DIGITS测试使用</title>
+      <link>https://bgbiao.github.io/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 02 Jan 2018 10:14:32 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</guid>
+      <description>&lt;h3 id=&#34;digits简介&#34;&gt;DIGITS简介&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/DIGITS&#34;&gt;DIGITS&lt;/a&gt;: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司开发的第一个交互式深度学习GPU训练系统。目的在于整合现有的Deep Learning开发工具，实现深度神经网络（Deep Neural Network，DNN）设计、训练和可视化等任务变得简单化。DIGITS是基于浏览器的接口，因而通过实时的网络行为的可视化，可以快速设计最优的DNN。DIGITS是开源软件，可在GitHub上找到，因而开发人员可以扩展和自定义DIGITS。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>开源OCR引擎tesseract的构建使用</title>
+      <link>https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sat, 09 Dec 2017 15:59:29 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</guid>
+      <description>&lt;h3 id=&#34;简介&#34;&gt;简介&lt;/h3&gt;
+
+&lt;h4 id=&#34;ocr&#34;&gt;OCR&lt;/h4&gt;
+
+&lt;p&gt;光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>CPU虚拟化技术探究</title>
+      <link>https://bgbiao.github.io/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</link>
+      <pubDate>Thu, 09 Nov 2017 21:57:45 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</guid>
+      <description>&lt;p&gt;KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
+内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>如何更加优雅的使用Docker</title>
+      <link>https://bgbiao.github.io/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/</link>
+      <pubDate>Thu, 09 Nov 2017 21:45:25 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;在使用docker过程中，我们经常发现管理维护是一个很复杂过程，因为我们在使用docker commands的过程中，我们只会去使用我们认为简单并且熟悉的命令，然而docker本身其实是提供给我们很多便捷且人性化的工具的，如果掌握这些使用技巧，也许你的维护管理工作将会事半功倍，并且给人看起来会很牛逼的样子。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Dockerfile最佳实践</title>
+      <link>https://bgbiao.github.io/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Thu, 09 Nov 2017 21:40:51 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。&lt;/p&gt;
+
+&lt;p&gt;2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。&lt;/p&gt;
+
+&lt;p&gt;3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Overlayfs技术探究以及Docker环境中的使用</title>
+      <link>https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Thu, 09 Nov 2017 21:36:58 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      <description>&lt;h3 id=&#34;overlayfs-基本概念&#34;&gt;overlayfs 基本概念&lt;/h3&gt;
+
+&lt;p&gt;一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
+当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>基于PCIe体系结构的处理器结构组成</title>
+      <link>https://bgbiao.github.io/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/</link>
+      <pubDate>Thu, 09 Nov 2017 21:27:07 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/</guid>
+      <description>&lt;h2 id=&#34;pcie体系结构的组成部件&#34;&gt;PCIe体系结构的组成部件&lt;/h2&gt;
+
+&lt;p&gt;PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
+在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>容器生态技术</title>
+      <link>https://bgbiao.github.io/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
+      <pubDate>Sun, 05 Nov 2017 22:30:59 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
+      <description>&lt;p&gt;2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>使用Docker镜像快速启动Etcd集群</title>
+      <link>https://bgbiao.github.io/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</link>
+      <pubDate>Fri, 03 Nov 2017 09:11:57 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</guid>
+      <description>&lt;p&gt;本篇文章上接&lt;a href=&#34;https://xxbandy.github.io/2017/08/26/Dockerfile-etcd/&#34;&gt;自构建etcd镜像&lt;/a&gt;来使用systemd工具利用自构建的etcd镜像快速的搭建一套高可用的etcd集群。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>玩转Docker运维管理</title>
+      <link>https://bgbiao.github.io/post/%E7%8E%A9%E8%BD%ACdocker%E8%BF%90%E7%BB%B4%E7%AE%A1%E7%90%86/</link>
+      <pubDate>Mon, 30 Oct 2017 22:41:34 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/%E7%8E%A9%E8%BD%ACdocker%E8%BF%90%E7%BB%B4%E7%AE%A1%E7%90%86/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;在使用docker过程中，我们经常发现管理维护是一个很复杂过程，因为我们在使用docker commands的过程中，我们只会去使用我们认为简单并且熟悉的命令，然而docker本身其实是提供给我们很多便捷且人性化的工具的，如果掌握这些使用技巧，也许你的维护管理工作将会事半功倍，并且给人看起来会很牛逼的样子。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>GPU环境下玩转Docker(三)</title>
+      <link>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%89/</link>
+      <pubDate>Mon, 30 Oct 2017 22:08:39 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%89/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 在前面两个章节中已经介绍了如何构建GPU的基础环境以及使用Docker方式来优雅的运行GPU应用，单纯的使用Docker这种方式是无法满足大规模的应用调度和管理的，对于集群调度以及容器化管理方面，我们也采用了业界比较知名的容器编排调度管理工具Kubernetes，本篇文章简单介绍GPU业务容器在Kubernetes上的运行。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>如何优雅的管理你的GPU</title>
+      <link>https://bgbiao.github.io/post/manager-your-gpus/</link>
+      <pubDate>Mon, 30 Oct 2017 22:03:27 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/manager-your-gpus/</guid>
+      <description>&lt;h2 id=&#34;使用nvidia-smi管理你的gpu卡&#34;&gt;使用nvidia-smi管理你的GPU卡&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;nvidia-smi&lt;/code&gt;命令是NVIDIA系统管理接口，之前提到使用&lt;code&gt;nvidia-docker&lt;/code&gt;实际上底层也是调用的该接口。该接口可以查看到当前主机上的相关GPU设备，任务以及当前状态等信息，熟练使用该接口能够更好的管理好GPU系统资源。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>GPU环境下玩转Docker(二)</title>
+      <link>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/</link>
+      <pubDate>Thu, 26 Oct 2017 10:07:46 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言:
+在一节中[](&lt;a href=&#34;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/),我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&#34;&gt;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/),我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>GPU环境下玩转Docker(一)</title>
+      <link>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/</link>
+      <pubDate>Thu, 26 Oct 2017 10:07:34 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/</guid>
+      <description>&lt;h3 id=&#34;背景&#34;&gt;背景：&lt;/h3&gt;
+
+&lt;p&gt;随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.jianshu.com/p/e72a352a2bd7&#34;&gt;从GPU到GPGPU&lt;/a&gt;
+&lt;a href=&#34;http://www.jianshu.com/p/609e0530a19c&#34;&gt;CPU与GPU&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>手把手构建Etcd镜像</title>
+      <link>https://bgbiao.github.io/post/dockerfile-etcd/</link>
+      <pubDate>Sat, 26 Aug 2017 17:56:15 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/dockerfile-etcd/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>使用Ansible快速部署Etcd集群</title>
+      <link>https://bgbiao.github.io/post/ansible-etcd-cluster/</link>
+      <pubDate>Sat, 26 Aug 2017 15:51:12 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/ansible-etcd-cluster/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;本篇文章记录一下使用&lt;code&gt;ansible-playbooks&lt;/code&gt;进行快速构建一个可用的etcd集群。在阅读并实践本文章之前，请确保您有一个可用的&lt;code&gt;ansible&lt;/code&gt;环境。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Docker的Python版API使用</title>
+      <link>https://bgbiao.github.io/post/docker-api-for-python/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.github.io/post/docker-api-for-python/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;使用Docker API for Python来更好的管理容器！&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

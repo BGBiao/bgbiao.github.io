@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Prometheus入门实践 - BGBiao的Ops人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="Prometheus入门实践 Prometheus下载地址 Prometheus相关文档 Prometheus官方文档
+" />
+
+  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.github.io/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="Prometheus入门实践" />
+<meta property="og:description" content="Prometheus入门实践
+
+Prometheus下载地址
+Prometheus相关文档
+Prometheus官方文档" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.github.io/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" />
+<meta property="article:published_time" content="2019-06-20T17:33:14+00:00" />
+<meta property="article:modified_time" content="2019-06-20T17:33:14+00:00" />
+<meta itemprop="name" content="Prometheus入门实践">
+<meta itemprop="description" content="Prometheus入门实践
+
+Prometheus下载地址
+Prometheus相关文档
+Prometheus官方文档">
+
+
+<meta itemprop="datePublished" content="2019-06-20T17:33:14&#43;00:00" />
+<meta itemprop="dateModified" content="2019-06-20T17:33:14&#43;00:00" />
+<meta itemprop="wordCount" content="6169">
+
+
+
+<meta itemprop="keywords" content="Prometheus,Docker,Docker,Grafana," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Prometheus入门实践"/>
+<meta name="twitter:description" content="Prometheus入门实践
+
+Prometheus下载地址
+Prometheus相关文档
+Prometheus官方文档"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的运维人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的运维人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.github.io/about/">关于BGBiao</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Prometheus入门实践</h1>
+      
+      <div class="post-meta">
+        <time datetime="2019-06-20" class="post-time">
+          2019-06-20
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.github.io/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#prometheus入门实践">Prometheus入门实践</a>
+<ul>
+<li><a href="#一-基本原理">一、基本原理</a></li>
+<li><a href="#二-组件介绍">二、组件介绍</a></li>
+<li><a href="#三-服务过程">三、服务过程</a></li>
+<li><a href="#四-pronetheus服务构建使用">四、pronetheus服务构建使用</a></li>
+<li><a href="#五-安装pushgateway">五、安装pushgateway</a></li>
+<li><a href="#六-安装grafana进行图标展示">六、安装Grafana进行图标展示</a></li>
+<li><a href="#七-安装altermanager">七、安装AlterManager</a></li>
+<li><a href="#八-后续优化">八、后续优化</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h2 id="prometheus入门实践">Prometheus入门实践</h2>
+
+<p><a href="https://prometheus.io/download/">Prometheus下载地址</a>
+<a href="https://www.kubernetes.org.cn/tags/prometheus">Prometheus相关文档</a>
+<a href="https://prometheus.io/docs/introduction/overview/">Prometheus官方文档</a></p>
+
+<h3 id="一-基本原理">一、基本原理</h3>
+
+<p>通过<code>HTTP协议周期性抓取被监控组件的状态</code>,任意组件只要提供对应的HTTP接口就可以接入监控。</p>
+
+<p>输出被监控组件信息的HTTP接口被叫做<code>exporter</code>,也就是数据采集端，通常来说，最需要接入改造的就是expoter. 当前互联网上已经有很多成熟的<code>exporter</code>组件，当然用户也可用根据官方提供的sdk自行编写exporter.</p>
+
+<ul>
+<li><a href="https://www.bookstack.cn/read/prometheus-manual/instrumenting-exporters.md">开箱即用的exporter</a></li>
+<li><a href="https://prometheus.io/docs/instrumenting/clientlibs/">官方的sdk</a></li>
+<li><a href="https://github.com/oliver006/redis_exporter">redis-exporter</a></li>
+</ul>
+
+<p><code>注意:prometheus的时间序列数据分为四种类型</code>
+- Counter: 收集的数据是按照某个趋势（增加／减少）一直变化的，我们往往用它记录服务请求总量，错误总数等
+- Gauge: 搜集的数据是一个瞬时的，与时间没有关系，可以任意变高变低，往往可以用来记录内存使用率、磁盘使用率等
+- Histogram: 用于表示一段时间范围内对数据进行采样,并能够对其指定区间以及总数进行统计，通常我们用它计算分位数的直方图。
+- Summary: 和Histogram类似，用于表示一段时间内数据采样结果。它直接存储了 quantile 数据，而不是根据统计区间计算出来的</p>
+
+<h3 id="二-组件介绍">二、组件介绍</h3>
+
+<ul>
+<li>1. Prometheus-server: 负责<code>数据采集和存储(TSDB)</code>,提供PromQL查询语言的支持</li>
+<li>2. Alertmanager: 警告管理器，用来进行报警</li>
+<li>3. Push Gateway: 支持临时性Job主动推送指标的中间网关(通常对应于短声明周期的任务监控)</li>
+</ul>
+
+<h3 id="三-服务过程">三、服务过程</h3>
+
+<ul>
+<li>1. <code>Prometheus Daemon</code>定时去目标上抓取<code>metrics(指标)数据</code>,每个抓取目标需要暴露一个http服务的接口给server进行定时获取。支持配置文件、文本文件、Zookeeper、Consul、DNS SRV Lookup方式抓取目标；对于长生命周期的服务，采用Pull模式定期拉取数据，对于段生命周期的任务，通过push-gateway来主动推送数据</li>
+<li>2. <code>Prometheus</code>本地存储抓取的所有数据，并通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。</li>
+<li>3. Prometheus通过PromQL和其他API可视化地展示收集的数据. 可以作为<code>Grafana</code>的数据源进行图标输出，也可通过API对外提供数据展示</li>
+<li>4. <code>PushGateway</code>支持client主动推送metrics到push-gateway(相当于是一个常驻的exporter服务),prometheus定期去push-gateway中获取数据</li>
+<li>5. <code>Alertmanager</code>是独立于prometheus的一个组件，支持PromQL查询语句，提供灵活的报警功能</li>
+</ul>
+
+<h3 id="四-pronetheus服务构建使用">四、pronetheus服务构建使用</h3>
+
+<p><a href="https://prometheus.io/download/">下载地址</a></p>
+
+<p><strong>源码安装</strong></p>
+
+<pre><code># 三个组件
+$ wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz -O node_exporter-0.18.1.tar.gz
+
+$ wget https://github.com/prometheus/prometheus/releases/download/v2.10.0/prometheus-2.10.0.linux-amd64.tar.gz -O prometheus-2.10.0.linux-amd64.tar.gz
+
+$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz
+
+
+</code></pre>
+
+<p><strong>docker方式安装</strong></p>
+
+<p><code>注意:prometheus默认使用yaml格式来定义配置文件</code></p>
+
+<pre><code># 编写prometheus默认配置文件
+$ cat prometheus.yml
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - &quot;first.rules&quot;
+  # - &quot;second.rules&quot;
+
+scrape_configs:
+  # 会在每个metrics数据中增加job=&quot;prometheus&quot;和instance=&quot;localhost:9090&quot;的基本数据
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+# 热启动prometheus服务
+$ docker run --name=prometheus -d -p 9090:9090  -v /Users/xuxuebiao/Desktop/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
+
+$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+5e1698a320b2        prom/prometheus     &quot;/bin/prometheus -...&quot;   3 days ago          Up 2 minutes        0.0.0.0:9090-&gt;9090/tcp   prometheus
+
+
+</code></pre>
+
+<p><code>注意:</code> prometheus为golang编写的程序，因此只有一个二进制文件，使用&ndash;config.file来制定配置文件，使用&ndash;web.enable-lifecycle来启用远程热加载配置文件. 调用指令<code>curl -X POST http://localhost:9090/-/reload</code></p>
+
+<p>此时可以访问<a href="http://localhost:9090">prometheus-web</a>即可查看prometheus的状态页面。此时它会每30s对自己暴露的http metrics数据进行采集。可以访问prometheus本身的<a href="http://localhost:9090/metrics">metrics数据</a></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e6e1d386fcd43a0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-graph" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-64dcaa81e432aa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-metrics" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-746ef7f040089d80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-当前收集上来的指标项" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-5d97ef27b313ef6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="go-info指标" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-943befcf74a6d6a0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="单metrics指标数据" /></p>
+
+<p><strong>通过node exporter提供metrics</strong></p>
+
+<pre><code># 启动node-exporter
+$ docker run -d --name=node-exporter -p 9100:9100  prom/node-exporter
+$ docker ps -l
+CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                    NAMES
+0f60bcce1ea6        prom/node-exporter   &quot;/bin/node_exporter&quot;   3 days ago          Up 42 seconds       0.0.0.0:9100-&gt;9100/tcp   node-exporter
+# 查看服务暴露的metrics
+$ curl http://localhost:9100/metrics
+
+# 将配置暴露给prometheus，并重载prometheus
+$ cat prometheus.yml
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - &quot;first.rules&quot;
+  # - &quot;second.rules&quot;
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+			# 增加一个target 并附加一个label来标记该metrics
+      # 注意:在prometheus启动时增加了一些参数,因此target不需要写协议和uri(http和/metrics)
+      - targets: ['10.13.13.60:9100']
+        labels:
+          group: &quot;client-node-exporter&quot;
+
+
+# prometheus服务重载
+$ curl -X POST http://localhost:9090/-/reload
+
+</code></pre>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-0daae077328b80f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter数据采集到prometheus" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-4461cc2d08501e1f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter采集的15分钟平均负载" /></p>
+
+<p><code>注意:如果需要同时查找多个项，其实需要熟悉prometheus的表达式编写</code></p>
+
+<h3 id="五-安装pushgateway">五、安装pushgateway</h3>
+
+<p><code>注意:push-gateway服务启动后也需要将endpoint加入prometheus中</code></p>
+
+<pre><code># 启动push-gateway服务
+docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
+
+# 查看push-gateway服务
+$ curl localhost:9091
+
+# 测试push一条metrics数据到Push-gateway
+echo &quot;tps 100&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+
+# 多指标推送
+cat &lt;&lt;EOF | curl --data-binary @- http://localhost:9091/metrics/job/xxb/instance/bgbiao
+tps{label=&quot;xxb&quot;} 8800
+tps1 100
+tps2 160
+tps3 160
+EOF
+
+</code></pre>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e7a94dd04483137d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway服务" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1956a56a26dda95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus增加push-gateway" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1b3319b62dfd036d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway采集上来的数据" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e2e614fc197f2a50.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus上查看push-gateway上报的数据" /></p>
+
+<h3 id="六-安装grafana进行图标展示">六、安装Grafana进行图标展示</h3>
+
+<pre><code># 创建grafana服务
+$ docker run -d -p 3000:3000 --name grafana grafana/grafana
+
+$ curl localhost:3000
+</code></pre>
+
+<p>添加数据源，以及基本数据验证</p>
+
+<pre><code># 向prometheus的push-gateway上主动push数据模拟数据上报
+➜  Desktop echo &quot;tps 10&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &quot;tps 9&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &quot;tps 20&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &quot;tps 30&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &quot;tps 310&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &quot;tps 222&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+
+</code></pre>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-d442c89b5796b2da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana数据源配置" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-6f234d69ad8ff8e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana查看prometheus中收集的metrics数据" /></p>
+
+<h3 id="七-安装altermanager">七、安装AlterManager</h3>
+
+<p><code>Prometheus</code>中的告警由独立的两部分组成
+- 1. Prometheus服务中的警告规则发送警告到Alertmanager
+- 2. Alertmanager管理这些警告.包含:silencing, inhibition, aggregation 并通过一些方式发送通知</p>
+
+<p>建立告警和通知的基本步骤:
+- 1. 创建和配置alertmanager
+- 2. 启动prometheus服务时，通过alertmanager.url 配置报警服务alertmanager服务，prometheus和alertmanager通信连接</p>
+
+<p><strong>启动altermanager服务</strong></p>
+
+<pre><code># 编辑alertmanager配置文件
+$cat alertmanager.yml
+global:
+  resolve_timeout: 5m
+route:
+  group_by: ['cqh']
+  group_wait: 10s #组报警等待时间
+  group_interval: 10s #组报警间隔时间
+  repeat_interval: 1m #重复报警间隔时间
+  receiver: 'web.hook'
+receivers:
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://10.13.118.71:8889/open/test'
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']
+
+# 启动服务
+$ docker run -d -p 9093:9093 --name alertmanager -v /Users/xuxuebiao/Desktop/alertmanager.yml:/etc/alertmanager/alertmanager.yml prom/alertmanager
+
+$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+c6ba74bfd03b        prom/alertmanager   &quot;/bin/alertmanager...&quot;   3 days ago          Up 7 seconds        0.0.0.0:9093-&gt;9093/tcp   alertmanager
+
+</code></pre>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-f2e6dec465c35f4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager服务" /></p>
+
+<p><strong>在prometheus中配置altermanager服务</strong></p>
+
+<pre><code># 编辑rule配置
+$ cat rules.yml
+groups:
+  # tps 超过150 并且持续10s就报警告通知
+  - name: bgbiao
+    rules:
+      - alert: bgbiao测试
+        expr: tps &gt; 150
+        for: 10s
+        labels:
+          status: warning
+        annotations:
+          summary: &quot;{{$labels.instance}}:tps 超过阈值150.&quot;
+          description: &quot;{{$labels.instance}}:tps 超过阈值!. 当前值: {{ $value }}&quot;
+
+
+
+# 修改prometheus主配置文件
+$ cat prometheus.yml
+global:
+  # 默认抓取时间间隔为15s
+  scrape_interval:     15s
+  # 计算rule的间隔
+  evaluation_interval: 15s
+  # 定义额外的label
+  external_labels:
+    monitor: &quot;bgbiao-monitor&quot;
+
+rule_files:
+  - /etc/prometheus/rules.yml
+  # - &quot;first.rules&quot;
+  # - &quot;second.rules&quot;
+
+# 抓取对象
+scrape_configs:
+  - job_name: prometheus
+    # 重写数据抓取时间(局部生效)
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          group: &quot;prom&quot;
+      - targets: ['10.13.118.71:9100']
+        labels:
+          group: &quot;node-exporter&quot;
+      - targets: ['10.13.118.71:9091']
+        labels:
+          group: &quot;push-gateway&quot;
+
+# 配置报警对象
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: [&quot;10.13.118.71:9093&quot;]
+
+</code></pre>
+
+<p><strong>重载prometheus服务</strong></p>
+
+<pre><code>curl -X POST http://localhost:9090/-/reload
+
+</code></pre>
+
+<p><strong>重新导入数据测试</strong></p>
+
+<pre><code># 循环向push-gateway推送数据
+$ cat test-abc.sh
+#!/bin/bash
+#Author_by:Andy_xu @JR-OPS
+num=`date +%s | cut -c10-13`
+metrics=`date +%s | cut -c${num}-13`
+echo $metrics
+echo &quot;tps $metrics&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+</code></pre>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-b710723c6e4f9e9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="模拟报警数据" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-2e90930e7db5d1e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager中显示的报警规则" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e3fb656620be40e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus中已出现红色报警" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1e0a57bafbb71e5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus报警详细内容" /></p>
+
+<h3 id="八-后续优化">八、后续优化</h3>
+
+<p><code>注意:</code> 此时使用prometheus可以监控到基础服务的资源使用情况，并且也可用借用<code>alertmanager</code>服务对相关报警规则进行检测和报警，那么需要如何把相关报警及时的通知到相关负责人呢。我们前面在<code>alertmanager</code>服务中配置了一个web-hook,即<code>http://10.13.118.71:8889/open/test</code>，可以在alertmanager服务的<code>status</code>中找到。我们可以很好的借助这个web-hook来对相关的报警发送。</p>
+
+<pre><code># 一个临时用来测试的web-hook服务
+$ cat test-web-hook.go
+/**
+ * @File Name: test-web-hook.go
+ * @Author: xxbandy @http://xxbandy.github.io
+ * @Email:
+ * @Create Date: 2019-06-19 14:06:48
+ * @Last Modified: 2019-06-19 15:06:13
+ * @Description: 一个临时用来测试的web-hook服务
+ * @build:
+ GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags '-w -s' -o prometheus-web-hook test-web-hook.go
+ */
+
+package main
+import (
+    &quot;github.com/gin-gonic/gin&quot;
+    &quot;net/http&quot;
+    &quot;io/ioutil&quot;
+    &quot;fmt&quot;
+)
+
+
+func main() {
+   router := gin.Default()
+   router.GET(&quot;/open/test&quot;, CollectData)
+   router.POST(&quot;/open/test&quot;, CollectData)
+
+   router.Run(&quot;:8889&quot;)
+
+}
+
+func CollectData(c *gin.Context) {
+    alertdata,_ := ioutil.ReadAll(c.Request.Body)
+    fmt.Println(string(alertdata))
+    c.JSON(http.StatusOK,nil)
+
+}
+
+# 构建成二进制文件
+$ GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags '-w -s' -o prometheus-web-hook test-web-hook.go
+$ chmod a+x prometheus-web-hook
+
+# 运行web-hook并收集报警信息
+➜  ./prometheus-web-hook
+[GIN-debug] [WARNING] Now Gin requires Go 1.6 or later and Go 1.7 will be required soon.
+
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in &quot;debug&quot; mode. Switch to &quot;release&quot; mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/test                --&gt; main.CollectData (3 handlers)
+[GIN-debug] POST   /open/test                --&gt; main.CollectData (3 handlers)
+[GIN-debug] Listening and serving HTTP on :8889
+{&quot;receiver&quot;:&quot;web\\.hook&quot;,&quot;status&quot;:&quot;firing&quot;,&quot;alerts&quot;:[{&quot;status&quot;:&quot;firing&quot;,&quot;labels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;annotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;startsAt&quot;:&quot;2019-06-19T06:17:19.247257311Z&quot;,&quot;endsAt&quot;:&quot;0001-01-01T00:00:00Z&quot;,&quot;generatorURL&quot;:&quot;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&quot;}],&quot;groupLabels&quot;:{},&quot;commonLabels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;commonAnnotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;externalURL&quot;:&quot;http://c6ba74bfd03b:9093&quot;,&quot;version&quot;:&quot;4&quot;,&quot;groupKey&quot;:&quot;{}:{}&quot;}
+
+[GIN] 2019/06/19 - 15:24:10 | 200 |     727.873µs |    10.13.118.71 | POST     /open/test
+{&quot;receiver&quot;:&quot;web\\.hook&quot;,&quot;status&quot;:&quot;firing&quot;,&quot;alerts&quot;:[{&quot;status&quot;:&quot;firing&quot;,&quot;labels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;annotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;startsAt&quot;:&quot;2019-06-19T06:17:19.247257311Z&quot;,&quot;endsAt&quot;:&quot;0001-01-01T00:00:00Z&quot;,&quot;generatorURL&quot;:&quot;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&quot;}],&quot;groupLabels&quot;:{},&quot;commonLabels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;commonAnnotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;externalURL&quot;:&quot;http://c6ba74bfd03b:9093&quot;,&quot;version&quot;:&quot;4&quot;,&quot;groupKey&quot;:&quot;{}:{}&quot;}
+
+[GIN] 2019/06/19 - 15:25:20 | 200 |     129.897µs |    10.13.118.71 | POST     /open/test
+</code></pre>
+
+<p><code>注意:我们这里的web-hook服务其实是将报警信息临时全部打印出来了，其实可以根据用户关心程度，将相关值取出来直接发送至用户终端，比如钉钉，微信，或者短信</code></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2019-06-20
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+    
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.github.io/tags/prometheus/">Prometheus</a>
+          <a href="https://bgbiao.github.io/tags/docker/">Docker</a>
+          <a href="https://bgbiao.github.io/tags/docker/">Docker</a>
+          <a href="https://bgbiao.github.io/tags/grafana/">Grafana</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/go-unit-test/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">Golang中的单元测试、基准测试、覆盖测试</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/post/golang-expect/">
+            <span class="next-text nav-default">Golang中的异常处理</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
