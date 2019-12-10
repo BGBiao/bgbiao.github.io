@@ -6,10 +6,170 @@
     <description>Recent content on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 10 Dec 2019 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>快速使用互联网检索有用数据</title>
+      <link>https://bgbiao.top/post/%E4%BA%92%E8%81%94%E7%BD%91%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/</link>
+      <pubDate>Tue, 10 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E4%BA%92%E8%81%94%E7%BD%91%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 随着互联网的普及和发展，互联网上充斥了大量的数据，如何从海量数据中识别自己最想要的数据成为了很多人头疼的问题，接下来给大家分享一些自己常用的检索数据的网站和方法.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;搜索引擎&#34;&gt;搜索引擎&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;1.搜索关键字&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在搜索关键字的时候，尽量选择具体的关键字，比如&lt;code&gt;大数据&lt;/code&gt;就没有&lt;code&gt;大数据就业&lt;/code&gt;，&lt;code&gt;大数据行业&lt;/code&gt;，&lt;code&gt;大数据企业&lt;/code&gt;具体；另外在搜索关键词的时候，通常推荐使用多次分词，也就是使用一个词一个词，词词之间使用空格分开，比如&lt;code&gt;大数据 云计算&lt;/code&gt;,同时在检索内容时，也可以根据关键程度将词前后位置进行转换。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.搜索技巧&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.文件类型搜索:在搜索引擎搜索框最后增加&lt;code&gt;空格 filetype:type&lt;/code&gt; type可以是[pdf,ppt,xls,doc]中的任意一个&lt;/li&gt;
+&lt;li&gt;2.网站定位搜索:在搜索引擎搜索框最后增加&lt;code&gt;空格 site:URL&lt;/code&gt;  URL即为指定网站(其实各种搜索引擎都是去定向爬取各个网站的关键字进行收录的)&lt;/li&gt;
+&lt;li&gt;3.限制性搜索: 使用&lt;code&gt;intitle&lt;/code&gt;,如在百度键入&lt;code&gt;intitie:大数据&lt;/code&gt;，限定于搜索标题中含有&lt;code&gt;大数据&lt;/code&gt;网页，如果输入&lt;code&gt;intitie:大数据市场规模&lt;/code&gt;限定于搜索标题中含有&lt;code&gt;大数据&lt;/code&gt;和&lt;code&gt;市场规模&lt;/code&gt;的网页&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其实上述三个搜索技巧，在各个搜索引擎中会默认支持工具，但是通常会被放在很隐蔽的地方&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1g9rfguy2qoj310m0hc42h.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;另外，除了常用的搜索引擎:百度,谷歌,必应,搜狗之外，通常还会有一些垂直领域或者非商业化的搜索引擎.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Google学术搜索: &lt;a href=&#34;http://scholar.google.com/&#34;&gt;http://scholar.google.com/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;科技文献搜索: &lt;a href=&#34;http://www.scirus.com&#34;&gt;http://www.scirus.com&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;学术搜索引擎: &lt;a href=&#34;http://www.base-search.net/&#34;&gt;http://www.base-search.net/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;交叉学科门户网站: &lt;a href=&#34;http://www.vascoda.de/&#34;&gt;http://www.vascoda.de/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;一个神奇的网站: &lt;a href=&#34;http://www.goole.com/&#34;&gt;http://www.goole.com/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Amazon推出的: &lt;a href=&#34;http://www.a9.com&#34;&gt;http://www.a9.com&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;免费paper检索: &lt;a href=&#34;http://www.findarticles.com/&#34;&gt;http://www.findarticles.com/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;计算机和信息科学: &lt;a href=&#34;http://citeseer.ist.psu.edu/&#34;&gt;http://citeseer.ist.psu.edu/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;谷歌马甲: &lt;a href=&#34;https://search.aol.com/&#34;&gt;https://search.aol.com/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;数据库&#34;&gt;数据库&lt;/h3&gt;
+
+&lt;p&gt;数据库是研究人员重要的数据来源之一，目前券商、基金研究研究机构都购买有商业数据库，目前研究用的数据库主要分为两大类，一是商业数据库，二是学术数据库。&lt;/p&gt;
+
+&lt;p&gt;由于一般是个人使用，这里仅介绍一些免费可用的数据库.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;数据汇: &lt;a href=&#34;http://www.shujuhui.com/database/&#34;&gt;http://www.shujuhui.com/database/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;数据圈子: &lt;a href=&#34;http://www.shujuquan.com.cn/&#34;&gt;http://www.shujuquan.com.cn/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;FRED: &lt;a href=&#34;http://research.stlouisfed.org/fred2/&#34;&gt;http://research.stlouisfed.org/fred2/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;OECD: &lt;a href=&#34;http://www.oecd-ilibrary.org/economics&#34;&gt;http://www.oecd-ilibrary.org/economics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;台湾学术数据库: &lt;a href=&#34;http://fedetd.mis.nsysu.edu.tw/&#34;&gt;http://fedetd.mis.nsysu.edu.tw/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;台湾大学电子书: &lt;a href=&#34;http://ebooks.lib.ntu.edu.tw/Home/ListBooks&#34;&gt;http://ebooks.lib.ntu.edu.tw/Home/ListBooks&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;共享文库&#34;&gt;共享文库&lt;/h3&gt;
+
+&lt;p&gt;主要介绍下国外的，国内的&lt;code&gt;百度文库&lt;/code&gt;,&lt;code&gt;道客巴巴&lt;/code&gt;之类的文档太差，而且还收费.&lt;/p&gt;
+
+&lt;p&gt;Scribd：&lt;a href=&#34;http://www.scribd.com&#34;&gt;http://www.scribd.com&lt;/a&gt;
+Docstoc: &lt;a href=&#34;http://www.docstoc.com&#34;&gt;http://www.docstoc.com&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;专业网站&#34;&gt;专业网站&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;人大经济论坛: &lt;a href=&#34;http://bbs.pinggu.org/&#34;&gt;http://bbs.pinggu.org/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;经济学家: &lt;a href=&#34;http://bbs.jjxj.org/&#34;&gt;http://bbs.jjxj.org/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;随意网-经济论坛: &lt;a href=&#34;http://economic.5d6d.net/&#34;&gt;http://economic.5d6d.net/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;理想在线: &lt;a href=&#34;http://www.55188.com&#34;&gt;股票券商研究报告&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;迈博汇金: &lt;a href=&#34;http://www.hibor.com.cn/&#34;&gt;股票券商研究报告&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;博瑞金融: &lt;a href=&#34;http://www.brjr.com.cn/forum.php&#34;&gt;金融行业专业型论坛&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;华尔街社区: &lt;a href=&#34;http://forum.cnwallstreet.com/index.php&#34;&gt;国内专业的金融论坛&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;中华股权投资论坛: &lt;a href=&#34;http://www.tzluntan.com/&#34;&gt;pe投资专业型论坛&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;政府数据&#34;&gt;政府数据&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;国家统计局: &lt;a href=&#34;http://www.stats.gov.cn/&#34;&gt;http://www.stats.gov.cn/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;工业和信息化部: &lt;a href=&#34;http://www.miit.gov.cn&#34;&gt;http://www.miit.gov.cn&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;中国人民银行: &lt;a href=&#34;http://www.pbc.gov.cn/&#34;&gt;http://www.pbc.gov.cn/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;银监会: &lt;a href=&#34;http://www.cbrc.gov.cn&#34;&gt;http://www.cbrc.gov.cn&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;中国海关: &lt;a href=&#34;http://www.customs.gov.cn&#34;&gt;http://www.customs.gov.cn&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;国家知识产权局: &lt;a href=&#34;http://www.sipo.gov.cn&#34;&gt;http://www.sipo.gov.cn&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;中国证监会: &lt;a href=&#34;http://www.csrc.gov.cn&#34;&gt;http://www.csrc.gov.cn&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;巨潮信息网:&lt;a href=&#34;http://www.cninfo.com.cn/&#34;&gt;中国资本市场指定披露平台&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;证券交易所&#34;&gt;证券交易所&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;上海证券交易所: &lt;a href=&#34;http://www.sse.com.cn/&#34;&gt;http://www.sse.com.cn/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;深圳证券交易所: &lt;a href=&#34;http://www.szse.cn/&#34;&gt;http://www.szse.cn/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;全国中小企业股份转让系统: &lt;a href=&#34;http://www.neeq.com.cn/&#34;&gt;http://www.neeq.com.cn/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;香港证券交易所: &lt;a href=&#34;http://www.hkexnews.hk/index_c.htm&#34;&gt;http://www.hkexnews.hk/index_c.htm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;台湾证券交易所: &lt;a href=&#34;http://www.tse.com.tw/ch/index.php&#34;&gt;http://www.tse.com.tw/ch/index.php&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;新加坡证券交易所: &lt;a href=&#34;http://www.sgx.com/&#34;&gt;http://www.sgx.com/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;纽约证券交易所: &lt;a href=&#34;http://www.nyse.com&#34;&gt;http://www.nyse.com&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;纳斯达克证券交易所: &lt;a href=&#34;http://www.nasdaq.com&#34;&gt;http://www.nasdaq.com&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;行业网站&#34;&gt;行业网站&lt;/h3&gt;
+
+&lt;p&gt;互联网及传媒
+1）资讯类
+新浪科技 &lt;a href=&#34;http://tech.sina.com.cn/&#34;&gt;http://tech.sina.com.cn/&lt;/a&gt;
+腾讯科技 &lt;a href=&#34;http://tech.qq.com/&#34;&gt;http://tech.qq.com/&lt;/a&gt;
+艾瑞网 &lt;a href=&#34;http://www.iresearch.cn/&#34;&gt;http://www.iresearch.cn/&lt;/a&gt;
+艺恩网 &lt;a href=&#34;http://www.entgroup.cn/&#34;&gt;http://www.entgroup.cn/&lt;/a&gt;
+虎嗅网 &lt;a href=&#34;http://wwww.huxiu.com/&#34;&gt;http://wwww.huxiu.com/&lt;/a&gt;
+36kr &lt;a href=&#34;http://36kr.com/&#34;&gt;http://36kr.com/&lt;/a&gt;
+钛媒体 &lt;a href=&#34;http://www.tmtpost.com/&#34;&gt;http://www.tmtpost.com/&lt;/a&gt;
+游戏大观 &lt;a href=&#34;http://www.gamelook.com.cn/&#34;&gt;http://www.gamelook.com.cn/&lt;/a&gt;
+亿欧网 &lt;a href=&#34;http://www.iyiou.com/&#34;&gt;http://www.iyiou.com/&lt;/a&gt;
+媒介360 &lt;a href=&#34;http://www.chinamedia360.com/main&#34;&gt;http://www.chinamedia360.com/main&lt;/a&gt;
+　
+2）数据类
+中国票房 &lt;a href=&#34;http://www.cbooo.cn/&#34;&gt;http://www.cbooo.cn/&lt;/a&gt;
+中国互联网络信息中心 &lt;a href=&#34;http://www.cnnic.net.cn/&#34;&gt;http://www.cnnic.net.cn/&lt;/a&gt;
+艾瑞网
+&lt;a href=&#34;http://www.iresearch.com.cn/report/viewlist.aspx&#34;&gt;http://www.iresearch.com.cn/report/viewlist.aspx&lt;/a&gt;
+易观智库 &lt;a href=&#34;http://www.analysys.cn/&#34;&gt;http://www.analysys.cn/&lt;/a&gt;
+游戏产业网
+&lt;a href=&#34;http://www.cgigc.com.cn/list/79644663134.html&#34;&gt;http://www.cgigc.com.cn/list/79644663134.html&lt;/a&gt;
+百度指数 &lt;a href=&#34;http://index.baidu.com/&#34;&gt;http://index.baidu.com/&lt;/a&gt;
+大数据导航 &lt;a href=&#34;http://hao.199it.com/&#34;&gt;http://hao.199it.com/&lt;/a&gt;
+CSM（电视收视率） &lt;a href=&#34;http://www.csm.com.cn/&#34;&gt;http://www.csm.com.cn/&lt;/a&gt;
+微排片 &lt;a href=&#34;http://www.weipaipian.com&#34;&gt;http://www.weipaipian.com&lt;/a&gt;
+　
+医药行业
+1）样本医院数据
+化药、生物药和中药注射剂 &lt;a href=&#34;http://pdb.pharmadl.com/&#34;&gt;http://pdb.pharmadl.com/&lt;/a&gt;
+中成药、化药 &lt;a href=&#34;http://www.menet.com.cn/&#34;&gt;http://www.menet.com.cn/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;银行业
+1）新闻资讯
+中证网 &lt;a href=&#34;http://www.cs.com.cn/xwzx/hg/&#34;&gt;http://www.cs.com.cn/xwzx/hg/&lt;/a&gt;
+一财网 &lt;a href=&#34;http://www.yicai.com/economy&#34;&gt;http://www.yicai.com/economy&lt;/a&gt;
+财新网 &lt;a href=&#34;http://finance.caixin.com/bank/&#34;&gt;http://finance.caixin.com/bank/&lt;/a&gt;
+华尔街见闻 &lt;a href=&#34;http://wallstreetcn.com/news?cid=19&#34;&gt;http://wallstreetcn.com/news?cid=19&lt;/a&gt;
+新浪财经 finance.sina.com.cn/
+证券时报网 &lt;a href=&#34;http://www.stcn.com/&#34;&gt;http://www.stcn.com/&lt;/a&gt;
+中国金融新闻网
+&lt;a href=&#34;http://www.financialnews.com.cn/yh/xw/&#34;&gt;http://www.financialnews.com.cn/yh/xw/&lt;/a&gt;
+　
+2）公告、数据查找
+中国货币网 &lt;a href=&#34;http://www.chinamoney.com.cn/index.html&#34;&gt;http://www.chinamoney.com.cn/index.html&lt;/a&gt;
+巨潮网 &lt;a href=&#34;http://www.cninfo.com.cn/&#34;&gt;http://www.cninfo.com.cn/&lt;/a&gt;
+统计局 www.stats.gov.cn/
+中国人民银行 www.pbc.gov.cn
+银监会 &lt;a href=&#34;http://www.cbrc.gov.cn/index.html&#34;&gt;http://www.cbrc.gov.cn/index.html&lt;/a&gt;
+上海证券交易所 www.sse.com.cn/
+深圳证券交易所 www.szse.cn/
+最常用wind股票数据库。&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>Golang中的单元测试、基准测试、覆盖测试</title>
@@ -4776,162 +4936,6 @@ Legend:
 &lt;p&gt;[bind]()
 &lt;a href=&#34;https://github.com/coredns/coredns&#34;&gt;coredns&lt;/a&gt;
 [skydns]()&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>使用Docker镜像快速启动Etcd集群</title>
-      <link>https://bgbiao.top/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</link>
-      <pubDate>Fri, 03 Nov 2017 09:11:57 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E4%BD%BF%E7%94%A8docker%E9%95%9C%E5%83%8F%E5%BF%AB%E9%80%9F%E5%90%AF%E5%8A%A8etcd%E9%9B%86%E7%BE%A4/</guid>
-      
-        <description>&lt;p&gt;本篇文章上接&lt;a href=&#34;https://xxbandy.github.io/2017/08/26/Dockerfile-etcd/&#34;&gt;自构建etcd镜像&lt;/a&gt;来使用systemd工具利用自构建的etcd镜像快速的搭建一套高可用的etcd集群。&lt;/p&gt;
-
-&lt;h3 id=&#34;核心配置文件&#34;&gt;核心配置文件&lt;/h3&gt;
-
-&lt;p&gt;测试集群使用3节点的etcd集群进行搭建测试，以下为node1节点配置示例，其他两个节点类似，仅需要修改&lt;code&gt;NAME&lt;/code&gt;
-&lt;a href=&#34;http://blog.csdn.net/peterxiaoq/article/details/72831866&#34;&gt;systemd添加自定义服务&lt;/a&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# cat /etc/etcd/etcd.conf
-NAME=&amp;quot;etcd-1&amp;quot;
-DATADIR=&amp;quot;/export/etcd_data&amp;quot;
-MYHOST=&amp;quot;http://10.0.0.1&amp;quot;
-PORT=&amp;quot;2379&amp;quot;
-CLUSTER_PORT=&amp;quot;2380&amp;quot;
-CLUSTER=&amp;quot;etcd-1=http://10.0.0.1:2380,etcd-2=http://10.0.0.2:2380,etcd-3=http://10.0.0.3:2380&amp;quot;
-CLUSTER_TOKEN=&amp;quot;my-etcd-token&amp;quot;
-CLUSTER_STATE=&amp;quot;new&amp;quot;
-
-# cat /etc/systemd/system/etcd-node.service
-[Unit]
-Description=etcd node
-After=docker.service
-Requires=docker.service
-
-[Service]
-User=root
-EnvironmentFile=-/etc/etcd/etcd.conf
-PermissionsStartOnly=true
-ExecStart=/usr/bin/docker run -itd --net=host   --name=etcd-node -e NAME=${NAME} -e DATADIR=${DATADIR} -e MYHOST=${MYHOST} -e PORT=${PORT} -e CLUSTER_PORT$=${CLUSTER_PORT} -e CLUSTER=${CLUSTER} -e CLUSTER_TOKEN=${CLUSTER_TOKEN} -e CLUSTER_STATE=${CLUSTER_STATE} xxbandy123/etcd:3.0.10
-
-#ExecStop=/usr/bin/docker rm -f etcd-node
-#Restart=always
-#RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;注意1&lt;/code&gt;:需要分别修改每个节点上/etc/etcd/etcd.conf配置文件中的NAME和MYHOST、CLUSTER三个变量
-&lt;code&gt;注意2&lt;/code&gt;:在编写systemctl服务管理配置的时候，一定不要设置重启策略并且设置&lt;code&gt;ExecStop&lt;/code&gt;,因为初始化集群时需要多个节点同时进行启动并互相发现，当重启某个实例的时候，重新选举注册时，就会发现该节点已经存在与集群中，因此无法正常加入集群，而导致实例启动失败。正常的做法应该是某个实例异常后，先在集群内部摘除该节点，其后将该节点按照当前状态加入到集群后根据相关信息再次启动实例
-&lt;a href=&#34;https://segmentfault.com/a/1190000003976539&#34;&gt;etcd运维&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;启动验证&#34;&gt;启动验证&lt;/h3&gt;
-
-&lt;p&gt;分别启动三个docker实例&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;systemctl daemon-reload
-systemctl start etcd-node
-
-# etcdctl cluster-health
-2017-11-03 09:15:49.006358 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-2017-11-03 09:15:49.007093 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-member 911c5e15a35cdb8f is healthy: got healthy result from http://10.0.0.1:2379
-member b01d138087dbe547 is healthy: got healthy result from http://10.0.0.3:2379
-member c22c1c7b5a4c9f9b is healthy: got healthy result from http://10.0.0.2:2379
-cluster is healthy
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;集群维护&#34;&gt;集群维护&lt;/h3&gt;
-
-&lt;p&gt;模拟集群某个节点宕机，并恢复集群&lt;/p&gt;
-
-&lt;h4 id=&#34;查看当前集群状态信息以及可用性&#34;&gt;查看当前集群状态信息以及可用性&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;etcdctl member list
-2017-11-04 09:04:14.150103 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-9923f8b86d3ce7a6: name=etcd-1 peerURLs=http://10.0.0.1:2380 clientURLs=http://172.25.44.6:2379 isLeader=false
-b01d138087dbe547: name=etcd-3 peerURLs=http://10.0.0.3:2380 clientURLs=http://172.25.47.78:2379 isLeader=false
-c22c1c7b5a4c9f9b: name=etcd-2 peerURLs=http://10.0.0.2:2380 clientURLs=http://172.25.47.77:2379 isLeader=true
-[root@hc-25-44-6 pe]# etcdctl set bgops biaoge
-2017-11-04 09:04:40.234434 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-biaoge
-
-# etcdctl get bgops
-2017-11-04 09:05:22.059435 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-biaoge
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;删除node2节点上的容器实例&#34;&gt;删除node2节点上的容器实例&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;# docker rm -f -v etcd-node
-# etcdctl cluster-health
-member 9923f8b86d3ce7a6 is healthy: got healthy result from http://10.0.0.1:2379
-member b01d138087dbe547 is healthy: got healthy result from http://10.0.0.3:2379
-failed to check the health of member c22c1c7b5a4c9f9b on http://10.0.0.2:2379: Get http://172.25.47.77:2379/health: dial tcp 172.25.47.77:2379: getsockopt: connection refused
-member c22c1c7b5a4c9f9b is unreachable: [http://10.0.0.2:2379] are all unreachable
-cluster is healthy
-
-# etcdctl get bgops
-2017-11-04 09:10:40.658013 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-biaoge
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;如上显示，其中node2节点的已经失联，而由于当前etcd集群是3实例集群，因此集群整体仍然是健康状态，并且能够正常使用&lt;/p&gt;
-
-&lt;h4 id=&#34;恢复node2节点实例到集群中&#34;&gt;恢复node2节点实例到集群中&lt;/h4&gt;
-
-&lt;p&gt;注意：如果单纯的去按照原始配置启动node2上的实例的话，会提示无法加入集群(因为实例id已经注册上去了c22c1c7b5a4c9f9b)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# docker logs etcd-node
- ....
-2017-11-04 01:12:25.307452 C | etcdmain: member c22c1c7b5a4c9f9b has already been bootstrapped
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;正确的恢复姿势
-1.在集群中移除异常节点
-2.在集群中增加集群节点(异常节点也作为新节点加入集群)
-3.根据集群反馈信息进行异常节点重启&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# etcdctl member remove c22c1c7b5a4c9f9b
-2017-11-04 09:15:48.488427 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-Removed member c22c1c7b5a4c9f9b from cluster
-
-# etcdctl member add etcd-2 http://10.0.0.2:2380
-2017-11-04 09:16:50.704247 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-Added member named etcd-2 with ID 51e807366fadaded to cluster
-
-ETCD_NAME=&amp;quot;etcd-2&amp;quot;
-ETCD_INITIAL_CLUSTER=&amp;quot;etcd-2=http://10.0.0.2:2380,etcd-1=http://10.0.0.1:2380,etcd-3=http://10.0.0.3:2380&amp;quot;
-ETCD_INITIAL_CLUSTER_STATE=&amp;quot;existing&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;根据反馈信息进行异常节点恢复(给出了name,cluster,state三个参数)
-由于我们是根据原有集群进行恢复节点，所以需要修改node2节点的状态,并启动实例&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# grep STATE  /etc/etcd/etcd.conf
-CLUSTER_STATE=&amp;quot;existing&amp;quot;
-# systemctl restart  etcd-node
-# docker ps
-CONTAINER ID        IMAGE                               COMMAND                  CREATED             STATUS              PORTS               NAMES
-9fb8b1544642        xxbandy123/etcd:3.0.10   &amp;quot;/docker-entrypoint.s&amp;quot;   33 seconds ago      Up 32 seconds                           etcd-node
-
-# etcdctl cluster-health
-2017-11-04 09:23:44.053605 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-2017-11-04 09:23:44.054497 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-member 51e807366fadaded is healthy: got healthy result from http://10.0.0.2:2379
-member 9923f8b86d3ce7a6 is healthy: got healthy result from http://10.0.0.1:2379
-member b01d138087dbe547 is healthy: got healthy result from http://10.0.0.3:2379
-cluster is healthy
-# etcdctl get bgops
-2017-11-04 09:23:38.541355 I | warning: ignoring ServerName for user-provided CA for backwards compatibility is deprecated
-biaoge
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;至此，node2节点成功恢复到etcd集群中，并可以提供正常服务&lt;/p&gt;</description>
       
     </item>
     
