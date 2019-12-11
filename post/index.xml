@@ -6,10 +6,21 @@
     <description>Recent content in Posts on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 10 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>salt-master高可用架构</title>
+      <link>https://bgbiao.top/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 新来这家公司使用&lt;a href=&#34;https://docs.saltstack.com/en/latest/&#34;&gt;Salt&lt;/a&gt;来作为基础配置库管理和自动化运维的工具，但是前期同事刚开始使用时只是简单使用，因此对于可用性和可靠性来说都会存在很大问题(具体可能出现的问题下面会提到)。不过作为一个专业的SRE或者运维人员，在使用一个基础组件时，必须要考虑的一个问题就是&lt;code&gt;可用性&lt;/code&gt;和&lt;code&gt;可靠性&lt;/code&gt;，以前使用&lt;a href=&#34;https://docs.ansible.com/&#34;&gt;Ansible&lt;/a&gt;作为配置管理和自动化运维工具时只需对&lt;code&gt;ssh-key&lt;/code&gt;或者密码进行管理即可通过水平扩容来保证高可用，而在&lt;code&gt;Salt&lt;/code&gt;中需要涉及到&lt;code&gt;salt-minion&lt;/code&gt;的发现以及&lt;code&gt;key&lt;/code&gt;的管理，接下来对&lt;code&gt;高可用的Salt集群架构&lt;/code&gt;进行介绍和实施。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>快速使用互联网检索有用数据</title>
@@ -246,15 +257,6 @@ google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一
 
 &lt;p&gt;PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
 在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>容器生态技术</title>
-      <link>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
-      <pubDate>Sun, 05 Nov 2017 22:30:59 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
-      <description>&lt;p&gt;2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。&lt;/p&gt;</description>
     </item>
     
   </channel>

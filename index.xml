@@ -6,10 +6,218 @@
     <description>Recent content on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 10 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>salt-master高可用架构</title>
+      <link>https://bgbiao.top/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 新来这家公司使用&lt;a href=&#34;https://docs.saltstack.com/en/latest/&#34;&gt;Salt&lt;/a&gt;来作为基础配置库管理和自动化运维的工具，但是前期同事刚开始使用时只是简单使用，因此对于可用性和可靠性来说都会存在很大问题(具体可能出现的问题下面会提到)。不过作为一个专业的SRE或者运维人员，在使用一个基础组件时，必须要考虑的一个问题就是&lt;code&gt;可用性&lt;/code&gt;和&lt;code&gt;可靠性&lt;/code&gt;，以前使用&lt;a href=&#34;https://docs.ansible.com/&#34;&gt;Ansible&lt;/a&gt;作为配置管理和自动化运维工具时只需对&lt;code&gt;ssh-key&lt;/code&gt;或者密码进行管理即可通过水平扩容来保证高可用，而在&lt;code&gt;Salt&lt;/code&gt;中需要涉及到&lt;code&gt;salt-minion&lt;/code&gt;的发现以及&lt;code&gt;key&lt;/code&gt;的管理，接下来对&lt;code&gt;高可用的Salt集群架构&lt;/code&gt;进行介绍和实施。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;单节点salt-master问题&#34;&gt;单节点salt-master问题&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;比如说2c2g的机器在管理500+左右的ECS时，就会发现异常慢，而且调用salt-api会出现异常，此时如果去检查资源使用率，就会发现cpu和load都会暴涨，这是因为在使用salt的场景中大部分会使用同步调用，此时salt相关的进程会一直占用资源，直到minion返回结果&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;当单节点主机异常时，整体的salt管控端将会失效，也就意味着全量的主机将无法被统一管理，这对于任何一个基于salt的自动化管理系统来说都是一个大灾难&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;因此，基于以上考虑，salt-master高可用架构的构建对于任何一个&lt;code&gt;生产环境&lt;/code&gt;的自动化基础设施来讲都是刻不容缓的。&lt;/p&gt;
+
+&lt;h3 id=&#34;salt-master高可用架构方案&#34;&gt;salt-master高可用架构方案&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.saltstack.com/en/master/topics/highavailability/index.html&#34;&gt;salt高可用方案&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;在salt的官方文档中提供了三种高可用的方案:
+- &lt;a href=&#34;https://docs.saltstack.com/en/master/topics/tutorials/multimaster.html#tutorial-multi-master&#34;&gt;多Master结构&lt;/a&gt;: 该种方式需要在&lt;code&gt;minion&lt;/code&gt;中配置多个master，此时默认所有的master都是在线的，同时多个master必须共享相同的&lt;code&gt;cryptographic keys&lt;/code&gt;，而且&lt;code&gt;minion keys&lt;/code&gt;必须在所有的master节点单独允许，此外还需要&lt;code&gt;file_roots&lt;/code&gt;和&lt;code&gt;pillar_roots&lt;/code&gt;保持同步
+- 故障切换的多Master结构: 同上，都是多Master架构，默认情况下采用的是顺序master，不过可以通过&lt;code&gt;master_type&lt;/code&gt;参数修改为&lt;code&gt;failover&lt;/code&gt;，以此来保障多Master节点之间的故障切换(通常failover需要&lt;code&gt;master_alive_interval&lt;/code&gt;和&lt;code&gt;master_shuffle: True&lt;/code&gt;参数支持)
+- &lt;a href=&#34;https://docs.saltstack.com/en/master/topics/topology/syndic.html#syndic&#34;&gt;syndic&lt;/a&gt;: salt-syndic其实不能算是一种严格的高可用架构，它有点儿类似代理的方式，即在主控master节点下设置syndic节点，由syndic节点来管控旗下的minion节点
+- [多Master结构下的syndic]: 同上&lt;/p&gt;
+
+&lt;p&gt;大概了解了集中高可用方案之后，我们做一个简单分析:&lt;br /&gt;
+1. 首先我们为了保障高可用，需要允许任意节点都是高可用的，因此排除&lt;code&gt;syndic&lt;/code&gt;方案
+2. 在&lt;code&gt;多master&lt;/code&gt;，&lt;code&gt;故障切换的多master&lt;/code&gt;和&lt;code&gt;多master下的syndic&lt;/code&gt;中，在可用用性和性能承受范围内考虑架构的简洁性，排除&lt;code&gt;多master下的syndic&lt;/code&gt;方案&lt;/p&gt;
+
+&lt;p&gt;因此，最终可供我们选择的即为&lt;code&gt;多master&lt;/code&gt;方案，至于&lt;code&gt;failover&lt;/code&gt;其实只是&lt;code&gt;多master&lt;/code&gt;下的一种类型。&lt;/p&gt;
+
+&lt;h3 id=&#34;salt-master高可用实施&#34;&gt;salt-master高可用实施&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在&lt;code&gt;多Master结构&lt;/code&gt;中也提到了，&lt;code&gt;cryptographic key&lt;/code&gt;和&lt;code&gt;file_roots&lt;/code&gt;以及&lt;code&gt;pillar_roots&lt;/code&gt;需要保持同步，我们这里使用共享存储方式来实现多master节点的文件同步。&lt;/p&gt;
+
+&lt;p&gt;如果使用的是阿里云，可以使用&lt;a href=&#34;https://www.aliyun.com/product/nas?source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;NAS&lt;/a&gt;服务来实现多主机的共享文件存储.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.aliyun.com/product/nas?source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1g9sqdlv593j316i0eun0l.jpg&#34; alt=&#34;NAS存储&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;如果是非云，或者非阿里云的环境，可以采用传统的&lt;code&gt;NFS&lt;/code&gt;存储方式来实现共享存储，不过&lt;code&gt;NFS&lt;/code&gt;仅提供了共享，却不保证高可用性，如果需要大规模使用也是需要考虑备份错输。另外其他的方式就是采用&lt;code&gt;GlusterFS&lt;/code&gt;或者&lt;code&gt;CephFS&lt;/code&gt;之类的分布式共享存储方案。因此在迁移迁移阶段，我们先采用&lt;code&gt;GlusterFS&lt;/code&gt;来提供底层的高可用的共性存储(后期会直接迁移到阿里云的NAS服务)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1.创建一个glusterfs volume&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 创建一个salt卷(复制卷)
+$ gluster volume create salt replica 2 node4:/data/salt node5:/data/salt force
+
+# 查看当前gluster集群下的volume(也供给k8s中的自建mysql使用)
+$ gluster volume list
+k8s
+salt
+
+# 启动salt volume
+$ gluster volume start salt
+$ gluster volume info salt
+
+
+# 开启磁盘配额的限制
+$ gluster volume quota salt enable
+volume quota : success
+
+$ gluster volume quota salt limit-usage / 200GB 90%
+volume quota : success
+
+# 查看磁盘配额情况
+$ gluster volume quota salt list
++----  1 line: Path                   Hard-limit  Soft-limit      Used  Available  Soft-limit exceeded? Hard-limit exce
+-------------------------------------------------------------------------------------------------------------------------------
+/                                        200.0GB     90%(180.0GB)   0Bytes 200.0GB              No                   No
+
+# 使用(被挂载节点需要绑定这个hosts)
+# 所有的客户端主机均需要安装(glusterfs客户端)
+$ yum install glusterfs glusterfs-client -y
+$ cat /etc/hosts
+10.0.21.74  node4
+10.0.21.73 node5
+
+$ mount -t glusterfs 10.0.21.73:/salt /opt/data/salt-data/
+$ df -H | grep /opt/data/
+10.0.21.73:/salt  215G     0  215G    0% /opt/data/salt-data
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;2.修改salt-master配置文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 每次master接收minion的认证后会将认证文件统一存放在&lt;code&gt;pki_dir&lt;/code&gt;目录下，如果是在单master像多Master改造，需要保持该文件的全量同步&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# salt-master-1
+$ grep -v ^#  /etc/salt/master  | grep -v ^$
+interface: 10.0.217.78
+pki_dir: /opt/data/salt-data/pki/master
+timeout: 10
+file_recv: True
+log_file: /var/log/salt/master
+log_level: info
+
+# salt-master-2
+$ grep -v ^#  /etc/salt/master  | grep -v ^$
+interface: 10.0.79.88
+pki_dir: /opt/data/salt-data/pki/master
+timeout: 10
+file_recv: True
+log_file: /var/log/salt/master
+log_level: info
+
+# salt-minion配置示例
+# 这里使用随机master，可以减少master的负载
+# 如果使用failover模式的话，将永远只有失败之后使用另外的salt-master，整体性价比较低(不过可随时切换)
+$ grep -v ^# /etc/salt/minion | grep -v ^$
+master:
+    - salt-master-2.bgbiao.top
+    - salt-master-1.bgbiao.top
+random_master: True
+id: 10.0.79.90
+
+# 分别重启salt-master和salt-minion进程
+# 在任意一台salt-master中同步key
+$ salt-key -a 10.0.79.90 -y
+
+# 测试后发现两个salt-master均可以对目标主机执行操作
+[root@salt-master-2 ~]# salt 10.0.79.90 test.ping
+10.0.79.90:
+    True
+
+[root@salt-master-1 ~]# salt 10.0.79.90 test.ping
+10.0.79.90:
+    True
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;3.修改file_roots和pillar_sls目录&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 修改salt-master相关配置
+# 增加file_roots目录(默认在/srv/salt/目录下)
+$ grep -v ^#  /etc/salt/master  | grep -v ^$
+interface: 10.0.79.88
+pki_dir: /opt/data/salt-data/pki/master
+timeout: 10
+file_recv: True
+file_roots:
+  base:
+    - /opt/data/salt-data/salt-sls/
+log_file: /var/log/salt/master
+log_level: info
+
+# 将源master节点/srv/salt/下文件同步到/opt/data/salt-data/salt-sls/目录即可
+
+# 测试salt state文件使用
+# 测试hadoop客户端安装
+[root@salt-master-2 salt-sls]# salt 10.0.79.90 state.sls hadoop-client.init-hadoop-env
+....
+....
+Summary
+-------------
+Succeeded: 25 (changed=24)
+Failed:     0
+-------------
+Total states run:     25
+
+# 使用state初始化hadoop环境后测试hadoop客户端是否正常
+[root@salt-master-2 salt-sls]# salt 10.0.79.90 cmd.run &#39;source /etc/profile &amp;amp;&amp;amp; hadoop fs -ls /hive;&#39;
+10.0.79.90:
+    19/12/10 16:37:59 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+    19/12/10 16:38:00 WARN shortcircuit.DomainSocketFactory: The short-circuit local reads feature cannot be used because libhadoop cannot be loaded.
+    Found 3 items
+    drwxr-x--x   - root   hadoop          0 2018-12-03 20:05 /hive/dw
+    drwxr-x--x   - root   hadoop          0 2019-04-02 11:03 /hive/ods
+    drwxr-x--x   - hadoop hadoop          0 2019-07-18 21:26 /hive/rpt
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;在新的master节点验证完毕后，将全部master节点的&lt;code&gt;/etc/salt/master&lt;/code&gt;配置文件进行同步(&lt;code&gt;interface&lt;/code&gt;参数需要为指定的地址)即可.&lt;/p&gt;
+
+&lt;h3 id=&#34;salt-minion接入使用&#34;&gt;salt-minion接入使用&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;# 安装salt-minion
+$ yum install salt-minion -y
+
+# 修改salt-minion配置文件(id为唯一标识salt-minion)
+$ cat /etc/salt/minion
+master:
+    - salt-master-2.bgbiao.top
+    - salt-master-1.bgbiao.top
+random_master: True
+# 其实这里的id可以不用指定，默认为socket.getfqdn()函数值(其实就是ipv4)
+id: 10.0.79.90
+
+# 重启salt-minion
+$ systemctl daemon-reload &amp;amp;&amp;amp; systemctl restart salt-minion
+
+# salt-master手动同意请求(可用设置成定期accept all)
+$ salt-key -a 10.0.79.90 -y
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;salt使用问题和注意事项&#34;&gt;salt使用问题和注意事项&lt;/h3&gt;
+
+&lt;ul class=&#34;task-list&#34;&gt;
+&lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; master设备会为每个minion的auth-request请求计算签名。 在有许多minions和频繁的auth请求时，这可以消耗掉master服务器上相当多的CPU资源.&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;</description>
+      
+    </item>
     
     <item>
       <title>快速使用互联网检索有用数据</title>
@@ -4795,147 +5003,6 @@ Legend:
 
 &lt;p&gt;&lt;a href=&#34;https://www.mianbaoban.cn/blog/post/193694&#34;&gt;PCIe体系结构组成部件&lt;/a&gt;
 &lt;a href=&#34;http://www.ssdfans.com/%E8%80%81%E7%94%B7%E5%AD%A9%E8%AF%BBpcie%E4%B9%8B%E4%BA%8C%EF%BC%9Apcie%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/&#34;&gt;PCIe拓扑结构&lt;/a&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>容器生态技术</title>
-      <link>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
-      <pubDate>Sun, 05 Nov 2017 22:30:59 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
-      
-        <description>&lt;p&gt;2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。&lt;/p&gt;
-
-&lt;p&gt;容器云生态图谱
-&lt;img src=&#34;http://oyep1jupk.bkt.clouddn.com/container/tech/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E7%94%9F%E6%80%81%E5%9B%BE%E8%B0%B1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;容器引擎&#34;&gt;容器引擎&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://www.docker.com/&#34;&gt;Docker&lt;/a&gt;
-&lt;a href=&#34;https://github.com/moby/moby&#34;&gt;Moby&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/rkt/rkt&#34;&gt;Rkt&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/lxc/lxc&#34;&gt;Lxc&lt;/a&gt;
-&lt;a href=&#34;https://github.com/lxc/lxd&#34;&gt;Lxd&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/opencontainers/runc&#34;&gt;OCI&lt;/a&gt;
-&lt;a href=&#34;https://www.opencontainers.org/&#34;&gt;OCI官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/hyperhq/hyperd&#34;&gt;Hyperd&lt;/a&gt;
-&lt;a href=&#34;http://www.hypercontainer.io&#34;&gt;Hyper官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;编排调度&#34;&gt;编排调度&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes&#34;&gt;Kubernetes&lt;/a&gt;
-&lt;a href=&#34;http://kubernetes.io&#34;&gt;k8s官网&lt;/a&gt;
-&lt;a href=&#34;k8smeetup.github.io&#34;&gt;k8s官网翻译&lt;/a&gt;
-&lt;a href=&#34;https://www.kubernetes.org.cn/&#34;&gt;k8s中文站&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/apache/mesos&#34;&gt;Mesos&lt;/a&gt;
-&lt;a href=&#34;https://github.com/mesosphere/marathon&#34;&gt;Marathon&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/docker/swarm&#34;&gt;Swarm&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/rancher/rancher&#34;&gt;Rancher&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;网络&#34;&gt;网络&lt;/h4&gt;
-
-&lt;h5 id=&#34;cni&#34;&gt;CNI&lt;/h5&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/containernetworking/cni&#34;&gt;CNI&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/projectcalico/calico&#34;&gt;Calico&lt;/a&gt;
-&lt;a href=&#34;https://www.projectcalico.org/&#34;&gt;Calico官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/weaveworks/weave&#34;&gt;Weave&lt;/a&gt;
-&lt;a href=&#34;https://www.weave.works&#34;&gt;Weave官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/contiv/netplugin&#34;&gt;Contiv&lt;/a&gt;
-&lt;a href=&#34;http://contiv.io&#34;&gt;Contiv官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/openvswitch/ovs&#34;&gt;ovs&lt;/a&gt;
-&lt;a href=&#34;http://openvswitch.org/&#34;&gt;ovs官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;h5 id=&#34;cnm&#34;&gt;CNM&lt;/h5&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/docker/libnetwork&#34;&gt;libnetwork&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/projectcalico/libnetwork-plugin&#34;&gt;Calico-libnetwork&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/contiv/netplugin&#34;&gt;Contiv&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/weaveworks/weave&#34;&gt;Weave&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;存储&#34;&gt;存储&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/ceph/ceph&#34;&gt;Ceph&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/gluster/glusterfs&#34;&gt;GlusterFS&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/ipdcode/containerfs&#34;&gt;ContainerFS&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/coreos/torus&#34;&gt;Torus&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;日志&#34;&gt;日志&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/elasticsearch&#34;&gt;ElasticSearch&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/beats&#34;&gt;Filebeat&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/fluent/fluentd&#34;&gt;Fluentd&lt;/a&gt;
-&lt;a href=&#34;http://www.fluentd.org/&#34;&gt;Fluentd官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/logstash&#34;&gt;Logstash&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/elastic/kibana&#34;&gt;Kibana&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;监控&#34;&gt;监控&lt;/h4&gt;
-
-&lt;h5 id=&#34;数据采集&#34;&gt;数据采集&lt;/h5&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/influxdata/telegraf&#34;&gt;Telegraf&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/firehol/netdata&#34;&gt;Netdata&lt;/a&gt;
-&lt;a href=&#34;https://my-netdata.io/&#34;&gt;Netdata官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/google/cadvisor&#34;&gt;cAdivisor&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/heapster&#34;&gt;Heapster&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/prometheus/prometheus&#34;&gt;Prometheus&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;数据存储&#34;&gt;数据存储&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/influxdata/influxdb&#34;&gt;Influxdb&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/OpenTSDB/opentsdb&#34;&gt;OpenTSDB&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;数据展示&#34;&gt;数据展示&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/grafana/grafana&#34;&gt;Grafana&lt;/a&gt;
-&lt;a href=&#34;https://grafana.com&#34;&gt;Grafana官网&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;镜像存储和安全&#34;&gt;镜像存储和安全&lt;/h3&gt;
-
-&lt;h4 id=&#34;镜像存储&#34;&gt;镜像存储&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/vmware/harbor&#34;&gt;Harbor&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/jcloudpub/speedy&#34;&gt;Speedy&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;安全扫描&#34;&gt;安全扫描&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/coreos/clair&#34;&gt;Clair&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/future-architect/vuls&#34;&gt;Vuls&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;域名解析&#34;&gt;域名解析&lt;/h3&gt;
-
-&lt;p&gt;[bind]()
-&lt;a href=&#34;https://github.com/coredns/coredns&#34;&gt;coredns&lt;/a&gt;
-[skydns]()&lt;/p&gt;</description>
       
     </item>
     
