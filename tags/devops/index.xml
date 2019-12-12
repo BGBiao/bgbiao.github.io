@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>DevOps on BGBiao的Ops人生</title>
+    <link>https://bgbiao.top/tags/devops/</link>
+    <description>Recent content in DevOps on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/devops/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linux下快速构建Android编译环境</title>
+      <link>https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 在移动互联网时代，大多数的企业内部都有移动客户端，而移动客户端又因为OS的不同产生了两个派系，即&lt;code&gt;安卓(Android)&lt;/code&gt;和&lt;code&gt;苹果(IOS)&lt;/code&gt;，而对于互联网技术从业者来说，这两者最直接的区别就是&lt;code&gt;开源&lt;/code&gt;和&lt;code&gt;闭源&lt;/code&gt;，因而也导致了在构建移动客户端时，为了整体的稳定性和可靠性的考虑(甚至有成本的考虑)，需要进行分别编译，本篇文章记录下如何在Linux环境下构建&lt;code&gt;Android&lt;/code&gt;编译环境.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
