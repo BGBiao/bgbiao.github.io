@@ -271,6 +271,7 @@ build-tools  cmake  licenses  platforms  platform-tools  tools
 &lt;ul&gt;
 &lt;li&gt;1.通常持续集成会使用&lt;code&gt;Jenkins&lt;/code&gt;来进行编译打包，因此以上环境再接入Jenkins-salve之前需要安装&lt;code&gt;git&lt;/code&gt;客户端名&lt;/li&gt;
 &lt;li&gt;2.通常客户端在测试包时会通过二维码扫描来下载包，因此环境上需要安装&lt;code&gt;qrencode&lt;/code&gt;软件，用于生成二维码&lt;/li&gt;
+&lt;li&gt;3.需要注意&lt;code&gt;gradle&lt;/code&gt;在编译过程中会启动一个守护进程，如果编译异常结束，该守护进程可能不会立即释放，此时立即再次编译将有可能导致OOM&lt;/li&gt;
 &lt;/ul&gt;</description>
       
     </item>
