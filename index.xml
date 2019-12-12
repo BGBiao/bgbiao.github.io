@@ -220,10 +220,10 @@ RUN yum clean all &amp;amp;&amp;amp; \
     yum install unzip wget curl -y &amp;amp;&amp;amp; \
     mkdir -p /opt/{servers,app} &amp;amp;&amp;amp; \
     cd /opt/servers/ &amp;amp;&amp;amp; \
-    wget  http://dl.soulapp-inc.cn/hadoop/jdk1.8.0_191.tar.gz &amp;amp;&amp;amp; \
-    wget http://dl.soulapp-inc.cn/dav/android-build/android-ndk-r16b-linux-x86_64.zip &amp;amp;&amp;amp; \
-    wget http://dl.soulapp-inc.cn/dav/android-build/gradle-4.10.1-all.zip &amp;amp;&amp;amp; \
-    wget http://dl.soulapp-inc.cn/dav/android-build/sdk-tools-linux-4333796.zip
+    wget  http://dl.bgbiao.top/hadoop/jdk1.8.0_191.tar.gz &amp;amp;&amp;amp; \
+    wget http://dl.bgbiao.top/dav/android-build/android-ndk-r16b-linux-x86_64.zip &amp;amp;&amp;amp; \
+    wget http://dl.bgbiao.top/dav/android-build/gradle-4.10.1-all.zip &amp;amp;&amp;amp; \
+    wget http://dl.bgbiao.top/dav/android-build/sdk-tools-linux-4333796.zip
 
 RUN pushd /opt/servers &amp;amp;&amp;amp; \
     tar -zxf jdk1.8.0_191.tar.gz &amp;amp;&amp;amp; \
@@ -264,7 +264,14 @@ build-tools  cmake  licenses  platforms  platform-tools  tools
 # 开始执行编译(之后就是漫长的等待了)
 [root@4c05d4ded28d /]# cd your-android-app &amp;amp;&amp;amp; gradle clean assembleRelease
 
-&lt;/code&gt;&lt;/pre&gt;</description>
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;注意事项&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.通常持续集成会使用&lt;code&gt;Jenkins&lt;/code&gt;来进行编译打包，因此以上环境再接入Jenkins-salve之前需要安装&lt;code&gt;git&lt;/code&gt;客户端名&lt;/li&gt;
+&lt;li&gt;2.通常客户端在测试包时会通过二维码扫描来下载包，因此环境上需要安装&lt;code&gt;qrencode&lt;/code&gt;软件，用于生成二维码&lt;/li&gt;
+&lt;/ul&gt;</description>
       
     </item>
     
