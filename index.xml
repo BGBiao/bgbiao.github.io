@@ -6,10 +6,228 @@
     <description>Recent content on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Goroutine与主进程的通信</title>
+      <link>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</link>
+      <pubDate>Fri, 13 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</guid>
+      
+        <description>&lt;p&gt;还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过&lt;code&gt;context&lt;/code&gt;这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。&lt;/p&gt;
+
+&lt;p&gt;子goroutine与主线程同步的集中方式:
+- &lt;code&gt;channel&lt;/code&gt;: 每个goroutine往主进程的&lt;code&gt;chan&lt;/code&gt;写数据，然后由主进程去读取，直到读取完了全部goroutine的&lt;code&gt;chan&lt;/code&gt;就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
+- &lt;code&gt;context&lt;/code&gt;: 使用&lt;code&gt;context&lt;/code&gt;中的&lt;code&gt;cancel&lt;/code&gt;，这种模式是主线程通知子线程结束
+- &lt;code&gt;sync.WaitGroup&lt;/code&gt;: 通过&lt;code&gt;Add&lt;/code&gt;方法设置等待子goroutine的数量，使用&lt;code&gt;Done&lt;/code&gt;方法设置等待子goroutine的数量减1，当等待数量为0时，&lt;code&gt;Wait&lt;/code&gt;函数退出.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1.通过channel实现同步&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat channel-sync.go
+package main
+import (
+    &amp;quot;fmt&amp;quot;
+)
+// 通过向主进程中的channel来和主进程进行通信
+func subTask(c chan int) {
+    defer close(c)
+    for i :=0;i&amp;lt; 10;i++ {
+        c &amp;lt;- i
+    }
+}
+
+func main() {
+    isok := make(chan int,10)
+    go subTask(isok)
+    // 通过channel来让子goroutine和主线程共享内存(通过通信实现共享内存)
+    for v := range isok {
+        fmt.Println(v)
+    }
+}
+$ go run channel-sync.go
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;**2.context方式传递数据给主线程 **&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat context-sync.go
+package main
+import (
+    &amp;quot;context&amp;quot;
+    &amp;quot;fmt&amp;quot;
+)
+
+func subTask(ctx context.Context) (chan int) {
+    dst := make(chan int)
+    n := 0
+    go func() {
+				// 通过使用select执行和channel相关的IO操作(类似switch)
+				// select关键字其实是go并发模型中比较重要的
+        for {
+            select {
+                case &amp;lt;- ctx.Done():
+                    return
+                case dst &amp;lt;- n:
+                    n++
+            }
+        }
+    }()
+    return dst
+}
+
+func main() {
+    ctx,cancel := context.WithCancel(context.Background())
+    defer cancel()
+
+    // subTask中其实是一个死循环会不断将n自增并返回到dst
+    testChan := subTask(ctx)
+
+    for n := range testChan {
+        // 主进程通过chan中的值控制并发？然后通过cancel()来通知子routine结束
+        if n == 9 {
+          break
+        }
+        fmt.Println(n)
+    }
+
+}
+
+$ go run context-sync.go
+0
+1
+2
+3
+4
+5
+6
+7
+8
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;3.通过sync.WaitGroup来实现&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat waitgroup-sync.go
+package main
+import (
+    &amp;quot;sync&amp;quot;
+    &amp;quot;fmt&amp;quot;
+)
+
+func subTask(wg *sync.WaitGroup){
+    // 在并发函数中通知waitgroup完成
+    defer wg.Done()
+    for i := 0;i &amp;lt; 10;i++ {
+        fmt.Println(i)
+    }
+}
+
+func main() {
+    wg := &amp;amp;sync.WaitGroup{}
+    // 设置waitgroup等待次数(并发次数)
+    wg.Add(2)
+    for i:=0;i&amp;lt;2;i++ {
+      go subTask(wg)
+    }
+    wg.Wait()
+}
+
+$go run waitgroup-sync.go
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;4.多个子goroutine之间通信&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat mutil-goroutines-sync.go
+package main
+import (
+    &amp;quot;fmt&amp;quot;
+)
+
+// 两个task互相协作，通过两个channel来互相通知对方执行的阻塞和继续
+// 因为c2其实是一个带缓冲的(1)的channel，会阻塞主直到另外一个task处理
+func task1(c1 chan bool,c2 chan bool) {
+    for i:= 1;i&amp;lt; 11;i += 2{
+        // c2是一个带缓冲的channel，因此第一次打印12后到这里会等待读取c2
+        &amp;lt;- c2
+        fmt.Printf(&amp;quot;%d&amp;quot;,i)
+        fmt.Printf(&amp;quot;%d&amp;quot;,i+1)
+        c1 &amp;lt;- true
+
+    }
+}
+
+func task2(c1 chan bool,c2 chan bool,c3 chan struct{}) {
+    char_seq := [...]string{&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;, &amp;quot;C&amp;quot;, &amp;quot;D&amp;quot;, &amp;quot;E&amp;quot;, &amp;quot;F&amp;quot;, &amp;quot;G&amp;quot;, &amp;quot;H&amp;quot;, &amp;quot;I&amp;quot;, &amp;quot;J&amp;quot;}
+    for i:=0;i&amp;lt;10;i += 2{
+        &amp;lt;- c1
+        fmt.Printf(&amp;quot;%s&amp;quot;, char_seq[i])
+        fmt.Printf(&amp;quot;%s&amp;quot;, char_seq[i+1])
+        c2 &amp;lt;- true
+    }
+    // 通知主进程任务执行完成
+    c3 &amp;lt;- struct{}{}
+}
+
+
+func main() {
+    c1 := make(chan bool)
+    // 通过有缓冲的channel来争抢执行
+    c2 := make(chan bool,1)
+    // 定义一个struct{}类型的channel
+    done := make(chan struct{})
+
+    // 创建两个goroutine在后台执行
+    go task1(c1,c2)
+    go task2(c1,c2,done)
+
+    // 继续执行，此时channel c2开始通过值告诉task1开始执行
+    fmt.Println(&amp;quot;begin&amp;quot;)
+    c2 &amp;lt;- true
+    // 通过一个struct{}类型的channel将主进程阻塞住
+    &amp;lt;- done
+}
+
+$ go run mutil-goroutines-sync.go
+begin
+12AB34CD56EF78GH910IJ%
+
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
     
     <item>
       <title>Linux下快速构建Android编译环境</title>
@@ -4937,260 +5155,6 @@ HTTP/1.1 404 Not Found
 Content-Type: text/plain; charset=utf-8
 Date: Fri, 19 May 2017 02:53:36 GMT
 Content-Length: 19
-&lt;/code&gt;&lt;/pre&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>Overlayfs技术探究以及Docker环境中的使用</title>
-      <link>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Thu, 09 Nov 2017 21:36:58 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
-      
-        <description>&lt;h3 id=&#34;overlayfs-基本概念&#34;&gt;overlayfs 基本概念&lt;/h3&gt;
-
-&lt;p&gt;一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
-当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://upload-images.jianshu.io/upload_images/2577135-efb7ae4b8b44c1c1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;overlayfs存储架构&#34; /&gt;
-&lt;code&gt;可以看到镜像层和容器层可以保存相同的文件，容器层的文件会覆盖镜像层的文件&lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;在overlayfs中每个镜像层都会在&lt;code&gt;/var/lib/docker/overlay&lt;/code&gt;有对应的目录，使用硬链接与底层数据进行关联。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;优势劣势&#34;&gt;优势劣势&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;1.OverlayFS支持页缓存共享，多个容器访问同一个文件能共享一个页缓存，以此提高内存使用&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;2.OverlayFS消耗inode，随着镜像和容器增加，inode会遇到瓶颈。Overlay2能解决这个问题。在Overlay下，为了解决inode问题，可以考虑将/var/lib/docker挂在单独的文件系统上，或者增加系统inode设置。&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;overlay中的读写&#34;&gt;overlay中的读写&lt;/h3&gt;
-
-&lt;h4 id=&#34;在容器中读取文件&#34;&gt;在容器中读取文件&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;(1)目标文件不在容器层内，overlay会从镜像层读取文件，此时，对容器性能的影响很小。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;(2)目标文件在容器层内，overlay直接从容器层读取。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;(3)目标文件在容器层和镜像层同时存在，overlay读入容器层中的文件，此时容器层的文件会覆盖镜像层的文件。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;在容器中修改文件&#34;&gt;在容器中修改文件&lt;/h4&gt;
-
-&lt;p&gt;在容器中第一次修改文件，此时文件不在容器层中。overlay会把文件从镜像层复制到容器层，所有该文件中的修改都保存在容器层中。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意：&lt;/code&gt;overlay工作文件系统层(devicemapper工作再块层面)，因此复制文件会复制整个文件，因此在频繁读写会很消耗资源&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;(1)只是在第一次修改文件时，需要把文件从镜像层复制到容器层，后续操作都是在容器层中完成。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;(2)overlayfs只有两层，lowerdir和upperdir，因此在很深的目录树中，搜索文件会相对比较快&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;在容器中删除文件和目录&#34;&gt;在容器中删除文件和目录&lt;/h4&gt;
-
-&lt;p&gt;在容器中删除文件时，overlay存储驱动在容器层中新建一个without文件，该文件用语隐藏镜像层中的目标文件。在容器层删除目录时，overlay存储驱动在容器层新建一个opaque目录，该目录用于隐藏镜像层中的目标目录。
-需要明白的一点是，任何存储驱动都不会删除底层image中的目标文件和目录的。&lt;/p&gt;
-
-&lt;h4 id=&#34;overlayfs的原理测试&#34;&gt;overlayfs的原理测试&lt;/h4&gt;
-
-&lt;p&gt;overlayfs挂载后系统文件的page cache是全部共享的。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# mkdir low upper work
-# ls
-low  upper  work
-# echo &#39;abs&#39; &amp;gt; low/11.txt
-# echo &#39;xuxuebiao&#39; &amp;gt; upper/22.txt
-# mkdir merged
-# mount -t overlay overlay -olowerdir=./low,upperdir=./upper,workdir=./work ./merged
-# ls
-low  merged  upper  work
-# cd merged/
-# ls
-11.txt  22.txt
-# ll
-total 8
--rw-r--r--. 1 root root  4 Mar 27 18:57 11.txt
--rw-r--r--. 1 root root 10 Mar 27 18:58 22.txt
-
-# tree
-.
-├── low
-│   └── 11.txt
-├── merged
-│   ├── 11.txt
-│   └── 22.txt
-├── upper
-│   └── 22.txt
-└── work
-    └── work
-
-5 directories, 4 files
-可以看到，merged目录中时low和upper目录联合的结果
-
-
-分别修改文件：
-# cat 11.txt
-abs
-# cat 22.txt
-xuxuebiao
-# vim 11.txt
-# cat 11.txt
-Hello ,overlayfs!
-# cat ../low/11.txt
-abs
-# cat ../upper/
-11.txt   11.txt~  22.txt
-# cat ../upper/11.txt
-Hello ,overlayfs!
-# cat ../upper/11.txt~
-cat: ../upper/11.txt~: No such device or address
-# cat ../upper/11.txt
-11.txt   11.txt~
-# cat ../upper/11.txt~
-cat: ../upper/11.txt~: No such device or address
-
-可以看到low目录下的文件没有变化，但是upper里面的文件内容已经改变，并且有了一个11.txt~文件
-
-
-# ls -i ../upper/11.txt 11.txt
-143902921 11.txt  143902921 ../upper/11.txt
-可以看到upper和merged目录中的两个文件11.txt的inode其实是一致的，其实是硬链接
-
-# ls -i ../low/11.txt 11.txt
-143902921 11.txt  143902918 ../low/11.txt
-merged目录文件和low目录文件对比
-
-
-删除文件测试：
-# rm 11.txt
-rm: remove regular file ‘11.txt’? y
-# ls
-ls: cannot access 11.txt: No such file or directory
-ls: cannot access 11.txt~: No such file or directory
-11.txt  11.txt~  22.txt
-
-# cat ../upper/11.txt~
-cat: ../upper/11.txt~: No such device or address
-# ls -l ../upper/11.txt
-c---------. 1 root root 0, 0 Mar 27 19:08 ../upper/11.txt
-
-删除文件后发现文件无法访问，底层变成了一个大小为0，且没有任何人有权限的一个空文件。
-overlayfs用这种删除标记的方式标识文件被删除，（如果upper中没有该文件的话，则底层low中的同名文件又恢复出来显示了，因此需要有这个空文件来标识删除，并且覆盖底层的文件）
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;overlayfs在docker中的使用&#34;&gt;overlayfs在docker中的使用&lt;/h3&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;首先，overlayfs是在高版本的内核上才支持的存储驱动，因此不管使用的官方内核，还是自己patch的内核，首先需要检查overlayfs是否被加载&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://mp.weixin.qq.com/s?__biz=MzA4OTMxODQwNA==&amp;amp;mid=2650978252&amp;amp;idx=1&amp;amp;sn=4e5040d70d5656d9b937eb7e9dbc672a&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=0327J9rVlXF0m4VU4b0raAJQ&amp;amp;key=7601aed56c2d62eb663f9c44acf41d0f3071fe13b7a35bd0e12641eef7aa201e53e5b9c680e04104a3c41e77eb9d2507aa4613cfac95837e6ae6a7e52710866fd11284eb8814fcf5ab872552099d0a8c&amp;amp;ascene=0&amp;amp;uin=MjUxNzI2NjE2Mg%3D%3D&amp;amp;devicetype=iMac+MacBookAir7%2C2+OSX+OSX+10.10.5+build(14F1021)&amp;amp;version=11020201&amp;amp;pass_ticket=gNSbIAbFM0u3hxIEr27nbXmZMTLnAbzlRuhwjwSUx8jm0iwFbqx9VvM799FvRrSB&#34;&gt;overlayfs&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;并且同样重要的是，对于aufs和overlay的实现，用来读取或执行共享库的共享内存也在所有运行的容器之间共享，大大的减少了通用库如’libc’的内存占用。这是一个分层策略的巨大优势，同时也是Docker的graphdriver是引擎中相当重要的一部分的原因之一。graphdriver的功能作用。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;1.检查overlay是否被加载&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;查看overlay是否被加载
-$ lsmod | grep overlay
-查看内核是否支持overlay模块
-$ modinfo overlayfs
-加载内核模块
-$ modprobe overlayfs
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;2.docker启动参数修改&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;检测overlayfs释放被识别，成功启动后修改参数到默认的配置文件中
-$ docker daemon(dockerd) -s overlay(--storage-driver=overlay) 
-
-修改配置文件
-$ cat /etc/sysconfig/docker.conf
-DOCKER_OPTS=&amp;quot;--storage-driver=overlay&amp;quot;
-
-模拟配置:
-other_args=&amp;quot;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.sock --bip 10.0.0.1/24 -H 0.0.0.0:5256  --api-enable-cors=true&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;3.检验overlayfs是否成功启动&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo /etc/init.d/docker restart
-成功启动，查看存储信息：
-$ sudo docker info
-Containers: 11
-Images: 5
-Server Version: 1.9.1
-Storage Driver: overlay
-Backing Filesystem: extfs
-Execution Driver: native-0.2
-Logging Driver: json-file
-Kernel Version: 2.6.32-431.wy38.el6.x86_64
-Operating System: &amp;lt;unknown&amp;gt;
-CPUs: 32
-Total Memory: 126 GiB
-Name: －－－－－
-ID: 2IER:NO5S:4NKX:ULDJ:THGQ:GBNR:NIN6:SCXG:SMFX:PG72:JAQF:GRZW
-
-可用看到相关存储驱动是overlay，文件系统是extfs
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;4.overlay在docker上面的使用&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;默认docker会将容器以及镜像相关的文件存储在/var/lib/docker/overlay目录下&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sh-4.1# docker  images
-REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-xxbandy123/centos6.8-sshd   latest              42c75e16533e        12 weeks ago        402 MB
-sh-4.1# pwd  （这里我们是配置了存储路径）
-/export/lib/docker/overlay
-
-sh-4.1# ll -t
-total 28
-drwx------ 4 root root 4096 Mar 31 10:37 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527
-drwx------ 4 root root 4096 Mar 31 10:37 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527-init
-drwx------ 3 root root 4096 Mar 31 10:35 42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e
-drwx------ 3 root root 4096 Mar 31 10:35 b46ba152cc17054229bc0099e7fda8b34958d518ce687c0d378b4832c4d8c91e
-drwx------ 3 root root 4096 Mar 31 10:35 9016bb11dc9b4a3ee23fbef484cf5b3c9b80491e87d67092febec45759baeb4f
-drwx------ 3 root root 4096 Mar 31 10:35 ea80c789cb2b3bcc1d12b9b3226c8482a06f28e94a4a49f8e201b5e9cdbdf0cc
-drwx------ 3 root root 4096 Mar 31 10:35 e444e2175366cd3507bc9278d9a68a7b7ca5759b364bfe960fc12a87f219e847
-
-可用看到我们现在有一个image，id为42c75e16533e,overlay会把该镜像的所有父镜像存储到本地(image的分层缓存)，该image共5层。
-sh-4.1# docker  inspect 42c75e16533e | grep b46ba152cc1
-    &amp;quot;Parent&amp;quot;: &amp;quot;b46ba152cc17054229bc0099e7fda8b34958d518ce687c0d378b4832c4d8c91e&amp;quot;,
-sh-4.1# docker  inspect b46ba152cc1 | grep 9016bb11dc9b4a
-    &amp;quot;Parent&amp;quot;: &amp;quot;9016bb11dc9b4a3ee23fbef484cf5b3c9b80491e87d67092febec45759baeb4f&amp;quot;,
-sh-4.1# docker  inspect 9016bb11dc9b4a | grep ea80c789cb2
-    &amp;quot;Parent&amp;quot;: &amp;quot;ea80c789cb2b3bcc1d12b9b3226c8482a06f28e94a4a49f8e201b5e9cdbdf0cc&amp;quot;,
-sh-4.1# docker  inspect ea80c789cb2 | grep e444e2175366cd35
-    &amp;quot;Parent&amp;quot;: &amp;quot;e444e2175366cd3507bc9278d9a68a7b7ca5759b364bfe960fc12a87f219e847&amp;quot;,
-sh-4.1# docker  inspect e444e2175366cd35 | grep Parent
-    &amp;quot;Parent&amp;quot;: &amp;quot;&amp;quot;,
-sh-4.1#
-
-
-由下面示例可以看到容器id 8ab8690b07，实际上是使用image 42c75e16533e 启动起来的一个container，并给出了container 的LowerDir:`/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root`
-
-sh-4.1# docker inspect 8ab8690b07 | grep Parent
-        &amp;quot;CgroupParent&amp;quot;: &amp;quot;&amp;quot;,
-sh-4.1# docker inspect 8ab8690b07 | grep 42c75e1653
-    &amp;quot;Image&amp;quot;: &amp;quot;42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e&amp;quot;,
-            &amp;quot;LowerDir&amp;quot;: &amp;quot;/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root&amp;quot;,
-        &amp;quot;Image&amp;quot;: &amp;quot;42c75e16533e&amp;quot;,
-sh-4.1#
-
-查看容器内部的存储结构：
-sh-4.1# ls 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527/
-lower-id  merged/   upper/
-容器的存储里面默认会存放三个文件，lower-id纪录的是image的id，也就是上面提到的LowerDir,其次存在merged和upper目录，分别为容器层，和容器最终看到的merged层。overlayfs中的lower,upper,merged三者的关系看文首。
-
 &lt;/code&gt;&lt;/pre&gt;</description>
       
     </item>

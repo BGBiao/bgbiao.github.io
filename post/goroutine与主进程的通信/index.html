@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>BGBiao的Ops人生</title>
+  <title>Goroutine与主进程的通信 - BGBiao的Ops人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="BGBiao的运维人生." />
+  <meta name="description" content="还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过context这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。
+子goroutine与主线程同步的集中方式: - channel: 每个goroutine往主进程的chan写数据，然后由主进程去读取，直到读取完了全部goroutine的chan就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束. - context: 使用context中的cancel，这种模式是主线程通知子线程结束 - sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方法设置等待子goroutine的数量减1，当等待数量为0时，Wait函数退出.
+" />
+
   <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
 
 
@@ -34,8 +37,8 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.top/" />
-<link href="/index.xml" rel="alternate" type="application/rss+xml" title="BGBiao的Ops人生" />
+<link rel="canonical" href="https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" />
+
 
 
 
@@ -58,18 +61,41 @@
 
 
 
-<meta property="og:title" content="BGBiao的Ops人生" />
-<meta property="og:description" content="BGBiao的运维人生." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://bgbiao.top/" />
+<meta property="og:title" content="Goroutine与主进程的通信" />
+<meta property="og:description" content="还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过context这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。
 
-<meta property="og:updated_time" content="2019-12-13T00:00:00+00:00" />
-<meta itemprop="name" content="BGBiao的Ops人生">
-<meta itemprop="description" content="BGBiao的运维人生.">
+子goroutine与主线程同步的集中方式:
+- channel: 每个goroutine往主进程的chan写数据，然后由主进程去读取，直到读取完了全部goroutine的chan就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
+- context: 使用context中的cancel，这种模式是主线程通知子线程结束
+- sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方法设置等待子goroutine的数量减1，当等待数量为0时，Wait函数退出." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" />
+<meta property="article:published_time" content="2019-12-13T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-12-13T00:00:00+00:00" />
+<meta itemprop="name" content="Goroutine与主进程的通信">
+<meta itemprop="description" content="还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过context这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。
 
+子goroutine与主线程同步的集中方式:
+- channel: 每个goroutine往主进程的chan写数据，然后由主进程去读取，直到读取完了全部goroutine的chan就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
+- context: 使用context中的cancel，这种模式是主线程通知子线程结束
+- sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方法设置等待子goroutine的数量减1，当等待数量为0时，Wait函数退出.">
+
+
+<meta itemprop="datePublished" content="2019-12-13T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-12-13T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1218">
+
+
+
+<meta itemprop="keywords" content="Golang,goroutine,进程通信,线程," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="BGBiao的Ops人生"/>
-<meta name="twitter:description" content="BGBiao的运维人生."/>
+<meta name="twitter:title" content="Goroutine与主进程的通信"/>
+<meta name="twitter:description" content="还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过context这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。
+
+子goroutine与主线程同步的集中方式:
+- channel: 每个goroutine往主进程的chan写数据，然后由主进程去读取，直到读取完了全部goroutine的chan就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
+- context: 使用context中的cancel，这种模式是主线程通知子线程结束
+- sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方法设置等待子goroutine的数量减1，当等待数量为0时，Wait函数退出."/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -217,7 +243,7 @@
   <ul id="menu" class="menu">
     
     
-        <li class="menu-item active">
+        <li class="menu-item">
         
           
           
@@ -286,227 +312,334 @@
     <main id="main" class="main bg-llight">
       <div class="content-wrapper">
         <div id="content" class="content container">
-          
-<section id="posts" class="posts">
-  
-  
+          <article class="post bg-white">
     
-  
-  
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
+    <header class="post-header">
+      <h1 class="post-title">Goroutine与主进程的通信</h1>
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+      <div class="post-meta">
+        <time datetime="2019-12-13" class="post-time">
+          2019-12-13
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/golang/"> golang </a>
+            
+          </div>
+        
 
-        </span>
-      
-      <a class="post-link" href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/">Goroutine与主进程的通信</a>
-    </h1>
+        
+        
+
+        
+        
+      </div>
+    </header>
+
     
-    <div class="post-meta">
-      <time datetime="2019-12-13" class="post-time">
-        2019-12-13
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
-          
-        </div>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
     
-    <div class="post-summary">
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    
+  </div>
+</div>
+
+    
+    <div class="post-content">
       <p>还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过<code>context</code>这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。</p>
 
 <p>子goroutine与主线程同步的集中方式:
 - <code>channel</code>: 每个goroutine往主进程的<code>chan</code>写数据，然后由主进程去读取，直到读取完了全部goroutine的<code>chan</code>就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
 - <code>context</code>: 使用<code>context</code>中的<code>cancel</code>，这种模式是主线程通知子线程结束
 - <code>sync.WaitGroup</code>: 通过<code>Add</code>方法设置等待子goroutine的数量，使用<code>Done</code>方法设置等待子goroutine的数量减1，当等待数量为0时，<code>Wait</code>函数退出.</p>
+
+<p><strong>1.通过channel实现同步</strong></p>
+
+<pre><code>$ cat channel-sync.go
+package main
+import (
+    &quot;fmt&quot;
+)
+// 通过向主进程中的channel来和主进程进行通信
+func subTask(c chan int) {
+    defer close(c)
+    for i :=0;i&lt; 10;i++ {
+        c &lt;- i
+    }
+}
+
+func main() {
+    isok := make(chan int,10)
+    go subTask(isok)
+    // 通过channel来让子goroutine和主线程共享内存(通过通信实现共享内存)
+    for v := range isok {
+        fmt.Println(v)
+    }
+}
+$ go run channel-sync.go
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+</code></pre>
+
+<p>**2.context方式传递数据给主线程 **</p>
+
+<pre><code>$ cat context-sync.go
+package main
+import (
+    &quot;context&quot;
+    &quot;fmt&quot;
+)
+
+func subTask(ctx context.Context) (chan int) {
+    dst := make(chan int)
+    n := 0
+    go func() {
+				// 通过使用select执行和channel相关的IO操作(类似switch)
+				// select关键字其实是go并发模型中比较重要的
+        for {
+            select {
+                case &lt;- ctx.Done():
+                    return
+                case dst &lt;- n:
+                    n++
+            }
+        }
+    }()
+    return dst
+}
+
+func main() {
+    ctx,cancel := context.WithCancel(context.Background())
+    defer cancel()
+
+    // subTask中其实是一个死循环会不断将n自增并返回到dst
+    testChan := subTask(ctx)
+
+    for n := range testChan {
+        // 主进程通过chan中的值控制并发？然后通过cancel()来通知子routine结束
+        if n == 9 {
+          break
+        }
+        fmt.Println(n)
+    }
+
+}
+
+$ go run context-sync.go
+0
+1
+2
+3
+4
+5
+6
+7
+8
+
+</code></pre>
+
+<p><strong>3.通过sync.WaitGroup来实现</strong></p>
+
+<pre><code>$ cat waitgroup-sync.go
+package main
+import (
+    &quot;sync&quot;
+    &quot;fmt&quot;
+)
+
+func subTask(wg *sync.WaitGroup){
+    // 在并发函数中通知waitgroup完成
+    defer wg.Done()
+    for i := 0;i &lt; 10;i++ {
+        fmt.Println(i)
+    }
+}
+
+func main() {
+    wg := &amp;sync.WaitGroup{}
+    // 设置waitgroup等待次数(并发次数)
+    wg.Add(2)
+    for i:=0;i&lt;2;i++ {
+      go subTask(wg)
+    }
+    wg.Wait()
+}
+
+$go run waitgroup-sync.go
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</code></pre>
+
+<p><strong>4.多个子goroutine之间通信</strong></p>
+
+<pre><code>$ cat mutil-goroutines-sync.go
+package main
+import (
+    &quot;fmt&quot;
+)
+
+// 两个task互相协作，通过两个channel来互相通知对方执行的阻塞和继续
+// 因为c2其实是一个带缓冲的(1)的channel，会阻塞主直到另外一个task处理
+func task1(c1 chan bool,c2 chan bool) {
+    for i:= 1;i&lt; 11;i += 2{
+        // c2是一个带缓冲的channel，因此第一次打印12后到这里会等待读取c2
+        &lt;- c2
+        fmt.Printf(&quot;%d&quot;,i)
+        fmt.Printf(&quot;%d&quot;,i+1)
+        c1 &lt;- true
+
+    }
+}
+
+func task2(c1 chan bool,c2 chan bool,c3 chan struct{}) {
+    char_seq := [...]string{&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;, &quot;H&quot;, &quot;I&quot;, &quot;J&quot;}
+    for i:=0;i&lt;10;i += 2{
+        &lt;- c1
+        fmt.Printf(&quot;%s&quot;, char_seq[i])
+        fmt.Printf(&quot;%s&quot;, char_seq[i+1])
+        c2 &lt;- true
+    }
+    // 通知主进程任务执行完成
+    c3 &lt;- struct{}{}
+}
+
+
+func main() {
+    c1 := make(chan bool)
+    // 通过有缓冲的channel来争抢执行
+    c2 := make(chan bool,1)
+    // 定义一个struct{}类型的channel
+    done := make(chan struct{})
+
+    // 创建两个goroutine在后台执行
+    go task1(c1,c2)
+    go task2(c1,c2,done)
+
+    // 继续执行，此时channel c2开始通过值告诉task1开始执行
+    fmt.Println(&quot;begin&quot;)
+    c2 &lt;- true
+    // 通过一个struct{}类型的channel将主进程阻塞住
+    &lt;- done
+}
+
+$ go run mutil-goroutines-sync.go
+begin
+12AB34CD56EF78GH910IJ%
+
+</code></pre>
     </div>
-    <div class="read-more">
-      <a href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" class="read-more-link">Read more</a>
-    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2019-12-13
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
     
   </div>
-</article>
+</div>
 
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/">Linux下快速构建Android编译环境</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-12-11" class="post-time">
-        2019-12-11
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/golang/">Golang</a>
+          <a href="https://bgbiao.top/tags/goroutine/">goroutine</a>
+          <a href="https://bgbiao.top/tags/%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1/">进程通信</a>
+          <a href="https://bgbiao.top/tags/%E7%BA%BF%E7%A8%8B/">线程</a>
           
         </div>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>背景: 在移动互联网时代，大多数的企业内部都有移动客户端，而移动客户端又因为OS的不同产生了两个派系，即<code>安卓(Android)</code>和<code>苹果(IOS)</code>，而对于互联网技术从业者来说，这两者最直接的区别就是<code>开源</code>和<code>闭源</code>，因而也导致了在构建移动客户端时，为了整体的稳定性和可靠性的考虑(甚至有成本的考虑)，需要进行分别编译，本篇文章记录下如何在Linux环境下构建<code>Android</code>编译环境.</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/">
+            <span class="next-text nav-default">Linux下快速构建Android编译环境</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
 </svg>
 
-        </span>
-      
-      <a class="post-link" href="/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/">salt-master高可用架构</a>
-    </h1>
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
     
-    <div class="post-meta">
-      <time datetime="2019-12-11" class="post-time">
-        2019-12-11
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>背景: 新来这家公司使用<a href="https://docs.saltstack.com/en/latest/">Salt</a>来作为基础配置库管理和自动化运维的工具，但是前期同事刚开始使用时只是简单使用，因此对于可用性和可靠性来说都会存在很大问题(具体可能出现的问题下面会提到)。不过作为一个专业的SRE或者运维人员，在使用一个基础组件时，必须要考虑的一个问题就是<code>可用性</code>和<code>可靠性</code>，以前使用<a href="https://docs.ansible.com/">Ansible</a>作为配置管理和自动化运维工具时只需对<code>ssh-key</code>或者密码进行管理即可通过水平扩容来保证高可用，而在<code>Salt</code>中需要涉及到<code>salt-minion</code>的发现以及<code>key</code>的管理，接下来对<code>高可用的Salt集群架构</code>进行介绍和实施。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
   
-</section>
-
-
-
-
-
-
-  
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-  <nav class="pagination">
-    <ul>
-      
-      <li  class="active" >
-        <a href="/">1</a>
-      </li>
-      
-      <li >
-        <a href="/page/2/">2</a>
-      </li>
-      
-      <li >
-        <a href="/page/3/">3</a>
-      </li>
-      
-      <li >
-        <a href="/page/4/">4</a>
-      </li>
-      
-      <li >
-        <a href="/page/5/">5</a>
-      </li>
-      
-      <li >
-        <a href="/page/6/">6</a>
-      </li>
-      
-      <li >
-        <a href="/page/7/">7</a>
-      </li>
-      
-      <li >
-        <a href="/page/8/">8</a>
-      </li>
-      
-      <li >
-        <a href="/page/9/">9</a>
-      </li>
-      
-      <li >
-        <a href="/page/10/">10</a>
-      </li>
-      
-      <li >
-        <a href="/page/11/">11</a>
-      </li>
-      
-    </ul>
-  </nav>
-
-  
-  
-
-
-
-
 
         </div>
       </div>

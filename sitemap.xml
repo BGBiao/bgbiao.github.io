@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/</loc>
     <lastmod>2019-12-11T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -225,6 +232,69 @@
   </url>
   
   <url>
+    <loc>https://bgbiao.top/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/categories/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/golang/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/categories/golang/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/goroutine/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/post/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/%E7%BA%BF%E7%A8%8B/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1/</loc>
+    <lastmod>2019-12-13T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/tags/android/</loc>
     <lastmod>2019-12-11T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -233,20 +303,6 @@
   
   <url>
     <loc>https://bgbiao.top/tags/ansible/</loc>
-    <lastmod>2019-12-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/</loc>
-    <lastmod>2019-12-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/categories/</loc>
     <lastmod>2019-12-11T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -267,21 +323,7 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/post/</loc>
-    <lastmod>2019-12-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://bgbiao.top/tags/salt/</loc>
-    <lastmod>2019-12-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/</loc>
     <lastmod>2019-12-11T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -346,20 +388,6 @@
   <url>
     <loc>https://bgbiao.top/tags/%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/</loc>
     <lastmod>2019-12-10T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/golang/</loc>
-    <lastmod>2019-11-20T16:01:23+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/categories/golang/</loc>
-    <lastmod>2019-11-20T16:01:23+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -6,10 +6,24 @@
     <description>Recent content in Posts on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Goroutine与主进程的通信</title>
+      <link>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</link>
+      <pubDate>Fri, 13 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</guid>
+      <description>&lt;p&gt;还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过&lt;code&gt;context&lt;/code&gt;这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。&lt;/p&gt;
+
+&lt;p&gt;子goroutine与主线程同步的集中方式:
+- &lt;code&gt;channel&lt;/code&gt;: 每个goroutine往主进程的&lt;code&gt;chan&lt;/code&gt;写数据，然后由主进程去读取，直到读取完了全部goroutine的&lt;code&gt;chan&lt;/code&gt;就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
+- &lt;code&gt;context&lt;/code&gt;: 使用&lt;code&gt;context&lt;/code&gt;中的&lt;code&gt;cancel&lt;/code&gt;，这种模式是主线程通知子线程结束
+- &lt;code&gt;sync.WaitGroup&lt;/code&gt;: 通过&lt;code&gt;Add&lt;/code&gt;方法设置等待子goroutine的数量，使用&lt;code&gt;Done&lt;/code&gt;方法设置等待子goroutine的数量减1，当等待数量为0时，&lt;code&gt;Wait&lt;/code&gt;函数退出.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Linux下快速构建Android编译环境</title>
@@ -244,18 +258,6 @@ google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一
 
 &lt;p&gt;3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>Overlayfs技术探究以及Docker环境中的使用</title>
-      <link>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Thu, 09 Nov 2017 21:36:58 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
-      <description>&lt;h3 id=&#34;overlayfs-基本概念&#34;&gt;overlayfs 基本概念&lt;/h3&gt;
-
-&lt;p&gt;一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
-当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。&lt;/p&gt;</description>
     </item>
     
   </channel>
