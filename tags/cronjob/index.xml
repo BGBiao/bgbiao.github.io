@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>cronjob on BGBiao的Ops人生</title>
+    <link>https://bgbiao.top/tags/cronjob/</link>
+    <description>Recent content in cronjob on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 29 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/cronjob/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>CronJob控制器中的一些绕坑指南</title>
+      <link>https://bgbiao.top/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/</link>
+      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 作为企业里唯一熟悉各种云产品的工种，通常需要和各种云产品打交道。当前，我们大部分的云基础设施和云服务都运行在阿里云上，而每个云产品都有独立的管理系统，这使得我们在运维过程中经常无法将相关产品和关联信息有效的组织在一起，来进行快速的问题诊断和信息查询，这对于运维和开发同学来说，在多个系统之间来回跳转查找关联信息是一个低效且极易出错的事务，因此通常来讲，不论是作为运维和开发，我们都希望将企业关联的云资源和服务进行整合关联，以实现效率的最大化。而在这过程中，我们采用Kubernetes集群的CronJob来定期获取阿里云的一些资源，在这过程中，遇到一些问题，根据问题重新细读CronJob官方文档，特记录于此。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

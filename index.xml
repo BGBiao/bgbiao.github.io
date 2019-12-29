@@ -6,10 +6,196 @@
     <description>Recent content on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 29 Dec 2019 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CronJob控制器中的一些绕坑指南</title>
+      <link>https://bgbiao.top/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/</link>
+      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 作为企业里唯一熟悉各种云产品的工种，通常需要和各种云产品打交道。当前，我们大部分的云基础设施和云服务都运行在阿里云上，而每个云产品都有独立的管理系统，这使得我们在运维过程中经常无法将相关产品和关联信息有效的组织在一起，来进行快速的问题诊断和信息查询，这对于运维和开发同学来说，在多个系统之间来回跳转查找关联信息是一个低效且极易出错的事务，因此通常来讲，不论是作为运维和开发，我们都希望将企业关联的云资源和服务进行整合关联，以实现效率的最大化。而在这过程中，我们采用Kubernetes集群的CronJob来定期获取阿里云的一些资源，在这过程中，遇到一些问题，根据问题重新细读CronJob官方文档，特记录于此。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;CronJob简单介绍&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;一个&lt;code&gt;CronJob&lt;/code&gt;对象就像是一个Linux环境的&lt;code&gt;crontab&lt;/code&gt;文件一样，它会在给定的调度周期(crontab格式)内定期的创建一些job.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;所有的定时任务的调度周期都依赖于k8s的master节点的时区&lt;/p&gt;
+
+&lt;p&gt;通常情况下，CronJob对于创建定期和重复的任务非常有用，比如定期的备份和邮件发送之类的任务场景。&lt;/p&gt;
+
+&lt;p&gt;当然了，在Kubernetes集群中，Cronjob也有一些局限性和特性，需要详细了解下才能用的比较好。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;: Cronjob控制器当前官方仍然是beta版本，也就意味着还是有一些问题存在的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cronjob的局限性&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;一个Cronjob会在它每执行一次调度就&lt;code&gt;大概&lt;/code&gt;会创建一个Jobs对象。&lt;code&gt;大概&lt;/code&gt;是因为有时候可能会有两个job被创建，或者没有任务创建。
+官方实现中尝试去解决这种问题，但是目前仍然无法避免。因此在设计过程中，所有的Job都应该是幂等性的(idempotent)&lt;/p&gt;
+
+&lt;p&gt;如果&lt;code&gt;startingDeadlineSeconds&lt;/code&gt;参数被设置为一个比较大的值，或者没有设置(默认)，并且&lt;code&gt;concurrencyPolicy&lt;/code&gt;设置为&lt;code&gt;Allow&lt;/code&gt;，那么Job总是会运行至少一次。&lt;/p&gt;
+
+&lt;p&gt;对于每一个Cronjob来说，&lt;code&gt;CronJob&lt;/code&gt;控制器会检查从上一次调度时间到现在的持续时间内它错过了多少个调度，如果错过调度100次，它将不再执行调度，并且会有如下相关异常.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Cannot determine if job needs to be started. Too many missed start time (&amp;gt; 100). Set or decrease .spec.startingDeadlineSeconds or check clock skew.
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;值得关注的是，如果设置了&lt;code&gt;startingDeadlineSeconds&lt;/code&gt;参数(不为空),控制器统计错过的调度次数将不再是从最后一次调度时间，而是
+从&lt;code&gt;startingDeadlineSeconds&lt;/code&gt;的值到现在进行统计。比如，如果设置&lt;code&gt;startingDeadlineSeconds:200&lt;/code&gt;,控制器会统计在最后200秒内错
+过了的调度次数。&lt;/p&gt;
+
+&lt;p&gt;如果CronJob未能在预定时间创建，则该任务将被视为错过调度。比如，当设置&lt;code&gt;concurrencyPolicy: Forbid&lt;/code&gt;时，当前一个任务还在运
+行时CronJob尝试再次被调度，此时会被&lt;code&gt;forbid&lt;/code&gt;掉，因此也会被记录为错过一次调度。&lt;/p&gt;
+
+&lt;p&gt;再比如，我们假设一个定时任务被设置在&lt;code&gt;08:30:00&lt;/code&gt;后每一分钟执行一次，并且&lt;code&gt;startingDeadlineSeconds&lt;/code&gt;参数没有被设置。如果CronJob控制器在&lt;code&gt;08:29:00&lt;/code&gt;到&lt;code&gt;10:21:00&lt;/code&gt;之间故障了，Job将不会运行，因此错过调度的任务数量将远超过100。&lt;/p&gt;
+
+&lt;p&gt;为了更深层次说明这个问题，假设一个定时任务被设置在&lt;code&gt;08:30:00&lt;/code&gt;开始每一分钟执行一次，并且&lt;code&gt;startingDeadlineSeconds:200&lt;/code&gt;。如果CronJob控制器依然在相同时间段故障了，Job将会在&lt;code&gt;10:22:00&lt;/code&gt;开始继续执行。 因为控制器仅会计算在过去的200秒内，错过调度的
+次数有多少，因此仅会错过调度3次，远远小于100次，所有定时任务会在控制器恢复后继续调度，而不会影响正常的任务。&lt;/p&gt;
+
+&lt;p&gt;另外需要注意的是，CronJob仅负责调度和创建匹配的Jobs，而由Jobs真正去管理真正执行任务的Pods。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cronjob的参数详情&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;spec.startingDeadlineSeconds&lt;/code&gt;: 表示统计错过调度次数(100次)的开始时间，默认从最后一次调度时间开始统计错过调度次数(超
+过100不再调度)&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;spec.concurrencyPolicy&lt;/code&gt;: 并发调度策略，可选值:{&amp;ldquo;Allow&amp;rdquo;:&amp;ldquo;允许并发&amp;rdquo;,&amp;ldquo;Forbid&amp;rdquo;:&amp;ldquo;不允许&amp;rdquo;,&amp;ldquo;Replace&amp;rdquo;:&amp;ldquo;调度覆盖&amp;rdquo;}.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Allow&lt;/code&gt;: &lt;code&gt;注意:&lt;/code&gt;当设置为&lt;code&gt;Allow&lt;/code&gt;时，需要考虑到任务执行时间和调度周期，因为可能上个任务没执行成功，下个任务就到执行时间了，如此下来可能会有很多任务都执行积压，造成资源误使用;&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Replace&lt;/code&gt;: 当使用&lt;code&gt;Replace&lt;/code&gt;遇到上述情况，后个任务会将前一个任务替换掉，如此以来所有的任务可能都不会完整执行;&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Forbid&lt;/code&gt;: 则不允许并发调度，也即就调度一次，下一次调度周期再调度，但是可能由于任务执行过长，导致大部分的任务在每一
+次调度时间都完美的错过了，此时&lt;code&gt;startingDeadlineSeconds&lt;/code&gt;参数也并没有设置，就可能会出现该任务不会再调度，对应到k8s里的事
+件可能是&lt;code&gt;Cannot determine if job needs to be started: too many missed start time (&amp;gt; 100). Set or decrease .spec.startingDeadlineSeconds or check clock skew&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;spec.schedule&lt;/code&gt;: 调度周期，格式为标准的crontab格式[分 时 日 月 周]&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;spec.failedJobsHistoryLimit&lt;/code&gt;: 历史失败的任务数限制(通常可以保留1-2个，用于查看失败详情，以调整调度策略)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;spec.successfulJobsHistoryLimit&lt;/code&gt;: 历史成功的任务数限制(可以自己决定保留多少个成功任务)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;spec.jobTemplate&lt;/code&gt;: 标准的pod运行的模板(容器运行时的相关参数)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;spec.suspend&lt;/code&gt;: 可选参数，如果设置为&lt;code&gt;true&lt;/code&gt;,所有后续的任务都会被暂停执行，该参数不适用于已经运行的任务，默认为False&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;CronJob示例&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 配置了一个定期去阿里云云解析获取解析详情的数据
+$ cat dnsall-cronjob.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    run: dnsall
+  name: dnsall
+  namespace: myapp
+spec:
+  # 强烈建议设置并发策略，根据调度周期和任务特性进行设置
+  concurrencyPolicy: Forbid
+  # 强烈建议设置失败任务数，用于排查任务失败根因，以优化任务
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
+  # 强烈建议设置错过调度的计算时间
+  startingDeadlineSeconds: 600
+  # 调度周期
+  schedule: &#39;05,15,25,35,45,55 */1 * * *&#39;
+  suspend: false
+  jobTemplate:
+    metadata:
+    spec:
+      template:
+        metadata:
+          labels:
+            run: dnsall
+        spec:
+          imagePullSecrets:
+          - name: mydocker
+          containers:
+          - args:
+            - -cmdbtype
+            - dns
+            image: harbor.bgbiao.top/cron-job:2019-12-04
+            imagePullPolicy: Always
+            name: dnsall
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          # 强烈建议设置任务的重启策略(任务的失败会触及到Jobs控制器中的Backofflimit参数，导致job失败)
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+
+$ kubectl  get cronjob -n myapp
+NAME             SCHEDULE                      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+dnsall           05,15,25,35,45,55 */1 * * *   False     0        8m41s           23h
+
+# cronjob其实定期的创建了job，因此具体的任务pod其实是由job控制器来维护的
+# 这里可以看到，我们上面的cronjob保存的三个执行成功的任务
+$ kubectl  get jobs -n myapp  | grep dns
+dnsall-1577597100           1/1           23s        22m
+dnsall-1577597700           1/1           24s        12m
+dnsall-1577598300           1/1           24s        2m22s
+
+# 再查看一个job真正管理的pod任务的执行
+# 任务已经已完成，所以任务的期望值为1，当前值为0
+$ kubectl  get pods -n myapp | grep dnsall-1577598300
+dnsall-1577598300-hdl4z           0/1     Completed   0          3m29s
+
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>软件工程师们必须了解的画图工具</title>
+      <link>https://bgbiao.top/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</link>
+      <pubDate>Mon, 16 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;作为一名在IT行业摸爬滚打多年的少年，选择一款适手的画图工具可以说是爽到不行。记得学生时代，鉴于条件的限制，都只能选择Visio进行绘制流程图、类图、UML图等，但是微软家的东西，大家也懂。特别是作为一名长期混迹在开源世界的从业者，我们都喜欢使用一种免费且好用的替代方案来完成日常的工作需求。比如&lt;code&gt;Markdown&lt;/code&gt;就基本上成功替代了&lt;code&gt;Document&lt;/code&gt;去编写文档，然后&lt;code&gt;Xmind&lt;/code&gt;、&lt;code&gt;ProcessOn&lt;/code&gt;、&lt;code&gt;Draw&lt;/code&gt;之类的工具基本上也可以实现对&lt;code&gt;Visio&lt;/code&gt;的替代，当然我这里仅说的是我个人遇到的情况，不能以偏概全，微软家的很多产品也依然是不错的。接下来像大家推荐几个常用的画图工具.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;在线类产品&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.processon.com/&#34;&gt;ProcessOn&lt;/a&gt;: 很好用的产品，但是对于免费用户来说可保存的文件有限&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://yuque.com/&#34;&gt;语雀&lt;/a&gt;: 阿里开源的一个在线知识写作平台，个人免费用户基本没什么限制，其中有个实验室功能，可以在线使用&lt;code&gt;PlantUML&lt;/code&gt;语法绘制各种图(流程图，时序图，UML图等)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://online.visual-paradigm.com/cn/&#34;&gt;Visual-paradigm&lt;/a&gt;: 和ProcessOn类似&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://draw.io/&#34;&gt;Draw&lt;/a&gt;: 开源免费的在线绘图(需要使用谷歌账号进行注册登录,不过既然开源是可以私有化部署，支持各种客户端)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;draw相关地址&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/weixin_33929309/article/details/91609993&#34;&gt;参考文章&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://dl.elkpi.com:8080/draw/&#34;&gt;国内在线draw&lt;/a&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/jgraph/drawio&#34;&gt;draw开源地址&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/jgraph/drawio-desktop&#34;&gt;draw客户端&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>Goroutine与主进程的通信</title>
@@ -4552,609 +4738,6 @@ echo 25000 &amp;gt; /proc/sys/vm/nr_hugepages
 或者：
 sysctl vm.nr_hugepages = N
 
-&lt;/code&gt;&lt;/pre&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>如何更加优雅的使用Docker</title>
-      <link>https://bgbiao.top/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/</link>
-      <pubDate>Thu, 09 Nov 2017 21:45:25 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;在使用docker过程中，我们经常发现管理维护是一个很复杂过程，因为我们在使用docker commands的过程中，我们只会去使用我们认为简单并且熟悉的命令，然而docker本身其实是提供给我们很多便捷且人性化的工具的，如果掌握这些使用技巧，也许你的维护管理工作将会事半功倍，并且给人看起来会很牛逼的样子。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&#34;创建容器时传入环境变量&#34;&gt;创建容器时传入环境变量&lt;/h3&gt;
-
-&lt;p&gt;在实际应用场景中，不论是从安全还是可配置方面去考虑，很多参数是比较适合用环境变量加载进去的，比如数据库的连接信息，时区，还有字体支持等等，在创建容器的时候其实都可以使用-e 指定key/value进行传递环境变量进去。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sh-4.2# docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; 172.25.46.9:5001/centos6.8-jdjr-test-app 
-ee20b44301e27c16eae63dab243d293054178dd5f819c23d44bd9e534208bb42
-sh-4.2# docker exec -it test-env date
-2017年 01月 17日 星期二 10:35:17 CST
-sh-4.2# date
-Tue Jan 17 10:35:21 CST 2017
-可以看到加了时区环境变量的容器已经和宿主机在同一个时区(CST)，并且时间和宿主机基本同步
-
-sh-4.2# docker run -itd --name test  172.25.46.9:5001/centos6.8-jdjr-test-app
-d6a02874b999ff4eea79e3b302148b42043af01c89a5d31e5d858e0806f9077a
-sh-4.2# docker exec -it test date
-2017年 01月 20日 星期五 01:43:48 Asia
-默认没有加时区环境变量的容器还是Asia
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;调整宿主机和容器的时间差异&#34;&gt;调整宿主机和容器的时间差异&lt;/h3&gt;
-
-&lt;p&gt;首先我们需要弄清几个概念：在类unix系统中有硬件时钟与系统时钟，硬件时钟是指主机板上的时钟设备，也就是通常可在BIOS画面设定的时钟，系统时钟则是指kernel中的时钟。unix以及linux系统时间是从格林威治时间到当前的秒数，即1970年1月1日凌晨零点零分零秒到当前的时间，全球都一样，这是绝对值；而时区则是由于地理位置差异、行政区划导致各地显示时间的差异，为了克服时间上的混乱，规定将全球划分为24个时区，我们国家属于东八区标识为CST。&lt;/p&gt;
-
-&lt;p&gt;因此，对于 Docker 容器而言，根本不存在宿主和容器的时间差异问题，因为他们使用的是同一个内核、同一个时钟，二者完全一样，所以根本不存在同步问题。一般来说这个问题是由时区导致的，可以使用date命令查看下容器当前的时间时区是啥。UTC(通用协调时)表示使用的是国际标准0时区，UTC与格林尼治平均时(GMT, Greenwich Mean Time)一样，都与英国伦敦的本地时相同。CST表示中国标准时间时区一般是中国上海&amp;rdquo;Aisa/Shanghai&amp;rdquo;，也就是说UTC和CST相差了8个小时。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;解决办法：
-创建容器的时候，使用-e 将时区信息传入到容器内部。
-sh-4.2# docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; images
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;注意：其实使用单纯的环境变量来改变容器内部的TIME ZONE，只会影响当前容器用户的时区，一旦切换到真正的root用户就会发现时区依然是不正确的，比如以下栗子：&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; images
-$ docker exec -it test-env bash
-bash-4.1# date
-2017年 09月 20日 星期三 20:45:54 CST
-bash-4.1# sudo su -c date
-2017年 09月 20日 星期三 08:46:02 EDT
-bash-4.1# 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;那么如何真正解决时区这个问题呢？其实是&lt;code&gt;/etc/localtime&lt;/code&gt;在作怪，用户只需要将容器内部的localtime改成你想要的时区就行了。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.1# ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
-bash-4.1# date
-2017年 09月 20日 星期三 20:54:35 CST
-bash-4.1# sudo su -c date
-2017年 09月 20日 星期三 20:54:39 CST
-bash-4.1# 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;So,在使用Dockerfile构建镜像的时候将&lt;code&gt;/usr/share/zoneinfo/Asia/Shanghai&lt;/code&gt;强制软连接到&lt;code&gt;/etc/localtime&lt;/code&gt;就可以永久修复时区的问题了。&lt;/p&gt;
-
-&lt;p&gt;####指定容器的rootfs的大小
-在使用docker的过程中，会发现cpu和memory可以很随意的动态调整，但是默认的rootfs却是不能随意调整的，默认是10g大小，当然如果对于数据有需求，可以通过挂载voulme进行扩展存储。如果用户执意想要调整rootfs的大小，在docker1.12版本默认提供了两种方式：在启动docker 的时候加载参数&lt;code&gt;--storage-opt dm.basesize=40G&lt;/code&gt;用来调整默认容器的rootfs大小；在创建容器的时候使用参数&lt;code&gt;--storage-opt size=70G&lt;/code&gt;来设置改容器的rootfs大小。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;喜讯：在docker最近发布的1.13版本中，支持了磁盘的配额，不过还未测试&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sh-4.2# docker run -itd --name volume-test --storage-opt size=70G 172.25.46.9:5001/centos6.8-jdjr-test-app
-18d47e69802aa84df00182885b256c50ebc56e15d8e6990fc1e187ffe254171e
-
-sh-4.2# docker exec -it volume-test df -H | grep rootfs
-rootfs                 76G  1.5G   74G   2% /
-sh-4.2# docker exec -it test-env df -H | grep rootfs
-rootfs                 11G  1.5G  9.3G  14% /
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;快速管理容器和镜像&#34;&gt;快速管理容器和镜像&lt;/h4&gt;
-
-&lt;p&gt;在docker中删除容器需要指定容器名或者容器id，但是在容器比较多，并且状态不一的情况下删除容器还是需要走下心的。不过好处是docker ps默认提供了很多好用的功能，可以很方便地管理容器(创建容器的时候如果加上label后更方便哦)。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;原理：先用docker ps -a -q 输出所有容器的container id(-f 表示过滤参数或者输出格式)，然后作为docker rm 的参数进行批量删除
-输出所有容器的name：
-sh-4.2# docker ps --format=&#39;{{.Names}}&#39;
-test-env
-test-args
-test-run
-输出所有容器名包含test的容器，并打印容器名
-sh-4.2# docker ps -f name=test --format=&#39;{{.Names}}&#39;
-test-env
-test-args
-test-run
-查看退出状态的容器，并打印容器名
-sh-4.2# docker ps -f status=exited --format=&amp;quot;{{.Names}}&amp;quot;
-thirsty_brahmagupta
-clever_mestorf
-hopeful_morse
-stoic_morse
-elated_williams
-tender_jepsen
-reverent_mirzakhani
-
-删除所有容器：
-sh-4.2# docker rm -f -v $(docker ps -a -q)
-删除/启动所有退出的容器：
-sh-4.2# docker rm/start $(docker ps -qf status=exited)
-删除所有镜像：
-sh-4.2# docker rmi $(docker images -q)
-
-查看悬挂镜像:
-sh-4.1# docker  images -qf dangling=true
-
-只查看镜像或者容器指定的信息(在docker1.10之后才支持的)
-
-只列出镜像的id以及仓库名称：
-sh-4.2# docker images --format &amp;quot;{{.ID}}: {{.Repository}}&amp;quot;
-67591570dd29: centos
-0a18f1c0ead2: rancher/server
-
-只列出容器的相关id,image,status和name
-sh-4.2# docker ps --format &amp;quot;{{.ID}}: {{.Image}} : {{.Status}} : {{.Names}}&amp;quot;
-66b60b72f00e: centos : Up 7 days : pensive_poincare
-或者自己重新定义列,就和原生差不多:
-sh-4.2# docker ps --format &amp;quot;table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}&amp;quot;
-CONTAINER ID        IMAGE                                         STATUS              NAMES
-66b60b72f00e        centos                                        Up 7 days           pensive_poincare
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;其实上面的&amp;ndash;format利用的就是go语言中的模版语法，所有容器的组织信息都在结构体中：&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;*formatter.containerContext&lt;/code&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;容器label的使用&#34;&gt;容器label的使用&lt;/h4&gt;
-
-&lt;p&gt;在实际运维过程中，大量的容器可能会一些运维上的挑战，通过使用label，可以很好的将容器分类。label贯穿于docker的整个过程。
-这个label可以作为你区分业务，区分模板各种区分容器的标识，通过标识，可以将容器更好的进行分组&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sh-4.2# docker run -itd --name volume-test --storage-opt size=70G --label zone=test 172.25.46.9:5001/centos6.8-jdjr-test-app
-c3772397e58e663095c2c0fd8d688b3d41b494097999ec2b6d6b7c509d23a138
-创建容器的时候定义一个label，表示该容器在test这个区域
-使用定义的label进行快速检索容器，并进行下一步操作(比如删除啦，更新啦)
-sh-4.2# docker ps -qf label=zone=test
-c3772397e58e
-sh-4.2# docker ps -f label=zone=test --format=&#39;{{.Names}}&#39;
-volume-test
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;快速查看容器的相关配置信息&#34;&gt;快速查看容器的相关配置信息&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;查看容器的devicemapper设备：
-sh-4.2# docker inspect -f &#39;{{.GraphDriver.Data.DeviceName}}&#39; nginx 
-docker-8:1-67411759-7c9d6d3327b02659c81bcb70bf6a4c7a45df6a589af2a2d42a387dc0e90d4913
-查看容器的PID：
-sh-4.2# docker inspect -f &#39;{{.State.Pid}}&#39; nginx 
-27521
-查看容器name：
-sh-4.2# docker inspect -f &#39;{{.Name}}&#39; nginx 
-/nginx
-获取容器的ID：
-sh-4.2# docker inspect --format {{.Id}} nginx
-53214bc9cd001f2c548edcce0c42fe51f1a118c08941406d43122a8348055843
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;使用alias来预定义常用的命令&#34;&gt;使用alias来预定义常用的命令&lt;/h4&gt;
-
-&lt;p&gt;docker管理命令经常需要指定各种参数，通过linux的alias命令将默认的参数预定义起来，可以很方便的进行管理容器。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sh-4.2# alias dockerrm=&#39;docker rm -f -v&#39;
-sh-4.2# alias dockerexec=&#39;docker exec -it&#39;
-sh-4.2# alias dockerrmimage=&#39;docker rmi&#39;
-
-sh-4.2# dockerrm volume-test
-volume-test
-
-sh-4.2# dockerexec volume-test ls
-bin   dev  export  lib	  media  opt   root  selinux  sys  usr
-boot  etc  home    lib64  mnt	 proc  sbin  srv      tmp  var
-sh-4.2# dockerexec volume-test bash
-bash-4.1# 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;使容器随着docker-daemon的启动一同启动&#34;&gt;使容器随着docker daemon的启动一同启动&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;docker run 的时候加参数--restart=always
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;如何动态修改容器的内存和cpu限制-docker1-10之后才支持的动态调整&#34;&gt;如何动态修改容器的内存和cpu限制&lt;code&gt;docker1.10之后才支持的动态调整&lt;/code&gt;&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
-9223372036854775807
-sh-4.2# cat /sys/fs/cgroup/memory/memory.limit_in_bytes 
-9223372036854775807
-可以看到，默认没有给容器限制内存，它会共享宿主机的所有内存
-动态调整内存为2014M：
-sh-4.2# docker update -m 2014M test-env
-test-env
-sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
-2111832064
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;docker容器中真实用户的隔离&#34;&gt;docker容器中真实用户的隔离&lt;/h4&gt;
-
-&lt;p&gt;注意：默认docker容器内部的用户会继承宿主机的用户id，也就是说容器外部有一个uid为500的用户test，容器内部有一个uid为500的用户admin，容器内部运行的程序如果在宿主机上查看的时候会发现程序的启动用户会是外部宿主机的test用户。
-这是因为默认情况下容器的 user namespace 并未开启，所以容器内的用户和宿主用户共享 uid 空间。容器内的 uid 为 0 的 root，就被系统视为 uid=0 的宿主 root，因此磁盘读写时，具有宿主 root 同等读写权限。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;开启user namespace：
-启动docker的时候加参数--userns-remap=default
-https://docs.docker.com/engine/reference/commandline/dockerd/#/daemon-user-namespace-options
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;在docker-container和物理机中双向拷贝文件&#34;&gt;在docker container和物理机中双向拷贝文件&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;容器内部文件拷贝到宿主机：
-sh-4.2# docker cp jupyter-70002111:/home/70002111/教程-研究功能介绍.ipynb .
-sh-4.2# ls
-Dockerfile  教程-研究功能介绍.ipynb
-宿主机文件拷贝到容器：
-sh-4.2# docker cp Dockerfile jupyter-70002111:/home/70002111/
-sh-4.2# docker exec -it jupyter-70002188 ls 
-Dockerfile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;向容器内部程序发送signal&#34;&gt;向容器内部程序发送signal&lt;/h4&gt;
-
-&lt;p&gt;注意：在给容器进程发送SIGTERM信号时只会发给主进程，也就是容器内 PID 为 1 的进程。至于说主进程启动的那些子进程，完全看主进程是否愿意转发SIGTERM 给子进程了。所以那些把 Docker当做虚拟机用的，主进程跑了个bash，然后exec 进去启动程序的，或者来个&amp;amp;让程序跑后台的情况，应用进程必然无法收到SIGTERM。
-&lt;/br&gt;还有一种可能是在Dockerfile中的CMD那行用的是 shell 格式写的命令，而不是 exec 格式。在镜像中使用CMD启动的容器会加一个 sh -c 来去执行，因此使用 shell 格式写 CMD 的时候，PID 为 1 的进程是 sh，而它不转发信号，所以主程序收不到。&lt;/p&gt;
-
-&lt;p&gt;所以在写CMD哪行命令的时候，最好按照exec格式去写。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;划重点: 由于在容器内部是没有init进程的，所以容器的整个生命周期会和容器内部PID为1的进程紧密相连，用户在使用过程中经常会发现容器更新版本之后，业务调用方经常会有一些请求异常，这其实也是因为容器内部的1号进程的设置有关，导致容器在停止时可能直接发送SIGKILL信号，导致容器当前正在处理中的业务也会立即断开连接，这样可能会导致一些业务异常&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;总而言之，向容器内部程序发送合适的信号是非常有必要的，这样可以使你的容器很优雅的退出。&lt;code&gt;docker stop操作会让容器在10s后进行优雅的退出&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://segmentfault.com/a/1190000008233992&#34;&gt;如何优雅的关闭容器&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;容器的cache不释放&#34;&gt;容器的cache不释放&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;$ echo 1 &amp;gt; /proc/sys/vm/drop_caches
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;桥接网络连入下层网络并使用ipam-没有nat-端口映射&#34;&gt;桥接网络连入下层网络并使用IPAM (没有NAT/端口映射)&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;注意:docker network是1.12版本加进来的，支持了多种网络插件&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker network create \
-	-d bridge \
-	--subnet=192.168.57.0/24 \
-	--ip-range=192.168.57.32/28 \
-	--gateway=192.168.57.11 \
-	--aux-address DefaultGatewayIPv4=192.168.57.1 \
-	-o com.docker.network.bridge.name=brnet \
-	brnet
-$ brctl addif brnet eth2
-$ docker run --net=brnet -it busybox ifconfig
-
-注意其它主机的 --ip-range 和 --gateway 需要做对应调整。
-
-这种拓扑是，容器内 eth0 连接 brnet 接口，该接口直接通过 eth2 访问交换。
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;docker查看某个容器绑定的cpu内核&#34;&gt;Docker查看某个容器绑定的cpu内核&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;容器内部第一个进程编号一般为1&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker exec -it container-name taskset -c -p 1 
-pid 1&#39;s current affinity list:0-3
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;给docker配置hosts&#34;&gt;给docker配置hosts&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker run --add-host biaoge-ops:192.168.0.1 centos cat /etc/hosts
-127.0.0.1	localhost
-::1	localhost ip6-localhost ip6-loopback
-fe00::0	ip6-localnet
-ff00::0	ip6-mcastprefix
-ff02::1	ip6-allnodes
-ff02::2	ip6-allrouters
-192.168.0.1	biaoge-ops
-10.0.0.3	6ff3ea7114b4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;个人博客：&lt;a href=&#34;https://my.oschina.net/xxbAndy/blog&#34;&gt;https://my.oschina.net/xxbAndy/blog&lt;/a&gt;
-微信公众号：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://upload-images.jianshu.io/upload_images/2577135-5d2191eacf61c6dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;wechat.png&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>Dockerfile最佳实践</title>
-      <link>https://bgbiao.top/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</link>
-      <pubDate>Thu, 09 Nov 2017 21:40:51 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</guid>
-      
-        <description>&lt;p&gt;&lt;strong&gt;在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。&lt;/p&gt;
-
-&lt;p&gt;2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。&lt;/p&gt;
-
-&lt;p&gt;3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;问题：如果我们构建业务镜像中默认需要启动多个服务，比如需要启动sshd和tomcat或者是一个nginx，那么就不能通过构建镜像的时候去使用CMD命令，因为CMD命令会继承上层images的CMD命令，从而导致上层的CMD命令失效。那么想要既继承上层的sshd，又需要启动业务进程，普通的方式可以采用脚本定义，并在业务镜像层进行RUN脚本。&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;所以比较好的方法：使用supervisord来管理images中的多个服务进程。可以在基本镜像层进行构建supervisord镜像，然后在上层业务层通过配置supervisord.conf来管理对个进程，实现一个容器中启动多个服务进程。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;构建无需启动服务的pass层镜像&#34;&gt;构建无需启动服务的pass层镜像&lt;/h3&gt;
-
-&lt;p&gt;该环节是提供给用户基本的软件运行环境，用户可以通过bash登录去启动业务程序。而根据业务的变化特征，以及基础服务的抽象程度，我们可以将该层的image镜像分成以下三个image进行叠加。&lt;/p&gt;
-
-&lt;h4 id=&#34;构建符合实际业务场景的base镜像&#34;&gt;构建符合实际业务场景的base镜像&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;注意：&lt;/code&gt;给image中打入sshd服务的主要原因还是想尽可能的满足用户当前的使用习惯，同时又能够充分利用docker image的特性&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM centos6.8-base
-MAINTAINER xuxuebiao
-RUN ssh-keygen -q -N &amp;quot;&amp;quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &amp;quot;&amp;quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
-    mkdir -p /root/.ssh &amp;amp;&amp;amp; chown root.root /root &amp;amp;&amp;amp; chmod 700 /root/.ssh ;\
-    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
-    echo &#39;root:redhat&#39; | chpasswd
-EXPOSE 52568
-ENV LANG=zh_CN.UTF-8;\
-    LC_ALL=zh_CN.UTF-8;\
-    TZ &amp;quot;Asia/Shanghai&amp;quot;;\
-    TERM xterm
-CMD /usr/sbin/sshd -D
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;#docker build -t centos6.8-sshd .
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;hr /&gt;
-
-&lt;h4 id=&#34;构建上层基本软件环境&#34;&gt;构建上层基本软件环境&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;注意：上层SSHD镜像默认使用CMD启动了一个sshd服务，因此这层PAAS层无法直接启动nginx和tomcat，本层只是构建了一个基本环境，容器启动后需要登录bash中执行脚本进行启动。这样交付的环境其实就相当于PAAS层的环境&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;构建一个基于jdk7tomcat6的基本镜像：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM centos6.8-sshd
-MAINTAINER &amp;quot;xuxuebiao&amp;quot;
-ENV TZ &amp;quot;Asia/Shanghai&amp;quot;;\
-    PATH $PATH:/export/data/
-
-RUN useradd admin;\
-    mkdir -p /export/servers/{jdk1.7.0_71,tomcat6.0.33,nginx};\
-    mkdir -p /export/{App,auto_deploy,Config,data,Data,Domains,home,Logs,servers,Shell};
-WORKDIR /export/data/
-EXPOSE 80
-EXPOSE 8080
-ADD jdk1.7.0_71  /export/servers/jdk1.7.0_71
-ADD tomcat6.0.33 /export/servers/tomcat6.0.33
-ADD profile /etc/profile
-ADD nginx  /export/servers/nginx
-ADD auto-add-tomcat /home/admin/
-COPY start_nginx /etc/init.d/nginx
-COPY init_nginx.sh /export/Shell/
-RUN chmod a+x /etc/init.d/nginx;\
-    chmod a+x /export/Shell/init_nginx.sh;\
-    chown admin.admin -R /export/ /home/admin/
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;构建一个基于python27的基本环境，环境中本身已经安装各种第三方程序库：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM centos6.8-sshd
-MAINTAINER biaoge
-ADD python27 /usr/local/python27
-RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
-    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
-    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;
-
-EXPOSE 8000
-EXPOSE 8081
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;构建本层的镜像Dockerfile中不能指定新的应用进程，否则基本镜像中的sshd就会失效&lt;/code&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&#34;构建开箱即用的saas层镜像-容器启动之后即可提供相应的服务-比如nginx-sshd等&#34;&gt;构建开箱即用的SaaS层镜像(容器启动之后即可提供相应的服务。比如nginx，sshd等)&lt;/h3&gt;
-
-&lt;h4 id=&#34;首先使用base镜像构建一层的supervisord基本镜像&#34;&gt;首先使用base镜像构建一层的supervisord基本镜像&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;由于supervisord是有python写的，所以可以直接在python模块包中使用&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM centos6.8-base
-MAINTAINER biaoge
-ENV LANG=zh_CN.UTF-8;\
-    LC_ALL=zh_CN.UTF-8;\
-    TZ=&amp;quot;Asia/Shanghai&amp;quot;;\
-    TERM=xterm
-ADD python27 /usr/local/python27
-RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
-    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
-    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;\
-    ln -s /usr/local/python27/bin/supervisord /usr/local/bin/supervisord;
-
-ADD supervisord.conf /etc/supervisord.conf
-EXPOSE 8000 8001 
-
-CMD [&amp;quot;/usr/local/bin/supervisord&amp;quot;,&amp;quot;-c&amp;quot;,&amp;quot;/etc/supervisord.conf&amp;quot;]
-#这里其实比较建议使用ENTRYPOINT
-#ENTRYPOINT通常情况下和CMD会一起使用，区别是CMD定义的执行命令会被container创建的时候的command取代。一般情况下ENTRYPOINT会定义命令执行的主体,CMD中增加默认的参数，而实际的参数可以通过创建container的时候用command进行优化选择
-#ENTRYPOINT  [&amp;quot;/usr/local/bin/supervisord&amp;quot;,&amp;quot;-c&amp;quot;,&amp;quot;/etc/supervisord.conf&amp;quot;]
-#文末会有演示一个ENTRYPOINT的例子
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;启动之后就会默认启动supervisord.conf中配的服务。&lt;/p&gt;
-
-&lt;p&gt;默认的supervisord.conf文件配置：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[supervisord]
-http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
-logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
-logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
-logfile_backups=10          ; (num of main logfile rotation backups;default 10)
-loglevel=info               ; (logging level;default info; others: debug,warn)
-pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
-nodaemon=true              ; (start in foreground if true;default false)
-minfds=1024                 ; (min. avail startup file descriptors;default 1024)
-minprocs=200                ; (min. avail process descriptors;default 200)
-
-
-[supervisorctl]
-serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
-
-#额外管理的服务
-#[program:httpd]
-#command = /usr/sbin/httpd
-#[program:sshd]
-#command = /usr/sbin/sshd -D
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id=&#34;使用上面构建的supervisord镜像进行构建服务镜像&#34;&gt;使用上面构建的supervisord镜像进行构建服务镜像&lt;/h4&gt;
-
-&lt;p&gt;镜像可自启动包含sshd和rabbitmq的服务&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM supversord
-MAINTAINER biaoge
-
-#需要如下相关的包
-#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
-COPY *.rpm /usr/local/
-RUN yum localinstall /usr/local/*.rpm -y 
-RUN ssh-keygen -q -N &amp;quot;&amp;quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &amp;quot;&amp;quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
-    mkdir -p /root/.ssh &amp;amp;&amp;amp; chown root.root /root &amp;amp;&amp;amp; chmod 700 /root/.ssh ;\
-    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
-    echo &#39;root:redhat&#39; | chpasswd
-EXPOSE 52568 5672 4369 
-
-#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;用来启动sshd和rabbitmq服务的&lt;code&gt;supervisord.conf&lt;/code&gt;配置文件。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[supervisord]
-http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
-logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
-logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
-logfile_backups=10          ; (num of main logfile rotation backups;default 10)
-loglevel=info               ; (logging level;default info; others: debug,warn)
-pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
-nodaemon=true              ; (start in foreground if true;default false)
-minfds=1024                 ; (min. avail startup file descriptors;default 1024)
-minprocs=200                ; (min. avail process descriptors;default 200)
-
-
-[supervisorctl]
-serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
-
-#额外管理的服务
-[program:rabbitmq]
-command = rabbitmq-server
-[program:sshd]
-command = /usr/sbin/sshd -D
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;测试访问：&lt;/strong&gt;
-使用上面Dockerfile创建images进行构建容器：
-&amp;gt;$docker run -itd &amp;ndash;name test-ssh sshd-rabbitmq&lt;/p&gt;
-
-&lt;p&gt;发现创建的容器，已经通过上面的supervisord.conf中定义好的，启动了rabbitmq和sshd服务。&lt;/p&gt;
-
-&lt;h3 id=&#34;构建基于paas层的其他基本镜像&#34;&gt;构建基于PaaS层的其他基本镜像&lt;/h3&gt;
-
-&lt;p&gt;基本sshd镜像：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM supervisord
-MAINTAINER 371990778@qq.com
-#配置相关的ssh需要的文件，以及相关的用户密码
-RUN ssh-keygen -q -N &amp;quot;&amp;quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &amp;quot;&amp;quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
-    mkdir -p /root/.ssh &amp;amp;&amp;amp; chown root.root /root &amp;amp;&amp;amp; chmod 700 /root/.ssh ;\
-    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
-    echo &#39;root:redhat&#39; | chpasswd
-EXPOSE 52568
-
-#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf 
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;相应的supervisord.conf文件中只需要增加相应的额服务启动命令&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;基本redis镜像：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM sshd-base
-MAINTAINER biaoge
-ADD redis-2.8.9 /usr/local/redis-2.8.9 
-#ADD redis.conf /etc/redis.conf
-RUN ln -s /usr/local/redis-2.8.9/src/redis-cli /usr/local/bin/redis-cli ;\
-    ln -s /usr/local/redis-2.8.9/src/redis-server /usr/local/bin/redis-server;\
-    ln -s /usr/local/redis-2.8.9/redisd.sh /usr/local/bin/redisd.sh
-
-EXPOSE 3679 
-ADD supervisord.conf /etc/supervisord.conf
-#CMD /usr/local/bin/redis-server 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;基本rabbit镜像：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM sshd-base
-MAINTAINER biaoge
-
-#需要如下相关的包
-#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
-COPY *.rpm /usr/local/
-RUN yum localinstall /usr/local/*.rpm -y 
-EXPOSE 5672 4369 
-
-#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;其他案例示范：&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM centos:6.8
-MAINTAINER &amp;quot;Andy_xu&amp;quot;
-
-ENV TZ &amp;quot;Asia/Shanghai&amp;quot;
-#ENV PATH $PATH:/export/data/
-ENV TERM xterm
-
-RUN mkdir -p /export/package
-COPY * /export/package 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;注意：上面dockerfile文件构建的环境没有默认的ps，需要加载export PS1=&#39;[\u@\h \W]\$&#39;&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;ENTRYPOINT 指令详解&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cat Dockerfile
-FROM centos6.8
-ENTRYPOINT [&amp;quot;curl&amp;quot;,&amp;quot;-s&amp;quot;,&amp;quot;10.0.0.1:2379/info&amp;quot;]
-#cmd 可以只定义参数
-#CMD [&amp;quot;-v&amp;quot;]
-$ docker build -t curl .
-$ docker  run curl  (执行ENTRYPOINT定义的内容)
-{&amp;quot;ID&amp;quot;:&amp;quot;RDTS:INFK:VAZI:5X75:EYAP:DBTC:AQ42:A5WH:IVJX:K4L2:RJ2R:CZS2&amp;quot;,&amp;quot;Containers&amp;quot;:21,&amp;quot;Images&amp;quot;:150,&amp;quot;Driver&amp;quot;:&amp;quot;overlay&amp;quot;,&amp;quot;DriverStatus&amp;quot;:[[&amp;quot;Backing Filesystem&amp;quot;,&amp;quot;extfs&amp;quot;]],&amp;quot;MemoryLimit&amp;quot;:true,&amp;quot;SwapLimit&amp;quot;:true,&amp;quot;CpuCfsPeriod&amp;quot;:true,&amp;quot;CpuCfsQuota&amp;quot;:true,&amp;quot;IPv4Forwarding&amp;quot;:true,&amp;quot;BridgeNfIptables&amp;quot;:true,&amp;quot;BridgeNfIp6tables&amp;quot;:true,&amp;quot;Debug&amp;quot;:false,&amp;quot;NFd&amp;quot;:42,&amp;quot;OomKillDisable&amp;quot;:true,&amp;quot;NGoroutines&amp;quot;:84,&amp;quot;SystemTime&amp;quot;:&amp;quot;2017-05-19T10:51:57.545371359+08:00&amp;quot;,&amp;quot;ExecutionDriver&amp;quot;:&amp;quot;native-0.2&amp;quot;,&amp;quot;LoggingDriver&amp;quot;:&amp;quot;json-file&amp;quot;,&amp;quot;NEventsListener&amp;quot;:0,&amp;quot;KernelVersion&amp;quot;:&amp;quot;2.6.32-431.wy39.el6.x86_64&amp;quot;,&amp;quot;OperatingSystem&amp;quot;:&amp;quot;\u003cunknown\u003e&amp;quot;,&amp;quot;IndexServerAddress&amp;quot;:&amp;quot;https://index.docker.io/v1/&amp;quot;,&amp;quot;RegistryConfig&amp;quot;:{&amp;quot;InsecureRegistryCIDRs&amp;quot;:[&amp;quot;127.0.0.0/8&amp;quot;],&amp;quot;IndexConfigs&amp;quot;:{&amp;quot;xxbandy123&amp;quot;:{&amp;quot;Name&amp;quot;:&amp;quot;172.25.46.9:5001&amp;quot;,&amp;quot;Mirrors&amp;quot;:[],&amp;quot;Secure&amp;quot;:false,&amp;quot;Official&amp;quot;:false},&amp;quot;docker.io&amp;quot;:{&amp;quot;Name&amp;quot;:&amp;quot;docker.io&amp;quot;,&amp;quot;Mirrors&amp;quot;:null,&amp;quot;Secure&amp;quot;:true,&amp;quot;Official&amp;quot;:true}},&amp;quot;Mirrors&amp;quot;:null},&amp;quot;InitSha1&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;InitPath&amp;quot;:&amp;quot;/usr/bin/docker&amp;quot;,&amp;quot;NCPU&amp;quot;:40,&amp;quot;MemTotal&amp;quot;:135282294784,&amp;quot;DockerRootDir&amp;quot;:&amp;quot;/export/lib/docker&amp;quot;,&amp;quot;HttpProxy&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;HttpsProxy&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;NoProxy&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;Name&amp;quot;:&amp;quot;HC-25-28-12.h.chinabank.com.cn&amp;quot;,&amp;quot;Labels&amp;quot;:null,&amp;quot;ExperimentalBuild&amp;quot;:false,&amp;quot;ServerVersion&amp;quot;:&amp;quot;1.9.1&amp;quot;,&amp;quot;ClusterStore&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;ClusterAdvertise&amp;quot;:&amp;quot;&amp;quot;}
-
-$ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆盖掉Dockerfile中掉CMD指令)
-* About to connect() to 10.0.0.1 port 5256 (#0)
-*   Trying 10.0.0.1... connected
-* Connected to 10.0.0.1 (10.0.0.1) port 5256 (#0)
-&amp;gt; HEAD /info HTTP/1.1
-&amp;gt; User-Agent: curl/7.19.7 (x86_64-redhat-linux-gnu) libcurl/7.19.7 NSS/3.21 Basic ECC zlib/1.2.3 libidn/1.18 libssh2/1.4.2
-&amp;gt; Host: 10.0.0.1:5256
-&amp;gt; Accept: */*
-&amp;gt;
-&amp;lt; HTTP/1.1 404 Not Found
-&amp;lt; Content-Type: text/plain; charset=utf-8
-&amp;lt; Date: Fri, 19 May 2017 02:53:36 GMT
-&amp;lt; Content-Length: 19
-&amp;lt;
-* Connection #0 to host 10.0.0.1 left intact
-* Closing connection #0
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-Date: Fri, 19 May 2017 02:53:36 GMT
-Content-Length: 19
 &lt;/code&gt;&lt;/pre&gt;</description>
       
     </item>

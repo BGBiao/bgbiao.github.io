@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>架构图 on BGBiao的Ops人生</title>
+    <link>https://bgbiao.top/tags/%E6%9E%B6%E6%9E%84%E5%9B%BE/</link>
+    <description>Recent content in 架构图 on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 16 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/%E6%9E%B6%E6%9E%84%E5%9B%BE/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>软件工程师们必须了解的画图工具</title>
+      <link>https://bgbiao.top/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</link>
+      <pubDate>Mon, 16 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</guid>
+      <description>作为一名在IT行业摸爬滚打多年的少年，选择一款适手的画图工具可以说是爽到不行。记得学生时代，鉴于条件的限制，都只能选择Visio进行绘制流程</description>
+    </item>
+    
+  </channel>
+</rss>
