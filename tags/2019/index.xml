@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>2019 on BGBiao的Ops人生</title>
+    <link>https://bgbiao.top/tags/2019/</link>
+    <description>Recent content in 2019 on BGBiao的Ops人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 02 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/2019/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>2019年总结之瞎扯淡</title>
+      <link>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/</link>
+      <pubDate>Thu, 02 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/</guid>
+      <description>大胡子是我特别佩服的一位老师，第一次知道他是17年偶尔一次线上讲座，具体题目忘记了，内容大概是关于&amp;rdquo;技术人如何赚钱&amp;rdquo;</description>
+    </item>
+    
+  </channel>
+</rss>
