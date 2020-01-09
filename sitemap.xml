@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://bgbiao.top/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/</loc>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/</loc>
     <lastmod>2020-01-02T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -260,42 +267,56 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/2019/</loc>
-    <lastmod>2020-01-02T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://bgbiao.top/</loc>
-    <lastmod>2020-01-02T00:00:00+00:00</lastmod>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/</loc>
-    <lastmod>2020-01-02T00:00:00+00:00</lastmod>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/</loc>
-    <lastmod>2020-01-02T00:00:00+00:00</lastmod>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/</loc>
-    <lastmod>2020-01-02T00:00:00+00:00</lastmod>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/%E6%8C%A3%E9%92%B1/</loc>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/%E7%90%86%E8%B4%A2/</loc>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/%E7%94%9F%E6%B4%BB/</loc>
+    <lastmod>2020-01-09T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/2019/</loc>
     <lastmod>2020-01-02T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -316,13 +337,6 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/%E7%90%86%E8%B4%A2/</loc>
-    <lastmod>2019-12-30T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://bgbiao.top/tags/cronjob/</loc>
     <lastmod>2019-12-29T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -337,14 +351,14 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/categories/kubernetes/</loc>
+    <loc>https://bgbiao.top/tags/kubernetes/</loc>
     <lastmod>2019-12-29T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/kubernetes/</loc>
+    <loc>https://bgbiao.top/categories/kubernetes/</loc>
     <lastmod>2019-12-29T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

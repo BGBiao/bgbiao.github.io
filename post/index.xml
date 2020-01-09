@@ -6,10 +6,19 @@
     <description>Recent content in Posts on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 02 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>关于如何挣钱的35条建议</title>
+      <link>https://bgbiao.top/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/</link>
+      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/</guid>
+      <description>这篇《关于如何挣钱的35条建议》，是波波从《How to Get Rich : Every Episode》[附录1]这篇长文(超过3.6万英文单词)翻译整理而来。波波非常</description>
+    </item>
     
     <item>
       <title>2019年总结之瞎扯淡</title>
@@ -236,19 +245,6 @@ google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一
       
       <guid>https://bgbiao.top/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</guid>
       <description>&lt;p&gt;最近在使用Golang进行文件读写的过程中，遇到几个细节问题导致程序写入数据时有一定脏数据的残留，最后发现是使用os.OpenFile在进行文件操作的时候没有使用正确的flag造成的。因此专门去学习了下Golang中读写文件的几种方式方法,在此记录下一些简单的操作，防止以后遗忘。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>开源OCR引擎tesseract的构建使用</title>
-      <link>https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Sat, 09 Dec 2017 15:59:29 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</guid>
-      <description>&lt;h3 id=&#34;简介&#34;&gt;简介&lt;/h3&gt;
-
-&lt;h4 id=&#34;ocr&#34;&gt;OCR&lt;/h4&gt;
-
-&lt;p&gt;光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。&lt;/p&gt;</description>
     </item>
     
   </channel>
