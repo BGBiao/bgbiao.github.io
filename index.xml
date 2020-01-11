@@ -36,11 +36,14 @@
 
 &lt;p&gt;我们都知道开发一个HTTP服务，首先需要启动一个TCP监听，然后需要有一些列的handler来处理具体的业务逻辑，最后在再将具体的业务逻辑通过HTTP协议约定和相关的Method和URL进行绑定，以此来对外提供具体功能的HTTP服务。那么在Gin框架对应的就是如下几个模型，我们将一起学习Gin的实现。&lt;/p&gt;
 
-&lt;p&gt;Gin框架中的几个重要的模型:
-- Engine: 用来初始化一个&lt;code&gt;gin&lt;/code&gt;对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L54&#34;&gt;源码文件&lt;/a&gt;
-- Router: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中
-- Context: &lt;code&gt;Context&lt;/code&gt;是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.
-- Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化数据来处理底层的业务逻辑，就需要使用&lt;code&gt;Bind&lt;/code&gt;相关的结构方法来解析context中的HTTP数据&lt;/p&gt;
+&lt;p&gt;Gin框架中的几个重要的模型:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Engine: 用来初始化一个&lt;code&gt;gin&lt;/code&gt;对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L54&#34;&gt;源码文件&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Router: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中&lt;/li&gt;
+&lt;li&gt;Context: &lt;code&gt;Context&lt;/code&gt;是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.&lt;/li&gt;
+&lt;li&gt;Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化数据来处理底层的业务逻辑，就需要使用&lt;code&gt;Bind&lt;/code&gt;相关的结构方法来解析context中的HTTP数据&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h4 id=&#34;1-gin框架中的engine结构体&#34;&gt;1.Gin框架中的Engine结构体&lt;/h4&gt;
 
@@ -99,37 +102,48 @@
 type HandlerFunc func(*Context)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;code&gt;初始化Engine的方式&lt;/code&gt;:
-- &lt;code&gt;New()&lt;/code&gt;: 该函数返回一个默认的Engine引用实例(开启了自动重定向,转发客户端ip和禁止请求路径转义)
-- &lt;code&gt;Default()&lt;/code&gt;: 内部调用&lt;code&gt;New()&lt;/code&gt;函数，但是增加了Logger和Recovery两个中间件&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;初始化Engine的方式&lt;/code&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;Engine对外常用的方法&lt;/code&gt;:
-- &lt;code&gt;Delims(left, right string) *Engine&lt;/code&gt;: 给创建好的gin实例指定模板引擎的左右分割符
-- &lt;code&gt;SecureJsonPrefix(prefix string) *Engine&lt;/code&gt;: 给创建好的gin实例设置secureJsonPrefixi
-- &lt;code&gt;SetHTMLTemplate(templ *template.Template)&lt;/code&gt;: 该方法会gin实实例绑定一个模板引擎(内部其实是设置了engine的HTMLRender属性)
-- &lt;code&gt;LoadHTMLGlob(pattern string)&lt;/code&gt;: 该方法用来加载glob模式(类似于shell中的正则)的html模板文件，然后将结果和HTML模板引擎关联(内部调用&lt;code&gt;SetHTMLTemplate&lt;/code&gt;方法将全部匹配到模板注册进去)
-- &lt;code&gt;LoadHTMLFiles(files ...string)&lt;/code&gt;: 该方法用上，需要指定一组模板文件名
-- &lt;code&gt;SetFuncMap(funcMap template.FuncMap)&lt;/code&gt;: 该方法会设置一个FuncMap给template.FuncMap使用(内部其实设置了engine的FuncMap)
-- &lt;code&gt;NoRoute(handlers ...HandlerFunc)&lt;/code&gt;: 该方法为NoRoute增加一些handler，它默认会返回404(通常在企业里，404我们会处理的比较优雅一些，比如给一些企业的静态页啥的)
-- &lt;code&gt;NoMethod(handlers ...HandlerFunc)&lt;/code&gt;: 同上，该方法用于给NoMethod增加handler，默认返回405
-- &lt;code&gt;Use(middleware ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法用于绑定一个全局的中间件给router. 通过该方法注册的中间件将包含在每个请求的handler chain中(比如可以在这里使用一些logger或者error相关的中间件). 在上面初始化实例的&lt;code&gt;Default()&lt;/code&gt;函数中其实内部使用了&lt;code&gt;engine.Use(Logger(), Recovery())&lt;/code&gt;来加载logger和recovery中间件
-- &lt;code&gt;Routes() (routes RoutesInfo)&lt;/code&gt;: 该方法用来返回一个路由列表信息&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L50&#34;&gt;RoutesInfo&lt;/a&gt;(一个路由信息RouteInfo中包含Method,Path,Handler,HandlerFunc)，该方法底层调用engine的trees来获取一些router必要的信息.
-- &lt;code&gt;Run(addr ...string) (err error)&lt;/code&gt;: 该方法会绑定router到http.Server中并开启一个http监听来接收http请求. 该方法其实是&lt;code&gt;http.ListenAndServe(addr, engine)&lt;/code&gt;的简单实现. 注意:该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求(engine内部只要实现了http.ServeHTTP方法即可)
-- &lt;code&gt;RunTLS(addr, certFile, keyFile string) (err error)&lt;/code&gt;: 同上，以https方式运行服务
-- &lt;code&gt;RunUnix(file string) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;方法，通过指定的unix socket文件运行服务
-- &lt;code&gt;RunFd(fd int) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;方法，通过指定的文件描述符(fd)来运行服务
-- &lt;code&gt;RunListener(listener net.Listener) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;，通过制定的&lt;code&gt;net.Listener&lt;/code&gt;来运行服务
-- &lt;code&gt;ServeHTTP(w http.ResponseWriter, req *http.Request)&lt;/code&gt;: 该方法遵循了&lt;code&gt;http.Handler&lt;/code&gt;的接口规范，可使gin内部调用&lt;code&gt;http.ListenAndServe&lt;/code&gt;来启动一个http服务
-- &lt;code&gt;HandleContext(c *Context)&lt;/code&gt;: 该方法会重新确认一个被重写的context(可以通过c.Request.URL.Path来实现). 需要注意的是该方法可能造成context的循环使用(会绕死你,谨慎使用)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;New()&lt;/code&gt;: 该函数返回一个默认的Engine引用实例(开启了自动重定向,转发客户端ip和禁止请求路径转义)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Default()&lt;/code&gt;: 内部调用&lt;code&gt;New()&lt;/code&gt;函数，但是增加了Logger和Recovery两个中间件&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Engine对外常用的方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Delims(left, right string) *Engine&lt;/code&gt;: 给创建好的gin实例指定模板引擎的左右分割符&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SecureJsonPrefix(prefix string) *Engine&lt;/code&gt;: 给创建好的gin实例设置secureJsonPrefixi&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SetHTMLTemplate(templ *template.Template)&lt;/code&gt;: 该方法会gin实实例绑定一个模板引擎(内部其实是设置了engine的HTMLRender属性)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LoadHTMLGlob(pattern string)&lt;/code&gt;: 该方法用来加载glob模式(类似于shell中的正则)的html模板文件，然后将结果和HTML模板引擎关联(内部调用&lt;code&gt;SetHTMLTemplate&lt;/code&gt;方法将全部匹配到模板注册进去)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LoadHTMLFiles(files ...string)&lt;/code&gt;: 该方法用上，需要指定一组模板文件名&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SetFuncMap(funcMap template.FuncMap)&lt;/code&gt;: 该方法会设置一个FuncMap给template.FuncMap使用(内部其实设置了engine的FuncMap)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;NoRoute(handlers ...HandlerFunc)&lt;/code&gt;: 该方法为NoRoute增加一些handler，它默认会返回404(通常在企业里，404我们会处理的比较优雅一些，比如给一些企业的静态页啥的)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;NoMethod(handlers ...HandlerFunc)&lt;/code&gt;: 同上，该方法用于给NoMethod增加handler，默认返回405&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Use(middleware ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法用于绑定一个全局的中间件给router. 通过该方法注册的中间件将包含在每个请求的handler chain中(比如可以在这里使用一些logger或者error相关的中间件). 在上面初始化实例的&lt;code&gt;Default()&lt;/code&gt;函数中其实内部使用了&lt;code&gt;engine.Use(Logger(), Recovery())&lt;/code&gt;来加载logger和recovery中间件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Routes() (routes RoutesInfo)&lt;/code&gt;: 该方法用来返回一个路由列表信息&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L50&#34;&gt;RoutesInfo&lt;/a&gt;(一个路由信息RouteInfo中包含Method,Path,Handler,HandlerFunc)，该方法底层调用engine的trees来获取一些router必要的信息.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Run(addr ...string) (err error)&lt;/code&gt;: 该方法会绑定router到http.Server中并开启一个http监听来接收http请求. 该方法其实是&lt;code&gt;http.ListenAndServe(addr, engine)&lt;/code&gt;的简单实现. 注意:该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求(engine内部只要实现了http.ServeHTTP方法即可)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RunTLS(addr, certFile, keyFile string) (err error)&lt;/code&gt;: 同上，以https方式运行服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RunUnix(file string) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;方法，通过指定的unix socket文件运行服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RunFd(fd int) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;方法，通过指定的文件描述符(fd)来运行服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RunListener(listener net.Listener) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;，通过制定的&lt;code&gt;net.Listener&lt;/code&gt;来运行服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ServeHTTP(w http.ResponseWriter, req *http.Request)&lt;/code&gt;: 该方法遵循了&lt;code&gt;http.Handler&lt;/code&gt;的接口规范，可使gin内部调用&lt;code&gt;http.ListenAndServe&lt;/code&gt;来启动一个http服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HandleContext(c *Context)&lt;/code&gt;: 该方法会重新确认一个被重写的context(可以通过c.Request.URL.Path来实现). 需要注意的是该方法可能造成context的循环使用(会绕死你,谨慎使用)&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h4 id=&#34;2-gin框架中的router&#34;&gt;2.Gin框架中的Router&lt;/h4&gt;
 
 &lt;p&gt;使用&lt;code&gt;Engine&lt;/code&gt;结构体中提供的相关方法，我们就可以快速的启动一个HTTP服务了，但是如何对外暴露一个URL来简单实现一个HTTP的数据传输呢，这个时候就需要使用Router中的方法了。&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;Gin框架中Router相关的结构体&lt;/code&gt;:
-- &lt;code&gt;RouterGroup&lt;/code&gt;: 该结构体被用来在Gin内部配置一个路由，一个RouterGroup被用来关联URL前缀和一组具体的handler业务逻辑
-- &lt;code&gt;IRoutes&lt;/code&gt;: IRoutes是一个定了了所有路由处理的接口(包含一些常用的HTTP方法)
-- &lt;code&gt;IRouter&lt;/code&gt;: IRouter则是一个包含单个路由和路由组的所有路由处理的接口&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Gin框架中Router相关的结构体&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;RouterGroup&lt;/code&gt;: 该结构体被用来在Gin内部配置一个路由，一个RouterGroup被用来关联URL前缀和一组具体的handler业务逻辑&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;IRoutes&lt;/code&gt;: IRoutes是一个定了了所有路由处理的接口(包含一些常用的HTTP方法)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;IRouter&lt;/code&gt;: IRouter则是一个包含单个路由和路由组的所有路由处理的接口&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;RouterGroup相关结构定义&lt;/code&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;// RouterGroup 结构体
 type RouterGroup struct {
@@ -178,22 +192,25 @@ type IRouter interface {
 		},
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;code&gt;RouterGroup结构体对外暴露的常用方法&lt;/code&gt;:
-- &lt;code&gt;Use(middleware ...HandlerFunc) IRoutes&lt;/code&gt;: 注册一个中间件并返回Iroutes接口
-- &lt;code&gt;Group(relativePath string, handlers ...HandlerFunc) *RouterGroup&lt;/code&gt;: Group方法会创建一个新的路由组。通常我们会创建一个公共的中间件或者是具有相同前缀的路由，来归并到一个路由组
-- &lt;code&gt;BasePath() string&lt;/code&gt;: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&amp;ldquo;/rest/n/v1/api&amp;rdquo;)，则v.BasePath()就是&amp;rdquo;/rest/n/v1/api&amp;rdquo;)
-- &lt;code&gt;Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法会使用给定的HTTP方法和URL来注册一个新的handler。(最后一个handler应该是真正的处理程序，其他的应该是在不同的路由之间共享的中间件)。&lt;code&gt;注意:内部调用了一个handle(httpMethod, relativePath string, handlers HandlersChain)的私有方法来处理核心逻辑&lt;/code&gt;
-- &lt;code&gt;POST(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法是&lt;code&gt;router.Handle(&amp;quot;POST&amp;quot;, path, handle)&lt;/code&gt;的快速实现，
-- &lt;code&gt;GET(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上
-- &lt;code&gt;DELETE(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上
-- &lt;code&gt;PATCH(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上
-- &lt;code&gt;PUT(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上
-- &lt;code&gt;OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上
-- &lt;code&gt;HEAD(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上
-- &lt;code&gt;Any(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上，会将HTTP的所有方法都注册上去
-- &lt;code&gt;StaticFile(relativePath, filepath string) IRoutes&lt;/code&gt;: 该方法用来注册一台路由来服务本地文件系统的单个文件，比如:&lt;code&gt;router.StaticFile(&amp;quot;favicon.ico&amp;quot;, &amp;quot;./resources/favicon.ico&amp;quot;)&lt;/code&gt;
-- &lt;code&gt;Static(relativePath, root string) IRoutes&lt;/code&gt;: 该方法用来提供一个指定文件系统根路径的的路由，内部调用&lt;code&gt;group.StaticFS(path,Dir(root,false))&lt;/code&gt;来提供服务
-- &lt;code&gt;StaticFS(relativePath string, fs http.FileSystem) IRoutes&lt;/code&gt;: 指定文件系统(http.FileSystem)来创建一个服务&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;RouterGroup结构体对外暴露的常用方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Use(middleware ...HandlerFunc) IRoutes&lt;/code&gt;: 注册一个中间件并返回Iroutes接口&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Group(relativePath string, handlers ...HandlerFunc) *RouterGroup&lt;/code&gt;: Group方法会创建一个新的路由组。通常我们会创建一个公共的中间件或者是具有相同前缀的路由，来归并到一个路由组&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;BasePath() string&lt;/code&gt;: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&amp;ldquo;/rest/n/v1/api&amp;rdquo;)，则v.BasePath()就是&amp;rdquo;/rest/n/v1/api&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法会使用给定的HTTP方法和URL来注册一个新的handler。(最后一个handler应该是真正的处理程序，其他的应该是在不同的路由之间共享的中间件)。&lt;code&gt;注意:内部调用了一个handle(httpMethod, relativePath string, handlers HandlersChain)的私有方法来处理核心逻辑&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;POST(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法是&lt;code&gt;router.Handle(&amp;quot;POST&amp;quot;, path, handle)&lt;/code&gt;的快速实现，&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;GET(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DELETE(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PATCH(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PUT(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HEAD(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Any(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上，会将HTTP的所有方法都注册上去&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;StaticFile(relativePath, filepath string) IRoutes&lt;/code&gt;: 该方法用来注册一台路由来服务本地文件系统的单个文件，比如:&lt;code&gt;router.StaticFile(&amp;quot;favicon.ico&amp;quot;, &amp;quot;./resources/favicon.ico&amp;quot;)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Static(relativePath, root string) IRoutes&lt;/code&gt;: 该方法用来提供一个指定文件系统根路径的的路由，内部调用&lt;code&gt;group.StaticFS(path,Dir(root,false))&lt;/code&gt;来提供服务&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;StaticFS(relativePath string, fs http.FileSystem) IRoutes&lt;/code&gt;: 指定文件系统(http.FileSystem)来创建一个服务&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h4 id=&#34;3-gin实例示例&#34;&gt;3.Gin实例示例&lt;/h4&gt;
 

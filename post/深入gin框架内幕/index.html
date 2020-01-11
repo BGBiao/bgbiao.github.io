@@ -81,7 +81,7 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 
 <meta itemprop="datePublished" content="2020-01-11T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-01-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5708">
+<meta itemprop="wordCount" content="5685">
 
 
 
@@ -378,11 +378,14 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 
 <p>我们都知道开发一个HTTP服务，首先需要启动一个TCP监听，然后需要有一些列的handler来处理具体的业务逻辑，最后在再将具体的业务逻辑通过HTTP协议约定和相关的Method和URL进行绑定，以此来对外提供具体功能的HTTP服务。那么在Gin框架对应的就是如下几个模型，我们将一起学习Gin的实现。</p>
 
-<p>Gin框架中的几个重要的模型:
-- Engine: 用来初始化一个<code>gin</code>对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L54">源码文件</a>
-- Router: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中
-- Context: <code>Context</code>是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.
-- Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化数据来处理底层的业务逻辑，就需要使用<code>Bind</code>相关的结构方法来解析context中的HTTP数据</p>
+<p>Gin框架中的几个重要的模型:</p>
+
+<ul>
+<li>Engine: 用来初始化一个<code>gin</code>对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L54">源码文件</a></li>
+<li>Router: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中</li>
+<li>Context: <code>Context</code>是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.</li>
+<li>Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化数据来处理底层的业务逻辑，就需要使用<code>Bind</code>相关的结构方法来解析context中的HTTP数据</li>
+</ul>
 
 <h4 id="1-gin框架中的engine结构体">1.Gin框架中的Engine结构体</h4>
 
@@ -441,37 +444,48 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 type HandlerFunc func(*Context)
 </code></pre>
 
-<p><code>初始化Engine的方式</code>:
-- <code>New()</code>: 该函数返回一个默认的Engine引用实例(开启了自动重定向,转发客户端ip和禁止请求路径转义)
-- <code>Default()</code>: 内部调用<code>New()</code>函数，但是增加了Logger和Recovery两个中间件</p>
+<p><code>初始化Engine的方式</code>:</p>
 
-<p><code>Engine对外常用的方法</code>:
-- <code>Delims(left, right string) *Engine</code>: 给创建好的gin实例指定模板引擎的左右分割符
-- <code>SecureJsonPrefix(prefix string) *Engine</code>: 给创建好的gin实例设置secureJsonPrefixi
-- <code>SetHTMLTemplate(templ *template.Template)</code>: 该方法会gin实实例绑定一个模板引擎(内部其实是设置了engine的HTMLRender属性)
-- <code>LoadHTMLGlob(pattern string)</code>: 该方法用来加载glob模式(类似于shell中的正则)的html模板文件，然后将结果和HTML模板引擎关联(内部调用<code>SetHTMLTemplate</code>方法将全部匹配到模板注册进去)
-- <code>LoadHTMLFiles(files ...string)</code>: 该方法用上，需要指定一组模板文件名
-- <code>SetFuncMap(funcMap template.FuncMap)</code>: 该方法会设置一个FuncMap给template.FuncMap使用(内部其实设置了engine的FuncMap)
-- <code>NoRoute(handlers ...HandlerFunc)</code>: 该方法为NoRoute增加一些handler，它默认会返回404(通常在企业里，404我们会处理的比较优雅一些，比如给一些企业的静态页啥的)
-- <code>NoMethod(handlers ...HandlerFunc)</code>: 同上，该方法用于给NoMethod增加handler，默认返回405
-- <code>Use(middleware ...HandlerFunc) IRoutes</code>: 该方法用于绑定一个全局的中间件给router. 通过该方法注册的中间件将包含在每个请求的handler chain中(比如可以在这里使用一些logger或者error相关的中间件). 在上面初始化实例的<code>Default()</code>函数中其实内部使用了<code>engine.Use(Logger(), Recovery())</code>来加载logger和recovery中间件
-- <code>Routes() (routes RoutesInfo)</code>: 该方法用来返回一个路由列表信息<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L50">RoutesInfo</a>(一个路由信息RouteInfo中包含Method,Path,Handler,HandlerFunc)，该方法底层调用engine的trees来获取一些router必要的信息.
-- <code>Run(addr ...string) (err error)</code>: 该方法会绑定router到http.Server中并开启一个http监听来接收http请求. 该方法其实是<code>http.ListenAndServe(addr, engine)</code>的简单实现. 注意:该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求(engine内部只要实现了http.ServeHTTP方法即可)
-- <code>RunTLS(addr, certFile, keyFile string) (err error)</code>: 同上，以https方式运行服务
-- <code>RunUnix(file string) (err error)</code>: 同<code>Run(addr)</code>方法，通过指定的unix socket文件运行服务
-- <code>RunFd(fd int) (err error)</code>: 同<code>Run(addr)</code>方法，通过指定的文件描述符(fd)来运行服务
-- <code>RunListener(listener net.Listener) (err error)</code>: 同<code>Run(addr)</code>，通过制定的<code>net.Listener</code>来运行服务
-- <code>ServeHTTP(w http.ResponseWriter, req *http.Request)</code>: 该方法遵循了<code>http.Handler</code>的接口规范，可使gin内部调用<code>http.ListenAndServe</code>来启动一个http服务
-- <code>HandleContext(c *Context)</code>: 该方法会重新确认一个被重写的context(可以通过c.Request.URL.Path来实现). 需要注意的是该方法可能造成context的循环使用(会绕死你,谨慎使用)</p>
+<ul>
+<li><code>New()</code>: 该函数返回一个默认的Engine引用实例(开启了自动重定向,转发客户端ip和禁止请求路径转义)</li>
+<li><code>Default()</code>: 内部调用<code>New()</code>函数，但是增加了Logger和Recovery两个中间件</li>
+</ul>
+
+<p><code>Engine对外常用的方法</code>:</p>
+
+<ul>
+<li><code>Delims(left, right string) *Engine</code>: 给创建好的gin实例指定模板引擎的左右分割符</li>
+<li><code>SecureJsonPrefix(prefix string) *Engine</code>: 给创建好的gin实例设置secureJsonPrefixi</li>
+<li><code>SetHTMLTemplate(templ *template.Template)</code>: 该方法会gin实实例绑定一个模板引擎(内部其实是设置了engine的HTMLRender属性)</li>
+<li><code>LoadHTMLGlob(pattern string)</code>: 该方法用来加载glob模式(类似于shell中的正则)的html模板文件，然后将结果和HTML模板引擎关联(内部调用<code>SetHTMLTemplate</code>方法将全部匹配到模板注册进去)</li>
+<li><code>LoadHTMLFiles(files ...string)</code>: 该方法用上，需要指定一组模板文件名</li>
+<li><code>SetFuncMap(funcMap template.FuncMap)</code>: 该方法会设置一个FuncMap给template.FuncMap使用(内部其实设置了engine的FuncMap)</li>
+<li><code>NoRoute(handlers ...HandlerFunc)</code>: 该方法为NoRoute增加一些handler，它默认会返回404(通常在企业里，404我们会处理的比较优雅一些，比如给一些企业的静态页啥的)</li>
+<li><code>NoMethod(handlers ...HandlerFunc)</code>: 同上，该方法用于给NoMethod增加handler，默认返回405</li>
+<li><code>Use(middleware ...HandlerFunc) IRoutes</code>: 该方法用于绑定一个全局的中间件给router. 通过该方法注册的中间件将包含在每个请求的handler chain中(比如可以在这里使用一些logger或者error相关的中间件). 在上面初始化实例的<code>Default()</code>函数中其实内部使用了<code>engine.Use(Logger(), Recovery())</code>来加载logger和recovery中间件</li>
+<li><code>Routes() (routes RoutesInfo)</code>: 该方法用来返回一个路由列表信息<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L50">RoutesInfo</a>(一个路由信息RouteInfo中包含Method,Path,Handler,HandlerFunc)，该方法底层调用engine的trees来获取一些router必要的信息.</li>
+<li><code>Run(addr ...string) (err error)</code>: 该方法会绑定router到http.Server中并开启一个http监听来接收http请求. 该方法其实是<code>http.ListenAndServe(addr, engine)</code>的简单实现. 注意:该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求(engine内部只要实现了http.ServeHTTP方法即可)</li>
+<li><code>RunTLS(addr, certFile, keyFile string) (err error)</code>: 同上，以https方式运行服务</li>
+<li><code>RunUnix(file string) (err error)</code>: 同<code>Run(addr)</code>方法，通过指定的unix socket文件运行服务</li>
+<li><code>RunFd(fd int) (err error)</code>: 同<code>Run(addr)</code>方法，通过指定的文件描述符(fd)来运行服务</li>
+<li><code>RunListener(listener net.Listener) (err error)</code>: 同<code>Run(addr)</code>，通过制定的<code>net.Listener</code>来运行服务</li>
+<li><code>ServeHTTP(w http.ResponseWriter, req *http.Request)</code>: 该方法遵循了<code>http.Handler</code>的接口规范，可使gin内部调用<code>http.ListenAndServe</code>来启动一个http服务</li>
+<li><code>HandleContext(c *Context)</code>: 该方法会重新确认一个被重写的context(可以通过c.Request.URL.Path来实现). 需要注意的是该方法可能造成context的循环使用(会绕死你,谨慎使用)</li>
+</ul>
 
 <h4 id="2-gin框架中的router">2.Gin框架中的Router</h4>
 
 <p>使用<code>Engine</code>结构体中提供的相关方法，我们就可以快速的启动一个HTTP服务了，但是如何对外暴露一个URL来简单实现一个HTTP的数据传输呢，这个时候就需要使用Router中的方法了。</p>
 
-<p><code>Gin框架中Router相关的结构体</code>:
-- <code>RouterGroup</code>: 该结构体被用来在Gin内部配置一个路由，一个RouterGroup被用来关联URL前缀和一组具体的handler业务逻辑
-- <code>IRoutes</code>: IRoutes是一个定了了所有路由处理的接口(包含一些常用的HTTP方法)
-- <code>IRouter</code>: IRouter则是一个包含单个路由和路由组的所有路由处理的接口</p>
+<p><code>Gin框架中Router相关的结构体</code>:</p>
+
+<ul>
+<li><code>RouterGroup</code>: 该结构体被用来在Gin内部配置一个路由，一个RouterGroup被用来关联URL前缀和一组具体的handler业务逻辑</li>
+<li><code>IRoutes</code>: IRoutes是一个定了了所有路由处理的接口(包含一些常用的HTTP方法)</li>
+<li><code>IRouter</code>: IRouter则是一个包含单个路由和路由组的所有路由处理的接口</li>
+</ul>
+
+<p><code>RouterGroup相关结构定义</code>:</p>
 
 <pre><code>// RouterGroup 结构体
 type RouterGroup struct {
@@ -520,22 +534,25 @@ type IRouter interface {
 		},
 </code></pre>
 
-<p><code>RouterGroup结构体对外暴露的常用方法</code>:
-- <code>Use(middleware ...HandlerFunc) IRoutes</code>: 注册一个中间件并返回Iroutes接口
-- <code>Group(relativePath string, handlers ...HandlerFunc) *RouterGroup</code>: Group方法会创建一个新的路由组。通常我们会创建一个公共的中间件或者是具有相同前缀的路由，来归并到一个路由组
-- <code>BasePath() string</code>: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&ldquo;/rest/n/v1/api&rdquo;)，则v.BasePath()就是&rdquo;/rest/n/v1/api&rdquo;)
-- <code>Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes</code>: 该方法会使用给定的HTTP方法和URL来注册一个新的handler。(最后一个handler应该是真正的处理程序，其他的应该是在不同的路由之间共享的中间件)。<code>注意:内部调用了一个handle(httpMethod, relativePath string, handlers HandlersChain)的私有方法来处理核心逻辑</code>
-- <code>POST(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 该方法是<code>router.Handle(&quot;POST&quot;, path, handle)</code>的快速实现，
-- <code>GET(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上
-- <code>DELETE(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上
-- <code>PATCH(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上
-- <code>PUT(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上
-- <code>OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上
-- <code>HEAD(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上
-- <code>Any(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上，会将HTTP的所有方法都注册上去
-- <code>StaticFile(relativePath, filepath string) IRoutes</code>: 该方法用来注册一台路由来服务本地文件系统的单个文件，比如:<code>router.StaticFile(&quot;favicon.ico&quot;, &quot;./resources/favicon.ico&quot;)</code>
-- <code>Static(relativePath, root string) IRoutes</code>: 该方法用来提供一个指定文件系统根路径的的路由，内部调用<code>group.StaticFS(path,Dir(root,false))</code>来提供服务
-- <code>StaticFS(relativePath string, fs http.FileSystem) IRoutes</code>: 指定文件系统(http.FileSystem)来创建一个服务</p>
+<p><code>RouterGroup结构体对外暴露的常用方法</code>:</p>
+
+<ul>
+<li><code>Use(middleware ...HandlerFunc) IRoutes</code>: 注册一个中间件并返回Iroutes接口</li>
+<li><code>Group(relativePath string, handlers ...HandlerFunc) *RouterGroup</code>: Group方法会创建一个新的路由组。通常我们会创建一个公共的中间件或者是具有相同前缀的路由，来归并到一个路由组</li>
+<li><code>BasePath() string</code>: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&ldquo;/rest/n/v1/api&rdquo;)，则v.BasePath()就是&rdquo;/rest/n/v1/api&rdquo;)</li>
+<li><code>Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes</code>: 该方法会使用给定的HTTP方法和URL来注册一个新的handler。(最后一个handler应该是真正的处理程序，其他的应该是在不同的路由之间共享的中间件)。<code>注意:内部调用了一个handle(httpMethod, relativePath string, handlers HandlersChain)的私有方法来处理核心逻辑</code></li>
+<li><code>POST(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 该方法是<code>router.Handle(&quot;POST&quot;, path, handle)</code>的快速实现，</li>
+<li><code>GET(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>DELETE(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>PATCH(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>PUT(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>HEAD(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>Any(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上，会将HTTP的所有方法都注册上去</li>
+<li><code>StaticFile(relativePath, filepath string) IRoutes</code>: 该方法用来注册一台路由来服务本地文件系统的单个文件，比如:<code>router.StaticFile(&quot;favicon.ico&quot;, &quot;./resources/favicon.ico&quot;)</code></li>
+<li><code>Static(relativePath, root string) IRoutes</code>: 该方法用来提供一个指定文件系统根路径的的路由，内部调用<code>group.StaticFS(path,Dir(root,false))</code>来提供服务</li>
+<li><code>StaticFS(relativePath string, fs http.FileSystem) IRoutes</code>: 指定文件系统(http.FileSystem)来创建一个服务</li>
+</ul>
 
 <h4 id="3-gin实例示例">3.Gin实例示例</h4>
 
