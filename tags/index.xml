@@ -6,10 +6,28 @@
     <description>Recent content in Tags on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 11 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Gin</title>
+      <link>https://bgbiao.top/tags/gin/</link>
+      <pubDate>Sat, 11 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/gin/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Golang</title>
+      <link>https://bgbiao.top/tags/golang/</link>
+      <pubDate>Sat, 11 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/golang/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>挣钱</title>
@@ -111,15 +129,6 @@
     </item>
     
     <item>
-      <title>Golang</title>
-      <link>https://bgbiao.top/tags/golang/</link>
-      <pubDate>Fri, 13 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/golang/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>goroutine</title>
       <link>https://bgbiao.top/tags/goroutine/</link>
       <pubDate>Fri, 13 Dec 2019 00:00:00 +0000</pubDate>
@@ -179,15 +188,6 @@
       <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/linux/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Salt</title>
-      <link>https://bgbiao.top/tags/salt/</link>
-      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/salt/</guid>
       <description></description>
     </item>
     
