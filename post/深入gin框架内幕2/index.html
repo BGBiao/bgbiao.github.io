@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>深入Gin框架内幕2 - BGBiao的Ops人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 在上一篇文章深入gin框架内幕(一)中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个Context引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。
+" />
+
+  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="深入Gin框架内幕2" />
+<meta property="og:description" content="
+在上一篇文章深入gin框架内幕(一)中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个Context引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/" />
+<meta property="article:published_time" content="2020-01-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-01-12T00:00:00+00:00" />
+<meta itemprop="name" content="深入Gin框架内幕2">
+<meta itemprop="description" content="
+在上一篇文章深入gin框架内幕(一)中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个Context引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。
+">
+
+
+<meta itemprop="datePublished" content="2020-01-12T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-01-12T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="6489">
+
+
+
+<meta itemprop="keywords" content="Golang,Gin," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="深入Gin框架内幕2"/>
+<meta name="twitter:description" content="
+在上一篇文章深入gin框架内幕(一)中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个Context引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的Ops人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的Ops人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">深入Gin框架内幕2</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-01-12" class="post-time">
+          2020-01-12
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
+            <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+            
+          </div>
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#gin框架中的几个核心结构">Gin框架中的几个核心结构</a>
+<ul>
+<li><a href="#1-gin框架对http响应数据的处理">1.Gin框架对HTTP响应数据的处理</a></li>
+<li><a href="#2-gin框架中的context结构体">2.Gin框架中的Context结构体</a></li>
+<li><a href="#3-gin实例示例">3.Gin实例示例</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>在上一篇文章<a href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/">深入gin框架内幕(一)</a>中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个<code>Context</code>引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。</p>
+</blockquote>
+
+<p>在开始分析之前，我们先简单回顾一下上一个章节中讲到的Gin框架中的几个核心的结构.</p>
+
+<h3 id="gin框架中的几个核心结构">Gin框架中的几个核心结构</h3>
+
+<p>Gin框架中的几个重要的模型:</p>
+
+<ul>
+<li><code>Engine</code>: 用来初始化一个<code>gin</code>对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L54">源码文件</a></li>
+<li><code>Router</code>: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中</li>
+<li>Context: <code>Context</code>是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.</li>
+<li>Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化
+数据来处理底层的业务逻辑，就需要使用<code>Bind</code>相关的结构方法来解析context中的HTTP数据</li>
+</ul>
+
+<h4 id="1-gin框架对http响应数据的处理">1.Gin框架对HTTP响应数据的处理</h4>
+
+<p>我们在<a href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/">深入Gin框架内幕(一)</a>中，以一个简单的Gin实例来具体讲解它内部是如何创建一个Http服务，并且注册一个路由来接收用户的请求，在示例程序中我们使用了<code>Context</code>引用对象的<code>String</code>方法来处理HTTP服务的数据响应，所以在整个Gin框架中紧跟<code>Router</code>模型结构的就要属<code>Context</code>结构了，该结构体主要用来处理整个HTTP请求的上下文数据，也是我们在开发HTTP服务中相对比较重要的一个结构体了。</p>
+
+<pre><code># 深入Gin框架内幕(一)中的示例
+$ cat case1.go
+package main
+import (
+    &quot;net/http&quot;
+
+    &quot;github.com/gin-gonic/gin&quot;
+)
+func main() {
+    ginObj := gin.Default()
+    ginObj.Any(&quot;/hello&quot;,func(c *gin.Context){
+        c.String(http.StatusOK,&quot;Hello BGBiao.&quot;)
+    })
+    ginObj.Run(&quot;localhost:8080&quot;)
+}
+</code></pre>
+
+<p>我们可以看到，在使用Gin框架后，我们只需要很简单的代码，即可以快速运行一个返回<code>Hello BGBiao.</code>的HTTP服务，而在<code>ginObj.Any</code>方法中，我们传入了一个参数为<code>Context</code>引用类型的匿名函数，并在该函数内部采用<code>String(code,data)</code>方法来处理HTTP服务的响应数据(返回Hello BGBiao字符串)，这个时候，你可能会想，我们在企业内部都是前后端分离，通常情况下后端仅会提供<code>RESTful API</code>，并通过<code>JSON</code>格式的数据和前端进行交互，那么Gin是如何处理其他非字符串类型的数据响应呢，这也是我们接下来要主要讲的<code>Context</code>结构模型。</p>
+
+<h4 id="2-gin框架中的context结构体">2.Gin框架中的Context结构体</h4>
+
+<p><code>注意:</code> 在Gin框架中由<code>Router</code>结构体来负责路由和方法(URL和HTTP方法)的绑定，内的Handler采用<code>Context</code>结构体来处理具体的HTTP数据传输方式，比如HTTP头部，请求体参数，状态码以及响应体和其他的一些常见HTTP行为。</p>
+
+<p><code>Context结构体</code>:</p>
+
+<pre><code>type Context struct {
+    // 一个包含size,status和ResponseWriter的结构体
+    writermem responseWriter
+    // http的请求体(指向原生的http.Request指针)
+    Request   *http.Request
+    // ResonseWriter接口
+    Writer    ResponseWriter
+
+    // 请求参数[]{&quot;Key&quot;:&quot;Value&quot;}
+    Params   Params
+    handlers HandlersChain
+    index int8
+    // http请求的全路径地址
+    fullPath string
+    // gin框架的Engine结构体指针
+    engine   *Engine
+    // 每个请求的context中的唯一键值对
+    Keys map[string]interface{}
+    // 绑定到所有使用该context的handler/middlewares的错误列表
+    Errors errorMsgs
+    // 定义了允许的格式被用于内容协商(content)
+    Accepted []string
+    // queryCache 使用url.ParseQuery来缓存参数查询结果(c.Request.URL.Query())
+    queryCache url.Values
+    // formCache 使用url.ParseQuery来缓存PostForm包含的表单数据(来自POST,PATCH,PUT请求体参数)
+    formCache url.Values
+}
+</code></pre>
+
+<p><strong>Context结构体常用的一些方法</strong></p>
+
+<p><code>基本方法</code>:</p>
+
+<ul>
+<li>Copy(): 返回当前正在使用的context的拷贝(context指针)，当这个context必须在goroutine中用时，该方法比较有用</li>
+<li>HandlerName(): 返回当前主handler的名称(比如:handler为handleGetUsers(),该方法将返回&rdquo;main.handleGetUsers&rdquo;)</li>
+<li>HandlerNames(): 返回所有注册的handler的名称</li>
+<li><code>Handler()</code>: 返回当前的主handler(<code>func (c *Context) Handler() HandlerFunc</code>)</li>
+<li>FullPath(): 返回一个匹配路由的全路径(uri: &ldquo;/user/:id&rdquo;,c.FullPath() == &ldquo;/user/:id&rdquo; )</li>
+</ul>
+
+<p><code>http常用方法</code>:</p>
+
+<ul>
+<li>ClientIP() string: 返回客户端ip(该方法会解析<code>X-Real-IP</code>,<code>X-Forwarded-For</code>)</li>
+<li>ContentType() string: 返回HTTP的Content-Type头</li>
+<li>IsWebsocket() bool: 返回是否为ws链接</li>
+</ul>
+
+<p><code>流控相关的方法:</code>
+- Next(): 该方法仅被使用在middleware中，它会在被调用的handler链内部执行pending handler
+- IsAborted(): 如果当前的context被终止了，该方法返回true
+- Abort(): 该函数可以从正在被调用中保护pending handler. 该方法停止后不会停止当前正在执行的handler. 比如我们有一个鉴权的中间件来验证请求是否有权限，如果认证失败了(用户信息异常等)，此时调用Abort()来确保后面的handler不再被调用
+- AbortWithStatus(code int): 同上，在会写入状态码。context.AbortWithStatus(401)即可表示上述的鉴权失败
+- AbortWithStatusJSON(code int, jsonObj interface{}): 同上，会再加响应数据.该方法会停止整个handler链，再写入状态码和json的响应体，同时也会设置Content-Type=&ldquo;application/json&rdquo;
+- AbortWithError(code int, err error) *Error: 同上返回错误信息</p>
+
+<p><code>错误管理</code>:</p>
+
+<ul>
+<li>Error(err error) *Error: 返回一些错误对象</li>
+</ul>
+
+<p><code>元数据管理</code>:</p>
+
+<ul>
+<li>Set(key string, value interface{}): 给当前这个context设置一个新的键值对</li>
+<li>Get(key string) (value interface{}, exists bool): 返回指定的key的值,以及是否存在</li>
+<li>MustGet(key string) interface{}: 返回指定key的值，不存在则panic</li>
+<li>GetString(key string) (s string): 以string类型返回指定的key</li>
+<li>GetBool(key string) (b bool): 返回分配给该key的值(bool类型)</li>
+<li>GetInt(key string) (i int):</li>
+<li>GetStringSlice(key string) (ss []string): 返回key的slice类型</li>
+<li>GetStringMap(key string) (sm map[string]interface{}): 返回interface{}类型的map结构</li>
+<li>GetStringMapString(key string) (sms map[string]string): 返回string类型的map结构</li>
+<li>GetStringMapStringSlice(key string) (smss map[string][]string): 同理</li>
+</ul>
+
+<p><code>输入数据</code>:</p>
+
+<ul>
+<li>Param(key string) string: 返回URL的参数值(uri_patten: &ldquo;/user/:id&rdquo;,url: &ldquo;/user/john&rdquo;,c.Param(&ldquo;id&rdquo;) = &ldquo;john&rdquo;)</li>
+<li>Query(key string) string: 返回url中的查询参数值(url: &ldquo;/path?id=1234&amp;name=Manu&amp;value=&ldquo;,c.Query(&ldquo;id&rdquo;)为1234,c.Query(&ldquo;name&rdquo;)为Manu,c.Query(&ldquo;value&rdquo;)为空)</li>
+<li>DefaultQuery(key, defaultValue string) string: 返回url中的查询参数的默认值(同上，但是c.Query(&ldquo;value&rdquo;)就没有值，该方法可以设置默认值)</li>
+<li>GetQuery(key string) (string, bool): 同Query()方法，并且会返回状态，如果对应的key不存在，返回(&ldquo;&rdquo;,false)</li>
+<li>QueryArray(key string) []string: 返回指定key的对应的array(slice的长度取决于给定key的参数的数量)</li>
+<li>GetQueryArray(key string) ([]string, bool): 同上，会返回状态</li>
+<li>QueryMap(key string) map[string]string: 返回指定key对应map类型</li>
+<li>GetQueryMap(key string) (map[string]string, bool): 同上，并且会返回状态</li>
+<li>PostForm(key string) string: 该方法返回一个从POST 请求的urlencode表单或者multipart表单数据，不存在时返回空字符串</li>
+<li>DefaultPostForm(key, defaultValue string) string: 同上，key不存在时返回默认值</li>
+<li>GetPostForm(key string) (string, bool): 同PostForm()方法，并且会返回状态</li>
+<li>PostFormArray(key string) []string: 该方法返回指定key的字符串类型的slice</li>
+<li>GetPostFormArray(key string) ([]string, bool): 同上，并返回状态</li>
+<li>PostFormMap(key string) map[string]string: 返回指定key的map类型</li>
+<li>GetPostFormMap(key string) (map[string]string, bool): 同上，并返回状态</li>
+<li>FormFile(name string) (*multipart.FileHeader, error): 返回指定key的第一个文件(用作文件上传)</li>
+<li>MultipartForm() (*multipart.Form, error): 该方法解析multipart表单，包含file文件上传</li>
+<li>SaveUploadedFile(file *multipart.FileHeader, dst string) error: 该方法用来上传指定的文件头到目标路径(dst)</li>
+</ul>
+
+<p><code>Bind家族相关方法</code>:</p>
+
+<ul>
+<li>Bind(obj interface{}) error: 自动解析<code>Content-Type</code>并绑定到指定的binding引擎</li>
+<li>BindJSON(obj interface{}) error: 同上，binding引擎为<code>binding.JSON</code></li>
+<li>BindXML(obj interface{}) error:</li>
+<li>BindQuery(obj interface{}) error:</li>
+<li>BindYAML(obj interface{}) error:</li>
+<li>BindHeader(obj interface{}) error:</li>
+<li>BindUri(obj interface{}) error: 使用<code>binding.Uri</code>来绑定传递的结构体指针</li>
+<li>MustBindWith(obj interface{}, b binding.Binding) error: 使用指定的binding引擎来绑定传递的结构体指针(当有任何错误时，终止请求并返回400)</li>
+</ul>
+
+<p><code>ShouldBind家族相关方法</code>:</p>
+
+<ul>
+<li>ShouldBind(obj interface{}) error: 同上述的Bind()方法，但是该方法在json结构无效时不会返回400</li>
+<li>ShouldBindJSON(obj interface{}) error:</li>
+<li>ShouldBindXML(obj interface{}) error:</li>
+<li>ShouldBindQuery(obj interface{}) error:</li>
+<li>ShouldBindYAML(obj interface{}) error:</li>
+<li>ShouldBindHeader(obj interface{}) error:</li>
+<li>ShouldBindUri(obj interface{}) error:</li>
+<li>ShouldBindWith(obj interface{}, b binding.Binding) error: 等同于MustBindWith()方法</li>
+<li>ShouldBindBodyWith(obj interface{}, bb binding.BindingBody) (err error): 和ShouldBindWith()方法相似，但是他会存储请求体到context中，当下次调用时可以重用(因为该方法是在binding之前读取body，因此在你只使用一次时，为了更好的性能还是使用ShouldBindWith会比较好)</li>
+</ul>
+
+<p><code>HTTP响应相关的方法</code>:</p>
+
+<ul>
+<li>Status(code int): 设置http的响应码</li>
+<li>Header(key, value string): 是<code>c.Writer.Header().Set(key, value)</code>的简单实现，在响应体重写入一个header，如果value为空，则相当于调用了<code>c.Writer.Header().Del(key)</code></li>
+<li>GetHeader(key string) string: 返回请求体重的header</li>
+<li>GetRawData() ([]byte, error): 返回流式数据</li>
+<li>SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool): 该方法将设置一个Set-Cookie到ResponseWriter的头中(注意:name必须是一个合法可用的名称,无效的coookie可能会被丢弃)</li>
+<li>Cookie(name string) (string, error): 返回名称为name的cookie</li>
+<li>Render(code int, r render.Render): 该方法写入响应头并调用render.Render去渲染数据</li>
+<li>HTML(code int, name string, obj interface{}): 该方法使用指定文件模板名称去渲染http模板(同时会更新状态码并设置Content-Type as &ldquo;text/html&rdquo;.)</li>
+<li>IndentedJSON(code int, obj interface{}): 该方法会序列化对象obj为一个pretty JSON 数据到响应体中，同时设置Content-Type as &ldquo;application/json&rdquo;(pretty JSON需要消耗cpu和带宽，强烈建议生产使用<code>Context.JSON()</code>)</li>
+<li>SecureJSON(code int, obj interface{}): 同上，会序列化成<code>Secure Json</code></li>
+<li>JSONP(code int, obj interface{}):</li>
+<li>JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&ldquo;application/json&rdquo;头</li>
+<li>AsciiJSON(code int, obj interface{}):</li>
+<li>PureJSON(code int, obj interface{}):</li>
+<li>XML(code int, obj interface{}): 序列化成<code>xml</code>格式,并写Content-Type:&ldquo;application/xml&rdquo;</li>
+<li>YAML(code int, obj interface{}): 序列化成<code>yaml</code></li>
+<li>ProtoBuf(code int, obj interface{}): 序列化成<code>probuf</code></li>
+<li>String(code int, format string, values &hellip;interface{}): 将制定的string写入响应体</li>
+<li>Redirect(code int, location string): 重定向</li>
+<li>Data(code int, contentType string, data []byte): 写一些数据到响应体重，并更新响应码</li>
+<li>DataFromReader(code int, contentLength int64, contentType string, reader io.Reader, extraHeaders map[string]string): 写一些制定模板的数据到响应体中，并更新状态码</li>
+<li>File(filepath string): 以一种高效方式将制定文件写入响应体数据中</li>
+<li>FileAttachment(filepath, filename string): 同上，但是在客户端文件会被直接下载下来</li>
+<li>SSEvent(name string, message interface{}): 写Server-Sent Event到响应数据中</li>
+<li>Stream(step func(w io.Writer) bool) bool: 发送一个流式的响应数据并返回状态</li>
+</ul>
+
+<h4 id="3-gin实例示例">3.Gin实例示例</h4>
+
+<p><strong>3.1返回json格式的数据</strong></p>
+
+<p>为了解决我们在开头提到的问题，我们将使用context引用对象的JSON家族方法来处理该需求</p>
+
+<pre><code># 使用context来返回json格式的数据
+$ cat case2.go
+package main
+
+import (
+    &quot;github.com/gin-gonic/gin&quot;
+)
+
+// 我们定义一个通用的格式化的响应数据
+// 在Data字段中采用空接口类型来实际存放我们的业务数据
+type restData struct {
+    Data        interface{}   `json:&quot;data&quot;`
+    Message     string        `json:&quot;message&quot;`
+    Status      bool          `json:&quot;status&quot;`
+}
+
+func main() {
+    // mock一个http响应数据
+    restdata := &amp;restData{&quot;Hello,BGBiao&quot;,&quot;&quot;,true}
+    restdata1 := &amp;restData{map[string]string{&quot;name&quot;:&quot;BGBiao&quot;,&quot;website&quot;:&quot;https://bgbiao.top&quot;},&quot;&quot;,true}
+
+    // 使用Gin框架启动一个http接口服务
+    ginObj := gin.Default()
+    ginObj.GET(&quot;/api/test&quot;,func(c *gin.Context){
+       // 我们的handlerFunc中入参是一个Context结构的引用对象c
+       // 因此我们可以使用Context中的JSON方法来返回一个json结构的数据
+       // 可用的方法有如下几种，我们可以根据实际需求进行选择
+       /*
+          IndentedJSON(code int, obj interface{}): 带缩进的json(消耗cpu和mem)
+          SecureJSON(code int, obj interface{}): 安全化json
+          JSONP(code int, obj interface{})
+          JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&quot;application/json&quot;头
+       */
+       c.JSON(200,restdata)
+    })
+    ginObj.GET(&quot;/api/test1&quot;,func(c *gin.Context){
+        c.IndentedJSON(200,restdata1)
+    })
+
+    ginObj.Run(&quot;localhost:8080&quot;)
+}
+
+
+# 实例运行(这里成功将我们写的两个api接口进行对外暴露)
+$ go run case2.go
+....
+....
+[GIN-debug] GET    /api/test                 --&gt; main.main.func1 (3 handlers)
+[GIN-debug] GET    /api/test1                --&gt; main.main.func2 (3 handlers)
+
+# 接口测试访问
+$ curl localhost:8080/api/test
+{&quot;data&quot;:&quot;Hello,BGBiao&quot;,&quot;message&quot;:&quot;&quot;,&quot;status&quot;:true}
+$ curl localhost:8080/api/test1
+{
+    &quot;data&quot;: {
+        &quot;name&quot;: &quot;BGBiao&quot;,
+        &quot;website&quot;: &quot;https://bgbiao.top&quot;
+    },
+    &quot;message&quot;: &quot;&quot;,
+    &quot;status&quot;: true
+}% 
+</code></pre>
+
+<p>当然上面我们仅以JSON格式来示例，类似的方式我们可以使用<code>XML</code>,<code>YAML</code>,<code>ProtoBuf</code>等方法来输出指定格式化后的数据。</p>
+
+<p><strong>3.2其他常用的基本方法</strong></p>
+
+<p><code>注意:</code>在其他基本方法中我们仍然使用上述示例代码中的主逻辑，主要用来测试基本的方法.</p>
+
+<pre><code># 我们在/api/test这个路由中增加如下两行代码
+// 设置响应体中的自定义header(通常我们可以通过自定义头来实现一个内部标识)
+c.Header(&quot;Api-Author&quot;,&quot;BGBiao&quot;)
+// GetHeader方法用来获取指定的请求头，比如我们经常会使用请求中的token来进行接口的认证和鉴权
+// 这里由于我们使用的restdata的指针，通过GetHeader方法获取到token赋值给Message
+// ClientIP()方法用于获取客户端的ip地址
+restdata.Message = fmt.Sprintf(&quot;token:%s 当前有效，客户端ip:%s&quot;,c.GetHeader(&quot;token&quot;),c.ClientIP())
+
+# 访问接口示例(我们可以看到在响应体中多了一个我们自定义的Api-Author头，并且我们将请求头token的值)
+$ curl -H 'token:xxxxxxxx' localhost:8080/api/test -i
+HTTP/1.1 200 OK
+Api-Author: BGBiao
+Content-Type: application/json; charset=utf-8
+Date: Sun, 12 Jan 2020 14:41:01 GMT
+Content-Length: 66
+
+{&quot;data&quot;:&quot;Hello,BGBiao&quot;,&quot;message&quot;:&quot;token:xxxxxxxx 当前有效，客户端ip:127.0.0.1&quot;,&quot;status&quot;:true}
+</code></pre>
+
+<p><strong>3.3用户数据输入</strong></p>
+
+<p>当然到这里后，你可能还会有新的疑问，就是通常情况下，我们开发后端接口会提供一些具体的参数，通过一些具体数据提交来实现具体的业务逻辑处理，这些参数通常会分为如下三类:</p>
+
+<ul>
+<li>使用HTTP GET方法获取到的url中的一些查询参数来执行更具体的业务逻辑(比如我们查询数据的指定条数之类的)</li>
+<li>使用HTTP POST GET等其他方式以form表单方式提交的数据来验证和处理用户数据</li>
+<li>在URL中获取一些可变参数(比如通常我们的url会定义为&rdquo;/api/uid/:id&rdquo;来表示用户id相关的接口，这个时候通常需要获取到url中的id字段)</li>
+</ul>
+
+<p>以上的基本需求，几乎都可以在Context结构体的<code>输入数据</code>中找到响应的方法.</p>
+
+<pre><code># 接下来，我们依然在上述的代码中进行修改，增加如下路由
+$ cat case2.go
+....
+....
+    // 比如我们该接口时用来获取全部数据，但是我们希望在url中增加参数来限制数据条数
+    datas := []string{&quot;Golang&quot;,&quot;Python&quot;,&quot;Docker&quot;,&quot;Kubernetes&quot;,&quot;CloudNative&quot;,&quot;DevOps&quot;}
+    ginObj.GET(&quot;/api/testdata&quot;,func(c *gin.Context){
+        limit := c.Query(&quot;limit&quot;)
+        // 其实既然这里我们已经确定需求了，当用户没有输入limit参数时我们就可以设置默认值
+        // DefaultQuery(&quot;limit&quot;,&quot;1&quot;)
+        // 同时我们其实也可以使用GetQuery方法来获取参数解析状态，即是否有对应的参数
+        // 还有QueryArray和GetQueryArray类似的方法
+        if limit != &quot;&quot; {
+            num,_ := strconv.Atoi(limit)
+            restdata1.Data = datas[:num]
+        }else {
+            restdata1.Data = datas
+        }
+        c.IndentedJSON(200,restdata1)
+
+    })
+
+    // 使用form表单方式提交数据
+    ginObj.POST(&quot;/api/testdata&quot;,func(c *gin.Context){
+        // 使用c.PostForm方法来提交一个data数据
+        // 同时我们可以使用DefaultPostForm方法来给提交数据一个默认值，比如我们有些参数是希望有默认值的
+        // 当然也可以使用GetPostForm，PostFormArray，PostFormArray方法来获取多个数据和状态
+        // data := c.PostForm(&quot;data&quot;)
+        // datas = append(datas,data)
+        /* 这里可能会有个问题就是同时提交多个数据时，使用PostForm方法就会不那么好使了
+        通常情况下回使用PostFormArray方法
+        */
+        data := c.PostFormArray(&quot;data&quot;)
+        datas = append(datas,data...)
+        restdata1.Data = datas
+        c.IndentedJSON(200,restdata1)
+    })
+
+    // 获取url中的路径参数
+    ginObj.GET(&quot;/api/testdata/:data&quot;,func(c *gin.Context){
+        data := c.Param(&quot;data&quot;)
+        for _,rawData := range datas {
+            if data == rawData {
+                restdata1.Data = data
+                break
+            }
+        }
+        if restdata1.Data != data {
+            restdata1.Data = &quot;&quot;
+            restdata1.Message = fmt.Sprintf(&quot;%v 不存在&quot;,data)
+            restdata1.Status = false
+        }
+        c.IndentedJSON(200,restdata1)
+    })
+....
+....
+
+
+
+# 请求示例接口
+# 我们可以看到使用GET方法默认会获取到全部数据，但是如果有了limit参数后，我们就可以限制数据的条数
+$ curl -H 'token:xxxxxxxx' localhost:8080/api/testdata
+{
+    &quot;data&quot;: [
+        &quot;Golang&quot;,
+        &quot;Python&quot;,
+        &quot;Docker&quot;,
+        &quot;Kubernetes&quot;,
+        &quot;CloudNative&quot;,
+        &quot;DevOps&quot;
+    ],
+    &quot;message&quot;: &quot;&quot;,
+    &quot;status&quot;: true
+}%
+$ curl -H 'token:xxxxxxxx' &quot;localhost:8080/api/testdata?limit=2&quot;
+{
+    &quot;data&quot;: [
+        &quot;Golang&quot;,
+        &quot;Python&quot;
+    ],
+    &quot;message&quot;: &quot;&quot;,
+    &quot;status&quot;: true
+}%
+
+# 当我们使用post接口往服务提交数据时，就可以让服务端按照需求进行数据处理
+curl -X POST  -d data=&quot;vue&quot; &quot;localhost:8080/api/testdata&quot;
+{
+    &quot;data&quot;: [
+        &quot;Golang&quot;,
+        &quot;Python&quot;,
+        &quot;Docker&quot;,
+        &quot;Kubernetes&quot;,
+        &quot;CloudNative&quot;,
+        &quot;DevOps&quot;,
+        &quot;vue&quot;
+    ],
+    &quot;message&quot;: &quot;&quot;,
+    &quot;status&quot;: true
+}%
+
+# 当我们同时需要提交多份数据时，可以使用PostFormArray方法，同时提交多份数据(可以理解为批量提交)
+$ curl -X POST -d data=&quot;vue&quot; -d data=&quot;Rust&quot; &quot;localhost:8080/api/testdata&quot;
+
+# 获取URL中的参数值
+$ curl &quot;localhost:8080/api/testdata/Golang&quot;
+{
+    &quot;data&quot;: &quot;Golang&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;status&quot;: true
+}%
+
+$ curl &quot;localhost:8080/api/testdata/Java&quot;
+{
+    &quot;data&quot;: &quot;&quot;,
+    &quot;message&quot;: &quot;Java 不存在&quot;,
+    &quot;status&quot;: false
+}%
+
+</code></pre>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-01-12
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+    
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/golang/">Golang</a>
+          <a href="https://bgbiao.top/tags/gin/">Gin</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/">
+            <span class="next-text nav-default">深入Gin框架内幕1</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -6,17 +6,462 @@
     <description>Recent content on BGBiao的Ops人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 11 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 12 Jan 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>深入Gin框架内幕</title>
-      <link>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/</link>
+      <title>深入Gin框架内幕2</title>
+      <link>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/</link>
+      <pubDate>Sun, 12 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;在上一篇文章&lt;a href=&#34;https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/&#34;&gt;深入gin框架内幕(一)&lt;/a&gt;中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个&lt;code&gt;Context&lt;/code&gt;引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在开始分析之前，我们先简单回顾一下上一个章节中讲到的Gin框架中的几个核心的结构.&lt;/p&gt;
+
+&lt;h3 id=&#34;gin框架中的几个核心结构&#34;&gt;Gin框架中的几个核心结构&lt;/h3&gt;
+
+&lt;p&gt;Gin框架中的几个重要的模型:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Engine&lt;/code&gt;: 用来初始化一个&lt;code&gt;gin&lt;/code&gt;对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L54&#34;&gt;源码文件&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Router&lt;/code&gt;: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中&lt;/li&gt;
+&lt;li&gt;Context: &lt;code&gt;Context&lt;/code&gt;是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.&lt;/li&gt;
+&lt;li&gt;Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化
+数据来处理底层的业务逻辑，就需要使用&lt;code&gt;Bind&lt;/code&gt;相关的结构方法来解析context中的HTTP数据&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;1-gin框架对http响应数据的处理&#34;&gt;1.Gin框架对HTTP响应数据的处理&lt;/h4&gt;
+
+&lt;p&gt;我们在&lt;a href=&#34;https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/&#34;&gt;深入Gin框架内幕(一)&lt;/a&gt;中，以一个简单的Gin实例来具体讲解它内部是如何创建一个Http服务，并且注册一个路由来接收用户的请求，在示例程序中我们使用了&lt;code&gt;Context&lt;/code&gt;引用对象的&lt;code&gt;String&lt;/code&gt;方法来处理HTTP服务的数据响应，所以在整个Gin框架中紧跟&lt;code&gt;Router&lt;/code&gt;模型结构的就要属&lt;code&gt;Context&lt;/code&gt;结构了，该结构体主要用来处理整个HTTP请求的上下文数据，也是我们在开发HTTP服务中相对比较重要的一个结构体了。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 深入Gin框架内幕(一)中的示例
+$ cat case1.go
+package main
+import (
+    &amp;quot;net/http&amp;quot;
+
+    &amp;quot;github.com/gin-gonic/gin&amp;quot;
+)
+func main() {
+    ginObj := gin.Default()
+    ginObj.Any(&amp;quot;/hello&amp;quot;,func(c *gin.Context){
+        c.String(http.StatusOK,&amp;quot;Hello BGBiao.&amp;quot;)
+    })
+    ginObj.Run(&amp;quot;localhost:8080&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;我们可以看到，在使用Gin框架后，我们只需要很简单的代码，即可以快速运行一个返回&lt;code&gt;Hello BGBiao.&lt;/code&gt;的HTTP服务，而在&lt;code&gt;ginObj.Any&lt;/code&gt;方法中，我们传入了一个参数为&lt;code&gt;Context&lt;/code&gt;引用类型的匿名函数，并在该函数内部采用&lt;code&gt;String(code,data)&lt;/code&gt;方法来处理HTTP服务的响应数据(返回Hello BGBiao字符串)，这个时候，你可能会想，我们在企业内部都是前后端分离，通常情况下后端仅会提供&lt;code&gt;RESTful API&lt;/code&gt;，并通过&lt;code&gt;JSON&lt;/code&gt;格式的数据和前端进行交互，那么Gin是如何处理其他非字符串类型的数据响应呢，这也是我们接下来要主要讲的&lt;code&gt;Context&lt;/code&gt;结构模型。&lt;/p&gt;
+
+&lt;h4 id=&#34;2-gin框架中的context结构体&#34;&gt;2.Gin框架中的Context结构体&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在Gin框架中由&lt;code&gt;Router&lt;/code&gt;结构体来负责路由和方法(URL和HTTP方法)的绑定，内的Handler采用&lt;code&gt;Context&lt;/code&gt;结构体来处理具体的HTTP数据传输方式，比如HTTP头部，请求体参数，状态码以及响应体和其他的一些常见HTTP行为。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Context结构体&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;type Context struct {
+    // 一个包含size,status和ResponseWriter的结构体
+    writermem responseWriter
+    // http的请求体(指向原生的http.Request指针)
+    Request   *http.Request
+    // ResonseWriter接口
+    Writer    ResponseWriter
+
+    // 请求参数[]{&amp;quot;Key&amp;quot;:&amp;quot;Value&amp;quot;}
+    Params   Params
+    handlers HandlersChain
+    index int8
+    // http请求的全路径地址
+    fullPath string
+    // gin框架的Engine结构体指针
+    engine   *Engine
+    // 每个请求的context中的唯一键值对
+    Keys map[string]interface{}
+    // 绑定到所有使用该context的handler/middlewares的错误列表
+    Errors errorMsgs
+    // 定义了允许的格式被用于内容协商(content)
+    Accepted []string
+    // queryCache 使用url.ParseQuery来缓存参数查询结果(c.Request.URL.Query())
+    queryCache url.Values
+    // formCache 使用url.ParseQuery来缓存PostForm包含的表单数据(来自POST,PATCH,PUT请求体参数)
+    formCache url.Values
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Context结构体常用的一些方法&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;基本方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Copy(): 返回当前正在使用的context的拷贝(context指针)，当这个context必须在goroutine中用时，该方法比较有用&lt;/li&gt;
+&lt;li&gt;HandlerName(): 返回当前主handler的名称(比如:handler为handleGetUsers(),该方法将返回&amp;rdquo;main.handleGetUsers&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;HandlerNames(): 返回所有注册的handler的名称&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Handler()&lt;/code&gt;: 返回当前的主handler(&lt;code&gt;func (c *Context) Handler() HandlerFunc&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;FullPath(): 返回一个匹配路由的全路径(uri: &amp;ldquo;/user/:id&amp;rdquo;,c.FullPath() == &amp;ldquo;/user/:id&amp;rdquo; )&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;http常用方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ClientIP() string: 返回客户端ip(该方法会解析&lt;code&gt;X-Real-IP&lt;/code&gt;,&lt;code&gt;X-Forwarded-For&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;ContentType() string: 返回HTTP的Content-Type头&lt;/li&gt;
+&lt;li&gt;IsWebsocket() bool: 返回是否为ws链接&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;流控相关的方法:&lt;/code&gt;
+- Next(): 该方法仅被使用在middleware中，它会在被调用的handler链内部执行pending handler
+- IsAborted(): 如果当前的context被终止了，该方法返回true
+- Abort(): 该函数可以从正在被调用中保护pending handler. 该方法停止后不会停止当前正在执行的handler. 比如我们有一个鉴权的中间件来验证请求是否有权限，如果认证失败了(用户信息异常等)，此时调用Abort()来确保后面的handler不再被调用
+- AbortWithStatus(code int): 同上，在会写入状态码。context.AbortWithStatus(401)即可表示上述的鉴权失败
+- AbortWithStatusJSON(code int, jsonObj interface{}): 同上，会再加响应数据.该方法会停止整个handler链，再写入状态码和json的响应体，同时也会设置Content-Type=&amp;ldquo;application/json&amp;rdquo;
+- AbortWithError(code int, err error) *Error: 同上返回错误信息&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;错误管理&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Error(err error) *Error: 返回一些错误对象&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;元数据管理&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Set(key string, value interface{}): 给当前这个context设置一个新的键值对&lt;/li&gt;
+&lt;li&gt;Get(key string) (value interface{}, exists bool): 返回指定的key的值,以及是否存在&lt;/li&gt;
+&lt;li&gt;MustGet(key string) interface{}: 返回指定key的值，不存在则panic&lt;/li&gt;
+&lt;li&gt;GetString(key string) (s string): 以string类型返回指定的key&lt;/li&gt;
+&lt;li&gt;GetBool(key string) (b bool): 返回分配给该key的值(bool类型)&lt;/li&gt;
+&lt;li&gt;GetInt(key string) (i int):&lt;/li&gt;
+&lt;li&gt;GetStringSlice(key string) (ss []string): 返回key的slice类型&lt;/li&gt;
+&lt;li&gt;GetStringMap(key string) (sm map[string]interface{}): 返回interface{}类型的map结构&lt;/li&gt;
+&lt;li&gt;GetStringMapString(key string) (sms map[string]string): 返回string类型的map结构&lt;/li&gt;
+&lt;li&gt;GetStringMapStringSlice(key string) (smss map[string][]string): 同理&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;输入数据&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Param(key string) string: 返回URL的参数值(uri_patten: &amp;ldquo;/user/:id&amp;rdquo;,url: &amp;ldquo;/user/john&amp;rdquo;,c.Param(&amp;ldquo;id&amp;rdquo;) = &amp;ldquo;john&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;Query(key string) string: 返回url中的查询参数值(url: &amp;ldquo;/path?id=1234&amp;amp;name=Manu&amp;amp;value=&amp;ldquo;,c.Query(&amp;ldquo;id&amp;rdquo;)为1234,c.Query(&amp;ldquo;name&amp;rdquo;)为Manu,c.Query(&amp;ldquo;value&amp;rdquo;)为空)&lt;/li&gt;
+&lt;li&gt;DefaultQuery(key, defaultValue string) string: 返回url中的查询参数的默认值(同上，但是c.Query(&amp;ldquo;value&amp;rdquo;)就没有值，该方法可以设置默认值)&lt;/li&gt;
+&lt;li&gt;GetQuery(key string) (string, bool): 同Query()方法，并且会返回状态，如果对应的key不存在，返回(&amp;ldquo;&amp;rdquo;,false)&lt;/li&gt;
+&lt;li&gt;QueryArray(key string) []string: 返回指定key的对应的array(slice的长度取决于给定key的参数的数量)&lt;/li&gt;
+&lt;li&gt;GetQueryArray(key string) ([]string, bool): 同上，会返回状态&lt;/li&gt;
+&lt;li&gt;QueryMap(key string) map[string]string: 返回指定key对应map类型&lt;/li&gt;
+&lt;li&gt;GetQueryMap(key string) (map[string]string, bool): 同上，并且会返回状态&lt;/li&gt;
+&lt;li&gt;PostForm(key string) string: 该方法返回一个从POST 请求的urlencode表单或者multipart表单数据，不存在时返回空字符串&lt;/li&gt;
+&lt;li&gt;DefaultPostForm(key, defaultValue string) string: 同上，key不存在时返回默认值&lt;/li&gt;
+&lt;li&gt;GetPostForm(key string) (string, bool): 同PostForm()方法，并且会返回状态&lt;/li&gt;
+&lt;li&gt;PostFormArray(key string) []string: 该方法返回指定key的字符串类型的slice&lt;/li&gt;
+&lt;li&gt;GetPostFormArray(key string) ([]string, bool): 同上，并返回状态&lt;/li&gt;
+&lt;li&gt;PostFormMap(key string) map[string]string: 返回指定key的map类型&lt;/li&gt;
+&lt;li&gt;GetPostFormMap(key string) (map[string]string, bool): 同上，并返回状态&lt;/li&gt;
+&lt;li&gt;FormFile(name string) (*multipart.FileHeader, error): 返回指定key的第一个文件(用作文件上传)&lt;/li&gt;
+&lt;li&gt;MultipartForm() (*multipart.Form, error): 该方法解析multipart表单，包含file文件上传&lt;/li&gt;
+&lt;li&gt;SaveUploadedFile(file *multipart.FileHeader, dst string) error: 该方法用来上传指定的文件头到目标路径(dst)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Bind家族相关方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Bind(obj interface{}) error: 自动解析&lt;code&gt;Content-Type&lt;/code&gt;并绑定到指定的binding引擎&lt;/li&gt;
+&lt;li&gt;BindJSON(obj interface{}) error: 同上，binding引擎为&lt;code&gt;binding.JSON&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;BindXML(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;BindQuery(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;BindYAML(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;BindHeader(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;BindUri(obj interface{}) error: 使用&lt;code&gt;binding.Uri&lt;/code&gt;来绑定传递的结构体指针&lt;/li&gt;
+&lt;li&gt;MustBindWith(obj interface{}, b binding.Binding) error: 使用指定的binding引擎来绑定传递的结构体指针(当有任何错误时，终止请求并返回400)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;ShouldBind家族相关方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ShouldBind(obj interface{}) error: 同上述的Bind()方法，但是该方法在json结构无效时不会返回400&lt;/li&gt;
+&lt;li&gt;ShouldBindJSON(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;ShouldBindXML(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;ShouldBindQuery(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;ShouldBindYAML(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;ShouldBindHeader(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;ShouldBindUri(obj interface{}) error:&lt;/li&gt;
+&lt;li&gt;ShouldBindWith(obj interface{}, b binding.Binding) error: 等同于MustBindWith()方法&lt;/li&gt;
+&lt;li&gt;ShouldBindBodyWith(obj interface{}, bb binding.BindingBody) (err error): 和ShouldBindWith()方法相似，但是他会存储请求体到context中，当下次调用时可以重用(因为该方法是在binding之前读取body，因此在你只使用一次时，为了更好的性能还是使用ShouldBindWith会比较好)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;HTTP响应相关的方法&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Status(code int): 设置http的响应码&lt;/li&gt;
+&lt;li&gt;Header(key, value string): 是&lt;code&gt;c.Writer.Header().Set(key, value)&lt;/code&gt;的简单实现，在响应体重写入一个header，如果value为空，则相当于调用了&lt;code&gt;c.Writer.Header().Del(key)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;GetHeader(key string) string: 返回请求体重的header&lt;/li&gt;
+&lt;li&gt;GetRawData() ([]byte, error): 返回流式数据&lt;/li&gt;
+&lt;li&gt;SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool): 该方法将设置一个Set-Cookie到ResponseWriter的头中(注意:name必须是一个合法可用的名称,无效的coookie可能会被丢弃)&lt;/li&gt;
+&lt;li&gt;Cookie(name string) (string, error): 返回名称为name的cookie&lt;/li&gt;
+&lt;li&gt;Render(code int, r render.Render): 该方法写入响应头并调用render.Render去渲染数据&lt;/li&gt;
+&lt;li&gt;HTML(code int, name string, obj interface{}): 该方法使用指定文件模板名称去渲染http模板(同时会更新状态码并设置Content-Type as &amp;ldquo;text/html&amp;rdquo;.)&lt;/li&gt;
+&lt;li&gt;IndentedJSON(code int, obj interface{}): 该方法会序列化对象obj为一个pretty JSON 数据到响应体中，同时设置Content-Type as &amp;ldquo;application/json&amp;rdquo;(pretty JSON需要消耗cpu和带宽，强烈建议生产使用&lt;code&gt;Context.JSON()&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;SecureJSON(code int, obj interface{}): 同上，会序列化成&lt;code&gt;Secure Json&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;JSONP(code int, obj interface{}):&lt;/li&gt;
+&lt;li&gt;JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&amp;ldquo;application/json&amp;rdquo;头&lt;/li&gt;
+&lt;li&gt;AsciiJSON(code int, obj interface{}):&lt;/li&gt;
+&lt;li&gt;PureJSON(code int, obj interface{}):&lt;/li&gt;
+&lt;li&gt;XML(code int, obj interface{}): 序列化成&lt;code&gt;xml&lt;/code&gt;格式,并写Content-Type:&amp;ldquo;application/xml&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;YAML(code int, obj interface{}): 序列化成&lt;code&gt;yaml&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;ProtoBuf(code int, obj interface{}): 序列化成&lt;code&gt;probuf&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;String(code int, format string, values &amp;hellip;interface{}): 将制定的string写入响应体&lt;/li&gt;
+&lt;li&gt;Redirect(code int, location string): 重定向&lt;/li&gt;
+&lt;li&gt;Data(code int, contentType string, data []byte): 写一些数据到响应体重，并更新响应码&lt;/li&gt;
+&lt;li&gt;DataFromReader(code int, contentLength int64, contentType string, reader io.Reader, extraHeaders map[string]string): 写一些制定模板的数据到响应体中，并更新状态码&lt;/li&gt;
+&lt;li&gt;File(filepath string): 以一种高效方式将制定文件写入响应体数据中&lt;/li&gt;
+&lt;li&gt;FileAttachment(filepath, filename string): 同上，但是在客户端文件会被直接下载下来&lt;/li&gt;
+&lt;li&gt;SSEvent(name string, message interface{}): 写Server-Sent Event到响应数据中&lt;/li&gt;
+&lt;li&gt;Stream(step func(w io.Writer) bool) bool: 发送一个流式的响应数据并返回状态&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;3-gin实例示例&#34;&gt;3.Gin实例示例&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;3.1返回json格式的数据&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;为了解决我们在开头提到的问题，我们将使用context引用对象的JSON家族方法来处理该需求&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 使用context来返回json格式的数据
+$ cat case2.go
+package main
+
+import (
+    &amp;quot;github.com/gin-gonic/gin&amp;quot;
+)
+
+// 我们定义一个通用的格式化的响应数据
+// 在Data字段中采用空接口类型来实际存放我们的业务数据
+type restData struct {
+    Data        interface{}   `json:&amp;quot;data&amp;quot;`
+    Message     string        `json:&amp;quot;message&amp;quot;`
+    Status      bool          `json:&amp;quot;status&amp;quot;`
+}
+
+func main() {
+    // mock一个http响应数据
+    restdata := &amp;amp;restData{&amp;quot;Hello,BGBiao&amp;quot;,&amp;quot;&amp;quot;,true}
+    restdata1 := &amp;amp;restData{map[string]string{&amp;quot;name&amp;quot;:&amp;quot;BGBiao&amp;quot;,&amp;quot;website&amp;quot;:&amp;quot;https://bgbiao.top&amp;quot;},&amp;quot;&amp;quot;,true}
+
+    // 使用Gin框架启动一个http接口服务
+    ginObj := gin.Default()
+    ginObj.GET(&amp;quot;/api/test&amp;quot;,func(c *gin.Context){
+       // 我们的handlerFunc中入参是一个Context结构的引用对象c
+       // 因此我们可以使用Context中的JSON方法来返回一个json结构的数据
+       // 可用的方法有如下几种，我们可以根据实际需求进行选择
+       /*
+          IndentedJSON(code int, obj interface{}): 带缩进的json(消耗cpu和mem)
+          SecureJSON(code int, obj interface{}): 安全化json
+          JSONP(code int, obj interface{})
+          JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&amp;quot;application/json&amp;quot;头
+       */
+       c.JSON(200,restdata)
+    })
+    ginObj.GET(&amp;quot;/api/test1&amp;quot;,func(c *gin.Context){
+        c.IndentedJSON(200,restdata1)
+    })
+
+    ginObj.Run(&amp;quot;localhost:8080&amp;quot;)
+}
+
+
+# 实例运行(这里成功将我们写的两个api接口进行对外暴露)
+$ go run case2.go
+....
+....
+[GIN-debug] GET    /api/test                 --&amp;gt; main.main.func1 (3 handlers)
+[GIN-debug] GET    /api/test1                --&amp;gt; main.main.func2 (3 handlers)
+
+# 接口测试访问
+$ curl localhost:8080/api/test
+{&amp;quot;data&amp;quot;:&amp;quot;Hello,BGBiao&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;status&amp;quot;:true}
+$ curl localhost:8080/api/test1
+{
+    &amp;quot;data&amp;quot;: {
+        &amp;quot;name&amp;quot;: &amp;quot;BGBiao&amp;quot;,
+        &amp;quot;website&amp;quot;: &amp;quot;https://bgbiao.top&amp;quot;
+    },
+    &amp;quot;message&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;status&amp;quot;: true
+}% 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然上面我们仅以JSON格式来示例，类似的方式我们可以使用&lt;code&gt;XML&lt;/code&gt;,&lt;code&gt;YAML&lt;/code&gt;,&lt;code&gt;ProtoBuf&lt;/code&gt;等方法来输出指定格式化后的数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.2其他常用的基本方法&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;在其他基本方法中我们仍然使用上述示例代码中的主逻辑，主要用来测试基本的方法.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 我们在/api/test这个路由中增加如下两行代码
+// 设置响应体中的自定义header(通常我们可以通过自定义头来实现一个内部标识)
+c.Header(&amp;quot;Api-Author&amp;quot;,&amp;quot;BGBiao&amp;quot;)
+// GetHeader方法用来获取指定的请求头，比如我们经常会使用请求中的token来进行接口的认证和鉴权
+// 这里由于我们使用的restdata的指针，通过GetHeader方法获取到token赋值给Message
+// ClientIP()方法用于获取客户端的ip地址
+restdata.Message = fmt.Sprintf(&amp;quot;token:%s 当前有效，客户端ip:%s&amp;quot;,c.GetHeader(&amp;quot;token&amp;quot;),c.ClientIP())
+
+# 访问接口示例(我们可以看到在响应体中多了一个我们自定义的Api-Author头，并且我们将请求头token的值)
+$ curl -H &#39;token:xxxxxxxx&#39; localhost:8080/api/test -i
+HTTP/1.1 200 OK
+Api-Author: BGBiao
+Content-Type: application/json; charset=utf-8
+Date: Sun, 12 Jan 2020 14:41:01 GMT
+Content-Length: 66
+
+{&amp;quot;data&amp;quot;:&amp;quot;Hello,BGBiao&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;token:xxxxxxxx 当前有效，客户端ip:127.0.0.1&amp;quot;,&amp;quot;status&amp;quot;:true}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;3.3用户数据输入&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;当然到这里后，你可能还会有新的疑问，就是通常情况下，我们开发后端接口会提供一些具体的参数，通过一些具体数据提交来实现具体的业务逻辑处理，这些参数通常会分为如下三类:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用HTTP GET方法获取到的url中的一些查询参数来执行更具体的业务逻辑(比如我们查询数据的指定条数之类的)&lt;/li&gt;
+&lt;li&gt;使用HTTP POST GET等其他方式以form表单方式提交的数据来验证和处理用户数据&lt;/li&gt;
+&lt;li&gt;在URL中获取一些可变参数(比如通常我们的url会定义为&amp;rdquo;/api/uid/:id&amp;rdquo;来表示用户id相关的接口，这个时候通常需要获取到url中的id字段)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上的基本需求，几乎都可以在Context结构体的&lt;code&gt;输入数据&lt;/code&gt;中找到响应的方法.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# 接下来，我们依然在上述的代码中进行修改，增加如下路由
+$ cat case2.go
+....
+....
+    // 比如我们该接口时用来获取全部数据，但是我们希望在url中增加参数来限制数据条数
+    datas := []string{&amp;quot;Golang&amp;quot;,&amp;quot;Python&amp;quot;,&amp;quot;Docker&amp;quot;,&amp;quot;Kubernetes&amp;quot;,&amp;quot;CloudNative&amp;quot;,&amp;quot;DevOps&amp;quot;}
+    ginObj.GET(&amp;quot;/api/testdata&amp;quot;,func(c *gin.Context){
+        limit := c.Query(&amp;quot;limit&amp;quot;)
+        // 其实既然这里我们已经确定需求了，当用户没有输入limit参数时我们就可以设置默认值
+        // DefaultQuery(&amp;quot;limit&amp;quot;,&amp;quot;1&amp;quot;)
+        // 同时我们其实也可以使用GetQuery方法来获取参数解析状态，即是否有对应的参数
+        // 还有QueryArray和GetQueryArray类似的方法
+        if limit != &amp;quot;&amp;quot; {
+            num,_ := strconv.Atoi(limit)
+            restdata1.Data = datas[:num]
+        }else {
+            restdata1.Data = datas
+        }
+        c.IndentedJSON(200,restdata1)
+
+    })
+
+    // 使用form表单方式提交数据
+    ginObj.POST(&amp;quot;/api/testdata&amp;quot;,func(c *gin.Context){
+        // 使用c.PostForm方法来提交一个data数据
+        // 同时我们可以使用DefaultPostForm方法来给提交数据一个默认值，比如我们有些参数是希望有默认值的
+        // 当然也可以使用GetPostForm，PostFormArray，PostFormArray方法来获取多个数据和状态
+        // data := c.PostForm(&amp;quot;data&amp;quot;)
+        // datas = append(datas,data)
+        /* 这里可能会有个问题就是同时提交多个数据时，使用PostForm方法就会不那么好使了
+        通常情况下回使用PostFormArray方法
+        */
+        data := c.PostFormArray(&amp;quot;data&amp;quot;)
+        datas = append(datas,data...)
+        restdata1.Data = datas
+        c.IndentedJSON(200,restdata1)
+    })
+
+    // 获取url中的路径参数
+    ginObj.GET(&amp;quot;/api/testdata/:data&amp;quot;,func(c *gin.Context){
+        data := c.Param(&amp;quot;data&amp;quot;)
+        for _,rawData := range datas {
+            if data == rawData {
+                restdata1.Data = data
+                break
+            }
+        }
+        if restdata1.Data != data {
+            restdata1.Data = &amp;quot;&amp;quot;
+            restdata1.Message = fmt.Sprintf(&amp;quot;%v 不存在&amp;quot;,data)
+            restdata1.Status = false
+        }
+        c.IndentedJSON(200,restdata1)
+    })
+....
+....
+
+
+
+# 请求示例接口
+# 我们可以看到使用GET方法默认会获取到全部数据，但是如果有了limit参数后，我们就可以限制数据的条数
+$ curl -H &#39;token:xxxxxxxx&#39; localhost:8080/api/testdata
+{
+    &amp;quot;data&amp;quot;: [
+        &amp;quot;Golang&amp;quot;,
+        &amp;quot;Python&amp;quot;,
+        &amp;quot;Docker&amp;quot;,
+        &amp;quot;Kubernetes&amp;quot;,
+        &amp;quot;CloudNative&amp;quot;,
+        &amp;quot;DevOps&amp;quot;
+    ],
+    &amp;quot;message&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;status&amp;quot;: true
+}%
+$ curl -H &#39;token:xxxxxxxx&#39; &amp;quot;localhost:8080/api/testdata?limit=2&amp;quot;
+{
+    &amp;quot;data&amp;quot;: [
+        &amp;quot;Golang&amp;quot;,
+        &amp;quot;Python&amp;quot;
+    ],
+    &amp;quot;message&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;status&amp;quot;: true
+}%
+
+# 当我们使用post接口往服务提交数据时，就可以让服务端按照需求进行数据处理
+curl -X POST  -d data=&amp;quot;vue&amp;quot; &amp;quot;localhost:8080/api/testdata&amp;quot;
+{
+    &amp;quot;data&amp;quot;: [
+        &amp;quot;Golang&amp;quot;,
+        &amp;quot;Python&amp;quot;,
+        &amp;quot;Docker&amp;quot;,
+        &amp;quot;Kubernetes&amp;quot;,
+        &amp;quot;CloudNative&amp;quot;,
+        &amp;quot;DevOps&amp;quot;,
+        &amp;quot;vue&amp;quot;
+    ],
+    &amp;quot;message&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;status&amp;quot;: true
+}%
+
+# 当我们同时需要提交多份数据时，可以使用PostFormArray方法，同时提交多份数据(可以理解为批量提交)
+$ curl -X POST -d data=&amp;quot;vue&amp;quot; -d data=&amp;quot;Rust&amp;quot; &amp;quot;localhost:8080/api/testdata&amp;quot;
+
+# 获取URL中的参数值
+$ curl &amp;quot;localhost:8080/api/testdata/Golang&amp;quot;
+{
+    &amp;quot;data&amp;quot;: &amp;quot;Golang&amp;quot;,
+    &amp;quot;message&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;status&amp;quot;: true
+}%
+
+$ curl &amp;quot;localhost:8080/api/testdata/Java&amp;quot;
+{
+    &amp;quot;data&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;message&amp;quot;: &amp;quot;Java 不存在&amp;quot;,
+    &amp;quot;status&amp;quot;: false
+}%
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>深入Gin框架内幕1</title>
+      <link>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/</link>
       <pubDate>Sat, 11 Jan 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/</guid>
+      <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/</guid>
       
         <description>&lt;h3 id=&#34;gin框架介绍&#34;&gt;Gin框架介绍&lt;/h3&gt;
 
@@ -4626,98 +5071,6 @@ func main() {
 GBK �� UTF-8 ����ת������
 GBK 与 UTF-8 编码转换测试
 &lt;/code&gt;&lt;/pre&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>Golang正则模块使用</title>
-      <link>https://bgbiao.top/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Sun, 24 Dec 2017 16:39:14 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/</guid>
-      
-        <description>&lt;p&gt;最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的&lt;code&gt;regexp&lt;/code&gt;模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为&lt;code&gt;string&lt;/code&gt;类型的方法。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;regexp&lt;/code&gt;模块的结构体和方法定义&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;//正则结构体
-type Regexp struct {
-        // contains filtered or unexported fields
-}
-
-//初始化结构体对象的方法
-func Compile(expr string) (*Regexp, error)
-func CompilePOSIX(expr string) (*Regexp, error)
-func MustCompile(str string) *Regexp
-func MustCompilePOSIX(str string) *Regexp
-
-
-//结构体方法.常用的几个
-//在字符串s中查找完全匹配正则表达式re的字符串.如果匹配到就停止不进行全部匹配，如果匹配不到就输出空字符串
-func (re *Regexp) FindString(s string) string
-
-//在字符串s中匹配re表达式，n表示匹配的次数，-1表示匹配整个字符串。返回字符串切片
-func (re *Regexp) FindAllString(s string, n int) []string
-
-//在src中匹配re，并替换为repl，该种方式中repl中的$符号会展开实际的变量，通常用在回溯查找中
-func (re *Regexp) ReplaceAllString(src, repl string) string
-
-//在src中匹配re，并替换为repl,该方法会按照repl中的字面意思进行替换，不支持高级变量匹配，比如回溯等等
-func (re *Regexp) ReplaceAllLiteralString(src, repl string) string
- 
- 
-//在字符串中是否匹配到re定义的字符串，匹配返回true
-func (re *Regexp) MatchString(s string) bool
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;简单示例&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cat regexp-test.go
-/**
- * @File Name: test.go
- * @Author:
- * @Email:
- * @Create Date: 2017-12-24 15:12:31
- * @Last Modified: 2017-12-24 16:12:12
- * @Description:
- */
-package main
-
-import (
-	&amp;quot;fmt&amp;quot;
-	&amp;quot;regexp&amp;quot;
-)
-
-func main() {
-  testString := &amp;quot;k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io&amp;quot;
-	re := regexp.MustCompile(&amp;quot;k8s?&amp;quot;)
-  fmt.Println(&amp;quot;src string:&amp;quot;,testString)
-  fmt.Println(&amp;quot;regular expression:&amp;quot;,re)
-
-  fmt.Println(&amp;quot;FindAllString matching all:&amp;quot;,re.FindAllString(testString,-1))
-  fmt.Println(&amp;quot;FindAllString matching twice:&amp;quot;,re.FindAllString(testString,2))
-  fmt.Println(&amp;quot;FindString:&amp;quot;,re.FindString(testString))
-  fmt.Println(&amp;quot;ReplaceAllString:&amp;quot;,re.ReplaceAllString(testString,&amp;quot;biaoge&amp;quot;))
-  fmt.Println(&amp;quot;ReplaceAllLiteralString:&amp;quot;,re.ReplaceAllLiteralString(testString,&amp;quot;BIAOGE&amp;quot;))
-  fmt.Println(&amp;quot;Match String:&amp;quot;,re.MatchString(testString))
-}
-
-$ go run regexp-test.go
-src string: k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io
-regular expression: k8s?
-FindAllString matching all: [k8s k8 k8s k8s]
-FindAllString matching twice: [k8s k8]
-FindString: k8s
-ReplaceAllString: biaoge-test-pod-12343biaoge11sadsxsakxz-test-biaoge-container.biaoge-@xxbandy.github.io
-ReplaceAllLiteralString: BIAOGE-test-pod-12343BIAOGE11sadsxsakxz-test-BIAOGE-container.BIAOGE-@xxbandy.github.io
-Match String: true
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;不论是哪种语言的正则模块，个人认为语法都不是最重要的，最重要我认为还是正则表达式本身，如果对正则表达式本身认识比较深的话，不论用哪种语言工具都可以很灵活的处理各种业务场景。这里附上一篇当年写的正则表达式相关的&lt;a href=&#34;https://my.oschina.net/xxbAndy/blog/370806&#34;&gt;文章&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;看到另外一篇文章的正则总结的挺好，分享下来.
-&lt;a href=&#34;http://blog.csdn.net/zfy1355/article/details/52959803&#34;&gt;http://blog.csdn.net/zfy1355/article/details/52959803&lt;/a&gt;&lt;/p&gt;</description>
       
     </item>
     
