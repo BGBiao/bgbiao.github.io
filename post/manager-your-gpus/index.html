@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>如何优雅的管理你的GPU - BGBiao的Ops人生</title>
+  <title>如何优雅的管理你的GPU - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="使用nvidia-smi管理你的GPU卡 nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实际上底层也是调用的该接口。该接口可以查看到当前主机上的相关GPU设备，任务以及当前状态等信息，熟练使用该接口能够更好的管理好GPU系统资源。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="如何优雅的管理你的GPU" />
 <meta property="og:description" content="使用nvidia-smi管理你的GPU卡
@@ -67,7 +69,7 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/manager-your-gpus/" />
 <meta property="article:published_time" content="2017-10-30T22:03:27+00:00" />
-<meta property="article:modified_time" content="2017-10-30T22:03:27+00:00" />
+<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
 <meta itemprop="name" content="如何优雅的管理你的GPU">
 <meta itemprop="description" content="使用nvidia-smi管理你的GPU卡
 
@@ -75,8 +77,8 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
 
 
 <meta itemprop="datePublished" content="2017-10-30T22:03:27&#43;00:00" />
-<meta itemprop="dateModified" content="2017-10-30T22:03:27&#43;00:00" />
-<meta itemprop="wordCount" content="3258">
+<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
+<meta itemprop="wordCount" content="3593">
 
 
 
@@ -97,13 +99,24 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -148,9 +161,52 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -217,6 +273,34 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -224,7 +308,7 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -288,10 +372,52 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -315,7 +441,8 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 3593 words </span>
+          <span class="more-meta"> 8 min read </span>
 
         
         
@@ -356,18 +483,56 @@ nvidia-smi命令是NVIDIA系统管理接口，之前提到使用nvidia-docker实
 <h3 id="开启持久模式">开启持久模式</h3>
 
 <p>在Linux上，你需要将GPUs设置为持久模式<code>persistence mode</code>来保证你的<code>NVIDIA</code>驱动即使没有应用正在运行也是出于加载状态的。这个在你有一些短生命周期的job类型应用运行时是非常有用的。持久模式比较耗电，但是它会防止每次启动GPU应用程序时发生的相当长的延迟。当然如果你使用设定了时钟频率或功率限制的GPUs的话(当驱动不加载的话，这些设置会丢失)，持久模式将是非常有必要的。通过如下命令设置持久模式：</p>
-
-<pre><code>nvidia-smi -pm 1
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">nvidia-smi -pm 1</pre></td></tr></table>
+</div>
+</div>
 <p>在Windows上，改接口不支持设置持久模式，但是可以设置为<code>TCC</code>模式。</p>
 
 <h3 id="查看gpu状态">查看GPU状态</h3>
 
 <p>1.GPU设备概要信息
 由以下输出可以看到驱动版本为：<code>375.39</code>,以及GPU基本信息</p>
-
-<pre><code>sh-4.2# nvidia-smi
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# nvidia-smi
 Wed Oct 18 11:58:03 2017
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
@@ -397,44 +562,235 @@ Wed Oct 18 11:58:03 2017
 
 # Temp 标识GPU设备的温度
 # Memory-Usage 表示内存使用率
-# GPU-Util 表示GPU使用率
-
-</code></pre>
-
+# GPU-Util 表示GPU使用率</pre></td></tr></table>
+</div>
+</div>
 <p>2.查看当前系统可用的GPU设备列表</p>
-
-<pre><code>$ nvidia-smi -L
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -L
 GPU 0: Tesla M40 24GB (UUID: GPU-eb4e4871-504d-feb7-ba59-xxxxxxxxxx)
 GPU 1: Tesla M40 (UUID: GPU-6c2cb0c9-acba-1dab-6525-xxxxxxxxxx)
 GPU 2: Tesla M40 24GB (UUID: GPU-85551fe5-68ea-15b3-76c1-6fe1sas2w    1)
-GPU 3: Tesla M40 (UUID: GPU-8fe0a30b-7faa-0537-e3a5-53ba5c8a61wesd)
-</code></pre>
-
+GPU 3: Tesla M40 (UUID: GPU-8fe0a30b-7faa-0537-e3a5-53ba5c8a61wesd)</pre></td></tr></table>
+</div>
+</div>
 <p>3.查看GPU以及单元信息</p>
-
-<pre><code>$ nvidia-smi -q
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -q</pre></td></tr></table>
+</div>
+</div>
 <p>4.查看每一个GPU指定详细信息</p>
-
-<pre><code># nvidia-smi --query-gpu=index,name,uuid,serial --format=csv
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># nvidia-smi --query-gpu=index,name,uuid,serial --format=csv
 index, name, uuid, serial
 0, Tesla M40 24GB, GPU-eb4e4871-504d-feb7-ba59-xxxxxxxx, xxxxxxxxxx
 1, Tesla M40, GPU-6c2cb0c9-acba-1dab-6525-xxxxxxxx, xxxxxxxxxx
 2, Tesla M40 24GB, GPU-85551fe5-68ea-15b3-76c1-xxxxxxxx, xxxxxxxxxx
-3, Tesla M40, GPU-8fe0a30b-7faa-0537-e3a5-xxxxxxxx, xxxxxxxxxx
-</code></pre>
-
+3, Tesla M40, GPU-8fe0a30b-7faa-0537-e3a5-xxxxxxxx, xxxxxxxxxx</pre></td></tr></table>
+</div>
+</div>
 <p>5.指定GPU查看相关信息</p>
-
-<pre><code># nvidia-smi --query-gpu=index,name,uuid,serial --format=csv --id=0
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># nvidia-smi --query-gpu=index,name,uuid,serial --format=csv --id=0
 index, name, uuid, serial
-0, Tesla M40 24GB, GPU-eb4e4871-504d-feb7-ba59-d15a66d6faa7, 0322816142509
-</code></pre>
-
+0, Tesla M40 24GB, GPU-eb4e4871-504d-feb7-ba59-d15a66d6faa7, 0322816142509</pre></td></tr></table>
+</div>
+</div>
 <p>6.查看GPU全部信息</p>
-
-<pre><code># nvidia-smi -a -i 3 
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># nvidia-smi -a -i 3 
 ==============NVSMI LOG==============
 
 Attached GPUs                       : 8
@@ -595,16 +951,49 @@ GPU 00000000:11:00.0
     Clock Policy
         Auto Boost                  : N/A
         Auto Boost Default          : N/A
-    Processes                       : None
-
-</code></pre>
-
+    Processes                       : None</pre></td></tr></table>
+</div>
+</div>
 <h3 id="监控和管理gpu-boost">监控和管理GPU Boost</h3>
 
 <p>管理员和用户可以使用这种方式来观察GPUs的状态。
 以下显示了每个GPU的可用时钟频率(Tesla M40)。</p>
-
-<pre><code>$ nvidia-smi -q -d SUPPORTED_CLOCKS
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -q -d SUPPORTED_CLOCKS
 GPU 0000:07:00.0
     Supported Clocks
         Memory                      : 3004 MHz
@@ -634,15 +1023,51 @@ GPU 0000:07:00.0
             Graphics                : 532 MHz
         Memory                      : 405 MHz
             Graphics                : 324 MHz
-            
-
-</code></pre>
-
+            </pre></td></tr></table>
+</div>
+</div>
 <p>以上显示中只有两个内存时钟(memory clock)被支持：3004 MHz和405 MHz.运行在前者的内存，有24个支持GPU时钟频率。后者只有一个GPU频率，且是空闲状态的。在Tesla K80上，GPU Boost会自动管理这些频率，来让他们运行的尽可能快。而在其他一些模块中，比如Tesla K40，必须由管理员来指定GPU时钟频率。</p>
 
 <p>查看当前GPU的时钟频率，默认的时钟加速和最小的时钟频率</p>
-
-<pre><code>$ nvidia-smi -q -d CLOCK
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -q -d CLOCK
 
 GPU 0000:07:00.0
     Clocks
@@ -675,14 +1100,25 @@ GPU 0000:07:00.0
         Avg                         : 3003 MHz
     Clock Policy
         Auto Boost                  : On
-        Auto Boost Default          : On
-
-
-</code></pre>
-
+        Auto Boost Default          : On</pre></td></tr></table>
+</div>
+</div>
 <p>理想状态中，你想让所有的时钟都一直运行在比较高的速度，但是对于所有的应用来说是不可能的。可以使用PERFORMANCE参数来查看每个GPU卡当前的状态以及时钟慢下来的原因。</p>
-
-<pre><code>$ nvidia-smi -q -d PERFORMANCE/performance
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -q -d PERFORMANCE/performance
 GPU 0000:07:00.0
     Performance State               : P0
     Clocks Throttle Reasons
@@ -691,16 +1127,40 @@ GPU 0000:07:00.0
         SW Power Cap                : Not Active
         HW Slowdown                 : Not Active
         Sync Boost                  : Not Active
-        Unknown                     : Not Active
-</code></pre>
-
+        Unknown                     : Not Active</pre></td></tr></table>
+</div>
+</div>
 <p>如果任何一个GPU时钟都以比较慢速度运行的话，那么上面的<code>Clocks Throttle Reasons</code>中的一个或多个将会被标记为active状态。最需要关注的是<code>HW Slowdown</code>和<code>Unknown</code>是否是active状态，如果那样的话很可能是电源或者冷却系统的问题。其余的需要关注设备卡是否是空闲的或者是由管理员手动设置为<code>slower</code>模式。</p>
 
 <p>使用<code>nvidia-smi</code>还可以去监控其他相关指标，-d参数支持<code>MEMORY UTILIZATION ECC TEMPERATURE POWER CLOCK COMPUTE PIDS PERFORMANCE SUPPORTED_CLOCKS PAGE_RETIREMENT ACCOUNTING</code></p>
 
 <p>查看每块GPU卡的内存使用：</p>
-
-<pre><code>$ nvidia-smi -q -d memory
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -q -d memory
 
 GPU 0000:06:00.0
     FB Memory Usage
@@ -720,19 +1180,42 @@ GPU 0000:07:00.0
     BAR1 Memory Usage
         Total                       : 16384 MiB
         Used                        : 2 MiB
-        Free                        : 16382 MiB
-</code></pre>
-
+        Free                        : 16382 MiB</pre></td></tr></table>
+</div>
+</div>
 <p>指定GPU卡查看相关指标：</p>
-
-<pre><code>$ nvidia-smi -i 0 -q -d MEMORY,UTILIZATION,POWER,CLOCK,COMPUTE
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi -i 0 -q -d MEMORY,UTILIZATION,POWER,CLOCK,COMPUTE</pre></td></tr></table>
+</div>
+</div>
 <h3 id="查看系统的拓扑结构">查看系统的拓扑结构</h3>
 
 <p>要适当的利用更先进的NVIDIA GPU优势(例如GPU Direct)，因此系统的拓扑结构的正确配置是非常重要的。拓扑结构涉及到<code>PCI-Express</code>(GPUs, InfiniBand HCAs, storage controllers, etc)设备如何连接到其他设备，以及如何连接到系统CPU的。如果配置不正确，可能某些特定的功能性能会比较低甚至不能正常工作。为了解决如上问题，<code>nvidia-smi</code>最近的版本包含了一个可用查看系统拓扑的命令。</p>
-
-<pre><code># 显示GPU拓扑(-m参数可以看到GPU交流矩阵以及CPU亲和性绑定)
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 显示GPU拓扑(-m参数可以看到GPU交流矩阵以及CPU亲和性绑定)
 $  nvidia-smi topo -m
 	GPU0	GPU1	GPU2	GPU3	CPU Affinity
 GPU0	 X 	PIX	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
@@ -747,12 +1230,9 @@ Legend:
   PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
   PXB  = Connection traversing multiple PCIe switches (without traversing the PCIe Host Bridge)
   PIX  = Connection traversing a single PCIe switch
-  NV#  = Connection traversing a bonded set of # NVLinks
-
-
-
-</code></pre>
-
+  NV#  = Connection traversing a bonded set of # NVLinks</pre></td></tr></table>
+</div>
+</div>
 <p>以上配置显示我们有四块GOU卡，并且都链接在服务器的第一颗CPU上(物理机2颗6核cpu并开启超线程)。该工具建议推荐我们将job运行在偶数标记的cpu上。并且以上四块GPU卡都是互相通过PCIe switch直连的。</p>
 
 <p>一个可用的GPU矩阵表示如下：
@@ -767,8 +1247,24 @@ Legend:
 <img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-topo.png" alt="" /></p>
 
 <p><strong><code>补充：查看GPU卡之间的邻居和链接关系</code></strong></p>
-
-<pre><code># nvidia-smi topo 命令有个参数-n可以用来指定gpu卡以及互联结构来查看和它互联结构
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># nvidia-smi topo 命令有个参数-n可以用来指定gpu卡以及互联结构来查看和它互联结构
 #                   0 = a single PCIe switch on a dual GPU board
 #                   1 = a single PCIe switch
 #                   2 = multiple PCIe switches
@@ -780,9 +1276,9 @@ for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nv
 # 查看每个GPU卡所在的PCIe host bridge 上链接的其他GPU卡设备
 for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nvidia-smi topo -i $uuid -n 3;done
 # 查看每个GPU卡所在的PCIe switch 上链接的其他GPU卡设备
-for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nvidia-smi topo -i $uuid -n 1;done
-</code></pre>
-
+for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nvidia-smi topo -i $uuid -n 1;done</pre></td></tr></table>
+</div>
+</div>
 <p><a href="https://www.microway.com/hpc-tech-tips/nvidia-smi_control-your-gpus/">nvidia-smi命令使用帮助</a></p>
 
 <p><a href="https://www.logitblog.com/how-to-capture-nvidia-grid-and-tesla-performance-data/">nvidia-smi输出详细参数</a></p>
@@ -798,14 +1294,17 @@ for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nv
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2017-10-30
+      2019-12-03
+      
+        
+        
       
     </span>
   </p>
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -818,7 +1317,15 @@ for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nv
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -872,6 +1379,16 @@ for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nv
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -1011,6 +1528,23 @@ for uuid in `nvidia-smi --query-gpu=uuid --format=csv | grep GPU  | xargs`;do nv
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

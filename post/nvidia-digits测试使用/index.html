@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>NVIDIA-DIGITS测试使用 - BGBiao的Ops人生</title>
+  <title>NVIDIA-DIGITS测试使用 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="DIGITS简介 DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司开发的第一个交互式深度学习GPU训练系统。目的在于整合现有的Deep Learning开发工具，实现深度神经网络（Deep Neural Network，DNN）设计、训练和可视化等任务变得简单化。DIGITS是基于浏览器的接口，因而通过实时的网络行为的可视化，可以快速设计最优的DNN。DIGITS是开源软件，可在GitHub上找到，因而开发人员可以扩展和自定义DIGITS。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="NVIDIA-DIGITS测试使用" />
 <meta property="og:description" content="DIGITS简介
@@ -76,7 +78,7 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
 
 <meta itemprop="datePublished" content="2018-01-02T10:14:32&#43;00:00" />
 <meta itemprop="dateModified" content="2018-01-02T10:14:32&#43;00:00" />
-<meta itemprop="wordCount" content="1687">
+<meta itemprop="wordCount" content="1741">
 
 
 
@@ -97,13 +99,24 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -148,9 +161,52 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -217,6 +273,34 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -224,7 +308,7 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -288,10 +372,52 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -315,7 +441,8 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 1741 words </span>
+          <span class="more-meta"> 4 min read </span>
 
         
         
@@ -376,8 +503,22 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
 <p>官方给了基于<code>Ubuntu</code>发行版的部署指南(估计是因为ubuntu上比较好处理python的各种依赖吧)，不过官方也构建的相关的Docker image来帮助用户进行部署。用户可以<code>docker pull nvidia/digits</code>直接下载最新版本。</p>
 
 <p>容器镜像中使用5000端口来暴露web服务，因此需要将5000端口映射出来。</p>
-
-<pre><code># docker run -itd --name digits -p 5000:5000 nvidia/digits:6.0
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># docker run -itd --name digits -p 5000:5000 nvidia/digits:6.0
 # docker logs digits 
   ___ ___ ___ ___ _____ ___
  |   \_ _/ __|_ _|_   _/ __|
@@ -386,10 +527,10 @@ DIGITS: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司�
 
 libdc1394 error: Failed to initialize libdc1394
 /usr/local/lib/python2.7/dist-packages/matplotlib/font_manager.py:273: UserWarning: Matplotlib is building the font cache using fc-list. This may take a moment.
-  warnings.warn('Matplotlib is building the font cache using fc-list. This may take a moment.')
-2017-12-27 13:24:54 [INFO ] Loaded 0 jobs.
-</code></pre>
-
+  warnings.warn(&#39;Matplotlib is building the font cache using fc-list. This may take a moment.&#39;)
+2017-12-27 13:24:54 [INFO ] Loaded 0 jobs.</pre></td></tr></table>
+</div>
+</div>
 <p>查看日志如上环境即部署成功。</p>
 
 <h3 id="环境测试">环境测试</h3>
@@ -400,8 +541,26 @@ libdc1394 error: Failed to initialize libdc1394
 <h4 id="下载模型数据">下载模型数据</h4>
 
 <p>可以登录到<code>digits</code>容器内部执行以下命令进行模型数据初始化。</p>
-
-<pre><code>$ python -m digits.download_data mnist ~/mnist
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ python -m digits.download_data mnist ~/mnist
 Downloading url=http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz ...
 Downloading url=http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz ...
 Downloading url=http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz ...
@@ -414,21 +573,45 @@ Reading labels from /home/username/mnist/train-labels.bin ...
 Reading images from /home/username/mnist/train-images.bin ...
 Reading labels from /home/username/mnist/test-labels.bin ...
 Reading images from /home/username/mnist/test-images.bin ...
-Dataset directory is created successfully at '/home/username/mnist'
-Done after 16.722807169 seconds.
-</code></pre>
-
+Dataset directory is created successfully at &#39;/home/username/mnist&#39;
+Done after 16.722807169 seconds.</pre></td></tr></table>
+</div>
+</div>
 <p>当然如果容器内部无法访问外网，也可以将相关模型数据下载后进行解压。</p>
-
-<pre><code>
-# ls dataset/
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># ls dataset/
   t10k-images-idx3-ubyte.gz  t10k-labels-idx1-ubyte.gz  train-images-idx3-ubyte.gz  train-labels-idx1-ubyte.gz 
-# docker cp dataset digits:/
-</code></pre>
-
+# docker cp dataset digits:/</pre></td></tr></table>
+</div>
+</div>
 <p>需要注意的是，该模型文件好像不能直接解压。</p>
-
-<pre><code># docker exec -it digits bash
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># docker exec -it digits bash
 root@aa3e7a2437af:/# cd dataset/
 root@aa3e7a2437af:/dataset# ls
 t10k-images-idx3-ubyte.gz  t10k-labels-idx1-ubyte.gz  train-images-idx3-ubyte.gz  train-labels-idx1-ubyte.gz
@@ -441,11 +624,11 @@ Reading labels from ./train-labels.bin ...
 Reading images from ./train-images.bin ...
 Reading labels from ./test-labels.bin ...
 Reading images from ./test-images.bin ...
-Dataset directory is created successfully at '.'
+Dataset directory is created successfully at &#39;.&#39;
 Done after 18.2706720829 seconds.
-root@aa3e7a2437af:/dataset#
-</code></pre>
-
+root@aa3e7a2437af:/dataset#</pre></td></tr></table>
+</div>
+</div>
 <h4 id="使用webapp">使用WebApp</h4>
 
 <p>使用浏览器访问容器宿主机的5000端口，即可看到首页数据</p>
@@ -514,18 +697,30 @@ root@aa3e7a2437af:/dataset#
 <p><img src="http://oyep1jupk.bkt.clouddn.com/test-model.png" alt="test-model2" /></p>
 
 <p>查看最终任务运行的过程信息：</p>
-
-<pre><code>2017-12-29 06:50:54 [20171229-065052-5cc9] [INFO ] Infer Model task started.
-2017-12-29 06:50:54 [20171229-065052-5cc9] [INFO ] Task subprocess args: &quot;/usr/bin/python /usr/local/lib/python2.7/dist-packages/digits/tools/inference.py /jobs/20171229-065052-5cc9/tmpctzfnI.txt /jobs/20171229-065052-5cc9 20171229-064432-4c8a --jobs_dir=/jobs --epoch=30.0 --layers=all --gpu=0&quot;
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">2017-12-29 06:50:54 [20171229-065052-5cc9] [INFO ] Infer Model task started.
+2017-12-29 06:50:54 [20171229-065052-5cc9] [INFO ] Task subprocess args: &#34;/usr/bin/python /usr/local/lib/python2.7/dist-packages/digits/tools/inference.py /jobs/20171229-065052-5cc9/tmpctzfnI.txt /jobs/20171229-065052-5cc9 20171229-064432-4c8a --jobs_dir=/jobs --epoch=30.0 --layers=all --gpu=0&#34;
 2017-12-29 06:50:54 [20171229-065052-5cc9] [WARNING] Infer Model unrecognized output: libdc1394 error: Failed to initialize libdc1394
 
 
 
 2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Infer Model task completed.
 2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Job complete.
-2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Job deleted.
-</code></pre>
-
+2017-12-29 06:52:43 [20171229-065052-5cc9] [INFO ] Job deleted.</pre></td></tr></table>
+</div>
+</div>
 <p>至此，使用NVIDIA-DIGITS已经完成了一个模型训练。</p>
     </div>
 
@@ -546,7 +741,7 @@ root@aa3e7a2437af:/dataset#
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -559,7 +754,15 @@ root@aa3e7a2437af:/dataset#
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -615,6 +818,16 @@ root@aa3e7a2437af:/dataset#
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -754,6 +967,23 @@ root@aa3e7a2437af:/dataset#
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

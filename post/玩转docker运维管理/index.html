@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>玩转Docker运维管理 - BGBiao的Ops人生</title>
+  <title>玩转Docker运维管理 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content=" 在使用docker过程中，我们经常发现管理维护是一个很复杂过程，因为我们在使用docker commands的过程中，我们只会去使用我们认为简单并且熟悉的命令，然而docker本身其实是提供给我们很多便捷且人性化的工具的，如果掌握这些使用技巧，也许你的维护管理工作将会事半功倍，并且给人看起来会很牛逼的样子。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="玩转Docker运维管理" />
 <meta property="og:description" content="
@@ -76,7 +78,7 @@
 
 <meta itemprop="datePublished" content="2017-10-30T22:41:34&#43;00:00" />
 <meta itemprop="dateModified" content="2017-10-30T22:41:34&#43;00:00" />
-<meta itemprop="wordCount" content="4025">
+<meta itemprop="wordCount" content="4186">
 
 
 
@@ -97,13 +99,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -148,9 +161,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -217,6 +273,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -224,7 +308,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -288,10 +372,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -315,7 +441,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 4186 words </span>
+          <span class="more-meta"> 9 min read </span>
 
         
         
@@ -370,8 +497,24 @@
 <h4 id="创建容器时传入环境变量">创建容器时传入环境变量</h4>
 
 <p>在实际应用场景中，不论是从安全还是可配置方面去考虑，很多参数是比较适合用环境变量加载进去的，比如数据库的连接信息，时区，还有字体支持等等，在创建容器的时候其实都可以使用-e 指定key/value进行传递环境变量进去。</p>
-
-<pre><code>sh-4.2# docker run -itd --name test-env -e TZ='Asia/Shanghai' biaoge/centos6.8-jdjr-test-app 
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; biaoge/centos6.8-jdjr-test-app 
 ee20b44301e27c16eae63dab243d293054178dd5f819c23d44bd9e534208bb42
 sh-4.2# docker exec -it test-env date
 2017年 01月 17日 星期二 10:35:17 CST
@@ -383,74 +526,157 @@ sh-4.2# docker run -itd --name test  biaoge/centos6.8-jdjr-test-app
 d6a02874b999ff4eea79e3b302148b42043af01c89a5d31e5d858e0806f9077a
 sh-4.2# docker exec -it test date
 2017年 01月 20日 星期五 01:43:48 Asia
-默认没有加时区环境变量的容器还是Asia
-</code></pre>
-
+默认没有加时区环境变量的容器还是Asia</pre></td></tr></table>
+</div>
+</div>
 <h4 id="调整宿主机和容器的时间差异">调整宿主机和容器的时间差异</h4>
 
 <p>首先我们需要弄清几个概念：在类unix系统中有硬件时钟与系统时钟，硬件时钟是指主机板上的时钟设备，也就是通常可在BIOS画面设定的时钟，系统时钟则是指kernel中的时钟。unix以及linux系统时间是从格林威治时间到当前的秒数，即1970年1月1日凌晨零点零分零秒到当前的时间，全球都一样，这是绝对值；而时区则是由于地理位置差异、行政区划导致各地显示时间的差异，为了克服时间上的混乱，规定将全球划分为24个时区，我们国家属于东八区标识为CST。</p>
 
 <p>因此，对于 Docker 容器而言，根本不存在宿主和容器的时间差异问题，因为他们使用的是同一个内核、同一个时钟，二者完全一样，所以根本不存在同步问题。一般来说这个问题是由时区导致的，可以使用date命令查看下容器当前的时间时区是啥。UTC(通用协调时)表示使用的是国际标准0时区，UTC与格林尼治平均时(GMT, Greenwich Mean Time)一样，都与英国伦敦的本地时相同。CST表示中国标准时间时区一般是中国上海&rdquo;Aisa/Shanghai&rdquo;，也就是说UTC和CST相差了8个小时。</p>
-
-<pre><code>解决办法：
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">解决办法：
 创建容器的时候，使用-e 将时区信息传入到容器内部。
-sh-4.2# docker run -itd --name test-env -e TZ='Asia/Shanghai' images
-</code></pre>
-
+sh-4.2# docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; images</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意：其实使用单纯的环境变量来改变容器内部的TIME ZONE，只会影响当前容器用户的时区，一旦切换到真正的root用户就会发现时区依然是不正确的，比如以下栗子：</code></p>
-
-<pre><code>$ docker run -itd --name test-env -e TZ='Asia/Shanghai' images
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker run -itd --name test-env -e TZ=&#39;Asia/Shanghai&#39; images
 $ docker exec -it test-env bash
 bash-4.1# date
 2017年 09月 20日 星期三 20:45:54 CST
 bash-4.1# sudo su -c date
 2017年 09月 20日 星期三 08:46:02 EDT
-bash-4.1# 
-</code></pre>
-
+bash-4.1# </pre></td></tr></table>
+</div>
+</div>
 <p>那么如何真正解决时区这个问题呢？其实是<code>/etc/localtime</code>在作怪，用户只需要将容器内部的localtime改成你想要的时区就行了。</p>
-
-<pre><code>bash-4.1# ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">bash-4.1# ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
 bash-4.1# date
 2017年 09月 20日 星期三 20:54:35 CST
 bash-4.1# sudo su -c date
 2017年 09月 20日 星期三 20:54:39 CST
-bash-4.1# 
-</code></pre>
-
+bash-4.1# </pre></td></tr></table>
+</div>
+</div>
 <p>So,在使用Dockerfile构建镜像的时候将<code>/usr/share/zoneinfo/Asia/Shanghai</code>强制软连接到<code>/etc/localtime</code>就可以永久修复时区的问题了。</p>
 
 <p>####指定容器的rootfs的大小
 在使用docker的过程中，会发现cpu和memory可以很随意的动态调整，但是默认的rootfs却是不能随意调整的，默认是10g大小，当然如果对于数据有需求，可以通过挂载voulme进行扩展存储。如果用户执意想要调整rootfs的大小，在docker1.12版本默认提供了两种方式：在启动docker 的时候加载参数<code>--storage-opt dm.basesize=40G</code>用来调整默认容器的rootfs大小；在创建容器的时候使用参数<code>--storage-opt size=70G</code>来设置改容器的rootfs大小。</p>
 
 <p><code>喜讯：在docker最近发布的1.13版本中，支持了磁盘的配额，不过还未测试</code></p>
-
-<pre><code>sh-4.2# docker run -itd --name volume-test --storage-opt size=70G biaoge/centos6.8-jdjr-test-app
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# docker run -itd --name volume-test --storage-opt size=70G biaoge/centos6.8-jdjr-test-app
 18d47e69802aa84df00182885b256c50ebc56e15d8e6990fc1e187ffe254171e
 
 sh-4.2# docker exec -it volume-test df -H | grep rootfs
 rootfs                 76G  1.5G   74G   2% /
 sh-4.2# docker exec -it test-env df -H | grep rootfs
-rootfs                 11G  1.5G  9.3G  14% /
-</code></pre>
-
+rootfs                 11G  1.5G  9.3G  14% /</pre></td></tr></table>
+</div>
+</div>
 <h4 id="快速管理容器和镜像">快速管理容器和镜像</h4>
 
 <p>在docker中删除容器需要指定容器名或者容器id，但是在容器比较多，并且状态不一的情况下删除容器还是需要走下心的。不过好处是docker ps默认提供了很多好用的功能，可以很方便地管理容器(创建容器的时候如果加上label后更方便哦)。</p>
-
-<pre><code>原理：先用docker ps -a -q 输出所有容器的container id(-f 表示过滤参数或者输出格式)，然后作为docker rm 的参数进行批量删除
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">原理：先用docker ps -a -q 输出所有容器的container id(-f 表示过滤参数或者输出格式)，然后作为docker rm 的参数进行批量删除
 输出所有容器的name(利用了Golang语言中的模板语法)：
-sh-4.2# docker ps --format='{{.Names}}'
+sh-4.2# docker ps --format=&#39;{{.Names}}&#39;
 test-env
 test-args
 test-run
 输出所有容器名包含test的容器，并打印容器名
-sh-4.2# docker ps -f name=test --format='{{.Names}}'
+sh-4.2# docker ps -f name=test --format=&#39;{{.Names}}&#39;
 test-env
 test-args
 test-run
 查看退出状态的容器，并打印容器名
-sh-4.2# docker ps -f status=exited --format=&quot;{{.Names}}&quot;
+sh-4.2# docker ps -f status=exited --format=&#34;{{.Names}}&#34;
 thirsty_brahmagupta
 clever_mestorf
 hopeful_morse
@@ -472,20 +698,19 @@ sh-4.1# docker  images -qf dangling=true
 只查看镜像或者容器指定的信息(在docker1.10之后才支持的)
 
 只列出镜像的id以及仓库名称：
-sh-4.2# docker images --format &quot;{{.ID}}: {{.Repository}}&quot;
+sh-4.2# docker images --format &#34;{{.ID}}: {{.Repository}}&#34;
 67591570dd29: centos
 0a18f1c0ead2: rancher/server
 
 只列出容器的相关id,image,status和name
-sh-4.2# docker ps --format &quot;{{.ID}}: {{.Image}} : {{.Status}} : {{.Names}}&quot;
+sh-4.2# docker ps --format &#34;{{.ID}}: {{.Image}} : {{.Status}} : {{.Names}}&#34;
 66b60b72f00e: centos : Up 7 days : pensive_poincare
 或者自己重新定义列,就和原生差不多:
-sh-4.2# docker ps --format &quot;table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}&quot;
+sh-4.2# docker ps --format &#34;table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}&#34;
 CONTAINER ID        IMAGE                                         STATUS              NAMES
-66b60b72f00e        centos                                        Up 7 days           pensive_poincare
-
-</code></pre>
-
+66b60b72f00e        centos                                        Up 7 days           pensive_poincare</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意:</code>其实上面的&ndash;format利用的就是go语言中的模版语法，所有容器的组织信息都在结构体中：</p>
 
 <p><code>*formatter.containerContext</code></p>
@@ -494,41 +719,81 @@ CONTAINER ID        IMAGE                                         STATUS        
 
 <p>在实际运维过程中，大量的容器可能会一些运维上的挑战，通过使用label，可以很好的将容器分类。label贯穿于docker的整个过程。
 这个label可以作为你区分业务，区分模板各种区分容器的标识，通过标识，可以将容器更好的进行分组</p>
-
-<pre><code>sh-4.2# docker run -itd --name volume-test --storage-opt size=70G --label zone=test biaoge/centos6.8-jdjr-test-app
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# docker run -itd --name volume-test --storage-opt size=70G --label zone=test biaoge/centos6.8-jdjr-test-app
 c3772397e58e663095c2c0fd8d688b3d41b494097999ec2b6d6b7c509d23a138
 创建容器的时候定义一个label，表示该容器在test这个区域
 使用定义的label进行快速检索容器，并进行下一步操作(比如删除啦，更新啦)
 sh-4.2# docker ps -qf label=zone=test
 c3772397e58e
-sh-4.2# docker ps -f label=zone=test --format='{{.Names}}'
-volume-test
-
-</code></pre>
-
+sh-4.2# docker ps -f label=zone=test --format=&#39;{{.Names}}&#39;
+volume-test</pre></td></tr></table>
+</div>
+</div>
 <h4 id="快速查看容器的相关配置信息">快速查看容器的相关配置信息</h4>
-
-<pre><code>查看容器的devicemapper设备：
-sh-4.2# docker inspect -f '{{.GraphDriver.Data.DeviceName}}' nginx 
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">查看容器的devicemapper设备：
+sh-4.2# docker inspect -f &#39;{{.GraphDriver.Data.DeviceName}}&#39; nginx 
 docker-8:1-67411759-7c9d6d3327b02659c81bcb70bf6a4c7a45df6a589af2a2d42a387dc0e90d4913
 查看容器的PID：
-sh-4.2# docker inspect -f '{{.State.Pid}}' nginx 
+sh-4.2# docker inspect -f &#39;{{.State.Pid}}&#39; nginx 
 27521
 查看容器name：
-sh-4.2# docker inspect -f '{{.Name}}' nginx 
+sh-4.2# docker inspect -f &#39;{{.Name}}&#39; nginx 
 /nginx
 获取容器的ID：
 sh-4.2# docker inspect --format {{.Id}} nginx
-53214bc9cd001f2c548edcce0c42fe51f1a118c08941406d43122a8348055843
-</code></pre>
-
+53214bc9cd001f2c548edcce0c42fe51f1a118c08941406d43122a8348055843</pre></td></tr></table>
+</div>
+</div>
 <h4 id="使用alias来预定义常用的命令">使用alias来预定义常用的命令</h4>
 
 <p>docker管理命令经常需要指定各种参数，通过linux的alias命令将默认的参数预定义起来，可以很方便的进行管理容器。</p>
-
-<pre><code>sh-4.2# alias dockerrm='docker rm -f -v'
-sh-4.2# alias dockerexec='docker exec -it'
-sh-4.2# alias dockerrmimage='docker rmi'
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# alias dockerrm=&#39;docker rm -f -v&#39;
+sh-4.2# alias dockerexec=&#39;docker exec -it&#39;
+sh-4.2# alias dockerrmimage=&#39;docker rmi&#39;
 
 sh-4.2# dockerrm volume-test
 volume-test
@@ -537,17 +802,34 @@ sh-4.2# dockerexec volume-test ls
 bin   dev  export  lib	  media  opt   root  selinux  sys  usr
 boot  etc  home    lib64  mnt	 proc  sbin  srv      tmp  var
 sh-4.2# dockerexec volume-test bash
-bash-4.1# 
-</code></pre>
-
+bash-4.1# </pre></td></tr></table>
+</div>
+</div>
 <h4 id="使容器随着docker-daemon的启动一同启动">使容器随着docker daemon的启动一同启动</h4>
-
-<pre><code>docker run 的时候加参数--restart=always
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">docker run 的时候加参数--restart=always</pre></td></tr></table>
+</div>
+</div>
 <h4 id="如何动态修改容器的内存和cpu限制-docker1-10之后才支持的动态调整">如何动态修改容器的内存和cpu限制<code>docker1.10之后才支持的动态调整</code></h4>
-
-<pre><code>sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
 9223372036854775807
 sh-4.2# cat /sys/fs/cgroup/memory/memory.limit_in_bytes 
 9223372036854775807
@@ -556,32 +838,48 @@ sh-4.2# cat /sys/fs/cgroup/memory/memory.limit_in_bytes
 sh-4.2# docker update -m 2014M test-env
 test-env
 sh-4.2# dockerexec test-env cat /sys/fs/cgroup/memory/memory.limit_in_bytes
-2111832064
-
-</code></pre>
-
+2111832064</pre></td></tr></table>
+</div>
+</div>
 <h4 id="docker容器中真实用户的隔离">docker容器中真实用户的隔离</h4>
 
 <p>注意：默认docker容器内部的用户会继承宿主机的用户id，也就是说容器外部有一个uid为500的用户test，容器内部有一个uid为500的用户admin，容器内部运行的程序如果在宿主机上查看的时候会发现程序的启动用户会是外部宿主机的test用户。
 这是因为默认情况下容器的 user namespace 并未开启，所以容器内的用户和宿主用户共享 uid 空间。容器内的 uid 为 0 的 root，就被系统视为 uid=0 的宿主 root，因此磁盘读写时，具有宿主 root 同等读写权限。</p>
-
-<pre><code>开启user namespace：
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">开启user namespace：
 启动docker的时候加参数--userns-remap=default
-https://docs.docker.com/engine/reference/commandline/dockerd/#/daemon-user-namespace-options
-</code></pre>
-
+https://docs.docker.com/engine/reference/commandline/dockerd/#/daemon-user-namespace-options</pre></td></tr></table>
+</div>
+</div>
 <h4 id="在docker-container和物理机中双向拷贝文件">在docker container和物理机中双向拷贝文件</h4>
-
-<pre><code>容器内部文件拷贝到宿主机：
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">容器内部文件拷贝到宿主机：
 sh-4.2# docker cp jupyter-70002111:/home/70002111/教程-研究功能介绍.ipynb .
 sh-4.2# ls
 Dockerfile  教程-研究功能介绍.ipynb
 宿主机文件拷贝到容器：
 sh-4.2# docker cp Dockerfile jupyter-70002111:/home/70002111/
 sh-4.2# docker exec -it jupyter-70002188 ls 
-Dockerfile
-</code></pre>
-
+Dockerfile</pre></td></tr></table>
+</div>
+</div>
 <h4 id="向容器内部程序发送signal">向容器内部程序发送signal</h4>
 
 <p>注意：在给容器进程发送SIGTERM信号时只会发给主进程，也就是容器内 PID 为 1 的进程。至于说主进程启动的那些子进程，完全看主进程是否愿意转发SIGTERM 给子进程了。所以那些把 Docker当做虚拟机用的，主进程跑了个bash，然后exec 进去启动程序的，或者来个&amp;让程序跑后台的情况，应用进程必然无法收到SIGTERM。
@@ -596,15 +894,36 @@ Dockerfile
 <p><a href="https://segmentfault.com/a/1190000008233992">如何优雅的关闭容器</a></p>
 
 <h4 id="容器的cache不释放">容器的cache不释放</h4>
-
-<pre><code>$ echo 1 &gt; /proc/sys/vm/drop_caches
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ echo 1 &gt; /proc/sys/vm/drop_caches</pre></td></tr></table>
+</div>
+</div>
 <h4 id="桥接网络连入下层网络并使用ipam-没有nat-端口映射">桥接网络连入下层网络并使用IPAM (没有NAT/端口映射)</h4>
 
 <p><code>注意:docker network是1.12版本加进来的，支持了多种网络插件</code></p>
-
-<pre><code>$ docker network create \
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker network create \
 	-d bridge \
 	--subnet=192.168.57.0/24 \
 	--ip-range=192.168.57.32/28 \
@@ -617,22 +936,37 @@ $ docker run --net=brnet -it busybox ifconfig
 
 注意其它主机的 --ip-range 和 --gateway 需要做对应调整。
 
-这种拓扑是，容器内 eth0 连接 brnet 接口，该接口直接通过 eth2 访问交换。
-
-</code></pre>
-
+这种拓扑是，容器内 eth0 连接 brnet 接口，该接口直接通过 eth2 访问交换。</pre></td></tr></table>
+</div>
+</div>
 <h4 id="docker查看某个容器绑定的cpu内核">Docker查看某个容器绑定的cpu内核</h4>
 
 <p><code>容器内部第一个进程编号一般为1</code></p>
-
-<pre><code>$ docker exec -it container-name taskset -c -p 1 
-pid 1's current affinity list:0-3
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker exec -it container-name taskset -c -p 1 
+pid 1&#39;s current affinity list:0-3</pre></td></tr></table>
+</div>
+</div>
 <h4 id="给docker配置hosts">给docker配置hosts</h4>
-
-<pre><code>$ docker run --add-host biaoge-ops:192.168.0.1 centos cat /etc/hosts
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker run --add-host biaoge-ops:192.168.0.1 centos cat /etc/hosts
 127.0.0.1	localhost
 ::1	localhost ip6-localhost ip6-loopback
 fe00::0	ip6-localnet
@@ -640,9 +974,9 @@ ff00::0	ip6-mcastprefix
 ff02::1	ip6-allnodes
 ff02::2	ip6-allrouters
 192.168.0.1	biaoge-ops
-10.0.0.3	6ff3ea7114b4
-</code></pre>
-
+10.0.0.3	6ff3ea7114b4</pre></td></tr></table>
+</div>
+</div>
 <p>[原文地址](<a href="http://www.jianshu.com/p/0231568ab33(">http://www.jianshu.com/p/0231568ab33(</a>)
 <a href="https://my.oschina.net/xxbAndy/blog">个人博客</a>
 微信公众号：</p>
@@ -667,7 +1001,7 @@ ff02::2	ip6-allrouters
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -724,6 +1058,16 @@ ff02::2	ip6-allrouters
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -863,6 +1207,23 @@ ff02::2	ip6-allrouters
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>开源OCR引擎tesseract的构建使用 - BGBiao的Ops人生</title>
+  <title>开源OCR引擎tesseract的构建使用 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="简介 OCR 光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="开源OCR引擎tesseract的构建使用" />
 <meta property="og:description" content="简介
@@ -80,7 +82,7 @@ OCR
 
 <meta itemprop="datePublished" content="2017-12-09T15:59:29&#43;00:00" />
 <meta itemprop="dateModified" content="2017-12-09T15:59:29&#43;00:00" />
-<meta itemprop="wordCount" content="2903">
+<meta itemprop="wordCount" content="3144">
 
 
 
@@ -103,13 +105,24 @@ OCR
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -154,9 +167,52 @@ OCR
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -223,6 +279,34 @@ OCR
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -230,7 +314,7 @@ OCR
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -294,10 +378,52 @@ OCR
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -321,7 +447,8 @@ OCR
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 3144 words </span>
+          <span class="more-meta"> 7 min read </span>
 
         
         
@@ -393,8 +520,60 @@ OCR
 <h4 id="使用yum安装">使用yum安装</h4>
 
 <p>Centos7中的epel源中包含了tesseract的3.05版本的包，可以直接安装使用。而在tesseract的github官方项目中最新版本也只到<a href="https://github.com/tesseract-ocr/tesseract/releases">3.05.01</a></p>
-
-<pre><code>$ sudo yum install epel-release
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ sudo yum install epel-release
  -y
 # 查看epel源
 $ cat /etc/yum.repos.d/epel.repo 
@@ -442,25 +621,166 @@ $ tesseract --list-langs
 List of available languages (3):
 eng
 chi_sim
-chi_tra
-
-</code></pre>
-
+chi_tra</pre></td></tr></table>
+</div>
+</div>
 <h4 id="2-源码编译最新版本-4-00-00alpha版本">2.源码编译最新版本(4.00.00alpha版本)</h4>
 
 <p>从官网上看，4.0版本在识别率以及性能等各方面上要比3.0版本高好多，但是官方又没有提供4.0的release版本，因此接下来使用github上的源码来手动编译<a href="https://github.com/tesseract-ocr/tesseract/tree/4.00.00alpha">tesseract4.00.00alpha</a>版本。同时由于对底层Leptonica的依赖，需要优先编译该库的依赖。</p>
 
 <p><code>注意：宿主操作系统仍然是一个纯净的Centos7.3.1611的OS</code></p>
-
-<pre><code># 安装基础依赖
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 安装基础依赖
 # sudo yum install gcc git gcc-c++ make automake libtool libpng-devel libjpeg-devel libtiff-devel zlib-devel -y
 
 # 安装leptonica-1.74.4
 # wget http://www.leptonica.org/source/leptonica-1.74.4.tar.gz  &amp;&amp; tar -zxf leptonica-1.74.4.tar.gz &amp;&amp; cd  leptonica ;./configure &amp;&amp; make &amp;&amp; make install
 
 ........
- /usr/bin/mkdir -p '/usr/local/lib'
- /bin/sh ../libtool   --mode=install /usr/bin/install -c   liblept.la '/usr/local/lib'
+ /usr/bin/mkdir -p &#39;/usr/local/lib&#39;
+ /bin/sh ../libtool   --mode=install /usr/bin/install -c   liblept.la &#39;/usr/local/lib&#39;
 libtool: install: /usr/bin/install -c .libs/liblept.so.5.0.1 /usr/local/lib/liblept.so.5.0.1
 libtool: install: (cd /usr/local/lib &amp;&amp; { ln -s -f liblept.so.5.0.1 liblept.so.5 || { rm -f liblept.so.5 &amp;&amp; ln -s liblept.so.5.0.1 liblept.so.5; }; })
 libtool: install: (cd /usr/local/lib &amp;&amp; { ln -s -f liblept.so.5.0.1 liblept.so || { rm -f liblept.so &amp;&amp; ln -s liblept.so.5.0.1 liblept.so; }; })
@@ -468,7 +788,7 @@ libtool: install: /usr/bin/install -c .libs/liblept.lai /usr/local/lib/liblept.l
 libtool: install: /usr/bin/install -c .libs/liblept.a /usr/local/lib/liblept.a
 libtool: install: chmod 644 /usr/local/lib/liblept.a
 libtool: install: ranlib /usr/local/lib/liblept.a
-libtool: finish: PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&quot; ldconfig -n /usr/local/lib
+libtool: finish: PATH=&#34;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&#34; ldconfig -n /usr/local/lib
 ----------------------------------------------------------------------
 
 Libraries have been installed in:
@@ -476,32 +796,32 @@ Libraries have been installed in:
 
 If you ever happen to want to link against installed libraries
 in a given directory, LIBDIR, you must either use libtool, and
-specify the full pathname of the library, or use the `-LLIBDIR'
+specify the full pathname of the library, or use the `-LLIBDIR&#39;
 flag during linking and do at least one of the following:
-   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+   - add LIBDIR to the `LD_LIBRARY_PATH&#39; environment variable
      during execution
-   - add LIBDIR to the `LD_RUN_PATH' environment variable
+   - add LIBDIR to the `LD_RUN_PATH&#39; environment variable
      during linking
-   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
-   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+   - use the `-Wl,-rpath -Wl,LIBDIR&#39; linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf&#39;
 
 See any operating system documentation about shared libraries for
 more information, such as the ld(1) and ld.so(8) manual pages.
 ----------------------------------------------------------------------
 
- /usr/bin/mkdir -p '/usr/local/include/leptonica'
- /usr/bin/mkdir -p '/usr/local/bin'
-  /bin/sh ../libtool   --mode=install /usr/bin/install -c convertfilestopdf convertfilestops convertformat convertsegfilestopdf convertsegfilestops converttopdf converttops fileinfo printimage printsplitimage printtiff splitimage2pdf xtractprotos '/usr/local/bin'
+ /usr/bin/mkdir -p &#39;/usr/local/include/leptonica&#39;
+ /usr/bin/mkdir -p &#39;/usr/local/bin&#39;
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c convertfilestopdf convertfilestops convertformat convertsegfilestopdf convertsegfilestops converttopdf converttops fileinfo printimage printsplitimage printtiff splitimage2pdf xtractprotos &#39;/usr/local/bin&#39;
 ......
 
-make[2]: Nothing to be done for `install-data-am'.
-make[2]: Leaving directory `/export/servers/leptonica-1.74.4/prog'
-make[1]: Leaving directory `/export/servers/leptonica-1.74.4/prog'
-make[1]: Entering directory `/export/servers/leptonica-1.74.4'
-make[2]: Entering directory `/export/servers/leptonica-1.74.4'
-make[2]: Nothing to be done for `install-exec-am'.
- /usr/bin/mkdir -p '/usr/local/lib/pkgconfig'
- /usr/bin/install -c -m 644 lept.pc '/usr/local/lib/pkgconfig'
+make[2]: Nothing to be done for `install-data-am&#39;.
+make[2]: Leaving directory `/export/servers/leptonica-1.74.4/prog&#39;
+make[1]: Leaving directory `/export/servers/leptonica-1.74.4/prog&#39;
+make[1]: Entering directory `/export/servers/leptonica-1.74.4&#39;
+make[2]: Entering directory `/export/servers/leptonica-1.74.4&#39;
+make[2]: Nothing to be done for `install-exec-am&#39;.
+ /usr/bin/mkdir -p &#39;/usr/local/lib/pkgconfig&#39;
+ /usr/bin/install -c -m 644 lept.pc &#39;/usr/local/lib/pkgconfig&#39;
 
 # 以上输出显示leptonica已经成功编译，并给出相关提示知名动态链接库的地址以及头文件等相关地址，需要注意的在使用之前一定要加载动态链接库/usr/local/lib
 # ldconfig -n /usr/local/lib
@@ -510,11 +830,11 @@ make[2]: Nothing to be done for `install-exec-am'.
 # git clone https://github.com/tesseract-ocr/tesseract.git；
 cd tesseract &amp;&amp; git checkout -b biaoge 4.00.00alpha &amp;&amp; ./configure &amp;&amp; make &amp;&amp; make install
 
- /usr/bin/mkdir -p '/usr/local/include/tesseract
+ /usr/bin/mkdir -p &#39;/usr/local/include/tesseract
 
- /usr/bin/mkdir -p '/usr/local/lib'
+ /usr/bin/mkdir -p &#39;/usr/local/lib&#39;
 
-libtool: finish: PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&quot; ldconfig -n /usr/local/lib
+libtool: finish: PATH=&#34;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin&#34; ldconfig -n /usr/local/lib
 
 ----------------------------------------------------------------------
 Libraries have been installed in:
@@ -522,43 +842,43 @@ Libraries have been installed in:
 
 If you ever happen to want to link against installed libraries
 in a given directory, LIBDIR, you must either use libtool, and
-specify the full pathname of the library, or use the `-LLIBDIR'
+specify the full pathname of the library, or use the `-LLIBDIR&#39;
 flag during linking and do at least one of the following:
-   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+   - add LIBDIR to the `LD_LIBRARY_PATH&#39; environment variable
      during execution
-   - add LIBDIR to the `LD_RUN_PATH' environment variable
+   - add LIBDIR to the `LD_RUN_PATH&#39; environment variable
      during linking
-   - use the `-Wl,-rpath -Wl,LIBDIR' linker flag
-   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+   - use the `-Wl,-rpath -Wl,LIBDIR&#39; linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf&#39;
 
 See any operating system documentation about shared libraries for
 more information, such as the ld(1) and ld.so(8) manual pages.
 ----------------------------------------------------------------------
- /usr/bin/mkdir -p '/usr/local/bin'
-  /bin/sh ../libtool   --mode=install /usr/bin/install -c tesseract '/usr/local/bin'
+ /usr/bin/mkdir -p &#39;/usr/local/bin&#39;
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c tesseract &#39;/usr/local/bin&#39;
 libtool: install: /usr/bin/install -c .libs/tesseract /usr/local/bin/tesseract
- /usr/bin/mkdir -p '/usr/local/include/tesseract'
- /usr/bin/install -c -m 644 apitypes.h baseapi.h capi.h renderer.h '/usr/local/include/tesseract'
+ /usr/bin/mkdir -p &#39;/usr/local/include/tesseract&#39;
+ /usr/bin/install -c -m 644 apitypes.h baseapi.h capi.h renderer.h &#39;/usr/local/include/tesseract&#39;
 
- /usr/bin/mkdir -p '/usr/local/lib/pkgconfig'
- /usr/bin/install -c -m 644 tesseract.pc '/usr/local/lib/pkgconfig'
+ /usr/bin/mkdir -p &#39;/usr/local/lib/pkgconfig&#39;
+ /usr/bin/install -c -m 644 tesseract.pc &#39;/usr/local/lib/pkgconfig&#39;
 
- /usr/bin/mkdir -p '/usr/local/share/tessdata/configs'
- /usr/bin/install -c -m 644 inter makebox box.train unlv ambigs.train api_config kannada box.train.stderr quiet logfile digits hocr tsv linebox pdf rebox strokewidth bigram txt '/usr/local/share/tessdata/configs'
-
-
- /usr/bin/mkdir -p '/usr/local/share/tessdata/tessconfigs'
- /usr/bin/install -c -m 644 batch batch.nochop nobatch matdemo segdemo msdemo '/usr/local/share/tessdata/tessconfigs'
+ /usr/bin/mkdir -p &#39;/usr/local/share/tessdata/configs&#39;
+ /usr/bin/install -c -m 644 inter makebox box.train unlv ambigs.train api_config kannada box.train.stderr quiet logfile digits hocr tsv linebox pdf rebox strokewidth bigram txt &#39;/usr/local/share/tessdata/configs&#39;
 
 
- /usr/bin/mkdir -p '/usr/local/share/tessdata'
- /usr/bin/install -c -m 644 pdf.ttf '/usr/local/share/tessdata'
+ /usr/bin/mkdir -p &#39;/usr/local/share/tessdata/tessconfigs&#39;
+ /usr/bin/install -c -m 644 batch batch.nochop nobatch matdemo segdemo msdemo &#39;/usr/local/share/tessdata/tessconfigs&#39;
 
 
- /usr/bin/mkdir -p '/usr/local/share/man/man1'
- /usr/bin/install -c -m 644 cntraining.1 combine_tessdata.1 mftraining.1 tesseract.1 unicharset_extractor.1 wordlist2dawg.1 ambiguous_words.1 shapeclustering.1 dawg2wordlist.1 '/usr/local/share/man/man1'
- /usr/bin/mkdir -p '/usr/local/share/man/man5'
- /usr/bin/install -c -m 644 unicharambigs.5 unicharset.5 '/usr/local/share/man/man5'
+ /usr/bin/mkdir -p &#39;/usr/local/share/tessdata&#39;
+ /usr/bin/install -c -m 644 pdf.ttf &#39;/usr/local/share/tessdata&#39;
+
+
+ /usr/bin/mkdir -p &#39;/usr/local/share/man/man1&#39;
+ /usr/bin/install -c -m 644 cntraining.1 combine_tessdata.1 mftraining.1 tesseract.1 unicharset_extractor.1 wordlist2dawg.1 ambiguous_words.1 shapeclustering.1 dawg2wordlist.1 &#39;/usr/local/share/man/man1&#39;
+ /usr/bin/mkdir -p &#39;/usr/local/share/man/man5&#39;
+ /usr/bin/install -c -m 644 unicharambigs.5 unicharset.5 &#39;/usr/local/share/man/man5&#39;
  
 # 以上输出也标明tesseract已经成功安装在了/usr/local/lib目录，并给出了一些tesseract相关的配置路径以及注意事项。特别需要注意的是，也需要加载动态链接库，否则程序可能无法识别相关的库文件。
 
@@ -573,9 +893,9 @@ tesseract 4.00.00alpha
 # 查看当前的语言库支持
 # tesseract --list-langs
 Error opening data file /usr/local/share/tessdata/eng.traineddata
-Please make sure the TESSDATA_PREFIX environment variable is set to the parent directory of your &quot;tessdata&quot; directory.
-Failed loading language 'eng'
-Tesseract couldn't load any languages!
+Please make sure the TESSDATA_PREFIX environment variable is set to the parent directory of your &#34;tessdata&#34; directory.
+Failed loading language &#39;eng&#39;
+Tesseract couldn&#39;t load any languages!
 Could not initialize tesseract.
 
 # 提示已经很明显，需要配置TESSDATA_PREFIX环境变量
@@ -590,34 +910,64 @@ Could not initialize tesseract.
 List of available languages (3):
 chi_sim
 eng
-chi_tra
-
-
-</code></pre>
-
+chi_tra</pre></td></tr></table>
+</div>
+</div>
 <p>至此，环境中已经能够正常使用<code>tesseract</code>命令了，基本上可以认为tesseract环境已经编译完成，接下来就是具体看看如何去使用tesseract了</p>
 
 <h3 id="简单使用">简单使用</h3>
 
 <p><img src="https://img.alicdn.com/simba/img/TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg" alt="" /></p>
-
-<pre><code>$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
 Tesseract Open Source OCR Engine v3.04.00 with Leptonica
 
 
 $ cat test.txt 
 走心特惠
-不玩套路
-
-
-
-</code></pre>
-
+不玩套路</pre></td></tr></table>
+</div>
+</div>
 <p>可以看出来对比较规范的字体还是可以正常识别的。</p>
 
 <h3 id="可能遇到的问题">可能遇到的问题</h3>
-
-<pre><code># 测试使用
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 测试使用
 # tesseract 5a0178d2N01754832.jpg test -l chi_sim 
 Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
 pixReadStreamJpeg: function not present
@@ -638,18 +988,43 @@ Tesseract Open Source OCR Engine v3.04.00 with Leptonica
 
 $ cat test.txt 
 走心特惠
-不玩套路
-
-
-</code></pre>
-
+不玩套路</pre></td></tr></table>
+</div>
+</div>
 <h3 id="福利">福利</h3>
 
 <p>由于目前tesseract官方并未直接提供4.0的软件包，并且tesseract环境的构建也是稍微比较复杂，为了秉承造福群众的理念，我将以上环境封装成Docker image供各位网友使用。具体使用方式如下：</p>
 
 <p><code>前提：需要有一个可用的Docker环境，任何版本都可以</code></p>
-
-<pre><code># 下载镜像(稍微有点大1.6G)
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 下载镜像(稍微有点大1.6G)
 # docker pull xxbandy123/tesseract-ocr4.00.00alpha:17-12-05
 
 # 运行tesseract环境
@@ -672,10 +1047,9 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
 [root@2b4df1a1e9d2 /]# cat test.txt
 一天猫电器全新服务保障
 
-胁 售后无忧
-
-</code></pre>
-
+胁 售后无忧</pre></td></tr></table>
+</div>
+</div>
 <p>测试原图<img src="https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg" alt="" /></p>
 
 <p>由此可见，开源的tesseract目前并不能完全识别所有的图片文字，如果需要借助于开源去做业务场景，可能还需要更多的二次改造才能够有所应用。</p>
@@ -698,7 +1072,7 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -711,7 +1085,15 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -766,6 +1148,16 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -905,6 +1297,23 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

@@ -80,7 +80,7 @@
   
   <url>
     <loc>https://bgbiao.top/post/go-unit-test/</loc>
-    <lastmod>2019-11-20T16:01:23+08:00</lastmod>
+    <lastmod>2019-12-01T19:18:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -94,28 +94,28 @@
   
   <url>
     <loc>https://bgbiao.top/post/golang-expect/</loc>
-    <lastmod>2019-11-07T16:01:23+08:00</lastmod>
+    <lastmod>2019-12-01T19:18:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/operatehivewithpython/</loc>
-    <lastmod>2018-10-28T14:14:39+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/operatemysqlwithpython/</loc>
-    <lastmod>2018-10-27T13:53:40+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/troubleshooting-teslagpu-with-nvidia-smi/</loc>
-    <lastmod>2018-08-20T14:34:43+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -234,7 +234,7 @@
   
   <url>
     <loc>https://bgbiao.top/post/manager-your-gpus/</loc>
-    <lastmod>2017-10-30T22:03:27+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -255,27 +255,28 @@
   
   <url>
     <loc>https://bgbiao.top/post/dockerfile-etcd/</loc>
-    <lastmod>2017-08-26T17:56:15+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/ansible-etcd-cluster/</loc>
-    <lastmod>2017-08-26T15:51:12+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/docker-api-for-python/</loc>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/about/</loc>
-    <lastmod>2019-08-28T21:41:52+08:00</lastmod>
+    <lastmod>2020-01-02T20:01:29+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -548,7 +549,7 @@
   
   <url>
     <loc>https://bgbiao.top/tags/testing/</loc>
-    <lastmod>2019-11-20T16:01:23+08:00</lastmod>
+    <lastmod>2019-12-01T19:18:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -569,49 +570,49 @@
   
   <url>
     <loc>https://bgbiao.top/tags/exception/</loc>
-    <lastmod>2019-11-07T16:01:23+08:00</lastmod>
+    <lastmod>2019-12-01T19:18:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/hadoop/</loc>
-    <lastmod>2018-10-28T14:14:39+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/hive/</loc>
-    <lastmod>2018-10-28T14:14:39+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/python/</loc>
-    <lastmod>2018-10-28T14:14:39+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/mysql/</loc>
-    <lastmod>2018-10-27T13:53:40+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/gpu/</loc>
-    <lastmod>2018-08-20T14:34:43+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/nvidia/</loc>
-    <lastmod>2018-08-20T14:34:43+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -695,7 +696,7 @@
   
   <url>
     <loc>https://bgbiao.top/tags/dockerfile/</loc>
-    <lastmod>2017-11-09T21:40:51+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -723,7 +724,7 @@
   
   <url>
     <loc>https://bgbiao.top/tags/etcd/</loc>
-    <lastmod>2017-11-03T09:11:57+00:00</lastmod>
+    <lastmod>2019-12-03T10:56:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Dockerfile最佳实践 - BGBiao的Ops人生</title>
+  <title>Dockerfile最佳实践 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -29,7 +29,7 @@
 3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -62,6 +62,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="Dockerfile最佳实践" />
 <meta property="og:description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
@@ -91,7 +93,7 @@
 
 <meta itemprop="datePublished" content="2017-11-09T21:40:51&#43;00:00" />
 <meta itemprop="dateModified" content="2017-11-09T21:40:51&#43;00:00" />
-<meta itemprop="wordCount" content="2711">
+<meta itemprop="wordCount" content="2906">
 
 
 
@@ -118,13 +120,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -169,9 +182,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -238,6 +294,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -245,7 +329,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -309,10 +393,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -336,7 +462,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 2906 words </span>
+          <span class="more-meta"> 6 min read </span>
 
         
         
@@ -398,26 +525,47 @@
 <h4 id="构建符合实际业务场景的base镜像">构建符合实际业务场景的base镜像</h4>
 
 <p><code>注意：</code>给image中打入sshd服务的主要原因还是想尽可能的满足用户当前的使用习惯，同时又能够充分利用docker image的特性</p>
-
-<pre><code>FROM centos6.8-base
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM centos6.8-base
 MAINTAINER xuxuebiao
-RUN ssh-keygen -q -N &quot;&quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &quot;&quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri 's/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g' /etc/pam.d/sshd ;\
+RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
     mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
-    sed -ri 's/#Port 22/Port 52568/g' /etc/ssh/sshd_config ;\
-    echo 'root:redhat' | chpasswd
+    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+    echo &#39;root:redhat&#39; | chpasswd
 EXPOSE 52568
 ENV LANG=zh_CN.UTF-8;\
     LC_ALL=zh_CN.UTF-8;\
-    TZ &quot;Asia/Shanghai&quot;;\
+    TZ &#34;Asia/Shanghai&#34;;\
     TERM xterm
-CMD /usr/sbin/sshd -D
-</code></pre>
-
-<pre><code>#docker build -t centos6.8-sshd .
-</code></pre>
-
+CMD /usr/sbin/sshd -D</pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">#docker build -t centos6.8-sshd .</pre></td></tr></table>
+</div>
+</div>
 <hr />
 
 <h4 id="构建上层基本软件环境">构建上层基本软件环境</h4>
@@ -425,10 +573,34 @@ CMD /usr/sbin/sshd -D
 <p><code>注意：上层SSHD镜像默认使用CMD启动了一个sshd服务，因此这层PAAS层无法直接启动nginx和tomcat，本层只是构建了一个基本环境，容器启动后需要登录bash中执行脚本进行启动。这样交付的环境其实就相当于PAAS层的环境</code></p>
 
 <p>构建一个基于jdk7tomcat6的基本镜像：</p>
-
-<pre><code>FROM centos6.8-sshd
-MAINTAINER &quot;xuxuebiao&quot;
-ENV TZ &quot;Asia/Shanghai&quot;;\
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM centos6.8-sshd
+MAINTAINER &#34;xuxuebiao&#34;
+ENV TZ &#34;Asia/Shanghai&#34;;\
     PATH $PATH:/export/data/
 
 RUN useradd admin;\
@@ -446,13 +618,24 @@ COPY start_nginx /etc/init.d/nginx
 COPY init_nginx.sh /export/Shell/
 RUN chmod a+x /etc/init.d/nginx;\
     chmod a+x /export/Shell/init_nginx.sh;\
-    chown admin.admin -R /export/ /home/admin/
-
-</code></pre>
-
+    chown admin.admin -R /export/ /home/admin/</pre></td></tr></table>
+</div>
+</div>
 <p>构建一个基于python27的基本环境，环境中本身已经安装各种第三方程序库：</p>
-
-<pre><code>FROM centos6.8-sshd
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM centos6.8-sshd
 MAINTAINER biaoge
 ADD python27 /usr/local/python27
 RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
@@ -460,10 +643,9 @@ RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
     ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;
 
 EXPOSE 8000
-EXPOSE 8081
-
-</code></pre>
-
+EXPOSE 8081</pre></td></tr></table>
+</div>
+</div>
 <p><code>构建本层的镜像Dockerfile中不能指定新的应用进程，否则基本镜像中的sshd就会失效</code></p>
 
 <hr />
@@ -473,12 +655,35 @@ EXPOSE 8081
 <h4 id="首先使用base镜像构建一层的supervisord基本镜像">首先使用base镜像构建一层的supervisord基本镜像</h4>
 
 <p><code>由于supervisord是有python写的，所以可以直接在python模块包中使用</code></p>
-
-<pre><code>FROM centos6.8-base
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM centos6.8-base
 MAINTAINER biaoge
 ENV LANG=zh_CN.UTF-8;\
     LC_ALL=zh_CN.UTF-8;\
-    TZ=&quot;Asia/Shanghai&quot;;\
+    TZ=&#34;Asia/Shanghai&#34;;\
     TERM=xterm
 ADD python27 /usr/local/python27
 RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
@@ -489,18 +694,41 @@ RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
 ADD supervisord.conf /etc/supervisord.conf
 EXPOSE 8000 8001 
 
-CMD [&quot;/usr/local/bin/supervisord&quot;,&quot;-c&quot;,&quot;/etc/supervisord.conf&quot;]
+CMD [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
 #这里其实比较建议使用ENTRYPOINT
 #ENTRYPOINT通常情况下和CMD会一起使用，区别是CMD定义的执行命令会被container创建的时候的command取代。一般情况下ENTRYPOINT会定义命令执行的主体,CMD中增加默认的参数，而实际的参数可以通过创建container的时候用command进行优化选择
-#ENTRYPOINT  [&quot;/usr/local/bin/supervisord&quot;,&quot;-c&quot;,&quot;/etc/supervisord.conf&quot;]
-#文末会有演示一个ENTRYPOINT的例子
-</code></pre>
-
+#ENTRYPOINT  [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
+#文末会有演示一个ENTRYPOINT的例子</pre></td></tr></table>
+</div>
+</div>
 <p>启动之后就会默认启动supervisord.conf中配的服务。</p>
 
 <p>默认的supervisord.conf文件配置：</p>
-
-<pre><code>[supervisord]
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">[supervisord]
 http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
 logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
 logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
@@ -519,37 +747,78 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 #[program:httpd]
 #command = /usr/sbin/httpd
 #[program:sshd]
-#command = /usr/sbin/sshd -D
-
-</code></pre>
-
+#command = /usr/sbin/sshd -D</pre></td></tr></table>
+</div>
+</div>
 <h4 id="使用上面构建的supervisord镜像进行构建服务镜像">使用上面构建的supervisord镜像进行构建服务镜像</h4>
 
 <p>镜像可自启动包含sshd和rabbitmq的服务</p>
-
-<pre><code>FROM supversord
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM supversord
 MAINTAINER biaoge
 
 #需要如下相关的包
 #esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
 COPY *.rpm /usr/local/
 RUN yum localinstall /usr/local/*.rpm -y 
-RUN ssh-keygen -q -N &quot;&quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &quot;&quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri 's/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g' /etc/pam.d/sshd ;\
+RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
     mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
-    sed -ri 's/#Port 22/Port 52568/g' /etc/ssh/sshd_config ;\
-    echo 'root:redhat' | chpasswd
+    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+    echo &#39;root:redhat&#39; | chpasswd
 EXPOSE 52568 5672 4369 
 
 #这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf
-
-</code></pre>
-
+ADD supervisord.conf /etc/supervisord.conf</pre></td></tr></table>
+</div>
+</div>
 <p>用来启动sshd和rabbitmq服务的<code>supervisord.conf</code>配置文件。</p>
-
-<pre><code>[supervisord]
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">[supervisord]
 http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
 logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
 logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
@@ -568,9 +837,9 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 [program:rabbitmq]
 command = rabbitmq-server
 [program:sshd]
-command = /usr/sbin/sshd -D
-</code></pre>
-
+command = /usr/sbin/sshd -D</pre></td></tr></table>
+</div>
+</div>
 <p><strong>测试访问：</strong>
 使用上面Dockerfile创建images进行构建容器：
 &gt;$docker run -itd &ndash;name test-ssh sshd-rabbitmq</p>
@@ -580,28 +849,57 @@ command = /usr/sbin/sshd -D
 <h3 id="构建基于paas层的其他基本镜像">构建基于PaaS层的其他基本镜像</h3>
 
 <p>基本sshd镜像：</p>
-
-<pre><code>FROM supervisord
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM supervisord
 MAINTAINER 371990778@qq.com
 #配置相关的ssh需要的文件，以及相关的用户密码
-RUN ssh-keygen -q -N &quot;&quot; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &quot;&quot; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri 's/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g' /etc/pam.d/sshd ;\
+RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
     mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
-    sed -ri 's/#Port 22/Port 52568/g' /etc/ssh/sshd_config ;\
-    echo 'root:redhat' | chpasswd
+    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+    echo &#39;root:redhat&#39; | chpasswd
 EXPOSE 52568
 
 #这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf 
-
-</code></pre>
-
+ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
+</div>
+</div>
 <p><code>相应的supervisord.conf文件中只需要增加相应的额服务启动命令</code></p>
 
 <p>基本redis镜像：</p>
-
-<pre><code>FROM sshd-base
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM sshd-base
 MAINTAINER biaoge
 ADD redis-2.8.9 /usr/local/redis-2.8.9 
 #ADD redis.conf /etc/redis.conf
@@ -611,12 +909,26 @@ RUN ln -s /usr/local/redis-2.8.9/src/redis-cli /usr/local/bin/redis-cli ;\
 
 EXPOSE 3679 
 ADD supervisord.conf /etc/supervisord.conf
-#CMD /usr/local/bin/redis-server 
-</code></pre>
-
+#CMD /usr/local/bin/redis-server </pre></td></tr></table>
+</div>
+</div>
 <p>基本rabbit镜像：</p>
-
-<pre><code>FROM sshd-base
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM sshd-base
 MAINTAINER biaoge
 
 #需要如下相关的包
@@ -626,34 +938,78 @@ RUN yum localinstall /usr/local/*.rpm -y
 EXPOSE 5672 4369 
 
 #这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf 
-</code></pre>
-
+ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
+</div>
+</div>
 <p><strong>其他案例示范：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="nx">FROM</span> <span class="nx">centos</span><span class="p">:</span><span class="mf">6.8</span>
+<span class="nx">MAINTAINER</span> <span class="s">&#34;Andy_xu&#34;</span>
 
-<pre><code>FROM centos:6.8
-MAINTAINER &quot;Andy_xu&quot;
+<span class="nx">ENV</span> <span class="nx">TZ</span> <span class="s">&#34;Asia/Shanghai&#34;</span>
+<span class="err">#</span><span class="nx">ENV</span> <span class="nx">PATH</span> <span class="err">$</span><span class="nx">PATH</span><span class="p">:</span><span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="nx">data</span><span class="o">/</span>
+<span class="nx">ENV</span> <span class="nx">TERM</span> <span class="nx">xterm</span>
 
-ENV TZ &quot;Asia/Shanghai&quot;
-#ENV PATH $PATH:/export/data/
-ENV TERM xterm
-
-RUN mkdir -p /export/package
-COPY * /export/package 
-</code></pre>
-
+<span class="nx">RUN</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span>
+<span class="nx">COPY</span> <span class="o">*</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span> </pre></td></tr></table>
+</div>
+</div>
 <p><code>注意：上面dockerfile文件构建的环境没有默认的ps，需要加载export PS1='[\u@\h \W]\$'</code></p>
 
 <p>ENTRYPOINT 指令详解</p>
-
-<pre><code>$ cat Dockerfile
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat Dockerfile
 FROM centos6.8
-ENTRYPOINT [&quot;curl&quot;,&quot;-s&quot;,&quot;10.0.0.1:2379/info&quot;]
+ENTRYPOINT [&#34;curl&#34;,&#34;-s&#34;,&#34;10.0.0.1:2379/info&#34;]
 #cmd 可以只定义参数
-#CMD [&quot;-v&quot;]
+#CMD [&#34;-v&#34;]
 $ docker build -t curl .
 $ docker  run curl  (执行ENTRYPOINT定义的内容)
-{&quot;ID&quot;:&quot;RDTS:INFK:VAZI:5X75:EYAP:DBTC:AQ42:A5WH:IVJX:K4L2:RJ2R:CZS2&quot;,&quot;Containers&quot;:21,&quot;Images&quot;:150,&quot;Driver&quot;:&quot;overlay&quot;,&quot;DriverStatus&quot;:[[&quot;Backing Filesystem&quot;,&quot;extfs&quot;]],&quot;MemoryLimit&quot;:true,&quot;SwapLimit&quot;:true,&quot;CpuCfsPeriod&quot;:true,&quot;CpuCfsQuota&quot;:true,&quot;IPv4Forwarding&quot;:true,&quot;BridgeNfIptables&quot;:true,&quot;BridgeNfIp6tables&quot;:true,&quot;Debug&quot;:false,&quot;NFd&quot;:42,&quot;OomKillDisable&quot;:true,&quot;NGoroutines&quot;:84,&quot;SystemTime&quot;:&quot;2017-05-19T10:51:57.545371359+08:00&quot;,&quot;ExecutionDriver&quot;:&quot;native-0.2&quot;,&quot;LoggingDriver&quot;:&quot;json-file&quot;,&quot;NEventsListener&quot;:0,&quot;KernelVersion&quot;:&quot;2.6.32-431.wy39.el6.x86_64&quot;,&quot;OperatingSystem&quot;:&quot;\u003cunknown\u003e&quot;,&quot;IndexServerAddress&quot;:&quot;https://index.docker.io/v1/&quot;,&quot;RegistryConfig&quot;:{&quot;InsecureRegistryCIDRs&quot;:[&quot;127.0.0.0/8&quot;],&quot;IndexConfigs&quot;:{&quot;xxbandy123&quot;:{&quot;Name&quot;:&quot;172.25.46.9:5001&quot;,&quot;Mirrors&quot;:[],&quot;Secure&quot;:false,&quot;Official&quot;:false},&quot;docker.io&quot;:{&quot;Name&quot;:&quot;docker.io&quot;,&quot;Mirrors&quot;:null,&quot;Secure&quot;:true,&quot;Official&quot;:true}},&quot;Mirrors&quot;:null},&quot;InitSha1&quot;:&quot;&quot;,&quot;InitPath&quot;:&quot;/usr/bin/docker&quot;,&quot;NCPU&quot;:40,&quot;MemTotal&quot;:135282294784,&quot;DockerRootDir&quot;:&quot;/export/lib/docker&quot;,&quot;HttpProxy&quot;:&quot;&quot;,&quot;HttpsProxy&quot;:&quot;&quot;,&quot;NoProxy&quot;:&quot;&quot;,&quot;Name&quot;:&quot;HC-25-28-12.h.chinabank.com.cn&quot;,&quot;Labels&quot;:null,&quot;ExperimentalBuild&quot;:false,&quot;ServerVersion&quot;:&quot;1.9.1&quot;,&quot;ClusterStore&quot;:&quot;&quot;,&quot;ClusterAdvertise&quot;:&quot;&quot;}
+{&#34;ID&#34;:&#34;RDTS:INFK:VAZI:5X75:EYAP:DBTC:AQ42:A5WH:IVJX:K4L2:RJ2R:CZS2&#34;,&#34;Containers&#34;:21,&#34;Images&#34;:150,&#34;Driver&#34;:&#34;overlay&#34;,&#34;DriverStatus&#34;:[[&#34;Backing Filesystem&#34;,&#34;extfs&#34;]],&#34;MemoryLimit&#34;:true,&#34;SwapLimit&#34;:true,&#34;CpuCfsPeriod&#34;:true,&#34;CpuCfsQuota&#34;:true,&#34;IPv4Forwarding&#34;:true,&#34;BridgeNfIptables&#34;:true,&#34;BridgeNfIp6tables&#34;:true,&#34;Debug&#34;:false,&#34;NFd&#34;:42,&#34;OomKillDisable&#34;:true,&#34;NGoroutines&#34;:84,&#34;SystemTime&#34;:&#34;2017-05-19T10:51:57.545371359+08:00&#34;,&#34;ExecutionDriver&#34;:&#34;native-0.2&#34;,&#34;LoggingDriver&#34;:&#34;json-file&#34;,&#34;NEventsListener&#34;:0,&#34;KernelVersion&#34;:&#34;2.6.32-431.wy39.el6.x86_64&#34;,&#34;OperatingSystem&#34;:&#34;\u003cunknown\u003e&#34;,&#34;IndexServerAddress&#34;:&#34;https://index.docker.io/v1/&#34;,&#34;RegistryConfig&#34;:{&#34;InsecureRegistryCIDRs&#34;:[&#34;127.0.0.0/8&#34;],&#34;IndexConfigs&#34;:{&#34;xxbandy123&#34;:{&#34;Name&#34;:&#34;172.25.46.9:5001&#34;,&#34;Mirrors&#34;:[],&#34;Secure&#34;:false,&#34;Official&#34;:false},&#34;docker.io&#34;:{&#34;Name&#34;:&#34;docker.io&#34;,&#34;Mirrors&#34;:null,&#34;Secure&#34;:true,&#34;Official&#34;:true}},&#34;Mirrors&#34;:null},&#34;InitSha1&#34;:&#34;&#34;,&#34;InitPath&#34;:&#34;/usr/bin/docker&#34;,&#34;NCPU&#34;:40,&#34;MemTotal&#34;:135282294784,&#34;DockerRootDir&#34;:&#34;/export/lib/docker&#34;,&#34;HttpProxy&#34;:&#34;&#34;,&#34;HttpsProxy&#34;:&#34;&#34;,&#34;NoProxy&#34;:&#34;&#34;,&#34;Name&#34;:&#34;HC-25-28-12.h.chinabank.com.cn&#34;,&#34;Labels&#34;:null,&#34;ExperimentalBuild&#34;:false,&#34;ServerVersion&#34;:&#34;1.9.1&#34;,&#34;ClusterStore&#34;:&#34;&#34;,&#34;ClusterAdvertise&#34;:&#34;&#34;}
 
 $ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆盖掉Dockerfile中掉CMD指令)
 * About to connect() to 10.0.0.1 port 5256 (#0)
@@ -674,8 +1030,9 @@ $ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆�
 HTTP/1.1 404 Not Found
 Content-Type: text/plain; charset=utf-8
 Date: Fri, 19 May 2017 02:53:36 GMT
-Content-Length: 19
-</code></pre>
+Content-Length: 19</pre></td></tr></table>
+</div>
+</div>
     </div>
 
     
@@ -695,7 +1052,7 @@ Content-Length: 19
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -708,7 +1065,15 @@ Content-Length: 19
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -762,6 +1127,16 @@ Content-Length: 19
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -901,6 +1276,23 @@ Content-Length: 19
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

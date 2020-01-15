@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>使用Python操作MySQL - BGBiao的Ops人生</title>
+  <title>使用Python操作MySQL - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content=" 前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="使用Python操作MySQL" />
 <meta property="og:description" content="
@@ -67,7 +69,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/operatemysqlwithpython/" />
 <meta property="article:published_time" content="2018-10-27T13:53:40+00:00" />
-<meta property="article:modified_time" content="2018-10-27T13:53:40+00:00" />
+<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
 <meta itemprop="name" content="使用Python操作MySQL">
 <meta itemprop="description" content="
 前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。
@@ -75,8 +77,8 @@
 
 
 <meta itemprop="datePublished" content="2018-10-27T13:53:40&#43;00:00" />
-<meta itemprop="dateModified" content="2018-10-27T13:53:40&#43;00:00" />
-<meta itemprop="wordCount" content="4175">
+<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
+<meta itemprop="wordCount" content="4479">
 
 
 
@@ -97,13 +99,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -148,9 +161,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -217,6 +273,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -224,7 +308,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -288,10 +372,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -315,7 +441,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             
           </div>
-        
+        <span class="more-meta"> 4479 words </span>
+          <span class="more-meta"> 9 min read </span>
 
         
         
@@ -364,8 +491,60 @@
 <p><code>注意:在当前容器化基础设施已经全面覆盖的时代，为了快速验证效果，我们及其推荐使用以Docker为代表的容器化基础设施来快速构建你的基础环境。</code></p>
 
 <p>在<a href="https://hub.docker.com/">DockerHub</a>上有丰富的基础中间件的镜像，我们可以使用Docker快速的构建我们的MySQL基础环境，而不必每次重新安装各种复杂的中间件环境，因为我们只是使用者，我相信每个团队都会有专门的中间件维护者。好吧，如果没有，那你依然可以自己根据实际的需求和标准进行构建Docker镜像，这样就为我们创造了一个未来很长一段时间可复用的组件。总之，想说的一件事就是，下面的MySQL环境是用Docker容器跑的。</p>
-
-<pre><code># 确保docker环境正常
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 确保docker环境正常
 $ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 
@@ -375,19 +554,19 @@ $ docker images | grep mysql
 mysql                                     5.6                 d1f491b20727        2 days ago          256 MB
 
 # 创建一个mysql实例[需要指定至少一个环境变量:MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD]
-$ docker run -itd --name mysql -e MYSQL_ROOT_PASSWORD=&quot;123456&quot;  -P mysql:5.6
+$ docker run -itd --name mysql -e MYSQL_ROOT_PASSWORD=&#34;123456&#34;  -P mysql:5.6
 6c4428b341516c7eeec48cbc5b658a464f76b5f7d42b3e689151392f5cd8ac56
 
 # MySQL密码为123456,端口为32773
 $ docker ps
 CONTAINER ID        IMAGE                                          COMMAND                  CREATED             STATUS              PORTS                                               NAMES
-6c4428b34151        mysql:5.6                                      &quot;docker-entrypoint.sh&quot;   5 seconds ago       Up 3 seconds        0.0.0.0:32773-&gt;3306/tcp                             mysql
+6c4428b34151        mysql:5.6                                      &#34;docker-entrypoint.sh&#34;   5 seconds ago       Up 3 seconds        0.0.0.0:32773-&gt;3306/tcp                             mysql
 
 # mysql数据库登录测试
 $ mysql -h 127.0.0.1 -uroot -P 32773 -p123456
 ...
 Server version: 5.6.42 MySQL Community Server (GPL)
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
 ...
 mysql&gt; show databases;
 +--------------------+
@@ -400,7 +579,7 @@ mysql&gt; show databases;
 3 rows in set (0.00 sec)
 
 # 查看数据库字符编码格式
-mysql&gt; show variables like '%char%';
+mysql&gt; show variables like &#39;%char%&#39;;
 +--------------------------+----------------------------+
 | Variable_name            | Value                      |
 +--------------------------+----------------------------+
@@ -413,9 +592,9 @@ mysql&gt; show variables like '%char%';
 | character_set_system     | utf8                       |
 | character_sets_dir       | /usr/share/mysql/charsets/ |
 +--------------------------+----------------------------+
-8 rows in set (0.00 sec)
-</code></pre>
-
+8 rows in set (0.00 sec)</pre></td></tr></table>
+</div>
+</div>
 <p>至此，一个MySQL数据库已经准备好，需要我们注意的是，因为使用的是官方的Docker image，我们需要进行相关配置的检查和设置，否则可能会为后期的操作造成一定麻烦，比如设置数据库的字符编码.<br />
 让MySQL支持中文，一般而言需要关注以下几个点:
 - 1. 修改MySQL配置中客户端和服务端的字符编码为<code>utf8</code>，分别为[mysqld的default-character-set和character-set-server参数以及client的default-character-set参数]
@@ -440,26 +619,58 @@ mysql&gt; show variables like '%char%';
 - 1. 使用系统自带工具安装<code>apt-get install or yum install</code>，该种方式会将模块默认安装的系统环境，可能会影响系统环境
 - 2. 使用Python原声的包管理工具<code>pip install</code> ，该种方式会默认安装到<code>pip</code>命令所在的Python解释环境下，因此取决于Python环境是否独立于系统环境的Python，通常情况下会使用<code>pyenv</code>之类的工具进行环境隔离
 - 3. 使用包管理工具<code>conda</code>相关工具进行管理python，可以有效管理python多环境依赖，并且可以很方便构建数据科学相关环境.<a href="https://www.jianshu.com/c/d2372cb5978e">conda使用指南</a></p>
-
-<pre><code># 安装pymysql库
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 安装pymysql库
 $ pip install pymysql
 or 
-$ conda install pymysql
-
-</code></pre>
-
+$ conda install pymysql</pre></td></tr></table>
+</div>
+</div>
 <h4 id="python链接mysql以及基本使用">python链接MySQL以及基本使用</h4>
 
 <p><strong>使用pymysql库操作mysql</strong></p>
-
-<pre><code>$ cat pytest_mysql.py
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat pytest_mysql.py
 import pymysql
 # 获取一个mysql链接对象
-conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, charset='utf8')
+conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, charset=&#39;utf8&#39;)
 # 使用数据库链接的cursor()方法获取一个游标对象
 cursor = conn.cursor()
 # 使用游标对象的execute()方法进行执行sql语句
-cursor.execute(&quot;SELECT VERSION()&quot;)
+cursor.execute(&#34;SELECT VERSION()&#34;)
 ## execute方法的定义如下,其中args可以是tuple, list or dict,如果是list or tuple的话，%s会被当做查询的一个占位符;如果是dict的话%(name)s会被当做一个占位符
 ## execute(self, query, args=None) 
 
@@ -474,16 +685,79 @@ conn.commit()
 
 # 及时关闭数据库链接以及打开的游标[以防止在并发情况下系统打开连接数过多]
 cursor.close()
-conn.close()
-
-</code></pre>
-
+conn.close()</pre></td></tr></table>
+</div>
+</div>
 <p><strong>尝试用python脚本进行数据库操作</strong></p>
-
-<pre><code>$ cat test_show_table.py
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat test_show_table.py
 import sys
 reload(sys)
-sys.setdefaultencoding('utf-8')
+sys.setdefaultencoding(&#39;utf-8&#39;)
 import pymysql
 
 class mysqlObj:
@@ -494,7 +768,7 @@ class mysqlObj:
         self.passwd = passwd
         self.port = port
     def mysqlConIns(self):
-        conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.dbname, charset='utf8')
+        conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.dbname, charset=&#39;utf8&#39;)
         return conn
     def querydata(self,sql,args=None):
         conn = self.mysqlConIns()
@@ -507,50 +781,70 @@ class mysqlObj:
         conn.close()
 
 
-if __name__ == '__main__':
-    mysqlobj = mysqlObj('localhost','mysql','root','123456',32773)
-    mysqlobj.querydata(&quot;show tables;&quot;)
+if __name__ == &#39;__main__&#39;:
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;mysql&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    mysqlobj.querydata(&#34;show tables;&#34;)
 
 # 对mysql库进行查看tables操作，返回的是一个tuple
 $ python test_show_table.py
-(u'columns_priv',)
-(u'db',)
-(u'event',)
-(u'func',)
-(u'general_log',)
-(u'help_category',)
-(u'help_keyword',)
-(u'help_relation',)
-(u'help_topic',)
-(u'innodb_index_stats',)
-(u'innodb_table_stats',)
-(u'ndb_binlog_index',)
-(u'plugin',)
-(u'proc',)
-(u'procs_priv',)
-(u'proxies_priv',)
-(u'servers',)
-(u'slave_master_info',)
-(u'slave_relay_log_info',)
-(u'slave_worker_info',)
-(u'slow_log',)
-(u'tables_priv',)
-(u'time_zone',)
-(u'time_zone_leap_second',)
-(u'time_zone_name',)
-(u'time_zone_transition',)
-(u'time_zone_transition_type',)
-(u'user',)
-
-</code></pre>
-
+(u&#39;columns_priv&#39;,)
+(u&#39;db&#39;,)
+(u&#39;event&#39;,)
+(u&#39;func&#39;,)
+(u&#39;general_log&#39;,)
+(u&#39;help_category&#39;,)
+(u&#39;help_keyword&#39;,)
+(u&#39;help_relation&#39;,)
+(u&#39;help_topic&#39;,)
+(u&#39;innodb_index_stats&#39;,)
+(u&#39;innodb_table_stats&#39;,)
+(u&#39;ndb_binlog_index&#39;,)
+(u&#39;plugin&#39;,)
+(u&#39;proc&#39;,)
+(u&#39;procs_priv&#39;,)
+(u&#39;proxies_priv&#39;,)
+(u&#39;servers&#39;,)
+(u&#39;slave_master_info&#39;,)
+(u&#39;slave_relay_log_info&#39;,)
+(u&#39;slave_worker_info&#39;,)
+(u&#39;slow_log&#39;,)
+(u&#39;tables_priv&#39;,)
+(u&#39;time_zone&#39;,)
+(u&#39;time_zone_leap_second&#39;,)
+(u&#39;time_zone_name&#39;,)
+(u&#39;time_zone_transition&#39;,)
+(u&#39;time_zone_transition_type&#39;,)
+(u&#39;user&#39;,)</pre></td></tr></table>
+</div>
+</div>
 <h4 id="mysql数据库常用的一些操作">MySQL数据库常用的一些操作</h4>
 
 <p><code>注意:在之前我们创建的MySQL实例中仅是一个空的数据库，在实际使用之前，我们需要进行数据库的库表结构创建，以及相关的数据库授权，而这一部分操作通常会由专业的数据库管理员(DBA)进行操作和处理</code></p>
 
 <p>接下来对一个<code>website</code>数据库和<code>use</code>表进行操作:</p>
-
-<pre><code>mysql&gt; create database website;
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">mysql&gt; create database website;
 Query OK, 1 row affected (0.00 sec)
 mysql&gt; CREATE TABLE  IF NOT EXISTS useinfo (userid int(10) primary key not null auto_increment,username varchar(20) not null,usersite varchar(50),other varchar(50)) DEFAULT CHARSET=utf8;
 Query OK, 0 rows affected (0.02 sec)
@@ -566,37 +860,131 @@ mysql&gt; describe useinfo;
 4 rows in set (0.00 sec)
 
 # 数据库授权[授权所有的主机可以以root用户,123456的密码去操作website库]
-mysql&gt; grant all on website.* to root@'%' identified by &quot;123456&quot;;
-Query OK, 0 rows affected (0.00 sec)
-
-</code></pre>
-
+mysql&gt; grant all on website.* to root@&#39;%&#39; identified by &#34;123456&#34;;
+Query OK, 0 rows affected (0.00 sec)</pre></td></tr></table>
+</div>
+</div>
 <h4 id="对指定数据库进行相关查询操作">对指定数据库进行相关查询操作</h4>
-
-<pre><code># 依然是上面那个test_show_table.py脚本,不过我们改变一下`__main__`
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 依然是上面那个test_show_table.py脚本,不过我们改变一下`__main__`
 $ cat test_show_table.py
 .....
-if __name__ == '__main__':
-    mysqlobj = mysqlObj('localhost','website','root','123456',32773)
-    args = [&quot;show tables;&quot;,&quot;describe useinfo;&quot;]
+if __name__ == &#39;__main__&#39;:
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;website&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    args = [&#34;show tables;&#34;,&#34;describe useinfo;&#34;]
     for arg in args:
         mysqlobj.querydata(arg)
 
 # 可以看到我们的website库下有useinfo一张表，并且该表包含userid,username,usersite,other4个字段
 $ python test_show_table.py
-(u'useinfo',)
-(u'userid', u'int(10)', u'NO', u'PRI', None, u'auto_increment')
-(u'username', u'varchar(20)', u'NO', u'', None, u'')
-(u'usersite', u'varchar(20)', u'YES', u'', None, u'')
-(u'other', u'varchar(20)', u'YES', u'', None, u'')
-</code></pre>
-
+(u&#39;useinfo&#39;,)
+(u&#39;userid&#39;, u&#39;int(10)&#39;, u&#39;NO&#39;, u&#39;PRI&#39;, None, u&#39;auto_increment&#39;)
+(u&#39;username&#39;, u&#39;varchar(20)&#39;, u&#39;NO&#39;, u&#39;&#39;, None, u&#39;&#39;)
+(u&#39;usersite&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)
+(u&#39;other&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)</pre></td></tr></table>
+</div>
+</div>
 <h4 id="对mysql数据库进行插入操作">对MySQL数据库进行插入操作</h4>
 
 <p><code>注意:插入操作分为单条记录插入和批量插入,一般数据库都支持批量插入方法,在pysql中为cursor.executemany(sql,args)</code>
 <code>为我们的mysqlObj类增加一个插入操作:</code></p>
-
-<pre><code>$ cat test_show_table.py
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat test_show_table.py
 ....
 ....
     #注意插入数据时单条记录使用tuple()类型;批量插入数据时使用list()类型
@@ -620,44 +1008,44 @@ $ python test_show_table.py
             conn.close()
 ....
 ...
-if __name__ == '__main__':
-    mysqlobj = mysqlObj('localhost','website','root','123456',32773)
-    '''
-    args = [&quot;show tables;&quot;,&quot;describe useinfo;&quot;]
+if __name__ == &#39;__main__&#39;:
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;website&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    &#39;&#39;&#39;
+    args = [&#34;show tables;&#34;,&#34;describe useinfo;&#34;]
     for arg in args:
         mysqlobj.querydata(arg)
-    '''
+    &#39;&#39;&#39;
     #插入一条数据
-    sql = &quot;insert into  useinfo (username) values(%s)&quot;
-    arg = &quot;彪哥&quot;
+    sql = &#34;insert into  useinfo (username) values(%s)&#34;
+    arg = &#34;彪哥&#34;
     mysqlobj.changedata(sql,arg)
-    sql1 = &quot;insert into  useinfo (username,usersite) values(%s,%s)&quot;
-    arg1 = (&quot;xxbandy&quot;,&quot;http://xxbandy.github.io&quot;)
+    sql1 = &#34;insert into  useinfo (username,usersite) values(%s,%s)&#34;
+    arg1 = (&#34;xxbandy&#34;,&#34;http://xxbandy.github.io&#34;)
     mysqlobj.changedata(sql1,arg1)
     #批量插入数据
 
-    argslist = [(&quot;彪哥&quot;,&quot;http://xxbandy.github.io&quot;),(&quot;bgbiao&quot;,&quot;https://www.jianshu.com/u/9c46ece5b7bd&quot;)]
+    argslist = [(&#34;彪哥&#34;,&#34;http://xxbandy.github.io&#34;),(&#34;bgbiao&#34;,&#34;https://www.jianshu.com/u/9c46ece5b7bd&#34;)]
     mysqlobj.changedata(sql1,argslist)
     #查询数据
-    mysqlobj.querydata(&quot;select * from useinfo&quot;)
+    mysqlobj.querydata(&#34;select * from useinfo&#34;)
 	
-		print(&quot;updating the data&quot;)
-		#更新数据[需要注意的是指定了字段之后由于usersite是varchar类型，占位符必须是&quot;%s&quot;,如果是'%s'会有问题]
-    data = &quot;https://my.oschina.net/xxbAndy&quot;
-    mysqlobj.changedata('update useinfo set usersite=%s where userid = 1',data)
-    mysqlobj.querydata(&quot;select * from useinfo&quot;)
+		print(&#34;updating the data&#34;)
+		#更新数据[需要注意的是指定了字段之后由于usersite是varchar类型，占位符必须是&#34;%s&#34;,如果是&#39;%s&#39;会有问题]
+    data = &#34;https://my.oschina.net/xxbAndy&#34;
+    mysqlobj.changedata(&#39;update useinfo set usersite=%s where userid = 1&#39;,data)
+    mysqlobj.querydata(&#34;select * from useinfo&#34;)
 
 # 插入数据并查看数据
 $ python /tmp/abc.py
-(1, u'\u5f6a\u54e5', None, None)
-(2, u'xxbandy', u'http://xxbandy.github.io', None)
-(3, u'\u5f6a\u54e5', u'http://xxbandy.github.io', None)
-(4, u'bgbiao', u'https://www.jianshu.com/u/9c46ece5b7bd', None)
+(1, u&#39;\u5f6a\u54e5&#39;, None, None)
+(2, u&#39;xxbandy&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(3, u&#39;\u5f6a\u54e5&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(4, u&#39;bgbiao&#39;, u&#39;https://www.jianshu.com/u/9c46ece5b7bd&#39;, None)
 updating the data
-(1, u'\u5f6a\u54e5', u'https://my.oschina.net/xxbAndy', None)
-(2, u'xxbandy', u'http://xxbandy.github.io', None)
-(3, u'\u5f6a\u54e5', u'http://xxbandy.github.io', None)
-(4, u'bgbiao', u'https://www.jianshu.com/u/9c46ece5b7bd', None)
+(1, u&#39;\u5f6a\u54e5&#39;, u&#39;https://my.oschina.net/xxbAndy&#39;, None)
+(2, u&#39;xxbandy&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(3, u&#39;\u5f6a\u54e5&#39;, u&#39;http://xxbandy.github.io&#39;, None)
+(4, u&#39;bgbiao&#39;, u&#39;https://www.jianshu.com/u/9c46ece5b7bd&#39;, None)
 
 # 数据库查询记录
 mysql&gt; select * from website.useinfo;
@@ -668,14 +1056,91 @@ mysql&gt; select * from website.useinfo;
 |      2 | xxbandy  | http://xxbandy.github.io               | NULL  |
 |      3 | 彪哥   | http://xxbandy.github.io               | NULL  |
 |      4 | bgbiao   | https://www.jianshu.com/u/9c46ece5b7bd | NULL  |
-+--------+----------+----------------------------------------+-------+
-</code></pre>
-
++--------+----------+----------------------------------------+-------+</pre></td></tr></table>
+</div>
+</div>
 <h4 id="源码">源码</h4>
-
-<pre><code>import sys
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import sys
 reload(sys)
-sys.setdefaultencoding('utf-8')
+sys.setdefaultencoding(&#39;utf-8&#39;)
 import pymysql
 
 class mysqlObj:
@@ -686,7 +1151,7 @@ class mysqlObj:
         self.passwd = passwd
         self.port = port
     def mysqlConIns(self):
-        conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.dbname, charset='utf8')
+        conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.dbname, charset=&#39;utf8&#39;)
         return conn
     def querydata(self,sql,args=None):
         conn = self.mysqlConIns()
@@ -719,36 +1184,36 @@ class mysqlObj:
 
 
 
-if __name__ == '__main__':
+if __name__ == &#39;__main__&#39;:
 
-    mysqlobj = mysqlObj('localhost','website','root','123456',32773)
-    '''
-    args = [&quot;show tables;&quot;,&quot;describe useinfo;&quot;]
+    mysqlobj = mysqlObj(&#39;localhost&#39;,&#39;website&#39;,&#39;root&#39;,&#39;123456&#39;,32773)
+    &#39;&#39;&#39;
+    args = [&#34;show tables;&#34;,&#34;describe useinfo;&#34;]
     for arg in args:
         mysqlobj.querydata(arg)
-    '''
+    &#39;&#39;&#39;
     #插入一条数据
-    sql = &quot;insert into  useinfo (username) values(%s)&quot;
-    arg = &quot;彪哥&quot;
+    sql = &#34;insert into  useinfo (username) values(%s)&#34;
+    arg = &#34;彪哥&#34;
     mysqlobj.changedata(sql,arg)
-    sql1 = &quot;insert into  useinfo (username,usersite) values(%s,%s)&quot;
-    arg1 = (&quot;xxbandy&quot;,&quot;http://xxbandy.github.io&quot;)
+    sql1 = &#34;insert into  useinfo (username,usersite) values(%s,%s)&#34;
+    arg1 = (&#34;xxbandy&#34;,&#34;http://xxbandy.github.io&#34;)
     mysqlobj.changedata(sql1,arg1)
     #批量插入数据
 
-    argslist = [(&quot;彪哥&quot;,&quot;http://xxbandy.github.io&quot;),(&quot;bgbiao&quot;,&quot;https://www.jianshu.com/u/9c46ece5b7bd&quot;)]
+    argslist = [(&#34;彪哥&#34;,&#34;http://xxbandy.github.io&#34;),(&#34;bgbiao&#34;,&#34;https://www.jianshu.com/u/9c46ece5b7bd&#34;)]
     mysqlobj.changedata(sql1,argslist)
 
 
     #查询数据
-    mysqlobj.querydata(&quot;select * from useinfo&quot;)
-    print(&quot;updating the data&quot;)
+    mysqlobj.querydata(&#34;select * from useinfo&#34;)
+    print(&#34;updating the data&#34;)
     #更新数据
-    data = &quot;https://my.oschina.net/xxbAndy&quot;
-    mysqlobj.changedata('''update useinfo set usersite=%s where userid = 1''',data)
-    mysqlobj.querydata(&quot;select * from useinfo&quot;)
-
-</code></pre>
+    data = &#34;https://my.oschina.net/xxbAndy&#34;
+    mysqlobj.changedata(&#39;&#39;&#39;update useinfo set usersite=%s where userid = 1&#39;&#39;&#39;,data)
+    mysqlobj.querydata(&#34;select * from useinfo&#34;)</pre></td></tr></table>
+</div>
+</div>
     </div>
 
     
@@ -761,14 +1226,17 @@ if __name__ == '__main__':
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2018-10-27
+      2019-12-03
+      
+        
+        
       
     </span>
   </p>
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -781,7 +1249,15 @@ if __name__ == '__main__':
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -835,6 +1311,16 @@ if __name__ == '__main__':
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -974,6 +1460,23 @@ if __name__ == '__main__':
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

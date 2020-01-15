@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Overlayfs技术探究以及Docker环境中的使用 - BGBiao的Ops人生</title>
+  <title>Overlayfs技术探究以及Docker环境中的使用 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="overlayfs 基本概念 一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="Overlayfs技术探究以及Docker环境中的使用" />
 <meta property="og:description" content="overlayfs 基本概念
@@ -78,7 +80,7 @@
 
 <meta itemprop="datePublished" content="2017-11-09T21:36:58&#43;00:00" />
 <meta itemprop="dateModified" content="2017-11-09T21:36:58&#43;00:00" />
-<meta itemprop="wordCount" content="2808">
+<meta itemprop="wordCount" content="2966">
 
 
 
@@ -100,13 +102,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -151,9 +164,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -220,6 +276,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -227,7 +311,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -291,10 +375,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -318,7 +444,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 2966 words </span>
+          <span class="more-meta"> 6 min read </span>
 
         
         
@@ -409,12 +536,96 @@
 <h4 id="overlayfs的原理测试">overlayfs的原理测试</h4>
 
 <p>overlayfs挂载后系统文件的page cache是全部共享的。</p>
-
-<pre><code># mkdir low upper work
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># mkdir low upper work
 # ls
 low  upper  work
-# echo 'abs' &gt; low/11.txt
-# echo 'xuxuebiao' &gt; upper/22.txt
+# echo &#39;abs&#39; &gt; low/11.txt
+# echo &#39;xuxuebiao&#39; &gt; upper/22.txt
 # mkdir merged
 # mount -t overlay overlay -olowerdir=./low,upperdir=./upper,workdir=./work ./merged
 # ls
@@ -490,10 +701,9 @@ cat: ../upper/11.txt~: No such device or address
 c---------. 1 root root 0, 0 Mar 27 19:08 ../upper/11.txt
 
 删除文件后发现文件无法访问，底层变成了一个大小为0，且没有任何人有权限的一个空文件。
-overlayfs用这种删除标记的方式标识文件被删除，（如果upper中没有该文件的话，则底层low中的同名文件又恢复出来显示了，因此需要有这个空文件来标识删除，并且覆盖底层的文件）
-
-</code></pre>
-
+overlayfs用这种删除标记的方式标识文件被删除，（如果upper中没有该文件的话，则底层low中的同名文件又恢复出来显示了，因此需要有这个空文件来标识删除，并且覆盖底层的文件）</pre></td></tr></table>
+</div>
+</div>
 <h3 id="overlayfs在docker中的使用">overlayfs在docker中的使用</h3>
 
 <blockquote>
@@ -506,32 +716,75 @@ overlayfs用这种删除标记的方式标识文件被删除，（如果upper中
 
 <ul>
 <li><p>1.检查overlay是否被加载</p>
-
-<pre><code>查看overlay是否被加载
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">查看overlay是否被加载
 $ lsmod | grep overlay
 查看内核是否支持overlay模块
 $ modinfo overlayfs
 加载内核模块
-$ modprobe overlayfs
-
-</code></pre></li>
+$ modprobe overlayfs</pre></td></tr></table>
+</div>
+</div></li>
 
 <li><p>2.docker启动参数修改</p>
-
-<pre><code>检测overlayfs释放被识别，成功启动后修改参数到默认的配置文件中
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">检测overlayfs释放被识别，成功启动后修改参数到默认的配置文件中
 $ docker daemon(dockerd) -s overlay(--storage-driver=overlay) 
 
 修改配置文件
 $ cat /etc/sysconfig/docker.conf
-DOCKER_OPTS=&quot;--storage-driver=overlay&quot;
+DOCKER_OPTS=&#34;--storage-driver=overlay&#34;
 
 模拟配置:
-other_args=&quot;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.sock --bip 10.0.0.1/24 -H 0.0.0.0:5256  --api-enable-cors=true&quot;
-</code></pre></li>
+other_args=&#34;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.sock --bip 10.0.0.1/24 -H 0.0.0.0:5256  --api-enable-cors=true&#34;</pre></td></tr></table>
+</div>
+</div></li>
 
 <li><p>3.检验overlayfs是否成功启动</p>
-
-<pre><code>$ sudo /etc/init.d/docker restart
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ sudo /etc/init.d/docker restart
 成功启动，查看存储信息：
 $ sudo docker info
 Containers: 11
@@ -548,15 +801,63 @@ Total Memory: 126 GiB
 Name: －－－－－
 ID: 2IER:NO5S:4NKX:ULDJ:THGQ:GBNR:NIN6:SCXG:SMFX:PG72:JAQF:GRZW
 
-可用看到相关存储驱动是overlay，文件系统是extfs
-</code></pre></li>
+可用看到相关存储驱动是overlay，文件系统是extfs</pre></td></tr></table>
+</div>
+</div></li>
 
 <li><p>4.overlay在docker上面的使用</p></li>
 </ul>
 
 <p><code>默认docker会将容器以及镜像相关的文件存储在/var/lib/docker/overlay目录下</code></p>
-
-<pre><code>sh-4.1# docker  images
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.1# docker  images
 REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 xxbandy123/centos6.8-sshd   latest              42c75e16533e        12 weeks ago        402 MB
 sh-4.1# pwd  （这里我们是配置了存储路径）
@@ -574,34 +875,34 @@ drwx------ 3 root root 4096 Mar 31 10:35 e444e2175366cd3507bc9278d9a68a7b7ca5759
 
 可用看到我们现在有一个image，id为42c75e16533e,overlay会把该镜像的所有父镜像存储到本地(image的分层缓存)，该image共5层。
 sh-4.1# docker  inspect 42c75e16533e | grep b46ba152cc1
-    &quot;Parent&quot;: &quot;b46ba152cc17054229bc0099e7fda8b34958d518ce687c0d378b4832c4d8c91e&quot;,
+    &#34;Parent&#34;: &#34;b46ba152cc17054229bc0099e7fda8b34958d518ce687c0d378b4832c4d8c91e&#34;,
 sh-4.1# docker  inspect b46ba152cc1 | grep 9016bb11dc9b4a
-    &quot;Parent&quot;: &quot;9016bb11dc9b4a3ee23fbef484cf5b3c9b80491e87d67092febec45759baeb4f&quot;,
+    &#34;Parent&#34;: &#34;9016bb11dc9b4a3ee23fbef484cf5b3c9b80491e87d67092febec45759baeb4f&#34;,
 sh-4.1# docker  inspect 9016bb11dc9b4a | grep ea80c789cb2
-    &quot;Parent&quot;: &quot;ea80c789cb2b3bcc1d12b9b3226c8482a06f28e94a4a49f8e201b5e9cdbdf0cc&quot;,
+    &#34;Parent&#34;: &#34;ea80c789cb2b3bcc1d12b9b3226c8482a06f28e94a4a49f8e201b5e9cdbdf0cc&#34;,
 sh-4.1# docker  inspect ea80c789cb2 | grep e444e2175366cd35
-    &quot;Parent&quot;: &quot;e444e2175366cd3507bc9278d9a68a7b7ca5759b364bfe960fc12a87f219e847&quot;,
+    &#34;Parent&#34;: &#34;e444e2175366cd3507bc9278d9a68a7b7ca5759b364bfe960fc12a87f219e847&#34;,
 sh-4.1# docker  inspect e444e2175366cd35 | grep Parent
-    &quot;Parent&quot;: &quot;&quot;,
+    &#34;Parent&#34;: &#34;&#34;,
 sh-4.1#
 
 
 由下面示例可以看到容器id 8ab8690b07，实际上是使用image 42c75e16533e 启动起来的一个container，并给出了container 的LowerDir:`/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root`
 
 sh-4.1# docker inspect 8ab8690b07 | grep Parent
-        &quot;CgroupParent&quot;: &quot;&quot;,
+        &#34;CgroupParent&#34;: &#34;&#34;,
 sh-4.1# docker inspect 8ab8690b07 | grep 42c75e1653
-    &quot;Image&quot;: &quot;42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e&quot;,
-            &quot;LowerDir&quot;: &quot;/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root&quot;,
-        &quot;Image&quot;: &quot;42c75e16533e&quot;,
+    &#34;Image&#34;: &#34;42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e&#34;,
+            &#34;LowerDir&#34;: &#34;/export/lib/docker/overlay/42c75e16533e2ef46ffd22a21318d354b3f3e520709230e9848ebaca8f1f514e/root&#34;,
+        &#34;Image&#34;: &#34;42c75e16533e&#34;,
 sh-4.1#
 
 查看容器内部的存储结构：
 sh-4.1# ls 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527/
 lower-id  merged/   upper/
-容器的存储里面默认会存放三个文件，lower-id纪录的是image的id，也就是上面提到的LowerDir,其次存在merged和upper目录，分别为容器层，和容器最终看到的merged层。overlayfs中的lower,upper,merged三者的关系看文首。
-
-</code></pre>
+容器的存储里面默认会存放三个文件，lower-id纪录的是image的id，也就是上面提到的LowerDir,其次存在merged和upper目录，分别为容器层，和容器最终看到的merged层。overlayfs中的lower,upper,merged三者的关系看文首。</pre></td></tr></table>
+</div>
+</div>
     </div>
 
     
@@ -621,7 +922,7 @@ lower-id  merged/   upper/
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -634,7 +935,15 @@ lower-id  merged/   upper/
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -688,6 +997,16 @@ lower-id  merged/   upper/
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -827,6 +1146,23 @@ lower-id  merged/   upper/
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

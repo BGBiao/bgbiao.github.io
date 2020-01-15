@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Golang正则模块使用 - BGBiao的Ops人生</title>
+  <title>Golang正则模块使用 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的regexp模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为string类型的方法。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="Golang正则模块使用" />
 <meta property="og:description" content="最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的regexp模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为string类型的方法。" />
@@ -72,7 +74,7 @@
 
 <meta itemprop="datePublished" content="2017-12-24T16:39:14&#43;00:00" />
 <meta itemprop="dateModified" content="2017-12-24T16:39:14&#43;00:00" />
-<meta itemprop="wordCount" content="676">
+<meta itemprop="wordCount" content="743">
 
 
 
@@ -91,13 +93,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -142,9 +155,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -211,6 +267,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -218,7 +302,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -282,10 +366,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -309,7 +435,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             
           </div>
-        
+        <span class="more-meta"> 743 words </span>
+          <span class="more-meta"> 2 min read </span>
 
         
         
@@ -333,8 +460,39 @@
       <p>最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的<code>regexp</code>模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为<code>string</code>类型的方法。</p>
 
 <p><strong><code>regexp</code>模块的结构体和方法定义</strong></p>
-
-<pre><code>//正则结构体
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">//正则结构体
 type Regexp struct {
         // contains filtered or unexported fields
 }
@@ -361,53 +519,94 @@ func (re *Regexp) ReplaceAllLiteralString(src, repl string) string
  
  
 //在字符串中是否匹配到re定义的字符串，匹配返回true
-func (re *Regexp) MatchString(s string) bool
-
-</code></pre>
-
+func (re *Regexp) MatchString(s string) bool</pre></td></tr></table>
+</div>
+</div>
 <p><strong>简单示例</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">regexp</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+<span class="cm">/**
+</span><span class="cm"> * @File Name: test.go
+</span><span class="cm"> * @Author:
+</span><span class="cm"> * @Email:
+</span><span class="cm"> * @Create Date: 2017-12-24 15:12:31
+</span><span class="cm"> * @Last Modified: 2017-12-24 16:12:12
+</span><span class="cm"> * @Description:
+</span><span class="cm"> */</span>
+<span class="kn">package</span> <span class="nx">main</span>
 
-<pre><code>$ cat regexp-test.go
-/**
- * @File Name: test.go
- * @Author:
- * @Email:
- * @Create Date: 2017-12-24 15:12:31
- * @Last Modified: 2017-12-24 16:12:12
- * @Description:
- */
-package main
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;fmt&#34;</span>
+	<span class="s">&#34;regexp&#34;</span>
+<span class="p">)</span>
 
-import (
-	&quot;fmt&quot;
-	&quot;regexp&quot;
-)
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">testString</span> <span class="o">:=</span> <span class="s">&#34;k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io&#34;</span>
+	<span class="nx">re</span> <span class="o">:=</span> <span class="nx">regexp</span><span class="p">.</span><span class="nf">MustCompile</span><span class="p">(</span><span class="s">&#34;k8s?&#34;</span><span class="p">)</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;src string:&#34;</span><span class="p">,</span><span class="nx">testString</span><span class="p">)</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;regular expression:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">)</span>
 
-func main() {
-  testString := &quot;k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io&quot;
-	re := regexp.MustCompile(&quot;k8s?&quot;)
-  fmt.Println(&quot;src string:&quot;,testString)
-  fmt.Println(&quot;regular expression:&quot;,re)
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;FindAllString matching all:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">.</span><span class="nf">FindAllString</span><span class="p">(</span><span class="nx">testString</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;FindAllString matching twice:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">.</span><span class="nf">FindAllString</span><span class="p">(</span><span class="nx">testString</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;FindString:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">.</span><span class="nf">FindString</span><span class="p">(</span><span class="nx">testString</span><span class="p">))</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ReplaceAllString:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">.</span><span class="nf">ReplaceAllString</span><span class="p">(</span><span class="nx">testString</span><span class="p">,</span><span class="s">&#34;biaoge&#34;</span><span class="p">))</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;ReplaceAllLiteralString:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">.</span><span class="nf">ReplaceAllLiteralString</span><span class="p">(</span><span class="nx">testString</span><span class="p">,</span><span class="s">&#34;BIAOGE&#34;</span><span class="p">))</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Match String:&#34;</span><span class="p">,</span><span class="nx">re</span><span class="p">.</span><span class="nf">MatchString</span><span class="p">(</span><span class="nx">testString</span><span class="p">))</span>
+<span class="p">}</span>
 
-  fmt.Println(&quot;FindAllString matching all:&quot;,re.FindAllString(testString,-1))
-  fmt.Println(&quot;FindAllString matching twice:&quot;,re.FindAllString(testString,2))
-  fmt.Println(&quot;FindString:&quot;,re.FindString(testString))
-  fmt.Println(&quot;ReplaceAllString:&quot;,re.ReplaceAllString(testString,&quot;biaoge&quot;))
-  fmt.Println(&quot;ReplaceAllLiteralString:&quot;,re.ReplaceAllLiteralString(testString,&quot;BIAOGE&quot;))
-  fmt.Println(&quot;Match String:&quot;,re.MatchString(testString))
-}
-
-$ go run regexp-test.go
-src string: k8s-test-pod-12343k811sadsxsakxz-test-k8s-container.k8s-@xxbandy.github.io
-regular expression: k8s?
-FindAllString matching all: [k8s k8 k8s k8s]
-FindAllString matching twice: [k8s k8]
-FindString: k8s
-ReplaceAllString: biaoge-test-pod-12343biaoge11sadsxsakxz-test-biaoge-container.biaoge-@xxbandy.github.io
-ReplaceAllLiteralString: BIAOGE-test-pod-12343BIAOGE11sadsxsakxz-test-BIAOGE-container.BIAOGE-@xxbandy.github.io
-Match String: true
-</code></pre>
-
+<span class="err">$</span> <span class="k">go</span> <span class="nx">run</span> <span class="nx">regexp</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+<span class="nx">src</span> <span class="kt">string</span><span class="p">:</span> <span class="nx">k8s</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">pod</span><span class="o">-</span><span class="mi">12343</span><span class="nx">k811sadsxsakxz</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">k8s</span><span class="o">-</span><span class="nx">container</span><span class="p">.</span><span class="nx">k8s</span><span class="o">-</span><span class="err">@</span><span class="nx">xxbandy</span><span class="p">.</span><span class="nx">github</span><span class="p">.</span><span class="nx">io</span>
+<span class="nx">regular</span> <span class="nx">expression</span><span class="p">:</span> <span class="nx">k8s</span><span class="err">?</span>
+<span class="nx">FindAllString</span> <span class="nx">matching</span> <span class="nx">all</span><span class="p">:</span> <span class="p">[</span><span class="nx">k8s</span> <span class="nx">k8</span> <span class="nx">k8s</span> <span class="nx">k8s</span><span class="p">]</span>
+<span class="nx">FindAllString</span> <span class="nx">matching</span> <span class="nx">twice</span><span class="p">:</span> <span class="p">[</span><span class="nx">k8s</span> <span class="nx">k8</span><span class="p">]</span>
+<span class="nx">FindString</span><span class="p">:</span> <span class="nx">k8s</span>
+<span class="nx">ReplaceAllString</span><span class="p">:</span> <span class="nx">biaoge</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">pod</span><span class="o">-</span><span class="mi">12343</span><span class="nx">biaoge11sadsxsakxz</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">biaoge</span><span class="o">-</span><span class="nx">container</span><span class="p">.</span><span class="nx">biaoge</span><span class="o">-</span><span class="err">@</span><span class="nx">xxbandy</span><span class="p">.</span><span class="nx">github</span><span class="p">.</span><span class="nx">io</span>
+<span class="nx">ReplaceAllLiteralString</span><span class="p">:</span> <span class="nx">BIAOGE</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">pod</span><span class="o">-</span><span class="mi">12343</span><span class="nx">BIAOGE11sadsxsakxz</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">BIAOGE</span><span class="o">-</span><span class="nx">container</span><span class="p">.</span><span class="nx">BIAOGE</span><span class="o">-</span><span class="err">@</span><span class="nx">xxbandy</span><span class="p">.</span><span class="nx">github</span><span class="p">.</span><span class="nx">io</span>
+<span class="nx">Match</span> <span class="nx">String</span><span class="p">:</span> <span class="kc">true</span></pre></td></tr></table>
+</div>
+</div>
 <p>不论是哪种语言的正则模块，个人认为语法都不是最重要的，最重要我认为还是正则表达式本身，如果对正则表达式本身认识比较深的话，不论用哪种语言工具都可以很灵活的处理各种业务场景。这里附上一篇当年写的正则表达式相关的<a href="https://my.oschina.net/xxbAndy/blog/370806">文章</a></p>
 
 <p>看到另外一篇文章的正则总结的挺好，分享下来.
@@ -431,7 +630,7 @@ Match String: true
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -444,7 +643,15 @@ Match String: true
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -498,6 +705,16 @@ Match String: true
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -637,6 +854,23 @@ Match String: true
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

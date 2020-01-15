@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>手把手构建Etcd镜像 - BGBiao的Ops人生</title>
+  <title>手把手构建Etcd镜像 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content=" 本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="手把手构建Etcd镜像" />
 <meta property="og:description" content="
@@ -67,7 +69,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/dockerfile-etcd/" />
 <meta property="article:published_time" content="2017-08-26T17:56:15+00:00" />
-<meta property="article:modified_time" content="2017-08-26T17:56:15+00:00" />
+<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
 <meta itemprop="name" content="手把手构建Etcd镜像">
 <meta itemprop="description" content="
 本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境
@@ -75,8 +77,8 @@
 
 
 <meta itemprop="datePublished" content="2017-08-26T17:56:15&#43;00:00" />
-<meta itemprop="dateModified" content="2017-08-26T17:56:15&#43;00:00" />
-<meta itemprop="wordCount" content="942">
+<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
+<meta itemprop="wordCount" content="1058">
 
 
 
@@ -97,13 +99,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -148,9 +161,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -217,6 +273,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -224,7 +308,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -288,10 +372,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -315,7 +441,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 1058 words </span>
+          <span class="more-meta"> 3 min read </span>
 
         
         
@@ -357,104 +484,207 @@
 <p><code>注意：优秀的docker镜像源文件都是会尝试去除所有依赖的，也即是该文件无论被谁拿走使用，都可以快速构建属于自己的image</code></p>
 
 <p>etcd镜像的Dockerfile项目文件结构：</p>
-
-<pre><code>$ tree .
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ tree .
 .
 ├──Dockerfile
 ├──docker-entrypoint.sh
 
 
-# Dockerfile 文件
+<span class="c1"># Dockerfile 文件</span>
 $ cat Dockerfile
 FROM centos-biaoge
-MAINTAINER 371990778@qq.com
-ENV LANG=zh_CN.UTF-8;\
-    LC_ALL=zh_CN.UTF-8;\
-    TZ=&quot;Asia/Shanghai&quot;;\
-    TERM=xterm;\
-    DOWNLOAD=https://github.com/coreos/etcd/releases/download/v3.0.10/ \
-    ETCDVERSION=etcd-v3.0.10-linux-amd64 \
-    USER=admin 
-RUN yum install mkdir curl wget tar chown unzip -y;\
-    useradd ${USER} ;\
-    mkdir -p /export/{servers,Logs,packages,Apps,Shell};\
-    wget ${DOWNLOAD}${ETCDVERSION}.tar.gz &amp;&amp; tar -zxf ${ETCDVERSION}.tar.gz -C /export/servers/ &amp;&amp; \
-    /bin/rm -rf ${ETCDVERSION}.tar.gz;\
-    chown -R ${USER}.${USER} /export ;\
-    ln -s /export/servers/${ETCDVERSION}/etcd* /usr/bin/;
-EXPOSE 2379 2380
+MAINTAINER <span class="m">371990778</span>@qq.com
+ENV <span class="nv">LANG</span><span class="o">=</span>zh_CN.UTF-8<span class="p">;</span><span class="se">\
+</span><span class="se"></span>    <span class="nv">LC_ALL</span><span class="o">=</span>zh_CN.UTF-8<span class="p">;</span><span class="se">\
+</span><span class="se"></span>    <span class="nv">TZ</span><span class="o">=</span><span class="s2">&#34;Asia/Shanghai&#34;</span><span class="p">;</span><span class="se">\
+</span><span class="se"></span>    <span class="nv">TERM</span><span class="o">=</span>xterm<span class="p">;</span><span class="se">\
+</span><span class="se"></span>    <span class="nv">DOWNLOAD</span><span class="o">=</span>https://github.com/coreos/etcd/releases/download/v3.0.10/ <span class="se">\
+</span><span class="se"></span>    <span class="nv">ETCDVERSION</span><span class="o">=</span>etcd-v3.0.10-linux-amd64 <span class="se">\
+</span><span class="se"></span>    <span class="nv">USER</span><span class="o">=</span>admin 
+RUN yum install mkdir curl wget tar chown unzip -y<span class="p">;</span><span class="se">\
+</span><span class="se"></span>    useradd <span class="si">${</span><span class="nv">USER</span><span class="si">}</span> <span class="p">;</span><span class="se">\
+</span><span class="se"></span>    mkdir -p /export/<span class="o">{</span>servers,Logs,packages,Apps,Shell<span class="o">}</span><span class="p">;</span><span class="se">\
+</span><span class="se"></span>    wget <span class="si">${</span><span class="nv">DOWNLOAD</span><span class="si">}${</span><span class="nv">ETCDVERSION</span><span class="si">}</span>.tar.gz <span class="o">&amp;&amp;</span> tar -zxf <span class="si">${</span><span class="nv">ETCDVERSION</span><span class="si">}</span>.tar.gz -C /export/servers/ <span class="o">&amp;&amp;</span> <span class="se">\
+</span><span class="se"></span>    /bin/rm -rf <span class="si">${</span><span class="nv">ETCDVERSION</span><span class="si">}</span>.tar.gz<span class="p">;</span><span class="se">\
+</span><span class="se"></span>    chown -R <span class="si">${</span><span class="nv">USER</span><span class="si">}</span>.<span class="si">${</span><span class="nv">USER</span><span class="si">}</span> /export <span class="p">;</span><span class="se">\
+</span><span class="se"></span>    ln -s /export/servers/<span class="si">${</span><span class="nv">ETCDVERSION</span><span class="si">}</span>/etcd* /usr/bin/<span class="p">;</span>
+EXPOSE <span class="m">2379</span> <span class="m">2380</span>
 COPY docker-entrypoint.sh /
-ENTRYPOINT [&quot;/docker-entrypoint.sh&quot;]
+ENTRYPOINT <span class="o">[</span><span class="s2">&#34;/docker-entrypoint.sh&#34;</span><span class="o">]</span>
 
-# 镜像启动脚本
+<span class="c1"># 镜像启动脚本</span>
 $ cat docker-entrypoint.sh
-#!/bin/bash
-#Filename:docker-entrypoint.sh
-#Author_by:Andy_xu 
-#Contact:[mail:371990778@qq.com,QQ:371990778]
-#Date:2017-07-25 16:42
-#Description:
-if [ -z $NAME ];then
-	NAME=my-etcd-1
-fi
-if [ -z $DATADIR ];then
-	DATADIR=/export/etcd_data
-fi
-if [ -z $MYHOST ];then
-	MYHOST=http://localhost
-fi
-if [ -z $PORT ];then
-        PORT=2379
-fi
-if [ -z $CLUSTER_PORT ];then
-        CLUSTER_PORT=2380
-fi
-if [ -z $CLUSTER ];then 
-	CLUSTER=my-etcd-1=http://localhost:2380
-fi
-if [ -z $CLUSTER_TOKEN ];then 
-	CLUSTER_TOKEN=my-etcd-token
-fi
-if [ -z $CLUSTER_STATE ];then
-	CLUSTER_STATE=new
-fi
+<span class="c1">#!/bin/bash</span>
+<span class="c1">#Filename:docker-entrypoint.sh</span>
+<span class="c1">#Author_by:Andy_xu</span> 
+<span class="c1">#Contact:[mail:371990778@qq.com,QQ:371990778]</span>
+<span class="c1">#Date:2017-07-25 16:42</span>
+<span class="c1">#Description:</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$NAME</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+	<span class="nv">NAME</span><span class="o">=</span>my-etcd-1
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$DATADIR</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+	<span class="nv">DATADIR</span><span class="o">=</span>/export/etcd_data
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$MYHOST</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+	<span class="nv">MYHOST</span><span class="o">=</span>http://localhost
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$PORT</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+        <span class="nv">PORT</span><span class="o">=</span><span class="m">2379</span>
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$CLUSTER_PORT</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+        <span class="nv">CLUSTER_PORT</span><span class="o">=</span><span class="m">2380</span>
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$CLUSTER</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span> 
+	<span class="nv">CLUSTER</span><span class="o">=</span>my-etcd-1<span class="o">=</span>http://localhost:2380
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$CLUSTER_TOKEN</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span> 
+	<span class="nv">CLUSTER_TOKEN</span><span class="o">=</span>my-etcd-token
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$CLUSTER_STATE</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+	<span class="nv">CLUSTER_STATE</span><span class="o">=</span>new
+<span class="k">fi</span>
 	
-ETCD_CMD=&quot;etcd --name ${NAME} --data-dir ${DATADIR}  \
-	--listen-client-urls http://0.0.0.0:${PORT}  \
-	--advertise-client-urls ${MYHOST}:${PORT} \
-  	--listen-peer-urls ${MYHOST}:${CLUSTER_PORT} \
-	--initial-advertise-peer-urls ${MYHOST}:${CLUSTER_PORT} \
-	--initial-cluster $CLUSTER  \
-	 --initial-cluster-token $CLUSTER_TOKEN \
-	--initial-cluster-state ${CLUSTER_STATE} \
-	$*&quot;
-echo -e &quot;Running '$ETCD_CMD'\nBEGIN ETCD OUTPUT\n&quot;
-exec $ETCD_CMD
-</code></pre>
-
+<span class="nv">ETCD_CMD</span><span class="o">=</span><span class="s2">&#34;etcd --name </span><span class="si">${</span><span class="nv">NAME</span><span class="si">}</span><span class="s2"> --data-dir </span><span class="si">${</span><span class="nv">DATADIR</span><span class="si">}</span><span class="s2">  \
+</span><span class="s2">	--listen-client-urls http://0.0.0.0:</span><span class="si">${</span><span class="nv">PORT</span><span class="si">}</span><span class="s2">  \
+</span><span class="s2">	--advertise-client-urls </span><span class="si">${</span><span class="nv">MYHOST</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">PORT</span><span class="si">}</span><span class="s2"> \
+</span><span class="s2">  	--listen-peer-urls </span><span class="si">${</span><span class="nv">MYHOST</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">CLUSTER_PORT</span><span class="si">}</span><span class="s2"> \
+</span><span class="s2">	--initial-advertise-peer-urls </span><span class="si">${</span><span class="nv">MYHOST</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">CLUSTER_PORT</span><span class="si">}</span><span class="s2"> \
+</span><span class="s2">	--initial-cluster </span><span class="nv">$CLUSTER</span><span class="s2">  \
+</span><span class="s2">	 --initial-cluster-token </span><span class="nv">$CLUSTER_TOKEN</span><span class="s2"> \
+</span><span class="s2">	--initial-cluster-state </span><span class="si">${</span><span class="nv">CLUSTER_STATE</span><span class="si">}</span><span class="s2"> \
+</span><span class="s2">	</span><span class="nv">$*</span><span class="s2">&#34;</span>
+<span class="nb">echo</span> -e <span class="s2">&#34;Running &#39;</span><span class="nv">$ETCD_CMD</span><span class="s2">&#39;\nBEGIN ETCD OUTPUT\n&#34;</span>
+<span class="nb">exec</span> <span class="nv">$ETCD_CMD</span></pre></td></tr></table>
+</div>
+</div>
 <h3 id="二-构建并使用image">二、构建并使用image</h3>
 
 <p><strong>1.构建etcd的image</strong></p>
 
 <p>进入项目路径下，执行以下命令：</p>
-
-<pre><code>$ docker build -t xxbandy123/etcd:3.0.10
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker build -t xxbandy123/etcd:3.0.10</pre></td></tr></table>
+</div>
+</div>
 <p><strong>2.使用默认参数创建etcd单实例</strong></p>
-
-<pre><code>$ docker run -itd --name etcd-1 xxbandy123/etcd:3.0.10  --auto-compaction-retention 1
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker run -itd --name etcd-1 xxbandy123/etcd:3.0.10  --auto-compaction-retention 1</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意：后面的 --auto-compaction-retention 1 为额外增加的参数表示1小时自动压缩保留
 默认的容器启动后面都可以增加额外的参数</code></p>
 
 <p><strong>3.使用自定义的参数进行创建etcd单实例</strong></p>
 
 <p>image内部定义的默认参数如下：</p>
-
-<pre><code>NAME=my-etcd-1
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">NAME=my-etcd-1
 DATADIR=/export/etcd_data
 MYHOST=http://localhost
 PORT=2379
@@ -471,59 +701,100 @@ etcd --name ${NAME} --data-dir ${DATADIR}  \
     --initial-advertise-peer-urls ${MYHOST}:${CLUSTER_PORT} \
     --initial-cluster $CLUSTER  \
      --initial-cluster-token $CLUSTER_TOKEN \
-    --initial-cluster-state ${CLUSTER_STATE} 
-</code></pre>
-
+    --initial-cluster-state ${CLUSTER_STATE} </pre></td></tr></table>
+</div>
+</div>
 <p>可以通过环境变量的方式启动单实例的etcd，也可以将该image传入不通变量去构造集群</p>
-
-<pre><code>$ docker run -itd -e DATADIR=/root/etcd_data -e CLUSTER_TOKEN=biaoge xxbandy123/etcd:3.0.10 --auto-compaction-retention 1
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ docker run -itd -e DATADIR=/root/etcd_data -e CLUSTER_TOKEN=biaoge xxbandy123/etcd:3.0.10 --auto-compaction-retention 1</pre></td></tr></table>
+</div>
+</div>
 <p><strong>4.如何使用etcd</strong></p>
-
-<pre><code>docker pull xxbandy123/etcd:3.0.10
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">docker pull xxbandy123/etcd:3.0.10
 
 # docker  ps -l
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS                                            NAMES
-e17c9479b424        xxbandy123/etcd:3.0.10   &quot;/docker-entrypoint.s&quot;   19 seconds ago      Up 17 seconds       0.0.0.0:1025-&gt;2379/tcp, 0.0.0.0:1024-&gt;2380/tcp   sharp_keller
+e17c9479b424        xxbandy123/etcd:3.0.10   &#34;/docker-entrypoint.s&#34;   19 seconds ago      Up 17 seconds       0.0.0.0:1025-&gt;2379/tcp, 0.0.0.0:1024-&gt;2380/tcp   sharp_keller
 
 # docker  exec -it sharp_keller etcdctl set test biaoge
 biaoge
 
 # curl -s localhost:1025/v2/keys/test | jq .
 {
-  &quot;node&quot;: {
-    &quot;createdIndex&quot;: 4,
-    &quot;modifiedIndex&quot;: 4,
-    &quot;value&quot;: &quot;biaoge&quot;,
-    &quot;key&quot;: &quot;/test&quot;
+  &#34;node&#34;: {
+    &#34;createdIndex&#34;: 4,
+    &#34;modifiedIndex&#34;: 4,
+    &#34;value&#34;: &#34;biaoge&#34;,
+    &#34;key&#34;: &#34;/test&#34;
   },
-  &quot;action&quot;: &quot;get&quot;
+  &#34;action&#34;: &#34;get&#34;
 }
 
 在任何一个客户端去访问：
 # curl -s 10.241.131.109:1025/v2/keys/test | jq .
 {
-  &quot;node&quot;: {
-    &quot;createdIndex&quot;: 4,
-    &quot;modifiedIndex&quot;: 4,
-    &quot;value&quot;: &quot;biaoge&quot;,
-    &quot;key&quot;: &quot;/test&quot;
+  &#34;node&#34;: {
+    &#34;createdIndex&#34;: 4,
+    &#34;modifiedIndex&#34;: 4,
+    &#34;value&#34;: &#34;biaoge&#34;,
+    &#34;key&#34;: &#34;/test&#34;
   },
-  &quot;action&quot;: &quot;get&quot;
-}
-
-</code></pre>
-
+  &#34;action&#34;: &#34;get&#34;
+}</pre></td></tr></table>
+</div>
+</div>
 <h3 id="三-自由发挥时间">三、自由发挥时间</h3>
 
 <p>由于该etcd实例可以通过环境变量传入参数，因此虽然是一个image，但是却非常灵活，用户可以在很快的时间内创建出来一个etcd集群。So，学会如何构建一个etcd镜像后，可以尝试下使用该image来快速构建一个etcd集群。</p>
 
 <p>为方便大家的使用，该image已经上传到docker hub中，读者可以直接在本地pull后进行使用：</p>
-
-<pre><code>docker pull xxbandy123/etcd:3.0.10
-</code></pre>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">docker pull xxbandy123/etcd:3.0.10</pre></td></tr></table>
+</div>
+</div>
     </div>
 
     
@@ -536,14 +807,17 @@ biaoge
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2017-08-26
+      2019-12-03
+      
+        
+        
       
     </span>
   </p>
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -556,7 +830,15 @@ biaoge
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -611,6 +893,16 @@ biaoge
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -750,6 +1042,23 @@ biaoge
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

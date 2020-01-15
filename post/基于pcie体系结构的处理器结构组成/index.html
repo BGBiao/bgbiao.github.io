@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>基于PCIe体系结构的处理器结构组成 - BGBiao的Ops人生</title>
+  <title>基于PCIe体系结构的处理器结构组成 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="PCIe体系结构的组成部件 PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。 在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="基于PCIe体系结构的处理器结构组成" />
 <meta property="og:description" content="PCIe体系结构的组成部件
@@ -78,7 +80,7 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
 
 <meta itemprop="datePublished" content="2017-11-09T21:27:07&#43;00:00" />
 <meta itemprop="dateModified" content="2017-11-09T21:27:07&#43;00:00" />
-<meta itemprop="wordCount" content="1366">
+<meta itemprop="wordCount" content="1395">
 
 
 
@@ -100,13 +102,24 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -151,9 +164,52 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -220,6 +276,34 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -227,7 +311,7 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -291,10 +375,52 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -318,7 +444,8 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 1395 words </span>
+          <span class="more-meta"> 3 min read </span>
 
         
         
@@ -365,8 +492,24 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
 <p>上图所示的结构将PCIe总线端口、存储器控制器等一系列与外部设备有关的接口都集成在一起，并统称为RC。RC具有一个或者多个PCIe端口，可以连接各类PCIe设备。PCIe设备包括EP(如网卡、显卡等设备)、Switch和PCIe桥。PCIe总线采用端到端的连接方式，每一个PCIe端口只能连接一个EP，当然PCIe端口也可以连接Switch进行链路扩展。通过Switch扩展出的PCIe链路可以继续挂接EP或者其他Switch。所谓的PCIe Bridge，用以将PCIe总线转换成PCI总线</p>
 
 <p>当前4颗GPU环境的架构：</p>
-
-<pre><code>$  nvidia-smi topo -m
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$  nvidia-smi topo -m
 	GPU0	GPU1	GPU2	GPU3	CPU Affinity
 GPU0	 X 	PIX	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
 GPU1	PIX	 X 	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
@@ -378,12 +521,31 @@ Legend:
   PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
   PXB  = Connection traversing multiple PCIe switches (without traversing the PCIe Host Bridge)
   PIX  = Connection traversing a single PCIe switch
-  NV#  = Connection traversing a bonded set of # NVLinks
-</code></pre>
-
+  NV#  = Connection traversing a bonded set of # NVLinks</pre></td></tr></table>
+</div>
+</div>
 <p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-topo.png" alt="" /></p>
-
-<pre><code>$ nvidia-smi topo --matrix
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ nvidia-smi topo --matrix
 
         GPU0    GPU1    GPU2    GPU3    mlx4_0  CPU Affinity
 GPU0     X      PIX     PHB     PHB     PHB     0-11
@@ -398,9 +560,9 @@ Legend:
   SOC = Path traverses a socket-level link (e.g. QPI)(CPU插槽之间直连,跨物理CPU)
   PHB = Path traverses a PCIe host bridge(跨PCIe host bridge设备)
   PXB = Path traverses multiple PCIe internal switches (通过内部多个Switch上进行互联的EP)
-  PIX = Path traverses a PCIe internal switch(同一个Switch上的EP)
-</code></pre>
-
+  PIX = Path traverses a PCIe internal switch(同一个Switch上的EP)</pre></td></tr></table>
+</div>
+</div>
 <p>上面的GPU拓扑可以看出来GPU0和GPU1以及GPU2和GPU3分别处于一个<code>switch</code>和<code>PCIe host bridge</code>上，也即GPU0和GPU1(GPU2和GPU3)可以通过直连的<code>switch</code>相互通信，而GPU0和GPU2(GPU3)通信均需要经过一个<code>PCIe Host Bridge</code></p>
 
 <p>个人理解:
@@ -432,7 +594,7 @@ Legend:
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -445,7 +607,15 @@ Legend:
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -499,6 +669,16 @@ Legend:
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -638,6 +818,23 @@ Legend:
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

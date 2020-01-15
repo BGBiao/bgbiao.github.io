@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>深入Gin框架内幕1 - BGBiao的Ops人生</title>
+  <title>深入Gin框架内幕1 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -27,7 +27,7 @@
 如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -60,6 +60,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="深入Gin框架内幕1" />
 <meta property="og:description" content="Gin框架介绍
@@ -81,7 +83,7 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 
 <meta itemprop="datePublished" content="2020-01-11T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-01-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5685">
+<meta itemprop="wordCount" content="5825">
 
 
 
@@ -104,13 +106,24 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -155,9 +168,52 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -224,6 +280,34 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -231,7 +315,7 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -295,10 +379,52 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -323,7 +449,8 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        
+        <span class="more-meta"> 5825 words </span>
+          <span class="more-meta"> 12 min read </span>
 
         
         
@@ -392,8 +519,53 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 <p>当我们在使用框架<code>[Gin](https://github.com/gin-gonic/gin)</code>来创建一个HTTP服务时，首先我们需要初始化一个实例，在<code>Engine</code>结构体中就包含了实例的一些基本属性和实例化的一些方法。</p>
 
 <p><code>Engine结构体</code>:</p>
-
-<pre><code>type Engine struct {
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">type Engine struct {
     // 路由组，在实际开发过程中我们通常会使用路由组来组织和管理一些列的路由. 比如: /apis/,/v1/等分组路由
     RouterGroup
     // 开启自动重定向。如果当前路由没有匹配到，但是存在不带/开头的handler就会重定向. 比如: 用户输入/foo/但是存在一个/foo 就会自动重定向到该handler，并且会向客户端返回301或者307状态码(区别在于GET方法和其他方法)
@@ -402,11 +574,11 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
     // 修复流程:
     // 1.首位多余元素会被删除(../ or //); 2.然后路由会对新的路径进行不区分大小写的查找;3.如果能正常找到对应的handler，路由就会重定向到正确的handler上并返回301或者307.(比如: 用户访问/FOO 和 /..//Foo可能会被重定向到/foo这个路由上)
     RedirectFixedPath bool
-    // 如果开启该参数，当当前请求不能被路由时，路由会自己去检查其他方法是否被允许.在这种情况下会响应&quot;Method Not Allowed&quot;，并返回状态码405; 如果没有其他方法被允许，将会委托给NotFound的handler
+    // 如果开启该参数，当当前请求不能被路由时，路由会自己去检查其他方法是否被允许.在这种情况下会响应&#34;Method Not Allowed&#34;，并返回状态码405; 如果没有其他方法被允许，将会委托给NotFound的handler
     HandleMethodNotAllowed bool
     // 是否转发客户端ip
     ForwardedByClientIP    bool
-    // 如果开启将会在请求中增加一个以&quot;X-AppEngine...&quot;开头的header
+    // 如果开启将会在请求中增加一个以&#34;X-AppEngine...&#34;开头的header
     AppEngine bool
     // 如果开启将会使用url.RawPath去查找参数(默认:false)
     UseRawPath bool
@@ -434,16 +606,20 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
     pool             sync.Pool
     // methodTrees是methodTree的切片(methodTree是一个包含请求方法和node指针的结构体,node是一个管理path的节点树)
     trees            methodTrees
-}
-
-</code></pre>
-
+}</pre></td></tr></table>
+</div>
+</div>
 <p><code>HandlerFunc定义</code>:</p>
-
-<pre><code>// 定义了一个可以被中间件使用的handler
-type HandlerFunc func(*Context)
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// 定义了一个可以被中间件使用的handler
+type HandlerFunc func(*Context)</pre></td></tr></table>
+</div>
+</div>
 <p><code>初始化Engine的方式</code>:</p>
 
 <ul>
@@ -486,8 +662,43 @@ type HandlerFunc func(*Context)
 </ul>
 
 <p><code>RouterGroup相关结构定义</code>:</p>
-
-<pre><code>// RouterGroup 结构体
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// RouterGroup 结构体
 type RouterGroup struct {
 	Handlers HandlersChain
 	basePath string
@@ -518,22 +729,30 @@ type IRoutes interface {
 type IRouter interface {
 	IRoutes
 	Group(string, ...HandlerFunc) *RouterGroup
-}
-
-</code></pre>
-
+}</pre></td></tr></table>
+</div>
+</div>
 <p>还记得在上一节中我们的<code>Engine</code>结构体中有一个<code>RouterGroup</code>字段吗，该字段会在我们创建一个<code>Engine</code>的gin实例后帮助我们初始化一个默认的<code>RouterGroup</code>实例。</p>
 
 <p>比如在<code>Engine</code>结构体的中的<code>New()</code>函数，会初始化一个带有如下<code>RouterGroup</code>的gin实例，并将gin实例注册到RouterGroup的<code>engine</code>字段.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L126">源码文件</a></p>
-
-<pre><code>// https://github.com/gin-gonic/gin/blob/master/gin.go#L129
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">// https://github.com/gin-gonic/gin/blob/master/gin.go#L129
 		RouterGroup: RouterGroup{
 			Handlers: nil,
-			basePath: &quot;/&quot;,
+			basePath: &#34;/&#34;,
 			root:     true,
-		},
-</code></pre>
-
+		},</pre></td></tr></table>
+</div>
+</div>
 <p><code>RouterGroup结构体对外暴露的常用方法</code>:</p>
 
 <ul>
@@ -559,73 +778,140 @@ type IRouter interface {
 <p>有了上面两个核心模型<code>Engine</code>和<code>RouteGroup</code>的了解，此时我们就可以通过Gin框架快速来创建一个简单HTTP服务了。</p>
 
 <p><strong>1.默认路由</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">#</span> <span class="nx">测试示例</span>
+<span class="err">$</span> <span class="nx">cat</span> <span class="nx">case1</span><span class="p">.</span><span class="k">go</span>
+<span class="kn">package</span> <span class="nx">main</span>
 
-<pre><code># 测试示例
-$ cat case1.go
-package main
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;net/http&#34;</span>
 
-import (
-    &quot;net/http&quot;
+    <span class="s">&#34;github.com/gin-gonic/gin&#34;</span>
+<span class="p">)</span>
 
-    &quot;github.com/gin-gonic/gin&quot;
-)
-
-func main() {
-    // 使用Default()函数来初始化一个gin实例(engine结构体的引用对象)
-    // Default函数内部调用New()函数来初始化一个gin实例，
-    // 同时使用Use(middleware ...HandlerFunc) IRoutes 方法注册了Logger和Recovery两个中间件
-    // 在New()初始化gin实例的过程中还默认初始化了一个bathPath为&quot;/&quot;的RouterGroup，其实就是一个router实例
-    ginObj := gin.Default()
-    // 由于RouterGroup在engine结构体中是一个匿名对象，因此实例化的engine引用对象就可以直接操作RouterGroup结构体里对外暴露的所有方法
-    // 这里我们尝试注册一个包含所有HTTP方法的路由
-    // https://github.com/gin-gonic/gin/blob/master/routergroup.go#L133
-    // 而在RouterGroup的各种对外暴露的方法中，底层调用了 Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes方法，后面可以传入多个handler来处理具体的业务逻辑，当handler有多个时最后一个处理实际的业务请求，前面的handler来处理中间件和共享的组件
-
-    // 而HandlerFunc 其实就是一个func(*Context)的匿名函数.Context会在下一节具体分析
-    ginObj.Any(&quot;/hello&quot;,func(c *gin.Context){
-        // context结构体相关的方法下一节会具体分析，这里是一个简单的示例
-        c.String(http.StatusOK,&quot;Hello BGBiao.&quot;)
-    })
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 使用Default()函数来初始化一个gin实例(engine结构体的引用对象)
+</span><span class="c1"></span>    <span class="c1">// Default函数内部调用New()函数来初始化一个gin实例，
+</span><span class="c1"></span>    <span class="c1">// 同时使用Use(middleware ...HandlerFunc) IRoutes 方法注册了Logger和Recovery两个中间件
+</span><span class="c1"></span>    <span class="c1">// 在New()初始化gin实例的过程中还默认初始化了一个bathPath为&#34;/&#34;的RouterGroup，其实就是一个router实例
+</span><span class="c1"></span>    <span class="nx">ginObj</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
+    <span class="c1">// 由于RouterGroup在engine结构体中是一个匿名对象，因此实例化的engine引用对象就可以直接操作RouterGroup结构体里对外暴露的所有方法
+</span><span class="c1"></span>    <span class="c1">// 这里我们尝试注册一个包含所有HTTP方法的路由
+</span><span class="c1"></span>    <span class="c1">// https://github.com/gin-gonic/gin/blob/master/routergroup.go#L133
+</span><span class="c1"></span>    <span class="c1">// 而在RouterGroup的各种对外暴露的方法中，底层调用了 Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes方法，后面可以传入多个handler来处理具体的业务逻辑，当handler有多个时最后一个处理实际的业务请求，前面的handler来处理中间件和共享的组件
+</span><span class="c1"></span>
+    <span class="c1">// 而HandlerFunc 其实就是一个func(*Context)的匿名函数.Context会在下一节具体分析
+</span><span class="c1"></span>    <span class="nx">ginObj</span><span class="p">.</span><span class="nf">Any</span><span class="p">(</span><span class="s">&#34;/hello&#34;</span><span class="p">,</span><span class="kd">func</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">){</span>
+        <span class="c1">// context结构体相关的方法下一节会具体分析，这里是一个简单的示例
+</span><span class="c1"></span>        <span class="nx">c</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span><span class="p">,</span><span class="s">&#34;Hello BGBiao.&#34;</span><span class="p">)</span>
+    <span class="p">})</span>
 
 
-    // 当所有的路由注册之后，我们可以使用gin的结构体方法(engine结构体的引用对象)来实际运行HTTP服务，以接收用户的http请求
-    // 我们前面说过该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求
-    ginObj.Run(&quot;localhost:8080&quot;)
-}
+    <span class="c1">// 当所有的路由注册之后，我们可以使用gin的结构体方法(engine结构体的引用对象)来实际运行HTTP服务，以接收用户的http请求
+</span><span class="c1"></span>    <span class="c1">// 我们前面说过该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求
+</span><span class="c1"></span>    <span class="nx">ginObj</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="s">&#34;localhost:8080&#34;</span><span class="p">)</span>
+<span class="p">}</span>
 
 
 
 
-# 运行实例
-$ go run case1.go
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+<span class="err">#</span> <span class="nx">运行实例</span>
+<span class="err">$</span> <span class="k">go</span> <span class="nx">run</span> <span class="nx">case1</span><span class="p">.</span><span class="k">go</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="p">[</span><span class="nx">WARNING</span><span class="p">]</span> <span class="nx">Creating</span> <span class="nx">an</span> <span class="nx">Engine</span> <span class="nx">instance</span> <span class="nx">with</span> <span class="nx">the</span> <span class="nx">Logger</span> <span class="nx">and</span> <span class="nx">Recovery</span> <span class="nx">middleware</span> <span class="nx">already</span> <span class="nx">attached</span><span class="p">.</span>
 
-[GIN-debug] [WARNING] Running in &quot;debug&quot; mode. Switch to &quot;release&quot; mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="p">[</span><span class="nx">WARNING</span><span class="p">]</span> <span class="nx">Running</span> <span class="nx">in</span> <span class="s">&#34;debug&#34;</span> <span class="nx">mode</span><span class="p">.</span> <span class="nx">Switch</span> <span class="nx">to</span> <span class="s">&#34;release&#34;</span> <span class="nx">mode</span> <span class="nx">in</span> <span class="nx">production</span><span class="p">.</span>
+ <span class="o">-</span> <span class="nx">using</span> <span class="nx">env</span><span class="p">:</span>	<span class="nx">export</span> <span class="nx">GIN_MODE</span><span class="p">=</span><span class="nx">release</span>
+ <span class="o">-</span> <span class="nx">using</span> <span class="nx">code</span><span class="p">:</span>	<span class="nx">gin</span><span class="p">.</span><span class="nf">SetMode</span><span class="p">(</span><span class="nx">gin</span><span class="p">.</span><span class="nx">ReleaseMode</span><span class="p">)</span>
 
-[GIN-debug] GET    /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] POST   /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] PUT    /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] PATCH  /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] HEAD   /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] OPTIONS /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] DELETE /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] CONNECT /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] TRACE  /hello                    --&gt; main.main.func1 (3 handlers)
-[GIN-debug] Listening and serving HTTP on localhost:8080
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">GET</span>    <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">POST</span>   <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">PUT</span>    <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">PATCH</span>  <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">HEAD</span>   <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">OPTIONS</span> <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">DELETE</span> <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">CONNECT</span> <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">TRACE</span>  <span class="o">/</span><span class="nx">hello</span>                    <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nf">func1</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">Listening</span> <span class="nx">and</span> <span class="nx">serving</span> <span class="nx">HTTP</span> <span class="nx">on</span> <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span>
 
-# 模拟请求(因为我们注册了全部的HTTP方法的路由)
-$ curl localhost:8080/hello
-Hello BGBiao.%                                                                                        
-$ curl -X POST  localhost:8080/hello
-Hello BGBiao.%                                                                                        
-$ curl -X DELETE   localhost:8080/hello
-Hello BGBiao.%                                                                                        
-$ curl -X TRACE   localhost:8080/hello
-Hello BGBiao.%
-</code></pre>
-
+<span class="err">#</span> <span class="nx">模拟请求</span><span class="p">(</span><span class="nx">因为我们注册了全部的HTTP方法的路由</span><span class="p">)</span>
+<span class="err">$</span> <span class="nx">curl</span> <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="nx">hello</span>
+<span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span>                                                                                        
+<span class="err">$</span> <span class="nx">curl</span> <span class="o">-</span><span class="nx">X</span> <span class="nx">POST</span>  <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="nx">hello</span>
+<span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span>                                                                                        
+<span class="err">$</span> <span class="nx">curl</span> <span class="o">-</span><span class="nx">X</span> <span class="nx">DELETE</span>   <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="nx">hello</span>
+<span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span>                                                                                        
+<span class="err">$</span> <span class="nx">curl</span> <span class="o">-</span><span class="nx">X</span> <span class="nx">TRACE</span>   <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="nx">hello</span>
+<span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span></pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
 
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
@@ -648,7 +934,7 @@ Hello BGBiao.%
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -661,7 +947,15 @@ Hello BGBiao.%
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -715,6 +1009,16 @@ Hello BGBiao.%
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -854,6 +1158,23 @@ Hello BGBiao.%
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

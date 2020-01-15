@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>GPU环境下玩转Docker(三) - BGBiao的Ops人生</title>
+  <title>GPU环境下玩转Docker(三) - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content=" 前言: 在前面两个章节中已经介绍了如何构建GPU的基础环境以及使用Docker方式来优雅的运行GPU应用，单纯的使用Docker这种方式是无法满足大规模的应用调度和管理的，对于集群调度以及容器化管理方面，我们也采用了业界比较知名的容器编排调度管理工具Kubernetes，本篇文章简单介绍GPU业务容器在Kubernetes上的运行。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="GPU环境下玩转Docker(三)" />
 <meta property="og:description" content="
@@ -76,7 +78,7 @@
 
 <meta itemprop="datePublished" content="2017-10-30T22:08:39&#43;00:00" />
 <meta itemprop="dateModified" content="2017-10-30T22:08:39&#43;00:00" />
-<meta itemprop="wordCount" content="1368">
+<meta itemprop="wordCount" content="1502">
 
 
 
@@ -97,13 +99,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -148,9 +161,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -217,6 +273,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -224,7 +308,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -288,10 +372,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -315,7 +441,8 @@
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 1502 words </span>
+          <span class="more-meta"> 3 min read </span>
 
         
         
@@ -381,8 +508,62 @@
 <code>注意2：kubelet程序在启动时必须加载--allow-privileged=true参数，以对所有的GPU容器设置特权模式来识别宿主机资源</code></p>
 
 <p><strong>kubelet启动参数</strong></p>
-
-<pre><code># cat  /usr/lib/systemd/system/kubelet.service | grep -v ^#
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># cat  /usr/lib/systemd/system/kubelet.service | grep -v ^#
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -407,10 +588,10 @@ Restart=on-failure
 
 
 # cat  /export/kubernetes/kubelet | grep -v ^#
-KUBELET_ADDRESS=&quot;--address=10.0.0.1&quot;
-KUBELET_HOSTNAME=&quot;--hostname-override=10.0.0.1&quot;
-KUBELET_POD_INFRA_CONTAINER=&quot;--pod-infra-container-image=idockerhub.xxb.com/k8s/pause&quot;
-KUBELET_ARGS=&quot;--cgroup-driver=cgroupfs \
+KUBELET_ADDRESS=&#34;--address=10.0.0.1&#34;
+KUBELET_HOSTNAME=&#34;--hostname-override=10.0.0.1&#34;
+KUBELET_POD_INFRA_CONTAINER=&#34;--pod-infra-container-image=idockerhub.xxb.com/k8s/pause&#34;
+KUBELET_ARGS=&#34;--cgroup-driver=cgroupfs \
                 --cluster-dns=10.254.0.2 \
                 --experimental-bootstrap-kubeconfig=/export/kubernetes/bootstrap.kubeconfig \
                 --kubeconfig=/export/kubernetes/kubelet.kubeconfig \
@@ -419,24 +600,37 @@ KUBELET_ARGS=&quot;--cgroup-driver=cgroupfs \
                 --cluster-domain=cluster.local. \
                 --hairpin-mode promiscuous-bridge \
                 --serialize-image-pulls=false \
-                --feature-gates='Accelerators=true'&quot;
+                --feature-gates=&#39;Accelerators=true&#39;&#34;
 
 # cat  /export/kubernetes/config | grep -v ^#
-KUBE_LOGTOSTDERR=&quot;--logtostderr=true&quot;
+KUBE_LOGTOSTDERR=&#34;--logtostderr=true&#34;
 
-KUBE_LOG_LEVEL=&quot;--v=0&quot;
+KUBE_LOG_LEVEL=&#34;--v=0&#34;
 
-KUBE_ALLOW_PRIV=&quot;--allow-privileged=true&quot;
+KUBE_ALLOW_PRIV=&#34;--allow-privileged=true&#34;
 
-KUBE_MASTER=&quot;--master=http://10.0.0.2:8080&quot;
+KUBE_MASTER=&#34;--master=http://10.0.0.2:8080&#34;
 
 
 
-#/usr/bin/kubelet --logtostderr=true --v=0 --address=10.0.0.1 --hostname-override=10.0.0.1 --allow-privileged=true --pod-infra-container-image=idockerhub.xxb.com/k8s/pause --cgroup-driver=cgroupfs --cluster-dns=10.254.0.2 --experimental-bootstrap-kubeconfig=/export/kubernetes/bootstrap.kubeconfig --kubeconfig=/export/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/export/kubernetes/ssl --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge --serialize-image-pulls=false --feature-gates=Accelerators=true Restart=on-failure
-
-</code></pre>
-
-<pre><code># /usr/local/bin/kubectl -s http://10.0.0.2:8080 label nodes 10.0.0.1 type=gpu
+#/usr/bin/kubelet --logtostderr=true --v=0 --address=10.0.0.1 --hostname-override=10.0.0.1 --allow-privileged=true --pod-infra-container-image=idockerhub.xxb.com/k8s/pause --cgroup-driver=cgroupfs --cluster-dns=10.254.0.2 --experimental-bootstrap-kubeconfig=/export/kubernetes/bootstrap.kubeconfig --kubeconfig=/export/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/export/kubernetes/ssl --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge --serialize-image-pulls=false --feature-gates=Accelerators=true Restart=on-failure</pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># /usr/local/bin/kubectl -s http://10.0.0.2:8080 label nodes 10.0.0.1 type=gpu
 
 # /usr/local/bin/kubectl -s http://10.0.0.2:8080 get nodes  --show-labels
 NAME             STATUS    AGE       VERSION   LABELS
@@ -446,13 +640,61 @@ NAME             STATUS    AGE       VERSION   LABELS
 
 # /usr/local/bin/kubectl -s http://10.0.0.2:8080 get node -l type=gpu
 NAME             STATUS    AGE       VERSION
-10.0.0.1   Ready     4h        v1.6.2
-
-</code></pre>
-
+10.0.0.1   Ready     4h        v1.6.2</pre></td></tr></table>
+</div>
+</div>
 <h4 id="2-测试用例">2. 测试用例</h4>
-
-<pre><code>apiVersion: extensions/v1beta1
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: test-gpu
@@ -497,22 +739,50 @@ spec:
             path: /dev/nvidia-uvm-tools
         - name: nvidiactl
           hostPath:
-            path: /dev/nvidiactl
-</code></pre>
-
+            path: /dev/nvidiactl</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意1：k8s调度gpudocker容器需要和业务方进行强关联，所以对于cuda,cudnn,nvidia-docker的版本要求是非常高的。</code>
 <code>注意2：k8s调度的gpu其实是独享的，也就是上面分配了2个gpu设备，那么该宿主机上将最多只能创建2个卡的gpu容器，否则会因为资源不够而调度失败。</code></p>
-
-<pre><code>
-# ll /var/lib/nvidia-docker/volumes/nvidia_driver/
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># ll /var/lib/nvidia-docker/volumes/nvidia_driver/
 total 0
 drwxr-xr-x 5 nvidia-docker nvidia-docker 38 Oct 18 21:38 375.39
 
 
 # docker ps
 CONTAINER ID        IMAGE                                                                                                                    COMMAND                  CREATED             STATUS              PORTS                                              NAMES
-f3a3f8dd30ca        idockerhub.xxb.com/jdjr/tensorflow-gpu@sha256:7844f390a9d5ff369c7756a52ca65dae095087c736935e9310e12c7caa7c73dd            &quot;/run_jupyter.sh --al&quot;   2 days ago          Up 2 days                                                              k8s_test-gpu_test-gpu-1430106381-9n8hb_default_97177dcf-b7da-11e7-b982-ecf4bbc19ea8_0
-7650dce5a686        idockerhub.xxb.com/k8s/pause                                                                                              &quot;/pod&quot;                   2 days ago          Up 2 days                                                              k8s_POD_test-gpu-1430106381-9n8hb_default_97177dcf-b7da-11e7-b982-ecf4bbc19ea8_0
+f3a3f8dd30ca        idockerhub.xxb.com/jdjr/tensorflow-gpu@sha256:7844f390a9d5ff369c7756a52ca65dae095087c736935e9310e12c7caa7c73dd            &#34;/run_jupyter.sh --al&#34;   2 days ago          Up 2 days                                                              k8s_test-gpu_test-gpu-1430106381-9n8hb_default_97177dcf-b7da-11e7-b982-ecf4bbc19ea8_0
+7650dce5a686        idockerhub.xxb.com/k8s/pause                                                                                              &#34;/pod&#34;                   2 days ago          Up 2 days                                                              k8s_POD_test-gpu-1430106381-9n8hb_default_97177dcf-b7da-11e7-b982-ecf4bbc19ea8_0
 
 
 
@@ -529,11 +799,9 @@ crw-rw-rw- 1 root root 195, 255 Jun 20 02:54 /dev/nvidiactl
 
 
 尝试运算服务后的结果：
-2017-10-23 10:14:25.172617: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
-
-
-</code></pre>
-
+2017-10-23 10:14:25.172617: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)</pre></td></tr></table>
+</div>
+</div>
 <p>通过上述测试用例，就可以跑通官方tensorflow gpu镜像。</p>
 
 <p><code>NOTES:</code>
@@ -561,7 +829,7 @@ crw-rw-rw- 1 root root 195, 255 Jun 20 02:54 /dev/nvidiactl
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -574,7 +842,15 @@ crw-rw-rw- 1 root root 195, 255 Jun 20 02:54 /dev/nvidiactl
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -630,6 +906,16 @@ crw-rw-rw- 1 root root 195, 255 Jun 20 02:54 /dev/nvidiactl
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -769,6 +1055,23 @@ crw-rw-rw- 1 root root 195, 255 Jun 20 02:54 /dev/nvidiactl
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

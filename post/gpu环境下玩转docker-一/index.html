@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>GPU环境下玩转Docker(一) - BGBiao的Ops人生</title>
+  <title>GPU环境下玩转Docker(一) - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -27,7 +27,7 @@
 从GPU到GPGPU CPU与GPU
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -60,6 +60,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="GPU环境下玩转Docker(一)" />
 <meta property="og:description" content="背景：
@@ -83,7 +85,7 @@ CPU与GPU">
 
 <meta itemprop="datePublished" content="2017-10-26T10:07:34&#43;00:00" />
 <meta itemprop="dateModified" content="2017-10-26T10:07:34&#43;00:00" />
-<meta itemprop="wordCount" content="6002">
+<meta itemprop="wordCount" content="6321">
 
 
 
@@ -107,13 +109,24 @@ CPU与GPU"/>
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -158,9 +171,52 @@ CPU与GPU"/>
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -227,6 +283,34 @@ CPU与GPU"/>
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -234,7 +318,7 @@ CPU与GPU"/>
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -298,10 +382,52 @@ CPU与GPU"/>
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -325,7 +451,8 @@ CPU与GPU"/>
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 6321 words </span>
+          <span class="more-meta"> 13 min read </span>
 
         
         
@@ -523,22 +650,69 @@ CPU与GPU"/>
 <p><strong>2.1 检测是否有一个CUDA-Capable GPU</strong></p>
 
 <p>如下显示当前主机上支持并有四个GPU设备</p>
-
-<pre><code>sh-4.2# lspci | grep -i nvidia
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# lspci | grep -i nvidia
 04:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
 05:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
 06:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-07:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-
-
-</code></pre>
-
+07:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意：如果使用上述命令没有任何输出，那需要更新你的PCI 硬件数据库，然后再次执行；</code></p>
 
 <p>安装nvidia-linux驱动:
 <code>注意:</code> 用户可以在<a href="https://www.nvidia.cn/Download/index.aspx?lang=cn">nvidia-driver</a>页面选择相应型号相应环境的nvidia驱动，并下载rpm格式的驱动程序。同时用户也可以在<a href="https://www.nvidia.com/object/linux-amd64-display-archive.html">nvidia-driver-run</a>页面下载指定版本的二进制驱动程序。通常情况下，推荐使用后者安装nvidia的驱动，但是前者的rpm包中默认也包含了对应的cuda版本，因此rpm包方式更适合傻瓜式安装，而使用二进制方式用户可以自行安装cuda版本。</p>
-
-<pre><code>sh-4.2# wget -O NVIDIA-Linux-x86_64-375.39.run https://www.nvidia.com/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# wget -O NVIDIA-Linux-x86_64-375.39.run https://www.nvidia.com/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
 sh-4.2# chmod a+x NVIDIA-Linux-x86_64-375.39.run
 # 选择安静模式安装
 sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
@@ -559,7 +733,7 @@ Verifying archive integrity... OK
 Uncompressing NVIDIA Accelerated Graphics Driver for Linux-x86_64 396.45..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
 
 ## 2. 提示如下
-ERROR: The Nouveau kernel driver is currently in use by your system.  This driver is incompatible with the NVIDIA driver, and must be disabled before proceeding.  Please consult the NVIDIA driver README and your Linux distribution's documentation for details on how to correctly disable the Nouveau kernel driver.
+ERROR: The Nouveau kernel driver is currently in use by your system.  This driver is incompatible with the NVIDIA driver, and must be disabled before proceeding.  Please consult the NVIDIA driver README and your Linux distribution&#39;s documentation for details on how to correctly disable the Nouveau kernel driver.
 
 # 在centos7中需要禁止一个内核模块Nouveau
 sh-4.2# lsmod | grep nouveau
@@ -575,13 +749,46 @@ wmi                    19070  2 mxm_wmi,nouveau
 
 # 临时卸载该模块
 sh-4.2# rmmod nouveau
-sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
-
-</code></pre>
-
+sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s</pre></td></tr></table>
+</div>
+</div>
 <p>查看GPU显卡信息:</p>
-
-<pre><code>sh-4.2# nvidia-smi
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# nvidia-smi
 Wed Oct 18 11:58:03 2017
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
@@ -611,9 +818,9 @@ Wed Oct 18 11:58:03 2017
 
 # Temp 标识GPU设备的温度
 # Memory-Usage 表示内存使用率
-# GPU-Util 表示GPU使用率
-</code></pre>
-
+# GPU-Util 表示GPU使用率</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意：上述输出也可以看出该系统上有4块GPU设备，使用Tesla M40型号。其中分别有两块卡24G内存，两块是12G内存，分别处于两个PCIE总线上</code></p>
 
 <p><code>注意：宿主机内存为256G，cpu为Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz 开启超线程后为24颗逻辑cpu(两颗6核心的cpu开启了超线程)</code></p>
@@ -627,22 +834,31 @@ Wed Oct 18 11:58:03 2017
 <p><strong>2.2 检测Linux的架构和操作系统版本</strong></p>
 
 <p>因为CUDA开发工具只支持一些指定发行版本的linux，需要用户查看操作系统的架构以及发行版本。可以在CUDA Toolkit发布版本的中查看支持的linux版本。</p>
-
-<pre><code># uname -m &amp;&amp; cat /etc/redhat-release
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># uname -m &amp;&amp; cat /etc/redhat-release
 x86_64
-CentOS Linux release 7.2.1511 (Core)
-
-</code></pre>
-
+CentOS Linux release 7.2.1511 (Core)</pre></td></tr></table>
+</div>
+</div>
 <p><strong>2.3 检测系统是否安装了gcc</strong></p>
 
 <p>当使用CUDA Toolkit进行开发的时候，gcc编译器是必须需要的。一般情况下linux主机都会安装了gcc编译器，但是为确保之后的操作不会出现大问题，建议检查下gcc以及版本是否为对应的版本。</p>
-
-<pre><code># gcc --version
-gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># gcc --version
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)</pre></td></tr></table>
+</div>
+</div>
 <p><strong>2.4 检测系统是否有正确的内核头文件以及一些开发包是否安装</strong></p>
 
 <p>CUDA驱动需要内核头文件和开发工具包来保证驱动程序的安装以及rebuilt，比如你的内核版本为<code>3.17.4-301</code>，那么<code>3.17.4-301</code>的内核头文件以及相关的开发包也必须安装。</p>
@@ -650,13 +866,20 @@ gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
 <p>当驱动程序的安装过程没有进行包的验证，在使用RPM或者DEB包安装驱动的时候如果系统上没有安装正确的软件包，它将会尝试去安装内核头文件以及开发工具包。但是通常情况下，这种安装会默认去寻找仓库中最新版本的软件包，可能会导致内核版本的不匹配等问题。因此，在安装CUDA驱动之前，最好手动确认内核头文件的版本以及开发工具包的安装。</p>
 
 <p>在centos系统上可以执行如下命令：</p>
-
-<pre><code># uname -r
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># uname -r
 3.10.0-327.el7.x86_64
 
-# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
-</code></pre>
-
+# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y</pre></td></tr></table>
+</div>
+</div>
 <p><strong>2.5 选择安装方式</strong></p>
 
 <p>官方有两种方式去安装： distribution-specific packages (RPM and Deb packages)和distribution-independent package (runfile packages)。其中前者对接了linux发行版原生的包管理系统，是强烈建议的一种安装方式。</p>
@@ -681,24 +904,38 @@ gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
 <p>使用如下方式去卸载相关的冲突包。</p>
 
 <p>卸载runfile方式的Toolkit :</p>
-
-<pre><code>/usr/local/cuda-X.Y/bin/uninstall_cuda_X.Y.pl
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/usr/local/cuda-X.Y/bin/uninstall_cuda_X.Y.pl</pre></td></tr></table>
+</div>
+</div>
 <p>卸载runfile方式的Driver：</p>
-
-<pre><code>/usr/bin/nvidia-uninstall
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">/usr/bin/nvidia-uninstall</pre></td></tr></table>
+</div>
+</div>
 <p>卸载RPM/Deb方式安装的包：</p>
-
-<pre><code>$ yum remove &lt;package_name&gt;                      # Redhat/CentOS
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ yum remove &lt;package_name&gt;                      # Redhat/CentOS
 $ dnf remove &lt;package_name&gt;                      # Fedora
 $ zypper remove &lt;package_name&gt;                   # OpenSUSE/SLES
-$ apt-get --purge remove &lt;package_name&gt;          # Ubuntu
-
-</code></pre>
-
+$ apt-get --purge remove &lt;package_name&gt;          # Ubuntu</pre></td></tr></table>
+</div>
+</div>
 <h4 id="安装包管理程序-package-manager">安装包管理程序(Package Manager)</h4>
 
 <p><a href="http://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html#redhat-x86_64">快速安装指南</a></p>
@@ -714,28 +951,47 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 驱动会依赖一个自动生成的xorg.conf文件<code>/etc/X11/xorg.conf</code>，该文件可能会影响驱动的正常工作，可以删除该文件，或者添加<code>/etc/X11/xorg.conf.d/00-nvidia.conf</code>的内容到xorg.conf文件中。</p></li>
 
 <li><p>4.安装meta-data仓库</p>
-
-<pre><code># rpm --install cuda-repo-&lt;distro&gt;-&lt;version&gt;.&lt;architecture&gt;.rpm
-</code></pre></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># rpm --install cuda-repo-&lt;distro&gt;-&lt;version&gt;.&lt;architecture&gt;.rpm</pre></td></tr></table>
+</div>
+</div></li>
 
 <li><p>5.清除仓库缓存</p>
-
-<pre><code># yum clean expire-cache
-</code></pre></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># yum clean expire-cache</pre></td></tr></table>
+</div>
+</div></li>
 
 <li><p>6.安装CUDA</p>
-
-<pre><code># yum install cuda
-
-</code></pre></li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># yum install cuda</pre></td></tr></table>
+</div>
+</div></li>
 </ul>
 
 <p>如果i686的libvdpau包安装失败，可以尝试以下步骤来修复该问题。</p>
-
-<pre><code># yumdownloader libvdpau.i686
-# sudo rpm -U --oldpackage libvdpau*.rpm
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">#</span> <span class="nx">yumdownloader</span> <span class="nx">libvdpau</span><span class="p">.</span><span class="nx">i686</span>
+<span class="err">#</span> <span class="nx">sudo</span> <span class="nx">rpm</span> <span class="o">-</span><span class="nx">U</span> <span class="o">--</span><span class="nx">oldpackage</span> <span class="nx">libvdpau</span><span class="o">*</span><span class="p">.</span><span class="nx">rpm</span></pre></td></tr></table>
+</div>
+</div>
 <ul>
 <li>7.如果需要，添加libcuda.so的软连接</li>
 </ul>
@@ -759,28 +1015,62 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 <p>4.1.1 环境设置</p>
 
 <p><code>PATH</code>环境变量必须包含<code>/usr/local/cuda-8.0/bin</code></p>
-
-<pre><code>export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意：</code>在使用runfile方式安装的时候，动态链接库<code>LD_LIBRARY_PATH</code>的环境变量需要包含<code>/usr/local/cuda-8.0/lib64</code>.</p>
-
-<pre><code>$ export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64\
-                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64\
+                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}</pre></td></tr></table>
+</div>
+</div>
 <p><strong>4.2 强烈推荐的操作</strong></p>
 
 <p>4.2.1 安装可写的示例程序</p>
 
 <p>为了修改，编译以及运行样品，样品程序必须也可写权限进行安装，安装脚本如下：</p>
-
-<pre><code># cuda-install-samples-8.0.sh &lt;dir&gt;
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># cuda-install-samples-8.0.sh &lt;dir&gt;</pre></td></tr></table>
+</div>
+</div>
 <p>该脚本会创建一个<code>/usr/local/cuda/samples</code>的只读拷贝，需要将拷贝的内容改为可写。</p>
-
-<pre><code># cuda-install-samples-8.0.sh /export/biaoge/cuda-samples
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># cuda-install-samples-8.0.sh /export/biaoge/cuda-samples
 
 # tree -L 2 /export/biaoge/cuda-samples/
 /export/biaoge/cuda-samples/
@@ -797,10 +1087,9 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
     ├── common
     ├── EULA.txt
     ├── Makefile
-    └── uninstall_cuda_samples_8.0.pl
-
-</code></pre>
-
+    └── uninstall_cuda_samples_8.0.pl</pre></td></tr></table>
+</div>
+</div>
 <p>4.2.2 验证所有的安装</p>
 
 <p>在继续操作之前，验证一下<code>CUDA Toolkit</code>能够识别到正确的GPU硬件设备是非常重要的。因此这里需要编译一些样品程序来进行检验。</p>
@@ -809,25 +1098,56 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 如果安装了确定，需要验证下加载驱动的版本是否正确，如果没有安装驱动或者没有用过内核模块来加载，可以暂时跳过该步骤。</p>
 
 <p>当驱动被加载后，可以通过如下命令查看到驱动的版本</p>
-
-<pre><code># cat /proc/driver/nvidia/version
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># cat /proc/driver/nvidia/version
 NVRM version: NVIDIA UNIX x86_64 Kernel Module  375.39  Tue Jan 31 20:47:00 PST 2017
-GCC version:  gcc version 4.8.5 20150623 (Red Hat 4.8.5-4) (GCC)
-</code></pre>
-
+GCC version:  gcc version 4.8.5 20150623 (Red Hat 4.8.5-4) (GCC)</pre></td></tr></table>
+</div>
+</div>
 <p>(2) 编译样品程序
 CUDA Toolkit的版本可以使用<code>nvcc --version/-V</code>查看，该命令运行编译驱动来编译CUDA程序，底层其实调用了gcc编译器来编译c代码，使用<code>NVIDIA PTX</code>编译器来调用CUDA代码。</p>
-
-<pre><code># nvcc -V
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># nvcc -V
 nvcc: NVIDIA (R) Cuda compiler driver
 Copyright (c) 2005-2016 NVIDIA Corporation
 Built on Tue_Jan_10_13:22:03_CST_2017
-Cuda compilation tools, release 8.0, V8.0.61
-</code></pre>
-
+Cuda compilation tools, release 8.0, V8.0.61</pre></td></tr></table>
+</div>
+</div>
 <p>NVIDIA CUDA Toolkit在源文件中包含了一些示例程序，用户可以通过修改<code>~/NVIDIA_CUDA-8.0_Samples</code>并执行<code>make</code>来编译这些示例程序。编译的二进制文件将存放在<code>~/NVIDIA_CUDA-8.0_Samples/bin</code></p>
-
-<pre><code># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/deviceQuery
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/deviceQuery
 
 #编译生成deviceQuery二进制文件，在(3)中需要验证环境
 # make
@@ -840,21 +1160,177 @@ Cuda compilation tools, release 8.0, V8.0.61
 # ll ../bandwidthTest/bandwidthTest
 -rwxr-xr-x 1 root root 603420 Oct 18 16:05 ../bandwidthTest/bandwidthTest
 # ll ../deviceQuery/deviceQuery
--rwxr-xr-x 1 root root 582882 Oct 18 16:44 ../deviceQuery/deviceQuery
-</code></pre>
-
+-rwxr-xr-x 1 root root 582882 Oct 18 16:44 ../deviceQuery/deviceQuery</pre></td></tr></table>
+</div>
+</div>
 <p>(3) 运行二进制文件</p>
 
 <p>编译完成之后，在<code>~/NVIDIA_CUDA-8.0_Samples</code>下对应目录下运行<code>deviceQuery</code>.如果CUDA程序被正确安装和配置，<code>deviceQuery</code>的输出应该看起来如下所示。</p>
-
-<pre><code># ./deviceQuery
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># ./deviceQuery
 ./deviceQuery Starting...
 
  CUDA Device Query (Runtime API) version (CUDART static linking)
 
 Detected 4 CUDA Capable device(s)
 
-Device 0: &quot;Tesla M40 24GB&quot;
+Device 0: &#34;Tesla M40 24GB&#34;
   CUDA Driver Version / Runtime Version          8.0 / 8.0
   CUDA Capability Major/Minor version number:    5.2
   Total amount of global memory:                 22940 MBytes (24054136832 bytes)
@@ -887,7 +1363,7 @@ Device 0: &quot;Tesla M40 24GB&quot;
   Compute Mode:
      &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
 
-Device 1: &quot;Tesla M40&quot;
+Device 1: &#34;Tesla M40&#34;
   CUDA Driver Version / Runtime Version          8.0 / 8.0
   CUDA Capability Major/Minor version number:    5.2
   Total amount of global memory:                 11443 MBytes (11998855168 bytes)
@@ -920,7 +1396,7 @@ Device 1: &quot;Tesla M40&quot;
   Compute Mode:
      &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
 
-Device 2: &quot;Tesla M40 24GB&quot;
+Device 2: &#34;Tesla M40 24GB&#34;
   CUDA Driver Version / Runtime Version          8.0 / 8.0
   CUDA Capability Major/Minor version number:    5.2
   Total amount of global memory:                 22940 MBytes (24054136832 bytes)
@@ -953,7 +1429,7 @@ Device 2: &quot;Tesla M40 24GB&quot;
   Compute Mode:
      &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
 
-Device 3: &quot;Tesla M40&quot;
+Device 3: &#34;Tesla M40&#34;
   CUDA Driver Version / Runtime Version          8.0 / 8.0
   CUDA Capability Major/Minor version number:    5.2
   Total amount of global memory:                 11443 MBytes (11998855168 bytes)
@@ -999,9 +1475,9 @@ Device 3: &quot;Tesla M40&quot;
 &gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 24GB (GPU2) : Yes
 
 deviceQuery, CUDA Driver = CUDART, CUDA Driver Version = 8.0, CUDA Runtime Version = 8.0, NumDevs = 4, Device0 = Tesla M40 24GB, Device1 = Tesla M40, Device2 = Tesla M40 24GB, Device3 = Tesla M40
-Result = PASS
-</code></pre>
-
+Result = PASS</pre></td></tr></table>
+</div>
+</div>
 <p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample.png" alt="官方文档中的示例程序" /></p>
 
 <p><code>注意：</code>如果CUDA-capable设备和CUDA 驱动都已经成功安装，但是<code>deviceQuery</code>程序报告没有<code>CUDA-capable</code>设备在线，这个可能是<code>/dev/nvidia*</code>相关文件丢失或者没有相应的权限。</p>
@@ -1009,8 +1485,36 @@ Result = PASS
 <p>可以使用<code>setenforce 0</code>关闭SELinux后再进行测试。</p>
 
 <p>运行<code>bandwidthTest</code>程序来确认系统和CUDA-capable设备可以正常通信，输出结果如下所示：</p>
-
-<pre><code># ./bandwidthTest
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># ./bandwidthTest
 [CUDA Bandwidth Test] - Starting...
 Running on...
 
@@ -1034,9 +1538,9 @@ Running on...
 
 Result = PASS
 
-NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
-</code></pre>
-
+NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.</pre></td></tr></table>
+</div>
+</div>
 <p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample-1.png" alt="官方文档中的示例程序" /></p>
 
 <p>上图表示测试通过，如果测试没有通过，可以确认下系统上CUDA-capable NVIDIA GPU是否正确安装。</p>
@@ -1044,20 +1548,29 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
 <p><code>注意：如果上述两个示例程序都可以正常输出，name恭喜您，GPU环境目前已经可用了！</code></p>
 
 <p>4.2.3  安装Nsight Eclipse plugins</p>
-
-<pre><code># /usr/local/cuda-9.0/bin/nsight_ee_plugins_manage.sh install &lt;eclipse-dir&gt;
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># /usr/local/cuda-9.0/bin/nsight_ee_plugins_manage.sh install &lt;eclipse-dir&gt;</pre></td></tr></table>
+</div>
+</div>
 <p><strong>4.3 可选的操作</strong></p>
 
 <p>在使用CUDA Toolkit中，有很多可选操作但是不是必须的但是可以提供额外的功能。</p>
 
 <p>4.3.1 安装第三方库文件</p>
-
-<pre><code># yum install freeglut-devel libX11-devel libXi-devel libXmu-devel \
-    make mesa-libGLU-devel
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># yum install freeglut-devel libX11-devel libXi-devel libXmu-devel \
+    make mesa-libGLU-devel</pre></td></tr></table>
+</div>
+</div>
 <p>4.3.2 为cuda-gdb安装源代码
 使用<code>runfile</code>方式安装后<code>cuda-gdb</code>源代码会自动安装。</p>
 
@@ -1083,7 +1596,7 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -1096,7 +1609,15 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -1152,6 +1673,16 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -1291,6 +1822,23 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

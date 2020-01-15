@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Prometheus入门实践 - BGBiao的Ops人生</title>
+  <title>Prometheus入门实践 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="Prometheus入门实践 Prometheus下载地址 Prometheus相关文档 Prometheus官方文档
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="Prometheus入门实践" />
 <meta property="og:description" content="Prometheus入门实践
@@ -80,7 +82,7 @@ Prometheus官方文档">
 
 <meta itemprop="datePublished" content="2019-06-20T17:33:14&#43;00:00" />
 <meta itemprop="dateModified" content="2019-06-20T17:33:14&#43;00:00" />
-<meta itemprop="wordCount" content="6169">
+<meta itemprop="wordCount" content="6177">
 
 
 
@@ -103,13 +105,24 @@ Prometheus官方文档"/>
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -154,9 +167,52 @@ Prometheus官方文档"/>
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -223,6 +279,34 @@ Prometheus官方文档"/>
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -230,7 +314,7 @@ Prometheus官方文档"/>
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -294,10 +378,52 @@ Prometheus官方文档"/>
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -321,7 +447,8 @@ Prometheus官方文档"/>
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        
+        <span class="more-meta"> 6177 words </span>
+          <span class="more-meta"> 13 min read </span>
 
         
         
@@ -406,47 +533,77 @@ Prometheus官方文档"/>
 <p><a href="https://prometheus.io/download/">下载地址</a></p>
 
 <p><strong>源码安装</strong></p>
-
-<pre><code># 三个组件
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 三个组件
 $ wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz -O node_exporter-0.18.1.tar.gz
 
 $ wget https://github.com/prometheus/prometheus/releases/download/v2.10.0/prometheus-2.10.0.linux-amd64.tar.gz -O prometheus-2.10.0.linux-amd64.tar.gz
 
-$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz
-
-
-</code></pre>
-
+$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz</pre></td></tr></table>
+</div>
+</div>
 <p><strong>docker方式安装</strong></p>
 
 <p><code>注意:prometheus默认使用yaml格式来定义配置文件</code></p>
-
-<pre><code># 编写prometheus默认配置文件
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 编写prometheus默认配置文件
 $ cat prometheus.yml
 global:
   scrape_interval:     15s
   evaluation_interval: 15s
 
 rule_files:
-  # - &quot;first.rules&quot;
-  # - &quot;second.rules&quot;
+  # - &#34;first.rules&#34;
+  # - &#34;second.rules&#34;
 
 scrape_configs:
-  # 会在每个metrics数据中增加job=&quot;prometheus&quot;和instance=&quot;localhost:9090&quot;的基本数据
+  # 会在每个metrics数据中增加job=&#34;prometheus&#34;和instance=&#34;localhost:9090&#34;的基本数据
   - job_name: prometheus
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: [&#39;localhost:9090&#39;]
 
 # 热启动prometheus服务
 $ docker run --name=prometheus -d -p 9090:9090  -v /Users/xuxuebiao/Desktop/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
 
 $ docker ps -l
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-5e1698a320b2        prom/prometheus     &quot;/bin/prometheus -...&quot;   3 days ago          Up 2 minutes        0.0.0.0:9090-&gt;9090/tcp   prometheus
-
-
-</code></pre>
-
+5e1698a320b2        prom/prometheus     &#34;/bin/prometheus -...&#34;   3 days ago          Up 2 minutes        0.0.0.0:9090-&gt;9090/tcp   prometheus</pre></td></tr></table>
+</div>
+</div>
 <p><code>注意:</code> prometheus为golang编写的程序，因此只有一个二进制文件，使用&ndash;config.file来制定配置文件，使用&ndash;web.enable-lifecycle来启用远程热加载配置文件. 调用指令<code>curl -X POST http://localhost:9090/-/reload</code></p>
 
 <p>此时可以访问<a href="http://localhost:9090">prometheus-web</a>即可查看prometheus的状态页面。此时它会每30s对自己暴露的http metrics数据进行采集。可以访问prometheus本身的<a href="http://localhost:9090/metrics">metrics数据</a></p>
@@ -462,12 +619,46 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-943befcf74a6d6a0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="单metrics指标数据" /></p>
 
 <p><strong>通过node exporter提供metrics</strong></p>
-
-<pre><code># 启动node-exporter
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 启动node-exporter
 $ docker run -d --name=node-exporter -p 9100:9100  prom/node-exporter
 $ docker ps -l
 CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                    NAMES
-0f60bcce1ea6        prom/node-exporter   &quot;/bin/node_exporter&quot;   3 days ago          Up 42 seconds       0.0.0.0:9100-&gt;9100/tcp   node-exporter
+0f60bcce1ea6        prom/node-exporter   &#34;/bin/node_exporter&#34;   3 days ago          Up 42 seconds       0.0.0.0:9100-&gt;9100/tcp   node-exporter
 # 查看服务暴露的metrics
 $ curl http://localhost:9100/metrics
 
@@ -478,25 +669,24 @@ global:
   evaluation_interval: 15s
 
 rule_files:
-  # - &quot;first.rules&quot;
-  # - &quot;second.rules&quot;
+  # - &#34;first.rules&#34;
+  # - &#34;second.rules&#34;
 
 scrape_configs:
   - job_name: prometheus
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: [&#39;localhost:9090&#39;]
 			# 增加一个target 并附加一个label来标记该metrics
       # 注意:在prometheus启动时增加了一些参数,因此target不需要写协议和uri(http和/metrics)
-      - targets: ['10.13.13.60:9100']
+      - targets: [&#39;10.13.13.60:9100&#39;]
         labels:
-          group: &quot;client-node-exporter&quot;
+          group: &#34;client-node-exporter&#34;
 
 
 # prometheus服务重载
-$ curl -X POST http://localhost:9090/-/reload
-
-</code></pre>
-
+$ curl -X POST http://localhost:9090/-/reload</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-0daae077328b80f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter数据采集到prometheus" /></p>
 
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-4461cc2d08501e1f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter采集的15分钟平均负载" /></p>
@@ -506,26 +696,44 @@ $ curl -X POST http://localhost:9090/-/reload
 <h3 id="五-安装pushgateway">五、安装pushgateway</h3>
 
 <p><code>注意:push-gateway服务启动后也需要将endpoint加入prometheus中</code></p>
-
-<pre><code># 启动push-gateway服务
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 启动push-gateway服务
 docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
 
 # 查看push-gateway服务
 $ curl localhost:9091
 
 # 测试push一条metrics数据到Push-gateway
-echo &quot;tps 100&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+echo &#34;tps 100&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
 
 # 多指标推送
 cat &lt;&lt;EOF | curl --data-binary @- http://localhost:9091/metrics/job/xxb/instance/bgbiao
-tps{label=&quot;xxb&quot;} 8800
+tps{label=&#34;xxb&#34;} 8800
 tps1 100
 tps2 160
 tps3 160
-EOF
-
-</code></pre>
-
+EOF</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-e7a94dd04483137d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway服务" /></p>
 
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-1956a56a26dda95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus增加push-gateway" /></p>
@@ -535,25 +743,41 @@ EOF
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-e2e614fc197f2a50.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus上查看push-gateway上报的数据" /></p>
 
 <h3 id="六-安装grafana进行图标展示">六、安装Grafana进行图标展示</h3>
-
-<pre><code># 创建grafana服务
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 创建grafana服务
 $ docker run -d -p 3000:3000 --name grafana grafana/grafana
 
-$ curl localhost:3000
-</code></pre>
-
+$ curl localhost:3000</pre></td></tr></table>
+</div>
+</div>
 <p>添加数据源，以及基本数据验证</p>
-
-<pre><code># 向prometheus的push-gateway上主动push数据模拟数据上报
-➜  Desktop echo &quot;tps 10&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &quot;tps 9&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &quot;tps 20&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &quot;tps 30&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &quot;tps 310&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &quot;tps 222&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 向prometheus的push-gateway上主动push数据模拟数据上报
+➜  Desktop echo &#34;tps 10&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &#34;tps 9&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &#34;tps 20&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &#34;tps 30&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &#34;tps 310&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+➜  Desktop echo &#34;tps 222&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-d442c89b5796b2da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana数据源配置" /></p>
 
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-6f234d69ad8ff8e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana查看prometheus中收集的metrics数据" /></p>
@@ -569,42 +793,128 @@ $ curl localhost:3000
 - 2. 启动prometheus服务时，通过alertmanager.url 配置报警服务alertmanager服务，prometheus和alertmanager通信连接</p>
 
 <p><strong>启动altermanager服务</strong></p>
-
-<pre><code># 编辑alertmanager配置文件
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 编辑alertmanager配置文件
 $cat alertmanager.yml
 global:
   resolve_timeout: 5m
 route:
-  group_by: ['cqh']
+  group_by: [&#39;cqh&#39;]
   group_wait: 10s #组报警等待时间
   group_interval: 10s #组报警间隔时间
   repeat_interval: 1m #重复报警间隔时间
-  receiver: 'web.hook'
+  receiver: &#39;web.hook&#39;
 receivers:
-  - name: 'web.hook'
+  - name: &#39;web.hook&#39;
     webhook_configs:
-      - url: 'http://10.13.118.71:8889/open/test'
+      - url: &#39;http://10.13.118.71:8889/open/test&#39;
 inhibit_rules:
   - source_match:
-      severity: 'critical'
+      severity: &#39;critical&#39;
     target_match:
-      severity: 'warning'
-    equal: ['alertname', 'dev', 'instance']
+      severity: &#39;warning&#39;
+    equal: [&#39;alertname&#39;, &#39;dev&#39;, &#39;instance&#39;]
 
 # 启动服务
 $ docker run -d -p 9093:9093 --name alertmanager -v /Users/xuxuebiao/Desktop/alertmanager.yml:/etc/alertmanager/alertmanager.yml prom/alertmanager
 
 $ docker ps -l
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-c6ba74bfd03b        prom/alertmanager   &quot;/bin/alertmanager...&quot;   3 days ago          Up 7 seconds        0.0.0.0:9093-&gt;9093/tcp   alertmanager
-
-</code></pre>
-
+c6ba74bfd03b        prom/alertmanager   &#34;/bin/alertmanager...&#34;   3 days ago          Up 7 seconds        0.0.0.0:9093-&gt;9093/tcp   alertmanager</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-f2e6dec465c35f4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager服务" /></p>
 
 <p><strong>在prometheus中配置altermanager服务</strong></p>
-
-<pre><code># 编辑rule配置
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 编辑rule配置
 $ cat rules.yml
 groups:
   # tps 超过150 并且持续10s就报警告通知
@@ -616,8 +926,8 @@ groups:
         labels:
           status: warning
         annotations:
-          summary: &quot;{{$labels.instance}}:tps 超过阈值150.&quot;
-          description: &quot;{{$labels.instance}}:tps 超过阈值!. 当前值: {{ $value }}&quot;
+          summary: &#34;{{$labels.instance}}:tps 超过阈值150.&#34;
+          description: &#34;{{$labels.instance}}:tps 超过阈值!. 当前值: {{ $value }}&#34;
 
 
 
@@ -630,12 +940,12 @@ global:
   evaluation_interval: 15s
   # 定义额外的label
   external_labels:
-    monitor: &quot;bgbiao-monitor&quot;
+    monitor: &#34;bgbiao-monitor&#34;
 
 rule_files:
   - /etc/prometheus/rules.yml
-  # - &quot;first.rules&quot;
-  # - &quot;second.rules&quot;
+  # - &#34;first.rules&#34;
+  # - &#34;second.rules&#34;
 
 # 抓取对象
 scrape_configs:
@@ -643,42 +953,55 @@ scrape_configs:
     # 重写数据抓取时间(局部生效)
     scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: [&#39;localhost:9090&#39;]
         labels:
-          group: &quot;prom&quot;
-      - targets: ['10.13.118.71:9100']
+          group: &#34;prom&#34;
+      - targets: [&#39;10.13.118.71:9100&#39;]
         labels:
-          group: &quot;node-exporter&quot;
-      - targets: ['10.13.118.71:9091']
+          group: &#34;node-exporter&#34;
+      - targets: [&#39;10.13.118.71:9091&#39;]
         labels:
-          group: &quot;push-gateway&quot;
+          group: &#34;push-gateway&#34;
 
 # 配置报警对象
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: [&quot;10.13.118.71:9093&quot;]
-
-</code></pre>
-
+        - targets: [&#34;10.13.118.71:9093&#34;]</pre></td></tr></table>
+</div>
+</div>
 <p><strong>重载prometheus服务</strong></p>
-
-<pre><code>curl -X POST http://localhost:9090/-/reload
-
-</code></pre>
-
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">curl -X POST http://localhost:9090/-/reload</pre></td></tr></table>
+</div>
+</div>
 <p><strong>重新导入数据测试</strong></p>
-
-<pre><code># 循环向push-gateway推送数据
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="c1"># 循环向push-gateway推送数据</span>
 $ cat test-abc.sh
-#!/bin/bash
-#Author_by:Andy_xu @JR-OPS
-num=`date +%s | cut -c10-13`
-metrics=`date +%s | cut -c${num}-13`
-echo $metrics
-echo &quot;tps $metrics&quot; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-</code></pre>
-
+<span class="c1">#!/bin/bash</span>
+<span class="c1">#Author_by:Andy_xu @JR-OPS</span>
+<span class="nv">num</span><span class="o">=</span><span class="sb">`</span>date +%s <span class="p">|</span> cut -c10-13<span class="sb">`</span>
+<span class="nv">metrics</span><span class="o">=</span><span class="sb">`</span>date +%s <span class="p">|</span> cut -c<span class="si">${</span><span class="nv">num</span><span class="si">}</span>-13<span class="sb">`</span>
+<span class="nb">echo</span> <span class="nv">$metrics</span>
+<span class="nb">echo</span> <span class="s2">&#34;tps </span><span class="nv">$metrics</span><span class="s2">&#34;</span> <span class="p">|</span> curl --data-binary @- http://localhost:9091/metrics/job/xxb</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-b710723c6e4f9e9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="模拟报警数据" /></p>
 
 <p><img src="https://upload-images.jianshu.io/upload_images/2577135-2e90930e7db5d1e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager中显示的报警规则" /></p>
@@ -690,70 +1013,134 @@ echo &quot;tps $metrics&quot; | curl --data-binary @- http://localhost:9091/metr
 <h3 id="八-后续优化">八、后续优化</h3>
 
 <p><code>注意:</code> 此时使用prometheus可以监控到基础服务的资源使用情况，并且也可用借用<code>alertmanager</code>服务对相关报警规则进行检测和报警，那么需要如何把相关报警及时的通知到相关负责人呢。我们前面在<code>alertmanager</code>服务中配置了一个web-hook,即<code>http://10.13.118.71:8889/open/test</code>，可以在alertmanager服务的<code>status</code>中找到。我们可以很好的借助这个web-hook来对相关的报警发送。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">#</span> <span class="nx">一个临时用来测试的web</span><span class="o">-</span><span class="nx">hook服务</span>
+<span class="err">$</span> <span class="nx">cat</span> <span class="nx">test</span><span class="o">-</span><span class="nx">web</span><span class="o">-</span><span class="nx">hook</span><span class="p">.</span><span class="k">go</span>
+<span class="cm">/**
+</span><span class="cm"> * @File Name: test-web-hook.go
+</span><span class="cm"> * @Author: xxbandy @http://xxbandy.github.io
+</span><span class="cm"> * @Email:
+</span><span class="cm"> * @Create Date: 2019-06-19 14:06:48
+</span><span class="cm"> * @Last Modified: 2019-06-19 15:06:13
+</span><span class="cm"> * @Description: 一个临时用来测试的web-hook服务
+</span><span class="cm"> * @build:
+</span><span class="cm"> GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags &#39;-w -s&#39; -o prometheus-web-hook test-web-hook.go
+</span><span class="cm"> */</span>
 
-<pre><code># 一个临时用来测试的web-hook服务
-$ cat test-web-hook.go
-/**
- * @File Name: test-web-hook.go
- * @Author: xxbandy @http://xxbandy.github.io
- * @Email:
- * @Create Date: 2019-06-19 14:06:48
- * @Last Modified: 2019-06-19 15:06:13
- * @Description: 一个临时用来测试的web-hook服务
- * @build:
- GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags '-w -s' -o prometheus-web-hook test-web-hook.go
- */
-
-package main
-import (
-    &quot;github.com/gin-gonic/gin&quot;
-    &quot;net/http&quot;
-    &quot;io/ioutil&quot;
-    &quot;fmt&quot;
-)
+<span class="kn">package</span> <span class="nx">main</span>
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;github.com/gin-gonic/gin&#34;</span>
+    <span class="s">&#34;net/http&#34;</span>
+    <span class="s">&#34;io/ioutil&#34;</span>
+    <span class="s">&#34;fmt&#34;</span>
+<span class="p">)</span>
 
 
-func main() {
-   router := gin.Default()
-   router.GET(&quot;/open/test&quot;, CollectData)
-   router.POST(&quot;/open/test&quot;, CollectData)
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="nx">router</span> <span class="o">:=</span> <span class="nx">gin</span><span class="p">.</span><span class="nf">Default</span><span class="p">()</span>
+   <span class="nx">router</span><span class="p">.</span><span class="nf">GET</span><span class="p">(</span><span class="s">&#34;/open/test&#34;</span><span class="p">,</span> <span class="nx">CollectData</span><span class="p">)</span>
+   <span class="nx">router</span><span class="p">.</span><span class="nf">POST</span><span class="p">(</span><span class="s">&#34;/open/test&#34;</span><span class="p">,</span> <span class="nx">CollectData</span><span class="p">)</span>
 
-   router.Run(&quot;:8889&quot;)
+   <span class="nx">router</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="s">&#34;:8889&#34;</span><span class="p">)</span>
 
-}
+<span class="p">}</span>
 
-func CollectData(c *gin.Context) {
-    alertdata,_ := ioutil.ReadAll(c.Request.Body)
-    fmt.Println(string(alertdata))
-    c.JSON(http.StatusOK,nil)
+<span class="kd">func</span> <span class="nf">CollectData</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">gin</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">alertdata</span><span class="p">,</span><span class="nx">_</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nf">ReadAll</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">Request</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">alertdata</span><span class="p">))</span>
+    <span class="nx">c</span><span class="p">.</span><span class="nf">JSON</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span><span class="p">,</span><span class="kc">nil</span><span class="p">)</span>
 
-}
+<span class="p">}</span>
 
-# 构建成二进制文件
-$ GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags '-w -s' -o prometheus-web-hook test-web-hook.go
-$ chmod a+x prometheus-web-hook
+<span class="err">#</span> <span class="nx">构建成二进制文件</span>
+<span class="err">$</span> <span class="nx">GOOS</span><span class="p">=</span><span class="nx">darwin</span> <span class="nx">GOARCH</span><span class="p">=</span><span class="nx">amd64</span> <span class="nx">CGO_ENABLED</span><span class="p">=</span><span class="mi">0</span>  <span class="nx">build</span> <span class="o">-</span><span class="nx">ldflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">w</span> <span class="o">-</span><span class="nx">s</span><span class="err">&#39;</span> <span class="o">-</span><span class="nx">o</span> <span class="nx">prometheus</span><span class="o">-</span><span class="nx">web</span><span class="o">-</span><span class="nx">hook</span> <span class="nx">test</span><span class="o">-</span><span class="nx">web</span><span class="o">-</span><span class="nx">hook</span><span class="p">.</span><span class="k">go</span>
+<span class="err">$</span> <span class="nx">chmod</span> <span class="nx">a</span><span class="o">+</span><span class="nx">x</span> <span class="nx">prometheus</span><span class="o">-</span><span class="nx">web</span><span class="o">-</span><span class="nx">hook</span>
 
-# 运行web-hook并收集报警信息
-➜  ./prometheus-web-hook
-[GIN-debug] [WARNING] Now Gin requires Go 1.6 or later and Go 1.7 will be required soon.
+<span class="err">#</span> <span class="nx">运行web</span><span class="o">-</span><span class="nx">hook并收集报警信息</span>
+<span class="err">➜</span>  <span class="p">.</span><span class="o">/</span><span class="nx">prometheus</span><span class="o">-</span><span class="nx">web</span><span class="o">-</span><span class="nx">hook</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="p">[</span><span class="nx">WARNING</span><span class="p">]</span> <span class="nx">Now</span> <span class="nx">Gin</span> <span class="nx">requires</span> <span class="nx">Go</span> <span class="mf">1.6</span> <span class="nx">or</span> <span class="nx">later</span> <span class="nx">and</span> <span class="nx">Go</span> <span class="mf">1.7</span> <span class="nx">will</span> <span class="nx">be</span> <span class="nx">required</span> <span class="nx">soon</span><span class="p">.</span>
 
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="p">[</span><span class="nx">WARNING</span><span class="p">]</span> <span class="nx">Creating</span> <span class="nx">an</span> <span class="nx">Engine</span> <span class="nx">instance</span> <span class="nx">with</span> <span class="nx">the</span> <span class="nx">Logger</span> <span class="nx">and</span> <span class="nx">Recovery</span> <span class="nx">middleware</span> <span class="nx">already</span> <span class="nx">attached</span><span class="p">.</span>
 
-[GIN-debug] [WARNING] Running in &quot;debug&quot; mode. Switch to &quot;release&quot; mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="p">[</span><span class="nx">WARNING</span><span class="p">]</span> <span class="nx">Running</span> <span class="nx">in</span> <span class="s">&#34;debug&#34;</span> <span class="nx">mode</span><span class="p">.</span> <span class="nx">Switch</span> <span class="nx">to</span> <span class="s">&#34;release&#34;</span> <span class="nx">mode</span> <span class="nx">in</span> <span class="nx">production</span><span class="p">.</span>
+ <span class="o">-</span> <span class="nx">using</span> <span class="nx">env</span><span class="p">:</span>	<span class="nx">export</span> <span class="nx">GIN_MODE</span><span class="p">=</span><span class="nx">release</span>
+ <span class="o">-</span> <span class="nx">using</span> <span class="nx">code</span><span class="p">:</span>	<span class="nx">gin</span><span class="p">.</span><span class="nf">SetMode</span><span class="p">(</span><span class="nx">gin</span><span class="p">.</span><span class="nx">ReleaseMode</span><span class="p">)</span>
 
-[GIN-debug] GET    /open/test                --&gt; main.CollectData (3 handlers)
-[GIN-debug] POST   /open/test                --&gt; main.CollectData (3 handlers)
-[GIN-debug] Listening and serving HTTP on :8889
-{&quot;receiver&quot;:&quot;web\\.hook&quot;,&quot;status&quot;:&quot;firing&quot;,&quot;alerts&quot;:[{&quot;status&quot;:&quot;firing&quot;,&quot;labels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;annotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;startsAt&quot;:&quot;2019-06-19T06:17:19.247257311Z&quot;,&quot;endsAt&quot;:&quot;0001-01-01T00:00:00Z&quot;,&quot;generatorURL&quot;:&quot;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&quot;}],&quot;groupLabels&quot;:{},&quot;commonLabels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;commonAnnotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;externalURL&quot;:&quot;http://c6ba74bfd03b:9093&quot;,&quot;version&quot;:&quot;4&quot;,&quot;groupKey&quot;:&quot;{}:{}&quot;}
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">GET</span>    <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span>                <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nf">CollectData</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">POST</span>   <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span>                <span class="o">--</span><span class="p">&gt;</span> <span class="nx">main</span><span class="p">.</span><span class="nf">CollectData</span> <span class="p">(</span><span class="mi">3</span> <span class="nx">handlers</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">GIN</span><span class="o">-</span><span class="nx">debug</span><span class="p">]</span> <span class="nx">Listening</span> <span class="nx">and</span> <span class="nx">serving</span> <span class="nx">HTTP</span> <span class="nx">on</span> <span class="p">:</span><span class="mi">8889</span>
+<span class="p">{</span><span class="s">&#34;receiver&#34;</span><span class="p">:</span><span class="s">&#34;web\\.hook&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;firing&#34;</span><span class="p">,</span><span class="s">&#34;alerts&#34;</span><span class="p">:[{</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;firing&#34;</span><span class="p">,</span><span class="s">&#34;labels&#34;</span><span class="p">:{</span><span class="s">&#34;alertname&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao测试&#34;</span><span class="p">,</span><span class="s">&#34;exported_job&#34;</span><span class="p">:</span><span class="s">&#34;xxb&#34;</span><span class="p">,</span><span class="s">&#34;group&#34;</span><span class="p">:</span><span class="s">&#34;push-gateway&#34;</span><span class="p">,</span><span class="s">&#34;instance&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091&#34;</span><span class="p">,</span><span class="s">&#34;job&#34;</span><span class="p">:</span><span class="s">&#34;prometheus&#34;</span><span class="p">,</span><span class="s">&#34;monitor&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao-monitor&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;warning&#34;</span><span class="p">},</span><span class="s">&#34;annotations&#34;</span><span class="p">:{</span><span class="s">&#34;description&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&#34;</span><span class="p">,</span><span class="s">&#34;summary&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值150.&#34;</span><span class="p">},</span><span class="s">&#34;startsAt&#34;</span><span class="p">:</span><span class="s">&#34;2019-06-19T06:17:19.247257311Z&#34;</span><span class="p">,</span><span class="s">&#34;endsAt&#34;</span><span class="p">:</span><span class="s">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span><span class="s">&#34;generatorURL&#34;</span><span class="p">:</span><span class="s">&#34;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&#34;</span><span class="p">}],</span><span class="s">&#34;groupLabels&#34;</span><span class="p">:{},</span><span class="s">&#34;commonLabels&#34;</span><span class="p">:{</span><span class="s">&#34;alertname&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao测试&#34;</span><span class="p">,</span><span class="s">&#34;exported_job&#34;</span><span class="p">:</span><span class="s">&#34;xxb&#34;</span><span class="p">,</span><span class="s">&#34;group&#34;</span><span class="p">:</span><span class="s">&#34;push-gateway&#34;</span><span class="p">,</span><span class="s">&#34;instance&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091&#34;</span><span class="p">,</span><span class="s">&#34;job&#34;</span><span class="p">:</span><span class="s">&#34;prometheus&#34;</span><span class="p">,</span><span class="s">&#34;monitor&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao-monitor&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;warning&#34;</span><span class="p">},</span><span class="s">&#34;commonAnnotations&#34;</span><span class="p">:{</span><span class="s">&#34;description&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&#34;</span><span class="p">,</span><span class="s">&#34;summary&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值150.&#34;</span><span class="p">},</span><span class="s">&#34;externalURL&#34;</span><span class="p">:</span><span class="s">&#34;http://c6ba74bfd03b:9093&#34;</span><span class="p">,</span><span class="s">&#34;version&#34;</span><span class="p">:</span><span class="s">&#34;4&#34;</span><span class="p">,</span><span class="s">&#34;groupKey&#34;</span><span class="p">:</span><span class="s">&#34;{}:{}&#34;</span><span class="p">}</span>
 
-[GIN] 2019/06/19 - 15:24:10 | 200 |     727.873µs |    10.13.118.71 | POST     /open/test
-{&quot;receiver&quot;:&quot;web\\.hook&quot;,&quot;status&quot;:&quot;firing&quot;,&quot;alerts&quot;:[{&quot;status&quot;:&quot;firing&quot;,&quot;labels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;annotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;startsAt&quot;:&quot;2019-06-19T06:17:19.247257311Z&quot;,&quot;endsAt&quot;:&quot;0001-01-01T00:00:00Z&quot;,&quot;generatorURL&quot;:&quot;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&quot;}],&quot;groupLabels&quot;:{},&quot;commonLabels&quot;:{&quot;alertname&quot;:&quot;bgbiao测试&quot;,&quot;exported_job&quot;:&quot;xxb&quot;,&quot;group&quot;:&quot;push-gateway&quot;,&quot;instance&quot;:&quot;10.13.118.71:9091&quot;,&quot;job&quot;:&quot;prometheus&quot;,&quot;monitor&quot;:&quot;bgbiao-monitor&quot;,&quot;status&quot;:&quot;warning&quot;},&quot;commonAnnotations&quot;:{&quot;description&quot;:&quot;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&quot;,&quot;summary&quot;:&quot;10.13.118.71:9091:tps 超过阈值150.&quot;},&quot;externalURL&quot;:&quot;http://c6ba74bfd03b:9093&quot;,&quot;version&quot;:&quot;4&quot;,&quot;groupKey&quot;:&quot;{}:{}&quot;}
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2019</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="mi">19</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">10</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>     <span class="mf">727.873</span><span class="nx">µs</span> <span class="p">|</span>    <span class="mf">10.13.118.71</span> <span class="p">|</span> <span class="nx">POST</span>     <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span>
+<span class="p">{</span><span class="s">&#34;receiver&#34;</span><span class="p">:</span><span class="s">&#34;web\\.hook&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;firing&#34;</span><span class="p">,</span><span class="s">&#34;alerts&#34;</span><span class="p">:[{</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;firing&#34;</span><span class="p">,</span><span class="s">&#34;labels&#34;</span><span class="p">:{</span><span class="s">&#34;alertname&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao测试&#34;</span><span class="p">,</span><span class="s">&#34;exported_job&#34;</span><span class="p">:</span><span class="s">&#34;xxb&#34;</span><span class="p">,</span><span class="s">&#34;group&#34;</span><span class="p">:</span><span class="s">&#34;push-gateway&#34;</span><span class="p">,</span><span class="s">&#34;instance&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091&#34;</span><span class="p">,</span><span class="s">&#34;job&#34;</span><span class="p">:</span><span class="s">&#34;prometheus&#34;</span><span class="p">,</span><span class="s">&#34;monitor&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao-monitor&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;warning&#34;</span><span class="p">},</span><span class="s">&#34;annotations&#34;</span><span class="p">:{</span><span class="s">&#34;description&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&#34;</span><span class="p">,</span><span class="s">&#34;summary&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值150.&#34;</span><span class="p">},</span><span class="s">&#34;startsAt&#34;</span><span class="p">:</span><span class="s">&#34;2019-06-19T06:17:19.247257311Z&#34;</span><span class="p">,</span><span class="s">&#34;endsAt&#34;</span><span class="p">:</span><span class="s">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span><span class="s">&#34;generatorURL&#34;</span><span class="p">:</span><span class="s">&#34;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&#34;</span><span class="p">}],</span><span class="s">&#34;groupLabels&#34;</span><span class="p">:{},</span><span class="s">&#34;commonLabels&#34;</span><span class="p">:{</span><span class="s">&#34;alertname&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao测试&#34;</span><span class="p">,</span><span class="s">&#34;exported_job&#34;</span><span class="p">:</span><span class="s">&#34;xxb&#34;</span><span class="p">,</span><span class="s">&#34;group&#34;</span><span class="p">:</span><span class="s">&#34;push-gateway&#34;</span><span class="p">,</span><span class="s">&#34;instance&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091&#34;</span><span class="p">,</span><span class="s">&#34;job&#34;</span><span class="p">:</span><span class="s">&#34;prometheus&#34;</span><span class="p">,</span><span class="s">&#34;monitor&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao-monitor&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;warning&#34;</span><span class="p">},</span><span class="s">&#34;commonAnnotations&#34;</span><span class="p">:{</span><span class="s">&#34;description&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&#34;</span><span class="p">,</span><span class="s">&#34;summary&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值150.&#34;</span><span class="p">},</span><span class="s">&#34;externalURL&#34;</span><span class="p">:</span><span class="s">&#34;http://c6ba74bfd03b:9093&#34;</span><span class="p">,</span><span class="s">&#34;version&#34;</span><span class="p">:</span><span class="s">&#34;4&#34;</span><span class="p">,</span><span class="s">&#34;groupKey&#34;</span><span class="p">:</span><span class="s">&#34;{}:{}&#34;</span><span class="p">}</span>
 
-[GIN] 2019/06/19 - 15:25:20 | 200 |     129.897µs |    10.13.118.71 | POST     /open/test
-</code></pre>
-
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2019</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="mi">19</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">25</span><span class="p">:</span><span class="mi">20</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>     <span class="mf">129.897</span><span class="nx">µs</span> <span class="p">|</span>    <span class="mf">10.13.118.71</span> <span class="p">|</span> <span class="nx">POST</span>     <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span></pre></td></tr></table>
+</div>
+</div>
 <p><code>注意:我们这里的web-hook服务其实是将报警信息临时全部打印出来了，其实可以根据用户关心程度，将相关值取出来直接发送至用户终端，比如钉钉，微信，或者短信</code></p>
     </div>
 
@@ -774,7 +1161,7 @@ $ chmod a+x prometheus-web-hook
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -787,7 +1174,15 @@ $ chmod a+x prometheus-web-hook
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -843,6 +1238,16 @@ $ chmod a+x prometheus-web-hook
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -982,6 +1387,23 @@ $ chmod a+x prometheus-web-hook
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

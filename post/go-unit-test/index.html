@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Golang中的单元测试、基准测试、覆盖测试 - BGBiao的Ops人生</title>
+  <title>Golang中的单元测试、基准测试、覆盖测试 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -26,7 +26,7 @@
   <meta name="description" content="单元测试、基准测试、覆盖测试  背景: 之前很长一段时间再写Golang程序时，不会有意识去写单元测试，直到后来写了独立项目后，慢慢才发现给一个功能编写对应的单元测试是多么高效和方便，接下来就再一起复习下Golang中的测试.
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -59,6 +59,8 @@
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="Golang中的单元测试、基准测试、覆盖测试" />
 <meta property="og:description" content="单元测试、基准测试、覆盖测试
@@ -69,7 +71,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/go-unit-test/" />
 <meta property="article:published_time" content="2019-10-20T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-11-20T16:01:23+08:00" />
+<meta property="article:modified_time" content="2019-12-01T19:18:01+08:00" />
 <meta itemprop="name" content="Golang中的单元测试、基准测试、覆盖测试">
 <meta itemprop="description" content="单元测试、基准测试、覆盖测试
 
@@ -79,8 +81,8 @@
 
 
 <meta itemprop="datePublished" content="2019-10-20T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2019-11-20T16:01:23&#43;08:00" />
-<meta itemprop="wordCount" content="4374">
+<meta itemprop="dateModified" content="2019-12-01T19:18:01&#43;08:00" />
+<meta itemprop="wordCount" content="4591">
 
 
 
@@ -103,13 +105,24 @@
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -154,9 +167,52 @@
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -223,6 +279,34 @@
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -230,7 +314,7 @@
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -294,10 +378,52 @@
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -321,7 +447,8 @@
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        
+        <span class="more-meta"> 4591 words </span>
+          <span class="more-meta"> 10 min read </span>
 
         
         
@@ -374,83 +501,162 @@
 <li>单元测试函数参数必须为<code>t *testing.T</code>(测试框架强要求)</li>
 
 <li><p>测试程序和被测试程序文件在一个包<code>package</code>中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">#</span> <span class="nx">示例文件</span>
+<span class="err">#</span> <span class="nx">假设我们为某段业务逻辑专门写了一个package</span><span class="p">(</span><span class="nx">用来初始化一个矩形</span><span class="err">，</span><span class="nx">并计算体积</span><span class="p">)</span><span class="err">，</span><span class="nx">此时看到到整体结构如下</span>
+<span class="err">$</span> <span class="nx">tree</span> <span class="o">-</span><span class="nx">L</span> <span class="mi">2</span> <span class="p">.</span><span class="o">/</span><span class="nx">unittest</span>
+<span class="p">.</span><span class="o">/</span><span class="nx">unittest</span>
+<span class="err">├──</span> <span class="nx">area</span><span class="p">.</span><span class="k">go</span>
+<span class="err">└──</span> <span class="nx">area_test</span><span class="p">.</span><span class="k">go</span>
 
-<pre><code># 示例文件
-# 假设我们为某段业务逻辑专门写了一个package(用来初始化一个矩形，并计算体积)，此时看到到整体结构如下
-$ tree -L 2 ./unittest
-./unittest
-├── area.go
-└── area_test.go
+<span class="err">#</span> <span class="nx">业务逻辑代码</span><span class="p">(</span><span class="nx">业务逻辑需要和单元测试在一个package下</span><span class="p">)</span>
+<span class="err">$</span> <span class="nx">cat</span> <span class="p">.</span><span class="o">/</span><span class="nx">unittest</span><span class="o">/</span><span class="nx">area</span><span class="p">.</span><span class="k">go</span>
+<span class="kn">package</span> <span class="nx">unittest</span>
 
-# 业务逻辑代码(业务逻辑需要和单元测试在一个package下)
-$ cat ./unittest/area.go
-package unittest
+<span class="kd">type</span> <span class="nx">box</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="nx">length</span>  <span class="kt">int</span>
+<span class="nx">width</span>   <span class="kt">int</span>
+<span class="nx">height</span>  <span class="kt">int</span>
+<span class="nx">name</span>    <span class="kt">string</span>
+<span class="p">}</span>
 
-type box struct {
-length  int
-width   int
-height  int
-name    string
-}
+<span class="c1">// 初始化一个结构体指针对象，后面使用结构体指针方法来设置和获取对象属性
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">Newbox</span><span class="p">()</span> <span class="p">(</span><span class="o">*</span><span class="nx">box</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">return</span> <span class="o">&amp;</span><span class="nx">box</span><span class="p">{}</span>
+<span class="p">}</span>
 
-// 初始化一个结构体指针对象，后面使用结构体指针方法来设置和获取对象属性
-func Newbox() (*box) {
-return &amp;box{}
-}
+<span class="c1">// 给结构体对象设置具体的属性(名称，规格大小)
+</span><span class="c1">// 注意: 在如下几个方法中，方法接受者为指针类型，而方法参数为值类型，因此在赋值时可能有人产生疑惑，这里其实是Golang底层做了优化(v.name = name 等同于(*v).name = name)
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">v</span> <span class="o">*</span><span class="nx">box</span><span class="p">)</span> <span class="nf">SetName</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">v</span><span class="p">.</span><span class="nx">name</span> <span class="p">=</span> <span class="nx">name</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">v</span> <span class="o">*</span><span class="nx">box</span><span class="p">)</span> <span class="nf">SetSize</span><span class="p">(</span><span class="nx">l</span><span class="p">,</span><span class="nx">w</span><span class="p">,</span><span class="nx">h</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">v</span><span class="p">.</span><span class="nx">length</span> <span class="p">=</span> <span class="nx">l</span>
+<span class="nx">v</span><span class="p">.</span><span class="nx">width</span> <span class="p">=</span> <span class="nx">w</span>
+<span class="nx">v</span><span class="p">.</span><span class="nx">height</span> <span class="p">=</span> <span class="nx">h</span>
+<span class="p">}</span>
 
-// 给结构体对象设置具体的属性(名称，规格大小)
-// 注意: 在如下几个方法中，方法接受者为指针类型，而方法参数为值类型，因此在赋值时可能有人产生疑惑，这里其实是Golang底层做了优化(v.name = name 等同于(*v).name = name)
-func (v *box) SetName(name string) {
-v.name = name
-}
-func (v *box) SetSize(l,w,h int) {
-v.length = l
-v.width = w
-v.height = h
-}
+<span class="c1">// 获取对象的一些属性(名称和体积)
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">v</span> <span class="o">*</span><span class="nx">box</span><span class="p">)</span> <span class="nf">GetName</span><span class="p">()</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">return</span> <span class="nx">v</span><span class="p">.</span><span class="nx">name</span>
+<span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">v</span> <span class="o">*</span><span class="nx">box</span><span class="p">)</span> <span class="nf">GetVolume</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">return</span> <span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">width</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">height</span><span class="p">)</span>
+<span class="p">}</span>
 
-// 获取对象的一些属性(名称和体积)
-func (v *box) GetName() (string) {
-return v.name
-}
-func (v *box) GetVolume() (int) {
-return (v.length)*(v.width)*(v.height)
-}
+<span class="err">#</span> <span class="nx">对应业务逻辑的单元测试逻辑</span>
+<span class="err">$</span> <span class="nx">cat</span> <span class="nx">unittest</span><span class="o">/</span><span class="nx">area_test</span><span class="p">.</span><span class="k">go</span>
+<span class="kn">package</span> <span class="nx">unittest</span>
+<span class="c1">// 必须导入testing模块，并且方法的接受者为(t *testing.T)
+</span><span class="c1"></span><span class="kn">import</span> <span class="p">(</span>
+<span class="s">&#34;fmt&#34;</span>
+<span class="s">&#34;testing&#34;</span>
+<span class="p">)</span>
+<span class="c1">// 测试1: 测试名称是否符合预期
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">TestSetSomething</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">box</span> <span class="o">:=</span> <span class="nf">Newbox</span><span class="p">()</span>
+<span class="nx">box</span><span class="p">.</span><span class="nf">SetName</span><span class="p">(</span><span class="s">&#34;bgbiao&#34;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nx">box</span><span class="p">.</span><span class="nf">GetName</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#34;bgbiao&#34;</span> <span class="p">{</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;the rectangular name&#39;s result is ok&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// 测试2: 测试计算出来的体积是否符合预期
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">TestGetSomething</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">box</span> <span class="o">:=</span> <span class="nf">Newbox</span><span class="p">()</span>
+<span class="nx">box</span><span class="p">.</span><span class="nf">SetSize</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">if</span> <span class="nx">box</span><span class="p">.</span><span class="nf">GetVolume</span><span class="p">()</span> <span class="o">==</span> <span class="mi">60</span> <span class="p">{</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;the rectangular volume&#39;s result is ok&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="p">}</span>
 
-# 对应业务逻辑的单元测试逻辑
-$ cat unittest/area_test.go
-package unittest
-// 必须导入testing模块，并且方法的接受者为(t *testing.T)
-import (
-&quot;fmt&quot;
-&quot;testing&quot;
-)
-// 测试1: 测试名称是否符合预期
-func TestSetSomething(t *testing.T) {
-box := Newbox()
-box.SetName(&quot;bgbiao&quot;)
-if box.GetName() == &quot;bgbiao&quot; {
-    fmt.Println(&quot;the rectangular name's result is ok&quot;)
-}
-}
-// 测试2: 测试计算出来的体积是否符合预期
-func TestGetSomething(t *testing.T) {
-box := Newbox()
-box.SetSize(3,4,5)
-if box.GetVolume() == 60 {
-    fmt.Println(&quot;the rectangular volume's result is ok&quot;)
-}
-}
-
-# 运行单元测试程序
-# 可以看到我们编写的两个单元测试都经过预期测试
-$ cd unittest
-$ go test
-the rectangular name's result is ok
-the rectangular volume's result is ok
-PASS
-ok  	_/User/BGBiao/unittest	0.005s
-</code></pre></li>
+<span class="err">#</span> <span class="nx">运行单元测试程序</span>
+<span class="err">#</span> <span class="nx">可以看到我们编写的两个单元测试都经过预期测试</span>
+<span class="err">$</span> <span class="nx">cd</span> <span class="nx">unittest</span>
+<span class="err">$</span> <span class="k">go</span> <span class="nx">test</span>
+<span class="nx">the</span> <span class="nx">rectangular</span> <span class="nx">name</span><span class="err">&#39;</span><span class="nx">s</span> <span class="nx">result</span> <span class="nx">is</span> <span class="nx">ok</span>
+<span class="nx">the</span> <span class="nx">rectangular</span> <span class="nx">volume</span><span class="err">&#39;</span><span class="nx">s</span> <span class="nx">result</span> <span class="nx">is</span> <span class="nx">ok</span>
+<span class="nx">PASS</span>
+<span class="nx">ok</span>  	<span class="nx">_</span><span class="o">/</span><span class="nx">User</span><span class="o">/</span><span class="nx">BGBiao</span><span class="o">/</span><span class="nx">unittest</span>	<span class="mf">0.005</span><span class="nx">s</span></pre></td></tr></table>
+</div>
+</div></li>
 </ul>
 
 <p><strong>单元测试的运行</strong></p>
@@ -477,11 +683,41 @@ ok  	_/User/BGBiao/unittest	0.005s
 </ul>
 
 <p>单元测试中常用的命令参数:</p>
-
-<pre><code># 对当前目录下的全部单元测试程序进行运行测试(也就是所有的xxx_test.go文件中的所有function都会运行)
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 对当前目录下的全部单元测试程序进行运行测试(也就是所有的xxx_test.go文件中的所有function都会运行)
 $ go test
-the rectangular name's result is ok
-the rectangular volume's result is ok
+the rectangular name&#39;s result is ok
+the rectangular volume&#39;s result is ok
 PASS
 ok  	_/Users/BGBiao/unittest	0.005s
 
@@ -489,25 +725,24 @@ ok  	_/Users/BGBiao/unittest	0.005s
 # (go test -v 等同于go test -args -test.v)
 $ go test -v
 === RUN   TestSetSomething
-the rectangular name's result is ok
+the rectangular name&#39;s result is ok
 --- PASS: TestSetSomething (0.00s)
 === RUN   TestGetSomething
-the rectangular volume's result is ok
+the rectangular volume&#39;s result is ok
 --- PASS: TestGetSomething (0.00s)
 PASS
 ok  	_/Users/BGBiao/unittest	0.005s
 
-# 指定单元测试function来进行测试(-run参数可以指定正则匹配模式-run=&quot;test1|test2&quot;)
+# 指定单元测试function来进行测试(-run参数可以指定正则匹配模式-run=&#34;test1|test2&#34;)
 # go test -v -run functionname 
 $ go test -v -test.run TestGetSomething
 === RUN   TestGetSomething
-the rectangular volume's result is ok
+the rectangular volume&#39;s result is ok
 --- PASS: TestGetSomething (0.00s)
 PASS
-ok  	_/Users/BGBiao/unittest	0.005s
-
-</code></pre>
-
+ok  	_/Users/BGBiao/unittest	0.005s</pre></td></tr></table>
+</div>
+</div>
 <p><strong>单元测试注意事项</strong></p>
 
 <p><code>注意:</code> 在单元测试时，一个比较重要的事情就是如何构造测试数据，因为通常我们能够想到的测试数据都是在预期之中的，有些核心逻辑的测试数据往往不能考虑到，因此构造测试数据时可考虑如下几个方面:</p>
@@ -528,8 +763,35 @@ ok  	_/Users/BGBiao/unittest	0.005s
 <p><strong>Golang的测试断言工具</strong></p>
 
 <p><code>注意:</code>在<code>testing</code>包中包含了一些常用的断言工具</p>
-
-<pre><code>func TestPrint(t *testing.T) {
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">func TestPrint(t *testing.T) {
     // 输出测试日志
     t.Logf()
     // 标记错误，但仍然执行后面的语句
@@ -537,11 +799,11 @@ ok  	_/Users/BGBiao/unittest	0.005s
     // 获取是否当前用例是执行错误的
     t.Failed()
     // 错误输出，等于 t.Logf 再执行 t.Fail()
-    t.Errorf(&quot;%s&quot;, &quot;run ErrorF&quot;)
+    t.Errorf(&#34;%s&#34;, &#34;run ErrorF&#34;)
     // 标记函数错误，并中断后面的执行
     t.FailNow()
     // 致命错误输出，等同于调用了 t.Logf 然后调用 t.FailNow()
-    t.Fatalf(&quot;%s&quot;, &quot;run Fatelf&quot;)
+    t.Fatalf(&#34;%s&#34;, &#34;run Fatelf&#34;)
     // 测试用例的名字
     t.Name()
     //运行子测试用例
@@ -552,9 +814,9 @@ ok  	_/Users/BGBiao/unittest	0.005s
     t.Skipped()
     // 并行测试
     t.Parallel()
-}
-</code></pre>
-
+}</pre></td></tr></table>
+</div>
+</div>
 <p><strong>测试覆盖率统计</strong></p>
 
 <p><code>注意:</code>Golang内置工具包中也提供了测试覆盖率相关的工具，<code>go test</code>常用参数如下:
@@ -569,23 +831,56 @@ ok  	_/Users/BGBiao/unittest	0.005s
 <p><a href="http://goconvey.co/">goconvey</a><br />
 <a href="https://github.com/smartystreets/goconvey">goconvey</a><br />
 <a href="https://codecov.io/">codecov</a></p>
-
-<pre><code># 使用golang内置的工具来执行覆盖测试，执行之后生成.test的执行文件，执行后会执行所有单元测试代码，然后输出覆盖率的报告
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 使用golang内置的工具来执行覆盖测试，执行之后生成.test的执行文件，执行后会执行所有单元测试代码，然后输出覆盖率的报告
 $ go test -c -covermode=count -coverpkg ./
 ➜  unittest git:(master) ✗ ls
 area.go       area_test.go  unittest.test
 ➜  unittest git:(master) ✗ ./unittest.test
-the rectangular name's result is ok
-the rectangular volume's result is ok
+the rectangular name&#39;s result is ok
+the rectangular volume&#39;s result is ok
 PASS
-coverage: 100.0% of statements in ./
-</code></pre>
-
+coverage: 100.0% of statements in ./</pre></td></tr></table>
+</div>
+</div>
 <p>统计单元测试的覆盖率，也就是白盒测试的覆盖率.</p>
 
 <p><code>覆盖率测试报告</code>:</p>
-
-<pre><code># 将测试覆盖率结果写入一个数据文件
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 将测试覆盖率结果写入一个数据文件
 $ go test -coverpkg=./ -coverprofile=coverage.data -timeout=5s
 
 # 将覆盖率报告数据文件转化成对应的人类可识别模式(go tool cover可查看覆盖率相关的工具)
@@ -602,9 +897,9 @@ total:										(statements)	100.0%
 $ go tool cover -html=coverage.data -o coverage.html
 
 # 直接以html形式展示覆盖测试率报告
-$ go tool cover -html=coverage.data
-</code></pre>
-
+$ go tool cover -html=coverage.data</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8tw12ghvej317l0u0jvu.jpg" alt="" /></p>
 
 <p><strong>基准测试</strong></p>
@@ -617,8 +912,38 @@ $ go tool cover -html=coverage.data
 </ul>
 
 <p><code>注意</code>: <code>*testing.B</code>参数提供了一些额外的性能测量相关的方法，同时还提供了一个随机整数<code>N</code>，用于限定执行的循环次数。</p>
-
-<pre><code># 编写benchmark函数
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 编写benchmark函数
 func Benchmark_GetSomething(b *testing.B) {
     box := Newbox()
     volume := 0
@@ -632,7 +957,7 @@ func Benchmark_GetSomething(b *testing.B) {
 # 运行测试(运行所有的基准测试，-bench可以指定函数名，-benchmem可以指定分配内存的次数和字节数)
 # 和单元测试不同的是，我们需要使用-bench来手工指定需运行的基准测试函数(.表示全部的基准测试函数)
 # 如下输出结果表示:GOMAXPROCS为4核心,每次调用GetSomething函数平均花费0.35ns(调用了2000000000次)
-$ go test -v -run=&quot;none&quot; -bench=Benchmark_GetSomething -benchmem
+$ go test -v -run=&#34;none&#34; -bench=Benchmark_GetSomething -benchmem
 goos: darwin
 goarch: amd64
 Benchmark_GetSomething-4   	2000000000	         0.35 ns/op	       0 B/op	       0 allocs/op
@@ -644,10 +969,9 @@ Benchmark_GetSomething-4   	2000000000	         0.35 ns/op	       0 B/op	       
     area_test.go:40: 24686420
     area_test.go:40: 24686420
 PASS
-ok  	_/Users/BGBiao/unittest	0.749s
-
-</code></pre>
-
+ok  	_/Users/BGBiao/unittest	0.749s</pre></td></tr></table>
+</div>
+</div>
 <p><strong>性能分析</strong></p>
 
 <p><code>注意:</code> 当我们的程序在运行过程中可能会消耗非常多的资源(通常是程序性价比较低时，比如处理一个很小的数据，却占用了几个G的内存，并且CPU长期处于高负荷状态)，此时我们就需要通过一些技术手段来分析程序性能损耗点，以此来提高程序的性价比。</p>
@@ -661,17 +985,62 @@ ok  	_/Users/BGBiao/unittest	0.749s
 </ul>
 
 <p><code>注意:</code> 剖析对于长期运行的程序尤其有用，因此可以通过调用Go的<code>runtime API</code>来启用运行时剖析。</p>
-
-<pre><code># 通过不同的参数来获取指定性能分析数据
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 通过不同的参数来获取指定性能分析数据
 $ go test -cpuprofile=cpu.out
 $ go test -blockprofile=block.out
-$ go test -memprofile=mem.out
-</code></pre>
-
+$ go test -memprofile=mem.out</pre></td></tr></table>
+</div>
+</div>
 <p>一旦我们通过上述内置工具获取到相关的分析数据，我们就可以使用<code>pprof</code>来分析数据，使用<code>go help pprof</code>可以查看更多帮助信息，最常用的即: 生成这个概要文件的可执行程序和对应的剖析数据</p>
-
-<pre><code># 获取CPU基准测试数据
-$ go test  -run=&quot;none&quot; -bench=Benchmark_GetSomething -cpuprofile=cpu.log
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 获取CPU基准测试数据
+$ go test  -run=&#34;none&#34; -bench=Benchmark_GetSomething -cpuprofile=cpu.log
 goos: darwin
 goarch: amd64
 Benchmark_GetSomething-4   	2000000000	         0.36 ns/op
@@ -704,9 +1073,9 @@ Showing nodes accounting for 680ms, 100% of 680ms total
 # web可视化分析(会弹出web页面,可查看程序每个逻辑的cpu使用)
 $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
 
-# 对应的，我们也可以使用-memprofile参数来获取内存分析数据，来查看处理逻辑对内存的消耗状况
-</code></pre>
-
+# 对应的，我们也可以使用-memprofile参数来获取内存分析数据，来查看处理逻辑对内存的消耗状况</pre></td></tr></table>
+</div>
+</div>
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8tz9u4xz2j30u00xxdjd.jpg" alt="cpu性能分析" /></p>
 
 <p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8u1yeltk4j305p0ptgmk.jpg" alt="mem分配" /></p>
@@ -726,14 +1095,17 @@ $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2019-11-20
+      2019-12-01
+      
+        
+        
       
     </span>
   </p>
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -746,7 +1118,15 @@ $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -800,6 +1180,16 @@ $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -939,6 +1329,23 @@ $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 

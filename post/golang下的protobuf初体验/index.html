@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Golang下的protobuf初体验 - BGBiao的Ops人生</title>
+  <title>Golang下的protobuf初体验 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -29,7 +29,7 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。
 " />
 
-  <meta name="keywords" content="Ops, DevOps, Kubernetes, Docker, 云原生" />
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
 
@@ -62,6 +62,8 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 
 
 
+<link rel="stylesheet" href="/css/custom.css">
+
 
 <meta property="og:title" content="Golang下的protobuf初体验" />
 <meta property="og:description" content="protpbuf简介
@@ -89,7 +91,7 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 
 <meta itemprop="datePublished" content="2018-04-03T15:01:07&#43;00:00" />
 <meta itemprop="dateModified" content="2018-04-03T15:01:07&#43;00:00" />
-<meta itemprop="wordCount" content="1356">
+<meta itemprop="wordCount" content="1509">
 
 
 
@@ -115,13 +117,24 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 <![endif]-->
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
 
 
 </head>
 <body>
   <div id="mobile-navbar" class="mobile-navbar">
   <div class="mobile-header-logo">
-    <a href="/" class="logo">BGBiao的Ops人生</a>
+    <a href="/" class="logo">BGBiao的SRE人生</a>
   </div>
   <div class="mobile-navbar-icon">
     <span></span>
@@ -166,9 +179,52 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
         
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+        
       </li>
     
 
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -235,6 +291,34 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
   
 
   
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
 
   
 
@@ -242,7 +326,7 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
     <div class="logo-wrapper">
   <a href="/" class="logo">
     
-      BGBiao的Ops人生
+      BGBiao的SRE人生
     
   </a>
 </div>
@@ -306,10 +390,52 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 
       </li>
     
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
 
     
     
 
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
     
   </ul>
 </nav>
@@ -333,7 +459,8 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             
           </div>
-        
+        <span class="more-meta"> 1509 words </span>
+          <span class="more-meta"> 4 min read </span>
 
         
         
@@ -389,183 +516,352 @@ google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一
 </ul>
 
 <h3 id="准备基础环境">准备基础环境</h3>
-
-<pre><code>sh-4.2# go version
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">sh-4.2# go version
 go version go1.8.3 linux/amd64
 sh-4.2# go env
 ....
-GOROOT=&quot;/usr/lib/golang&quot;
-GOPATH=&quot;/root/go&quot;
-....
-</code></pre>
-
+GOROOT=&#34;/usr/lib/golang&#34;
+GOPATH=&#34;/root/go&#34;
+....</pre></td></tr></table>
+</div>
+</div>
 <h3 id="准备protobuf底层库环境">准备protobuf底层库环境</h3>
-
-<pre><code># 因为工作原因会使用conda管理一些基础包，所以可以使用conda去安装基础模块
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 因为工作原因会使用conda管理一些基础包，所以可以使用conda去安装基础模块
 
 $ source /export/python2.7/setenv.sh
 $ conda install libprotobuf -y
 $ protoc --version
-libprotoc 3.0.0
-
-</code></pre>
-
+libprotoc 3.0.0</pre></td></tr></table>
+</div>
+</div>
 <h3 id="准备protobuf模块以及插件">准备protobuf模块以及插件</h3>
-
-<pre><code># protoc-gen-go是用来将protobuf的的代码转换成go语言代码的一个插件
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># protoc-gen-go是用来将protobuf的的代码转换成go语言代码的一个插件
 $ go get -u github.com/golang/protobuf/protoc-gen-go
 # proto是protobuf在golang中的接口模块
-$ go get -u github.com/golang/protobuf/proto
-</code></pre>
-
+$ go get -u github.com/golang/protobuf/proto</pre></td></tr></table>
+</div>
+</div>
 <h3 id="使用protobuf构造golang的模块代码">使用protobuf构造golang的模块代码</h3>
 
 <p><a href="https://segmentfault.com/a/1190000007917576">Protobuf语法</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">#</span> <span class="nx">创建项目</span>
+<span class="err">$</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="s">&#34;${GOPATH}/src/protobuf-study&#34;</span>
 
-<pre><code># 创建项目
-$ mkdir -p &quot;${GOPATH}/src/protobuf-study&quot;
+<span class="err">#</span> <span class="nx">生成protobuf和相应的golang代码</span>
+<span class="err">$</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="s">&#34;${GOPATH}/src/protobuf-study/protobuf&#34;</span> <span class="o">&amp;&amp;</span> <span class="nx">pushd</span> <span class="s">&#34;${GOPATH}/src/protobuf-study/goprotobuf&#34;</span>
 
-# 生成protobuf和相应的golang代码
-$ mkdir -p &quot;${GOPATH}/src/protobuf-study/protobuf&quot; &amp;&amp; pushd &quot;${GOPATH}/src/protobuf-study/goprotobuf&quot;
+<span class="err">#</span> <span class="nx">定义protobuf消息格式</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="nx">cat</span> <span class="nx">test</span><span class="p">.</span><span class="nx">proto</span>
+<span class="c1">//这里的语法必须使用proto2,在proto3的版本中和optional参数冲突了
+</span><span class="c1"></span><span class="nx">syntax</span> <span class="p">=</span> <span class="s">&#34;proto2&#34;</span><span class="p">;</span>
+<span class="c1">//显式生命报名，在其他消息格式定义中可以使用package.message的方式来使用类型
+</span><span class="c1">//比如goprotobuf.HelloWorld
+</span><span class="c1"></span><span class="kn">package</span> <span class="nx">goprotobuf</span><span class="p">;</span>
+<span class="c1">//声明一个消息体描述一个请求或者响应的消息格式
+</span><span class="c1"></span><span class="nx">message</span> <span class="nx">HelloWorld</span> <span class="p">{</span>
+    <span class="nx">required</span> <span class="kt">int32</span>     <span class="nx">id</span> <span class="p">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="nx">required</span> <span class="kt">string</span>    <span class="nx">name</span> <span class="p">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="nx">optional</span> <span class="kt">int32</span>     <span class="nx">opt</span> <span class="p">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="p">}</span>
 
-# 定义protobuf消息格式
-sh-4.2# cat test.proto
-//这里的语法必须使用proto2,在proto3的版本中和optional参数冲突了
-syntax = &quot;proto2&quot;;
-//显式生命报名，在其他消息格式定义中可以使用package.message的方式来使用类型
-//比如goprotobuf.HelloWorld
-package goprotobuf;
-//声明一个消息体描述一个请求或者响应的消息格式
-message HelloWorld {
-    required int32     id = 1;
-    required string    name = 2;
-    optional int32     opt = 3;
-}
+<span class="err">#</span> <span class="nx">生成对应的golang模块代码</span><span class="p">(</span><span class="nx">会将protobuf消息格式转换为对应golang结构体</span><span class="p">)</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="nx">protoc</span> <span class="o">--</span><span class="nx">go_out</span><span class="p">=.</span><span class="o">/</span> <span class="nx">test</span><span class="p">.</span><span class="nx">proto</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="nx">ls</span>
+<span class="nx">test</span><span class="p">.</span><span class="nx">pb</span><span class="p">.</span><span class="k">go</span>  <span class="nx">test</span><span class="p">.</span><span class="nx">proto</span>
 
-# 生成对应的golang模块代码(会将protobuf消息格式转换为对应golang结构体)
-sh-4.2# protoc --go_out=./ test.proto
-sh-4.2# ls
-test.pb.go  test.proto
+<span class="err">#</span> <span class="nx">看一下生成的test</span><span class="p">.</span><span class="nx">pd</span><span class="p">.</span><span class="nx">go的核心代码</span>
+<span class="c1">// 声明一个消息体描述一个请求或者响应的消息格式
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">HelloWorld</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Id</span>               <span class="o">*</span><span class="kt">int32</span>  <span class="s">`protobuf:&#34;varint,1,req,name=id&#34; json:&#34;id,omitempty&#34;`</span>
+	<span class="nx">Name</span>             <span class="o">*</span><span class="kt">string</span> <span class="s">`protobuf:&#34;bytes,2,req,name=name&#34; json:&#34;name,omitempty&#34;`</span>
+	<span class="nx">Opt</span>              <span class="o">*</span><span class="kt">int32</span>  <span class="s">`protobuf:&#34;varint,3,opt,name=opt&#34; json:&#34;opt,omitempty&#34;`</span>
+	<span class="nx">XXX_unrecognized</span> <span class="p">[]</span><span class="kt">byte</span>  <span class="s">`json:&#34;-&#34;`</span>
+<span class="p">}</span>
 
-# 看一下生成的test.pd.go的核心代码
-// 声明一个消息体描述一个请求或者响应的消息格式
-type HelloWorld struct {
-	Id               *int32  `protobuf:&quot;varint,1,req,name=id&quot; json:&quot;id,omitempty&quot;`
-	Name             *string `protobuf:&quot;bytes,2,req,name=name&quot; json:&quot;name,omitempty&quot;`
-	Opt              *int32  `protobuf:&quot;varint,3,opt,name=opt&quot; json:&quot;opt,omitempty&quot;`
-	XXX_unrecognized []byte  `json:&quot;-&quot;`
-}
+<span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">Reset</span><span class="p">()</span>                    <span class="p">{</span> <span class="o">*</span><span class="nx">m</span> <span class="p">=</span> <span class="nx">HelloWorld</span><span class="p">{}</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">String</span><span class="p">()</span> <span class="kt">string</span>            <span class="p">{</span> <span class="k">return</span> <span class="nx">proto</span><span class="p">.</span><span class="nf">CompactTextString</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">ProtoMessage</span><span class="p">()</span>               <span class="p">{}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">Descriptor</span><span class="p">()</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">fileDescriptor0</span><span class="p">,</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">}</span>
 
-func (m *HelloWorld) Reset()                    { *m = HelloWorld{} }
-func (m *HelloWorld) String() string            { return proto.CompactTextString(m) }
-func (*HelloWorld) ProtoMessage()               {}
-func (*HelloWorld) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+<span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">GetId</span><span class="p">()</span> <span class="kt">int32</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">m</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">Id</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">*</span><span class="nx">m</span><span class="p">.</span><span class="nx">Id</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="mi">0</span>
+<span class="p">}</span>
 
-func (m *HelloWorld) GetId() int32 {
-	if m != nil &amp;&amp; m.Id != nil {
-		return *m.Id
-	}
-	return 0
-}
+<span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">GetName</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">m</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">Name</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">*</span><span class="nx">m</span><span class="p">.</span><span class="nx">Name</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="s">&#34;&#34;</span>
+<span class="p">}</span>
 
-func (m *HelloWorld) GetName() string {
-	if m != nil &amp;&amp; m.Name != nil {
-		return *m.Name
-	}
-	return &quot;&quot;
-}
-
-func (m *HelloWorld) GetOpt() int32 {
-	if m != nil &amp;&amp; m.Opt != nil {
-		return *m.Opt
-	}
-	return 0
-}
-</code></pre>
-
+<span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">HelloWorld</span><span class="p">)</span> <span class="nf">GetOpt</span><span class="p">()</span> <span class="kt">int32</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">m</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">Opt</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">*</span><span class="nx">m</span><span class="p">.</span><span class="nx">Opt</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="mi">0</span>
+<span class="p">}</span></pre></td></tr></table>
+</div>
+</div>
 <h3 id="使用-goprotobuf-包中定义的protobuf数据格式进行通信">使用<code>goprotobuf</code>包中定义的protobuf数据格式进行通信</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="err">$</span> <span class="nx">pushd</span> <span class="err">$</span><span class="nx">GOPATH</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">protobuf</span><span class="o">-</span><span class="nx">study</span>
 
-<pre><code>$ pushd $GOPATH/src/protobuf-study
+<span class="err">#</span> <span class="nx">一个简单使用protobuf进行读写文件的例子</span>
+<span class="err">$</span> <span class="nx">cat</span> <span class="nx">write</span><span class="p">.</span><span class="k">go</span>
+<span class="kn">package</span> <span class="nx">main</span>
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="nx">protobuf</span> <span class="s">&#34;github.com/golang/protobuf/proto&#34;</span>
+    <span class="s">&#34;protobuf-study/goprotobuf&#34;</span>
+    <span class="s">&#34;fmt&#34;</span>
+    <span class="s">&#34;os&#34;</span>
+<span class="p">)</span>
 
-# 一个简单使用protobuf进行读写文件的例子
-$ cat write.go
-package main
-import (
-    protobuf &quot;github.com/golang/protobuf/proto&quot;
-    &quot;protobuf-study/goprotobuf&quot;
-    &quot;fmt&quot;
-    &quot;os&quot;
-)
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">//初始化protobuf数据格式
+</span><span class="c1"></span>    <span class="nx">msg</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">goprotobuf</span><span class="p">.</span><span class="nx">HelloWorld</span><span class="p">{</span>
+        <span class="nx">Id</span><span class="p">:</span>     <span class="nx">protobuf</span><span class="p">.</span><span class="nf">Int32</span><span class="p">(</span><span class="mi">17</span><span class="p">),</span>
+        <span class="nx">Name</span><span class="p">:</span>   <span class="nx">protobuf</span><span class="p">.</span><span class="nf">String</span><span class="p">(</span><span class="s">&#34;BGbiao&#34;</span><span class="p">),</span>
+        <span class="nx">Opt</span><span class="p">:</span>    <span class="nx">protobuf</span><span class="p">.</span><span class="nf">Int32</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span>
 
-func main() {
-    //初始化protobuf数据格式
-    msg := &amp;goprotobuf.HelloWorld{
-        Id:     protobuf.Int32(17),
-        Name:   protobuf.String(&quot;BGbiao&quot;),
-        Opt:    protobuf.Int32(18),
+    <span class="p">}</span>
 
-    }
+    <span class="nx">filename</span> <span class="o">:=</span> <span class="s">&#34;./protobuf-test.txt&#34;</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;使用protobuf创建文件 %s\n&#34;</span><span class="p">,</span><span class="nx">filename</span><span class="p">)</span>
+    <span class="nx">fObj</span><span class="p">,</span><span class="nx">_</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">Create</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span>
+    <span class="k">defer</span> <span class="nx">fObj</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+    <span class="nx">buffer</span><span class="p">,</span><span class="nx">_</span> <span class="o">:=</span> <span class="nx">protobuf</span><span class="p">.</span><span class="nf">Marshal</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span>
+    <span class="nx">fObj</span><span class="p">.</span><span class="nf">Write</span><span class="p">(</span><span class="nx">buffer</span><span class="p">)</span>
 
-    filename := &quot;./protobuf-test.txt&quot;
-    fmt.Printf(&quot;使用protobuf创建文件 %s\n&quot;,filename)
-    fObj,_ := os.Create(filename)
-    defer fObj.Close()
-    buffer,_ := protobuf.Marshal(msg)
-    fObj.Write(buffer)
+<span class="p">}</span>
 
-}
+<span class="err">#</span> <span class="nx">测试执行写文件程序</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="k">go</span> <span class="nx">run</span> <span class="nx">write</span><span class="p">.</span><span class="k">go</span>
+<span class="nx">使用protobuf创建文件</span> <span class="p">.</span><span class="o">/</span><span class="nx">protobuf</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="nx">txt</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="nx">cat</span> <span class="o">-</span><span class="nx">A</span> <span class="nx">protobuf</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="nx">txt</span>
+<span class="p">^</span><span class="nx">H</span><span class="p">^</span><span class="nx">Q</span><span class="p">^</span><span class="nx">R</span><span class="p">^</span><span class="nx">FBGbiao</span><span class="p">^</span><span class="nx">X</span><span class="p">^</span><span class="nx">R</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span>
 
-# 测试执行写文件程序
-sh-4.2# go run write.go
-使用protobuf创建文件 ./protobuf-test.txt
-sh-4.2# cat -A protobuf-test.txt
-^H^Q^R^FBGbiao^X^R
-sh-4.2#
+<span class="err">#</span> <span class="nx">一个简单的通过之前定义的protobuf格式进行读取文件内容的例子</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="nx">cat</span> <span class="nx">read</span><span class="p">.</span><span class="k">go</span>
+<span class="kn">package</span> <span class="nx">main</span>
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="nx">protobuf</span> <span class="s">&#34;github.com/golang/protobuf/proto&#34;</span>
+    <span class="s">&#34;protobuf-study/goprotobuf&#34;</span>
+    <span class="s">&#34;fmt&#34;</span>
+    <span class="s">&#34;io&#34;</span>
+    <span class="s">&#34;os&#34;</span>
+<span class="p">)</span>
 
-# 一个简单的通过之前定义的protobuf格式进行读取文件内容的例子
-sh-4.2# cat read.go
-package main
-import (
-    protobuf &quot;github.com/golang/protobuf/proto&quot;
-    &quot;protobuf-study/goprotobuf&quot;
-    &quot;fmt&quot;
-    &quot;io&quot;
-    &quot;os&quot;
-)
+<span class="kd">func</span> <span class="nf">checkError</span><span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nf">Error</span><span class="p">())</span>
+        <span class="nx">os</span><span class="p">.</span><span class="nf">Exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-func checkError(err error) {
-    if err != nil {
-        fmt.Println(err.Error())
-        os.Exit(-1)
-    }
-}
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">filename</span> <span class="o">:=</span> <span class="s">&#34;protobuf-test.txt&#34;</span>
+    <span class="nx">file</span><span class="p">,</span><span class="nx">fileErr</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">Open</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span>
+    <span class="nf">checkError</span><span class="p">(</span><span class="nx">fileErr</span><span class="p">)</span>
 
-func main() {
-    filename := &quot;protobuf-test.txt&quot;
-    file,fileErr := os.Open(filename)
-    checkError(fileErr)
+    <span class="k">defer</span> <span class="nx">file</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+    <span class="nx">fs</span><span class="p">,</span><span class="nx">fsErr</span> <span class="o">:=</span> <span class="nx">file</span><span class="p">.</span><span class="nf">Stat</span><span class="p">()</span>
+    <span class="nf">checkError</span><span class="p">(</span><span class="nx">fsErr</span><span class="p">)</span>
+    <span class="nx">buffer</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span><span class="nx">fs</span><span class="p">.</span><span class="nf">Size</span><span class="p">())</span>
+    <span class="c1">//把file文件内容读取到buffer
+</span><span class="c1"></span>    <span class="nx">_</span><span class="p">,</span><span class="nx">readErr</span> <span class="o">:=</span> <span class="nx">io</span><span class="p">.</span><span class="nf">ReadFull</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span><span class="nx">buffer</span><span class="p">)</span>
+    <span class="nf">checkError</span><span class="p">(</span><span class="nx">readErr</span><span class="p">)</span>
 
-    defer file.Close()
-    fs,fsErr := file.Stat()
-    checkError(fsErr)
-    buffer := make([]byte,fs.Size())
-    //把file文件内容读取到buffer
-    _,readErr := io.ReadFull(file,buffer)
-    checkError(readErr)
-
-    //初始化pb结构体对象并将buffer中的文件内容读取到pb结构体中
-    msg := &amp;goprotobuf.HelloWorld{}
-    pbErr := protobuf.Unmarshal(buffer, msg)
-    checkError(pbErr)
-    fmt.Printf(&quot;读取文件:%s \r\nname:%s\nid:%d\nopt:%d\n&quot;,filename,msg.GetName(),msg.GetId(),msg.GetOpt())
-}
-sh-4.2# go run read.go
-读取文件:protobuf-test.txt
-name:BGbiao
-id:17
-opt:18
-</code></pre>
-
+    <span class="c1">//初始化pb结构体对象并将buffer中的文件内容读取到pb结构体中
+</span><span class="c1"></span>    <span class="nx">msg</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">goprotobuf</span><span class="p">.</span><span class="nx">HelloWorld</span><span class="p">{}</span>
+    <span class="nx">pbErr</span> <span class="o">:=</span> <span class="nx">protobuf</span><span class="p">.</span><span class="nf">Unmarshal</span><span class="p">(</span><span class="nx">buffer</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span>
+    <span class="nf">checkError</span><span class="p">(</span><span class="nx">pbErr</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;读取文件:%s \r\nname:%s\nid:%d\nopt:%d\n&#34;</span><span class="p">,</span><span class="nx">filename</span><span class="p">,</span><span class="nx">msg</span><span class="p">.</span><span class="nf">GetName</span><span class="p">(),</span><span class="nx">msg</span><span class="p">.</span><span class="nf">GetId</span><span class="p">(),</span><span class="nx">msg</span><span class="p">.</span><span class="nf">GetOpt</span><span class="p">())</span>
+<span class="p">}</span>
+<span class="nx">sh</span><span class="o">-</span><span class="mf">4.2</span><span class="err">#</span> <span class="k">go</span> <span class="nx">run</span> <span class="nx">read</span><span class="p">.</span><span class="k">go</span>
+<span class="nx">读取文件</span><span class="p">:</span><span class="nx">protobuf</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="nx">txt</span>
+<span class="nx">name</span><span class="p">:</span><span class="nx">BGbiao</span>
+<span class="nx">id</span><span class="p">:</span><span class="mi">17</span>
+<span class="nx">opt</span><span class="p">:</span><span class="mi">18</span></pre></td></tr></table>
+</div>
+</div>
 <h3 id="相关链接">相关链接</h3>
 
 <p><a href="https://segmentfault.com/a/1190000007917576">Protobuf语法</a></p>
@@ -588,7 +884,7 @@ opt:18
   
   <p class="copyright-item">
     <span class="item-title">License</span>
-    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
   </p>
 </div>
 
@@ -601,7 +897,15 @@ opt:18
   <div class="qr-code">
     
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
     
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
   </div>
 </div>
 
@@ -655,6 +959,16 @@ opt:18
   
 
   
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
   
 
   
@@ -794,6 +1108,23 @@ opt:18
 
 
 
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
 
 
 
