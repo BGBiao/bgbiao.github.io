@@ -141,6 +141,35 @@ if (!doNotTrack) {
       </li><li class="mobile-menu-item">
         
           
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
@@ -158,18 +187,6 @@ if (!doNotTrack) {
             
               <li>
                 <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
           </ul>
@@ -348,6 +365,34 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
@@ -364,18 +409,6 @@ if (!doNotTrack) {
             
               <li>
                 <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
           </ul>
@@ -524,18 +557,18 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/go-unit-test/">Golang中的单元测试、基准测试、覆盖测试</a>
+      <a class="post-link" href="/post/k8s-ali-terway/">基于阿里云Terway网络的Kubernetes集群实践</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2019-10-20" class="post-time">
-        2019-10-20
+      <time datetime="2019-10-27" class="post-time">
+        2019-10-27
       </time>
       <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
           
         </div>
-      <span class="more-meta"> 4591 words </span>
+      <span class="more-meta"> 4938 words </span>
       <span class="more-meta"> 10 min read </span>
       
       
@@ -546,14 +579,12 @@ if (!doNotTrack) {
   <div class="post-content">
     
     <div class="post-summary">
-      <h2 id="单元测试-基准测试-覆盖测试">单元测试、基准测试、覆盖测试</h2>
-
-<blockquote>
-<p>背景: 之前很长一段时间再写Golang程序时，不会有意识去写单元测试，直到后来写了独立项目后，慢慢才发现给一个功能编写对应的单元测试是多么高效和方便，接下来就再一起复习下Golang中的测试.</p>
+      <blockquote>
+<p>背景: 众所周知的是在构建一个Kubernetes集群时，容器网络通常会使用一个独立的私有子网来构建Kubernetes集群内部的pod网络和service网络，但在实际的业务场景中，没有企业会在一段时间内将内部全部的服务都迁移到Kubernetes集群中(因为涉及到业务架构以及整体业务的可靠性)，因而会产生一些Kubernetes集群内部服务和集群外部服务互相调用的场景，当然如果是HTTP服务，我们可以采用LVS、Nginx、HAProxy之类的代理工具工具进行集群内外的流量转发，但如果是TCP服务，比如使用Dubbo框架时，生产者和消费者需要直连，当生产者和消费者不在一个可以互联互通的网络下会比较麻烦，这也就是为什么大厂在规模化使用Kubernetes时首先需要解决的就是网络问题的原因了。比如我们在数科的时候就采用的是<a href="https://github.com/contiv/install">Contiv</a>+BGP的模式来实现容器网络和容器外网络的互联互通的，而这通常需要一个比较专业的SDN团队来构建和维护。而作为创业公司通常会使用公有云来承载自己的业务，这种轻资产模式的好处就是底层会有专业的团队来提供保障，因此考虑到业务需求我们采用了阿里云的terway网络插件来实现内部的Kubernetes集群网络.</p>
 </blockquote>
     </div>
     <div class="read-more">
-      <a href="/post/go-unit-test/" class="read-more-link">Read more</a>
+      <a href="/post/k8s-ali-terway/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -582,65 +613,523 @@ if (!doNotTrack) {
 
   
   
-  <nav class="pagination">
-    <ul>
-      
-      <li >
-        <a href="/">1</a>
-      </li>
-      
-      <li >
-        <a href="/page/2/">2</a>
-      </li>
-      
-      <li >
-        <a href="/page/3/">3</a>
-      </li>
-      
-      <li  class="active" >
-        <a href="/page/4/">4</a>
-      </li>
-      
-      <li >
-        <a href="/page/5/">5</a>
-      </li>
-      
-      <li >
-        <a href="/page/6/">6</a>
-      </li>
-      
-      <li >
-        <a href="/page/7/">7</a>
-      </li>
-      
-      <li >
-        <a href="/page/8/">8</a>
-      </li>
-      
-      <li >
-        <a href="/page/9/">9</a>
-      </li>
-      
-      <li >
-        <a href="/page/10/">10</a>
-      </li>
-      
-      <li >
-        <a href="/page/11/">11</a>
-      </li>
-      
-      <li >
-        <a href="/page/12/">12</a>
-      </li>
-      
-      <li >
-        <a href="/page/13/">13</a>
-      </li>
-      
-    </ul>
-  </nav>
 
-  
+    <nav class="pagination">
+      <ul>
+
+      
+      
+      <li><a href="/">««</a></li>
+      
+
+      
+      
+      <li><a href="/page/3/">«</a></li>
+      
+
+      
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/">
+              1
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/2/">
+              2
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/3/">
+              3
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="active">
+            <a href="/page/4/">
+              4
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/5/">
+              5
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/6/">
+              6
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/7/">
+              7
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/8/">
+              8
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/9/">
+              9
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/10/">
+              10
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/11/">
+              11
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/12/">
+              12
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+              
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+          <li class="">
+            <a href="/page/13/">
+              13
+            </a>
+          </li>
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+      
+      
+      <li><a href="/page/5/">»</a></li>
+      
+
+      
+      
+      <li><a href="/page/16/">»»</a></li>
+      
+
+      </ul>
+    </nav>
   
 
 

@@ -130,16 +130,107 @@
     </item>
     
     <item>
+      <title>基于阿里云Terway网络的Kubernetes集群实践</title>
+      <link>https://bgbiao.top/post/k8s-ali-terway/</link>
+      <pubDate>Sun, 27 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-ali-terway/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 众所周知的是在构建一个Kubernetes集群时，容器网络通常会使用一个独立的私有子网来构建Kubernetes集群内部的pod网络和service网络，但在实际的业务场景中，没有企业会在一段时间内将内部全部的服务都迁移到Kubernetes集群中(因为涉及到业务架构以及整体业务的可靠性)，因而会产生一些Kubernetes集群内部服务和集群外部服务互相调用的场景，当然如果是HTTP服务，我们可以采用LVS、Nginx、HAProxy之类的代理工具工具进行集群内外的流量转发，但如果是TCP服务，比如使用Dubbo框架时，生产者和消费者需要直连，当生产者和消费者不在一个可以互联互通的网络下会比较麻烦，这也就是为什么大厂在规模化使用Kubernetes时首先需要解决的就是网络问题的原因了。比如我们在数科的时候就采用的是&lt;a href=&#34;https://github.com/contiv/install&#34;&gt;Contiv&lt;/a&gt;+BGP的模式来实现容器网络和容器外网络的互联互通的，而这通常需要一个比较专业的SDN团队来构建和维护。而作为创业公司通常会使用公有云来承载自己的业务，这种轻资产模式的好处就是底层会有专业的团队来提供保障，因此考虑到业务需求我们采用了阿里云的terway网络插件来实现内部的Kubernetes集群网络.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>k8s删除Terminating状态的命名空间</title>
+      <link>https://bgbiao.top/post/k8s-delete-namespace/</link>
+      <pubDate>Mon, 21 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-delete-namespace/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
       <title>Golang中的单元测试、基准测试、覆盖测试</title>
-      <link>https://bgbiao.top/post/go-unit-test/</link>
+      <link>https://bgbiao.top/post/golang-unit-test/</link>
       <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://bgbiao.top/post/go-unit-test/</guid>
+      <guid>https://bgbiao.top/post/golang-unit-test/</guid>
       <description>&lt;h2 id=&#34;单元测试-基准测试-覆盖测试&#34;&gt;单元测试、基准测试、覆盖测试&lt;/h2&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;背景: 之前很长一段时间再写Golang程序时，不会有意识去写单元测试，直到后来写了独立项目后，慢慢才发现给一个功能编写对应的单元测试是多么高效和方便，接下来就再一起复习下Golang中的测试.&lt;/p&gt;
 &lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Kubernetes-1.15管理NVIDIA GPU容器</title>
+      <link>https://bgbiao.top/post/k8s-nvidia-gpu/</link>
+      <pubDate>Tue, 08 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-nvidia-gpu/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;使用kubernetes来调度和管理nvidia gpu资源。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Traefik-v2.0快速入门</title>
+      <link>https://bgbiao.top/post/k8s-traefik-v2/</link>
+      <pubDate>Fri, 27 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-traefik-v2/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/&#34;&gt;traefik官方文档&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Golang module的使用</title>
+      <link>https://bgbiao.top/post/golang-module/</link>
+      <pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-module/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用&lt;code&gt;vendor&lt;/code&gt;或者&lt;code&gt;glide&lt;/code&gt;的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为&lt;code&gt;go modules&lt;/code&gt;的版本管理机制。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;
+- 在Golang1.11版本中需要使用&lt;code&gt;export GO111MODULE=on&lt;/code&gt;来显式开启go module
+- 在Golang1.12之后默认开启了module&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>k8s dashboard的http接口改造</title>
+      <link>https://bgbiao.top/post/k8s-dashboard-http/</link>
+      <pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-dashboard-http/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件&lt;a href=&#34;https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/&#34;&gt;dashboard&lt;/a&gt;,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了&lt;code&gt;https&lt;/code&gt;并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Golang的ElasticSearch6的SDK问题处理</title>
+      <link>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</link>
+      <pubDate>Mon, 12 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</guid>
+      <description>&lt;h2 id=&#34;es6-版本的golang-sdk问题处理&#34;&gt;es6 版本的golang-sdk问题处理&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;ElasticSearch6版本的Golang SDK问题处理.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://olivere.github.io/elastic/&#34;&gt;golang-sdk&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;es_version: 6.4.3&lt;/p&gt;
+
+&lt;p&gt;官方建议的sdk版本:     &lt;a href=&#34;https://github.com/olivere/elastic&#34;&gt;https://github.com/olivere/elastic&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:很好奇,作者其他版本都采用vN来标记版本，但是在v6的时候直接采用github版本&lt;/code&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -153,104 +244,6 @@
 &lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
 &lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
 &lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Golang中的异常处理</title>
-      <link>https://bgbiao.top/post/golang-expect/</link>
-      <pubDate>Wed, 06 Mar 2019 16:01:23 +0800</pubDate>
-      
-      <guid>https://bgbiao.top/post/golang-expect/</guid>
-      <description>&lt;h2 id=&#34;golang的异常处理和单元测试&#34;&gt;Golang的异常处理和单元测试&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.Golang语言中没有其他语言中的&lt;code&gt;try...catch...&lt;/code&gt;语句来捕获异常和异常恢复&lt;/li&gt;
-&lt;li&gt;2.在Golang中我们通常会使用&lt;code&gt;panic&lt;/code&gt;关键字来抛出异常，在&lt;code&gt;defer&lt;/code&gt;中使用&lt;code&gt;recover&lt;/code&gt;来捕获异常进行具体逻辑处理&lt;/li&gt;
-&lt;li&gt;3.Golang中我们通常会在函数或方法中返回&lt;code&gt;error&lt;/code&gt;结构对象来判断是否有异常出现&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;注意事项&lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.利用&lt;code&gt;recover&lt;/code&gt;和&lt;code&gt;panic&lt;/code&gt;指令，&lt;code&gt;defer&lt;/code&gt;必须放在panic之前定义(&lt;code&gt;panic会终止其后要执行的代码&lt;/code&gt;).&lt;/li&gt;
-&lt;li&gt;2.&lt;code&gt;recover&lt;/code&gt;只有在&lt;code&gt;defer&lt;/code&gt;调用的函数中才有效，否则&lt;code&gt;recover&lt;/code&gt;无法捕获到&lt;code&gt;panic&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;3.&lt;code&gt;recover&lt;/code&gt;处理异常后，业务逻辑会跑到&lt;code&gt;defer&lt;/code&gt;之后的处理片段中&lt;/li&gt;
-&lt;li&gt;4.多个&lt;code&gt;defer&lt;/code&gt;会形成&lt;code&gt;defer栈&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;5.panic会等到整个&lt;code&gt;goroutine&lt;/code&gt;退出才会报告错误&lt;/li&gt;
-&lt;/ul&gt;</description>
-    </item>
-    
-    <item>
-      <title>使用Python来操作Hive中的数据</title>
-      <link>https://bgbiao.top/post/operatehivewithpython/</link>
-      <pubDate>Sun, 28 Oct 2018 14:14:39 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/operatehivewithpython/</guid>
-      <description>&lt;blockquote&gt;
-&lt;p&gt;背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了&lt;a href=&#34;http://hive.apache.org/&#34;&gt;Hive&lt;/a&gt;作为数据仓库工具，同时使用&lt;a href=&#34;https://github.com/cloudera/hue&#34;&gt;Hue&lt;/a&gt;来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;本篇简单记录下使用Python操作Hive。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>使用Python操作MySQL</title>
-      <link>https://bgbiao.top/post/operatemysqlwithpython/</link>
-      <pubDate>Sat, 27 Oct 2018 13:53:40 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/operatemysqlwithpython/</guid>
-      <description>&lt;blockquote&gt;
-&lt;p&gt;前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。&lt;/p&gt;
-&lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>使用nvidia-smi来对Tesla-GPU进行故障排查</title>
-      <link>https://bgbiao.top/post/troubleshooting-teslagpu-with-nvidia-smi/</link>
-      <pubDate>Mon, 20 Aug 2018 14:34:43 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/troubleshooting-teslagpu-with-nvidia-smi/</guid>
-      <description>&lt;blockquote&gt;
-&lt;p&gt;背景:生产环境中使用Tesla P40型号的进行线上模型训练，突然收到业务方反馈某一块卡好像坏了，无法使用。经了解后，发现业务方无法使用某一块卡进行运行程序，而其他GPU卡设备均正常。本篇文章记录如何排查并修复该问题。&lt;/p&gt;
-&lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>Golang下的protobuf初体验</title>
-      <link>https://bgbiao.top/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
-      <pubDate>Tue, 03 Apr 2018 15:01:07 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
-      <description>&lt;h3 id=&#34;protpbuf简介&#34;&gt;protpbuf简介&lt;/h3&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。&lt;br /&gt;
-google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。&lt;br /&gt;
-可以把它用于分布式应用之间的数据通信或者异构环境下的&lt;code&gt;数据交换&lt;/code&gt;。&lt;br /&gt;
-作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。&lt;/p&gt;
-&lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>NVIDIA-DIGITS测试使用</title>
-      <link>https://bgbiao.top/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Tue, 02 Jan 2018 10:14:32 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</guid>
-      <description>&lt;h3 id=&#34;digits简介&#34;&gt;DIGITS简介&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/DIGITS&#34;&gt;DIGITS&lt;/a&gt;: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司开发的第一个交互式深度学习GPU训练系统。目的在于整合现有的Deep Learning开发工具，实现深度神经网络（Deep Neural Network，DNN）设计、训练和可视化等任务变得简单化。DIGITS是基于浏览器的接口，因而通过实时的网络行为的可视化，可以快速设计最优的DNN。DIGITS是开源软件，可在GitHub上找到，因而开发人员可以扩展和自定义DIGITS。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Golang中GBK和UTF-8格式互相转换</title>
-      <link>https://bgbiao.top/post/golang%E4%B8%ADgbk%E5%92%8Cutf-8%E6%A0%BC%E5%BC%8F%E7%94%BB%E5%83%8F%E8%BD%AC%E6%8D%A2/</link>
-      <pubDate>Sun, 24 Dec 2017 17:36:14 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/golang%E4%B8%ADgbk%E5%92%8Cutf-8%E6%A0%BC%E5%BC%8F%E7%94%BB%E5%83%8F%E8%BD%AC%E6%8D%A2/</guid>
-      <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 刚开始学习&lt;code&gt;Golang&lt;/code&gt;的时候，做一些简单数据处理发现总是会出现乱码，通常是因为字符集的问题，这里记录下如何在&lt;code&gt;GBK&lt;/code&gt;和&lt;code&gt;UTF-8&lt;/code&gt;之间进行格式转换&lt;/p&gt;
-&lt;/blockquote&gt;</description>
     </item>
     
   </channel>

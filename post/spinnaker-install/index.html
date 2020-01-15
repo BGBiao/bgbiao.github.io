@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Spinnaker国内生产环境级别集群搭建 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用minio作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。
+" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/spinnaker-install/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="Spinnaker国内生产环境级别集群搭建" />
+<meta property="og:description" content="
+前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用minio作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/spinnaker-install/" />
+<meta property="article:published_time" content="2010-08-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2010-08-26T00:00:00+00:00" />
+<meta itemprop="name" content="Spinnaker国内生产环境级别集群搭建">
+<meta itemprop="description" content="
+前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用minio作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。
+">
+
+
+<meta itemprop="datePublished" content="2010-08-26T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2010-08-26T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="4135">
+
+
+
+<meta itemprop="keywords" content="运维,kubernetes,spinnaker," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Spinnaker国内生产环境级别集群搭建"/>
+<meta name="twitter:description" content="
+前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用minio作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Spinnaker国内生产环境级别集群搭建</h1>
+      
+      <div class="post-meta">
+        <time datetime="2010-08-26" class="post-time">
+          2010-08-26
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+            
+          </div>
+        <span class="more-meta"> 4135 words </span>
+          <span class="more-meta"> 9 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#基本环境准备">基本环境准备</a></li>
+<li><a href="#spinnaker集群部署">Spinnaker集群部署</a>
+<ul>
+<li><a href="#注意事项">注意事项</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用<code>minio</code>作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。</p>
+</blockquote>
+
+<p><strong>前提条件</strong></p>
+
+<ul>
+<li>1.spinnaker机器可直连外网(科学上网)</li>
+<li>2.minio持久化层</li>
+<li>3.jenkins(基本认证)</li>
+</ul>
+
+<h3 id="基本环境准备">基本环境准备</h3>
+
+<p><strong>1. 网络环境配置</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 访问国外网站(准备一个翻墙代理)
+$ export http_proxy=http://172.29.202.140:8118
+$ export https_proxy=http://172.29.202.140:8118
+$ curl www.google.com -I
+HTTP/1.1 200 OK
+Date: Tue, 27 Aug 2019 08:21:35 GMT
+Expires: -1
+Cache-Control: private, max-age=0
+Content-Type: text/html; charset=ISO-8859-1
+P3P: CP=&#34;This is not a P3P policy! See g.co/p3phelp for more info.&#34;
+Server: gws
+X-XSS-Protection: 0
+......</pre></td></tr></table>
+</div>
+</div>
+<p><strong>2. minio持久化</strong></p>
+
+<p><a href="https://min.io/">minio-开源的对象存储引擎</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># minio 持久化层(真生生产环境需要高可用)
+$  docker run -itd  -p 9000:9000 -v /opt/data/minio:/data/ --name minio1 -e &#34;MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE&#34; -e &#34;MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&#34; --restart=on-failure:3 minio/minio server /data
+0719d218a9bcd83c730b88234bb22f75b37fd993fb3c149cf70638ea6c811009
+$  docker ps -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+0719d218a9bc        minio/minio         &#34;/usr/bin/docker-ent…&#34;   4 seconds ago       Up 3 seconds        0.0.0.0:9000-&gt;9000/tcp   minio1
+
+# 查看minio 相关信息
+$ docker logs minio1
+Endpoint:  http://10.0.0.2:9000  http://127.0.0.1:9000
+AccessKey: AKIAIOSFODNN7EXAMPLE
+SecretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+Browser Access:
+   http://10.0.0.2:9000  http://127.0.0.1:9000
+
+Command-line Access: https://docs.min.io/docs/minio-client-quickstart-guide
+   $ mc config host add myminio http://10.0.0.2:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+Object API (Amazon S3 compatible):
+   Go:         https://docs.min.io/docs/golang-client-quickstart-guide
+   Java:       https://docs.min.io/docs/java-client-quickstart-guide
+   Python:     https://docs.min.io/docs/python-client-quickstart-guide
+   JavaScript: https://docs.min.io/docs/javascript-client-quickstart-guide
+   .NET:       https://docs.min.io/docs/dotnet-client-quickstart-guide</pre></td></tr></table>
+</div>
+</div>
+<p><strong>3. Jenkins(可选)</strong></p>
+
+<p>Spinnaker主要用来做CD，也就是持续部署，同时也包含了一些应用管理以及部署流程上的相关特性。因此，在标准的CI/CD流水线中其实是可以融合在一起的，所以Jenkins可有可无，如果有的话，可以直接从Spinnaker中进行任务触发然后自动化部署。</p>
+
+<p><code>注意:Jenkins使用基本认证是可以直接接入Spinnaker集群的，如果接了LDAP认证的可能会有些问题(无法获取到job信息)</code></p>
+
+<h3 id="spinnaker集群部署">Spinnaker集群部署</h3>
+
+<p><a href="https://www.spinnaker.io/guides/developer/getting-set-up/">Spinnaker部署</a></p>
+
+<p><strong>0.整体步骤</strong>
+- 安装Halyard
+- 配置存储服务
+- 选择一个云提供商(Kubernetes)
+- 配置部署模式
+- 执行<code>hal deploy apply</code>进行部署</p>
+
+<p>** 1.安装hal工具**</p>
+
+<p><code>注意:Spinnaker部署环境必须是Ubuntu或Debian，当然官方也提供了Docker容器部署方式。推荐先使用Ubuntu机器进行安装。</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 进入ubuntu安装hal环境
+$ curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/debian/InstallHalyard.sh
+$ apt-get update &amp;&amp; apt-get install curl vim -y
+$ export http_proxy=http://172.29.202.140:8118
+$ export https_proxy=http://172.29.202.140:8118
+$ curl www.facebook.com -I
+HTTP/1.1 302 Found
+Location: https://www.facebook.com/
+Content-Type: text/html; charset=&#34;utf-8&#34;
+X-FB-Debug: Bw0gsFvK4VhuMpkmeG3Bc+myLg0Mgz+EkLsMmuq0NVLIvEjiAqckf/N2cjIFRYs4lOWzx3J0P8nvJmtSaZGjCg==
+Date: Tue, 27 Aug 2019 08:34:31 GMT
+Connection: keep-alive
+Content-Length: 0
+Proxy-Connection: keep-alive
+
+# 创建spinnaker用户以及依赖环境
+$ chmod a+x InstallHalyard.sh &amp;&amp; useradd spinnaker
+$ apt-get install software-properties-common -y
+
+# 安装hal(1.22.0-20190718020510 推荐指定版本，默认会安装最新版本)
+$ bash InstallHalyard.sh --version 1.22.0-20190718020510
+Please supply a non-root user to run Halyard as: spinnaker
+Halyard version will be stable
+Halyard will be downloaded from gs://spinnaker-artifacts/halyard
+Halyard config will come from bucket gs://halconfig
+Halconfig will be stored at /home/spinnaker/.hal/config
+Uninstall script is located at /home/spinnaker/.hal/uninstall.sh
+.....
+.....
+The halyard daemon isn&#39;t running yet... starting it manually..
+1.22.0-20190718020510
+
+Would you like to configure halyard to use bash auto-completion? [default=Y]:
+
+Where is your bash RC? [default=/home/spinnaker/.bashrc]:
+grep: /home/spinnaker/.bashrc: No such file or directory
+Bash auto-completion configured.
+To use the auto-completion either restart your shell, or run
+. /home/spinnaker/.bashrc
+
+
+# 确认hal版本以及相关情况
+$ hal -v
+1.22.0-20190718020510
+$ . /home/spinnaker/.bashrc</pre></td></tr></table>
+</div>
+</div>
+<p><strong>2. 配置hal的代理</strong>
+&gt;如果<code>hal</code>使用默认JVM参数使用时，可能会出现如下情况(仅在国内):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">- Get released versions
+  Failure
+Problems in Global:
+! ERROR Could not load &#34;versions.yml&#34; from config bucket:
+  Connection reset.
+
+- Failed to load available Spinnaker versions.</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:为Halyard设置代理，因为每次更新需要去墙外直接获取数据.修改DEFAULT_JVM_OPTS参数(export http_proxy会直接影响整个终端环境)</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 修改/opt/halyard/bin/halyard文件(最后一定要给localhost和example.com设置不代理)
+# example.com即为最终想要访问Spinnaker集群的域名
+DEFAULT_JVM_OPTS=&#39;&#34;-Djava.security.egd=file:/dev/./urandom&#34; &#34;-Dspring.config.additional-location=/opt/spinnaker/config/&#34; &#34;-Dhttp.proxyHost=172.29.202.140&#34; &#34;-Dhttp.proxyPort=8118&#34; &#34;-Dhttps.proxyHost=172.29.202.140&#34; &#34;-Dhttps.proxyPort=8118&#34; &#34;-Dhttp.nonProxyHosts=\&#34;localhost|*.example.com\&#34;&#34;&#39;
+
+# 重启hal(shutdown之后任意命令启动)
+$ hal shutdown
+
+# 查看当前hal版本支持的Spinnaker版本(能正常获取到Spinnaker版本就是没有问题的)
+$ hal version list
++ Get current deployment
+  Success
++ Get Spinnaker version
+  Success
++ Get released versions
+  Success
++ You are on version &#34;&#34;, and the following are available:
+ - 1.13.12 (BirdBox):
+   Changelog: https://gist.github.com/spinnaker-release/9ee98b0cbed65e334cd498bc31676295
+   Published: Tue Jul 30 02:18:59 CST 2019
+   (Requires Halyard &gt;= 1.17)
+ - 1.14.14 (LoveDeathAndRobots):
+   Changelog: https://gist.github.com/spinnaker-release/ad1e0eb6b6547b296c9103eb21d9beec
+   Published: Wed Aug 14 21:37:51 CST 2019
+   (Requires Halyard &gt;= 1.17)
+ - 1.15.2 (ExtremelyWickedShockinglyEvilAndVile):
+   Changelog: https://gist.github.com/spinnaker-release/e72cc8015d544738d07d57a183cb5404
+   Published: Tue Aug 13 04:48:52 CST 2019
+   (Requires Halyard &gt;= 1.17)
+ - 1.15.3 (ExtremelyWickedShockinglyEvilAndVile):
+   Changelog: https://gist.github.com/spinnaker-release/bed366b82e09498dbb536c098ac11f14
+   Published: Tue Aug 27 05:09:21 CST 2019
+   (Requires Halyard &gt;= 1.17)</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:每个hal的版本都会对应一个可用的Spinnaker的版本列表,其实挺恶心的(镜像版本不一致)</code></p>
+
+<p><strong>3. 配置kubectl环境</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ apt install snapd -y
+$ snap install kubectl --classic
+
+$ kubectl  version
+Client Version: version.Info{Major:&#34;1&#34;, Minor:&#34;15&#34;, GitVersion:&#34;v1.15.0&#34;, GitCommit:&#34;e8462b5b5dc2584fdcd18e6bcfe9f1e4d970a529&#34;, GitTreeState:&#34;clean&#34;, BuildDate:&#34;2019-06-21T13:09:06Z&#34;, GoVersion:&#34;go1.12.6&#34;, Compiler:&#34;gc&#34;, Platform:&#34;linux/amd64&#34;}
+
+# 配置kubeconfig(将master节点的kubeconfig拷贝到spinnaker部署机器环境中[~/.kube/config或者指定目录])
+$ kubectl  --kubeconfig kubeconfig get nodes
+NAME              STATUS   ROLES    AGE   VERSION
+k8s-master-1   Ready    master   90d   v1.14.1
+k8s-node-1     Ready    &lt;none&gt;   90d   v1.14.2
+k8s-node-2     Ready    &lt;none&gt;   90d   v1.14.2</pre></td></tr></table>
+</div>
+</div>
+<p><strong>4. 配置spinnaker环境</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
+</span><span class="lnt">231
+</span><span class="lnt">232
+</span><span class="lnt">233
+</span><span class="lnt">234
+</span><span class="lnt">235
+</span><span class="lnt">236
+</span><span class="lnt">237
+</span><span class="lnt">238
+</span><span class="lnt">239
+</span><span class="lnt">240
+</span><span class="lnt">241
+</span><span class="lnt">242
+</span><span class="lnt">243
+</span><span class="lnt">244
+</span><span class="lnt">245
+</span><span class="lnt">246
+</span><span class="lnt">247
+</span><span class="lnt">248
+</span><span class="lnt">249
+</span><span class="lnt">250
+</span><span class="lnt">251
+</span><span class="lnt">252
+</span><span class="lnt">253
+</span><span class="lnt">254
+</span><span class="lnt">255
+</span><span class="lnt">256
+</span><span class="lnt">257
+</span><span class="lnt">258
+</span><span class="lnt">259
+</span><span class="lnt">260
+</span><span class="lnt">261
+</span><span class="lnt">262
+</span><span class="lnt">263
+</span><span class="lnt">264
+</span><span class="lnt">265
+</span><span class="lnt">266
+</span><span class="lnt">267
+</span><span class="lnt">268
+</span><span class="lnt">269
+</span><span class="lnt">270
+</span><span class="lnt">271
+</span><span class="lnt">272
+</span><span class="lnt">273
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 开始k8s支持
+$ hal config provider kubernetes enable
+# 开启jenkins支持
+$ hal config ci jenkins enable
+
+# 获取k8s的上下文
+$ kubectl --kubeconfig kubeconfig config current-context
+kubernetes-admin@kubernetes
+
+# 配置k8s环境(添加一个账户[即一个k8s集群])
+# 指定账户名为spinnaker1 指定版本为v2(v1版本更多是复选框的填写,v2版本更多倾向于Pipeline方式) 指定k8s的kubeconfig配置文件
+$ hal config provider kubernetes account add spinnaker1 --provider-version v2 --context kubernetes-admin@kubernetes --kubeconfig-file /root/kubeconfig
+
+# 配置jenkins环境
+$ hal config ci jenkins master add my-jenkins-master --address http://10.0.0.1:8080 --username root --password passwd
+
+# 指定账户设置集群部署模式(distributed|local|local-git)
+# 因为我们是部署在k8s集群中的，这里选择分布式
+$ hal config deploy edit --type distributed --account-name spinnaker1
+
+# 配置持久化存储
+# 官方文档中默认的示例是redis存储，使用redis会把pipeline执行信息存放在里面，可能会导致pipeline相关信息不稳定，而且官方也不建议生产环境使用redis
+$ hal config --set-current-deployment default
+$ hal config storage edit --type s3
+$ mkdir /home/spinnaker/.hal/default/profiles
+$ echo &#34;spinnaker.s3.versioning: false&#34; &gt; /home/spinnaker/.hal/default/profiles/front50-local.yml
+
+# 配置minio的参数,私钥,以及bucket(bucket需要提前创建)
+$ hal config storage s3 edit --endpoint http://172.16.33.101:9000  --access-key-id AKIAIOSFODNN7EXAMPLE --secret-access-key wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY --bucket spinnaker
+
+
+# 查看镜像版本(当前hal版本支持的spinnaker版本列表)
+$ hal version list
++ Get current deployment
+  Success
++ Get Spinnaker version
+  Success
++ Get released versions
+  Success
++ You are on version &#34;&#34;, and the following are available:
+ - 1.13.12 (BirdBox):
+   Changelog: https://gist.github.com/spinnaker-release/9ee98b0cbed65e334cd498bc31676295
+   Published: Tue Jul 30 02:18:59 CST 2019
+   (Requires Halyard &gt;= 1.17)
+ - 1.14.14 (LoveDeathAndRobots):
+   Changelog: https://gist.github.com/spinnaker-release/ad1e0eb6b6547b296c9103eb21d9beec
+   Published: Wed Aug 14 21:37:51 CST 2019
+   (Requires Halyard &gt;= 1.17)
+ - 1.15.2 (ExtremelyWickedShockinglyEvilAndVile):
+   Changelog: https://gist.github.com/spinnaker-release/e72cc8015d544738d07d57a183cb5404
+   Published: Tue Aug 13 04:48:52 CST 2019
+   (Requires Halyard &gt;= 1.17)
+ - 1.15.3 (ExtremelyWickedShockinglyEvilAndVile):
+   Changelog: https://gist.github.com/spinnaker-release/bed366b82e09498dbb536c098ac11f14
+   Published: Tue Aug 27 05:09:21 CST 2019
+   (Requires Halyard &gt;= 1.17)
+
+# 选择一个版本进行部署
+$ hal config version edit --version 1.14.11
+
+# 查看spinnaker版本对应的镜像(后面的version其实就是镜像版本)
+$ hal version bom 1.14.11
++ Get BOM for 1.14.11
+  Success
+version: 1.14.11
+timestamp: &#39;2019-07-19 16:28:04&#39;
+services:
+  echo:
+    version: 2.5.2-20190708184501
+    commit: afcbb51661a36260ed85649f3e5f137371c8b4e0
+  clouddriver:
+    version: 4.7.0-20190713034015
+    commit: 387dde5d27098c83837b9bad3353fff189eee719
+  deck:
+    version: 2.9.8-20190718101338
+    commit: 30dadbd80921caa2ec757a46b56fa916f77cc0b2
+  fiat:
+    version: 1.5.2-20190704034018
+    commit: ff44172d40a14400a8989a33fc35b54a416db3fc
+  front50:
+    version: 0.17.0-20190510203645
+    commit: 0540599582fdefaf5249009c3efdb10d26854956
+  gate:
+    version: 1.8.4-20190719034017
+    commit: 97f6477ffac66205d01949a05e8c6efabc65b7ef
+  igor:
+    version: 1.3.0-20190515102735
+    commit: b3f354f0bd49d0656217998108f522519b30444c
+  kayenta:
+    version: 0.9.1-20190628120214
+    commit: dd8a91d0cf2bd10f2d58564f6e6730030e26f814
+  orca:
+    version: 2.7.6-20190719122741
+    commit: dfafeef02ce273ed4e9f565af7dd754e4b1057f2
+  rosco:
+    version: 0.12.0-20190517180000
+    commit: 59f79299a3fcfb39229cbd0a2e52bf435c340f4a
+  defaultArtifact: {}
+  monitoring-third-party:
+    version: 0.13.0-20190430163248
+    commit: bf01bf225168919ad13d63b82f93c39061e0b544
+  monitoring-daemon:
+    version: 0.13.0-20190430163248
+    commit: bf01bf225168919ad13d63b82f93c39061e0b544
+dependencies:
+  redis:
+    version: 2:2.8.4-2
+  consul:
+    version: 0.7.5
+  vault:
+    version: 0.7.0
+artifactSources:
+  debianRepository: https://dl.bintray.com/spinnaker-releases/debians
+  dockerRegistry: gcr.io/spinnaker-marketplace
+  googleImageProject: marketplace-spinnaker-release
+  gitPrefix: https://github.com/spinnaker
+
+# 整理后的相关镜像地址如下:
+$ cat images-1.14.11.txt
+gcr.io/spinnaker-marketplace/echo:2.5.2-20190708184501
+gcr.io/spinnaker-marketplace/clouddriver:4.7.0-20190713034015
+gcr.io/spinnaker-marketplace/deck:2.9.8-20190718101338
+gcr.io/spinnaker-marketplace/fiat:1.5.2-20190704034018
+gcr.io/spinnaker-marketplace/front50:0.17.0-20190510203645
+gcr.io/spinnaker-marketplace/gate:1.8.4-20190719034017
+gcr.io/spinnaker-marketplace/igor:1.3.0-20190515102735
+gcr.io/spinnaker-marketplace/kayenta:0.9.1-20190628120214
+gcr.io/spinnaker-marketplace/orca:2.7.6-20190719122741
+gcr.io/spinnaker-marketplace/rosco:0.12.0-20190517180000
+gcr.io/spinnaker-marketplace/monitoring-daemon:0.13.0-20190430163248
+gcr.io/spinnaker-marketplace/monitoring-third-party:0.13.0-20190430163248
+
+# 可以将相关镜像缓存在企业内部的本地镜像仓库
+
+$ cat retag.py
+import os
+images = open(&#34;images-1.14.11.txt&#34;, &#39;r&#39;)
+for line in images.readlines():
+    name = line.strip()
+    tag = name.replace(&#34;gcr.io/spinnaker-marketplace/&#34;, &#34;registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-&#34;)
+    os.system(&#39;docker pull %s&#39; % name)
+    os.system(&#39;docker tag %s %s&#39; % (name, tag))
+    os.system(&#39;docker push %s&#39; % tag)
+
+
+# 配置spinnaker的自定义参数(自定义域名和参数)
+# 让Spinnaker集群能够识别到自定义的镜像和自定义的域名
+$ mkdir /home/spinnaker/.hal/default/service-settings
+$/home/spinnaker/.hal/default/service-settings# for i in `ls`;do echo $i;cat $i;done
+clouddriver.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-clouddriver:4.7.0-20190713034015
+deck.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-deck:2.9.8-20190718101338
+overrideBaseUrl: http://deck-spinnaker.example.com/
+echo.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-echo:2.5.2-20190708184501
+fiat.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-fiat:1.5.2-20190704034018
+front50.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-front50:0.17.0-20190510203645
+gate.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-gate:1.8.4-20190719034017
+overrideBaseUrl: http://gate-spinnaker.example.com/
+igor.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-igor:1.3.0-20190515102735
+kayenta.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-kayenta:0.9.1-20190628120214
+orca.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-orca:2.7.6-20190719122741
+redis.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-redis-cluster:v2
+rosco.yml
+artifactId: registry.cn-hangzhou.aliyuncs.com/spinnaker/spinnaker-rosco:0.12.0-20190517180000
+
+# 修改目录权限
+chown -R spinnaker.spinnaker -R /home/spinnaker/
+
+# 查看配置好的部署文件(注意:需要修改时区:Asia/Shanghai)
+$ ls /home/spinnaker/.hal/config
+
+# 开始部署(需要确保网络可翻墙)
+$ hal deploy apply
+....
+....
++ Deploy spin-redis
+  Success
++ Deploy spin-clouddriver
+  Success
++ Deploy spin-front50
+  Success
++ Deploy spin-orca
+  Success
++ Deploy spin-deck
+  Success
++ Deploy spin-echo
+  Success
++ Deploy spin-gate
+  Success
++ Deploy spin-igor
+  Success
++ Deploy spin-rosco
+  Success
++ Run `hal deploy connect` to connect to Spinnaker.
+
+
+# 查看部署详情
+$ kubectl --kubeconfig kubeconfig get pods -n spinnaker
+NAME                               READY   STATUS    RESTARTS   AGE
+spin-clouddriver-5fb4c87f9-wlrgw   1/1     Running   0          5m40s
+spin-deck-6cfc48db45-d2xvb         1/1     Running   0          5m41s
+spin-echo-c556dfb86-t5whn          1/1     Running   0          5m41s
+spin-front50-5b5ff6b78c-x2j79      1/1     Running   5          5m39s
+spin-gate-57487bc64f-l9r27         1/1     Running   0          5m41s
+spin-igor-55d9cb4594-c42vd         1/1     Running   0          5m40s
+spin-orca-67c57f555c-rd2js         1/1     Running   0          5m41s
+spin-redis-85959ff9d-9dsw9         1/1     Running   2          55d
+spin-rosco-5ff55dd7d8-8v67d        1/1     Running   0          5m39s
+
+# 为spinnaker创建一个ingress
+$ cat spinnaker-ingress.yaml
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  name: deck-spinnaker.example.com
+  namespace: spinnaker
+spec:
+  rules:
+  - host: deck-spinnaker.example.com
+    http:
+      paths:
+      - backend:
+          serviceName: spin-deck
+          servicePort: 9000
+        path: /
+status:
+  loadBalancer: {}
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  name: gate-spinnaker.example.com
+  namespace: spinnaker
+spec:
+  rules:
+  - host: gate-spinnaker.example.com
+    http:
+      paths:
+      - backend:
+          serviceName: spin-gate
+          servicePort: 8084
+        path: /
+status:
+  loadBalancer: {}
+
+$  kubectl --kubeconfig kubeconfig create -f spinnaker-ingress.yaml
+ingress.extensions/deck-spinnaker.example.com created
+ingress.extensions/gate-spinnaker.example.com created
+
+# 测试访问
+$ curl -H &#39;host:deck-spinnaker.example.com&#39; k8s-node-1  -I
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 17727
+Content-Type: text/html
+Date: Wed, 28 Aug 2019 03:36:02 GMT
+Etag: &#34;453f-58df54dd71b00&#34;
+Last-Modified: Thu, 18 Jul 2019 14:19:56 GMT
+Server: Apache/2.4.38 (Debian)
+Vary: Accept-Encoding</pre></td></tr></table>
+</div>
+</div>
+<p><strong>5. Spinnaker使用</strong></p>
+
+<p><code>注意:deck组件是spinnaker的ui,gate组件为spinnaker的api网关，因此这两个组件的域名必须都能解析</code></p>
+
+<p>在用户本地绑定<code>k8s-node-ip  deck-spinnaker.example.com gate-spinnaker.example.com</code> hosts配置后即可通过<a href="http://deck-spinnaker.example.com">http://deck-spinnaker.example.com</a> 进行访问.</p>
+
+<p><strong>6. Spinnaker升级</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 更新spinnaker配置的config文件
+hal config version edit --version 1.15.2
+
+# 查看1.15.2相关的镜像
+$ hal version bom  1.15.2
++ Get BOM for 1.15.2
+  Success
+version: 1.15.2
+timestamp: &#39;2019-08-12 19:38:56&#39;
+services:
+  echo:
+    version: 2.6.0-20190709142816
+    commit: 4aae0bc62eb0fb530ea51044473c0683f332bffd
+  clouddriver:
+    version: 6.1.0-20190812153835
+    commit: 96ba2f78c3f819a1701e0cc0c5c9571368bd8002
+  deck:
+    version: 2.10.2-20190812115844
+    commit: 09e4382eda9c757f25033ef63a6ee290881c0e50
+  fiat:
+    version: 1.6.1-20190802051323
+    commit: fced26ecb8aceefb1c5adce7bca7c6d0c776b893
+  front50:
+    version: 0.18.0-20190709142816
+    commit: e6c5f942d0480a57b603f9b714be01782124cd63
+  gate:
+    version: 1.10.0-20190809134220
+    commit: 0743b2c2290ccf03896b5aef16db869d25632c9f
+  igor:
+    version: 1.4.0-20190709142816
+    commit: 324596955e9f4699b1e1356a8feba6608eeb70bc
+  kayenta:
+    version: 0.10.1-20190802051323
+    commit: 6a3c60f9467938b2c2d91a23489fb14d5c180e14
+  orca:
+    version: 2.8.2-20190812153835
+    commit: f70d10fb4b259bb92785e6ed095a6c0b9d77ae09
+  rosco:
+    version: 0.13.0-20190709142816
+    commit: f01311c659c5408fa28a25595e3d2b1c9d891c99
+  defaultArtifact: {}
+  monitoring-third-party:
+    version: 0.14.0-20190702202823
+    commit: a37ddcef19500350bf48fb2a9ae94f24c26e8e81
+  monitoring-daemon:
+    version: 0.14.0-20190702202823
+    commit: a37ddcef19500350bf48fb2a9ae94f24c26e8e81
+dependencies:
+  redis:
+    version: 2:2.8.4-2
+  consul:
+    version: 0.7.5
+  vault:
+    version: 0.7.0
+artifactSources:
+  debianRepository: https://dl.bintray.com/spinnaker-releases/debians
+  dockerRegistry: gcr.io/spinnaker-marketplace
+  googleImageProject: marketplace-spinnaker-release
+  gitPrefix: https://github.com/spinnaker</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意</code>:每个版本的镜像都是不同，此时需要下载相关镜像，并需要将镜像标签在<code>/home/spinnaker/.hal/default/service-settings/</code>目录下的文件进行逐一更新。</p>
+
+<h4 id="注意事项">注意事项</h4>
+
+<p>作者在安装该环境时，<code>kubernetes</code>版本为1.14.3，<code>hal</code>的版本为1.22.0-20190718020510，<code>spinnaker</code>的版本为<code>1.14.1</code> ，而当<code>Kubernetes</code>升级到1.15以上版本后，<code>Deployment</code>相关的API版本由<code>apps/v1beta1</code>等已经更新为<code>apps/v1</code>(非稳定版本已经废弃)，导致再次安装<code>spinnaker</code>时出现类似如下错误:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Failure
+Problems in Global:
+! ERROR Failed to deploy manifest:
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+........
+........</pre></td></tr></table>
+</div>
+</div>
+<p><strong>解决方案</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 更新halyard
+$ update-halyard
+# 修改hal的默认JVM配置，增加代理配置
+$ vi /opt/halyard/bin/halyard 
+# 重启hal
+$ hal shutdown
+$ hal -v
+1.27.0-20191107172815
+# 重新执行spinnaker部署安装
+$ hal deploy apply</pre></td></tr></table>
+</div>
+</div>
+<p><a href="https://github.com/spinnaker/spinnaker/issues/4995">参考文章</a></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2010-08-26
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/kubernetes/">kubernetes</a>
+          <a href="https://bgbiao.top/tags/spinnaker/">spinnaker</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/ansible-etcd-cluster/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">使用Ansible快速部署Etcd集群</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/post/docker-api-for-python/">
+            <span class="next-text nav-default">Docker的Python版API使用</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

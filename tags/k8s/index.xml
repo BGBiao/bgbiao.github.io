@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>k8s on BGBiao的SRE人生</title>
+    <link>https://bgbiao.top/tags/k8s/</link>
+    <description>Recent content in k8s on BGBiao的SRE人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 27 Sep 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/k8s/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Traefik-v2.0快速入门</title>
+      <link>https://bgbiao.top/post/k8s-traefik-v2/</link>
+      <pubDate>Fri, 27 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-traefik-v2/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/&#34;&gt;traefik官方文档&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>k8s dashboard的http接口改造</title>
+      <link>https://bgbiao.top/post/k8s-dashboard-http/</link>
+      <pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-dashboard-http/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件&lt;a href=&#34;https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/&#34;&gt;dashboard&lt;/a&gt;,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了&lt;code&gt;https&lt;/code&gt;并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -6,10 +6,21 @@
     <description>Recent content in GPU on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 20 Aug 2018 14:34:43 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 08 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/gpu/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes-1.15管理NVIDIA GPU容器</title>
+      <link>https://bgbiao.top/post/k8s-nvidia-gpu/</link>
+      <pubDate>Tue, 08 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-nvidia-gpu/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;使用kubernetes来调度和管理nvidia gpu资源。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>使用nvidia-smi来对Tesla-GPU进行故障排查</title>

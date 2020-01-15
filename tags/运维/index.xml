@@ -44,5 +44,16 @@
 &lt;/blockquote&gt;</description>
     </item>
     
+    <item>
+      <title>Spinnaker国内生产环境级别集群搭建</title>
+      <link>https://bgbiao.top/post/spinnaker-install/</link>
+      <pubDate>Thu, 26 Aug 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/spinnaker-install/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用&lt;code&gt;minio&lt;/code&gt;作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
   </channel>
 </rss>

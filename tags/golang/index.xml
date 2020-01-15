@@ -51,15 +51,51 @@
     
     <item>
       <title>Golang中的单元测试、基准测试、覆盖测试</title>
-      <link>https://bgbiao.top/post/go-unit-test/</link>
+      <link>https://bgbiao.top/post/golang-unit-test/</link>
       <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://bgbiao.top/post/go-unit-test/</guid>
+      <guid>https://bgbiao.top/post/golang-unit-test/</guid>
       <description>&lt;h2 id=&#34;单元测试-基准测试-覆盖测试&#34;&gt;单元测试、基准测试、覆盖测试&lt;/h2&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;背景: 之前很长一段时间再写Golang程序时，不会有意识去写单元测试，直到后来写了独立项目后，慢慢才发现给一个功能编写对应的单元测试是多么高效和方便，接下来就再一起复习下Golang中的测试.&lt;/p&gt;
 &lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Golang module的使用</title>
+      <link>https://bgbiao.top/post/golang-module/</link>
+      <pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-module/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用&lt;code&gt;vendor&lt;/code&gt;或者&lt;code&gt;glide&lt;/code&gt;的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为&lt;code&gt;go modules&lt;/code&gt;的版本管理机制。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;
+- 在Golang1.11版本中需要使用&lt;code&gt;export GO111MODULE=on&lt;/code&gt;来显式开启go module
+- 在Golang1.12之后默认开启了module&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Golang的ElasticSearch6的SDK问题处理</title>
+      <link>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</link>
+      <pubDate>Mon, 12 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</guid>
+      <description>&lt;h2 id=&#34;es6-版本的golang-sdk问题处理&#34;&gt;es6 版本的golang-sdk问题处理&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;ElasticSearch6版本的Golang SDK问题处理.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://olivere.github.io/elastic/&#34;&gt;golang-sdk&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;es_version: 6.4.3&lt;/p&gt;
+
+&lt;p&gt;官方建议的sdk版本:     &lt;a href=&#34;https://github.com/olivere/elastic&#34;&gt;https://github.com/olivere/elastic&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:很好奇,作者其他版本都采用vN来标记版本，但是在v6的时候直接采用github版本&lt;/code&gt;&lt;/p&gt;</description>
     </item>
     
     <item>

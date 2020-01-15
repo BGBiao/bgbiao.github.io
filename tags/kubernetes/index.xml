@@ -23,12 +23,67 @@
     </item>
     
     <item>
+      <title>基于阿里云Terway网络的Kubernetes集群实践</title>
+      <link>https://bgbiao.top/post/k8s-ali-terway/</link>
+      <pubDate>Sun, 27 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-ali-terway/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 众所周知的是在构建一个Kubernetes集群时，容器网络通常会使用一个独立的私有子网来构建Kubernetes集群内部的pod网络和service网络，但在实际的业务场景中，没有企业会在一段时间内将内部全部的服务都迁移到Kubernetes集群中(因为涉及到业务架构以及整体业务的可靠性)，因而会产生一些Kubernetes集群内部服务和集群外部服务互相调用的场景，当然如果是HTTP服务，我们可以采用LVS、Nginx、HAProxy之类的代理工具工具进行集群内外的流量转发，但如果是TCP服务，比如使用Dubbo框架时，生产者和消费者需要直连，当生产者和消费者不在一个可以互联互通的网络下会比较麻烦，这也就是为什么大厂在规模化使用Kubernetes时首先需要解决的就是网络问题的原因了。比如我们在数科的时候就采用的是&lt;a href=&#34;https://github.com/contiv/install&#34;&gt;Contiv&lt;/a&gt;+BGP的模式来实现容器网络和容器外网络的互联互通的，而这通常需要一个比较专业的SDN团队来构建和维护。而作为创业公司通常会使用公有云来承载自己的业务，这种轻资产模式的好处就是底层会有专业的团队来提供保障，因此考虑到业务需求我们采用了阿里云的terway网络插件来实现内部的Kubernetes集群网络.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>k8s删除Terminating状态的命名空间</title>
+      <link>https://bgbiao.top/post/k8s-delete-namespace/</link>
+      <pubDate>Mon, 21 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-delete-namespace/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Kubernetes-1.15管理NVIDIA GPU容器</title>
+      <link>https://bgbiao.top/post/k8s-nvidia-gpu/</link>
+      <pubDate>Tue, 08 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-nvidia-gpu/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;使用kubernetes来调度和管理nvidia gpu资源。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>k8s dashboard的http接口改造</title>
+      <link>https://bgbiao.top/post/k8s-dashboard-http/</link>
+      <pubDate>Wed, 18 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/k8s-dashboard-http/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件&lt;a href=&#34;https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/&#34;&gt;dashboard&lt;/a&gt;,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了&lt;code&gt;https&lt;/code&gt;并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
       <title>容器生态技术</title>
       <link>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</link>
       <pubDate>Sun, 05 Nov 2017 22:30:59 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/</guid>
       <description>&lt;p&gt;2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Spinnaker国内生产环境级别集群搭建</title>
+      <link>https://bgbiao.top/post/spinnaker-install/</link>
+      <pubDate>Thu, 26 Aug 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/spinnaker-install/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用&lt;code&gt;minio&lt;/code&gt;作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
     </item>
     
   </channel>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ElasticSearch6 on BGBiao的SRE人生</title>
+    <link>https://bgbiao.top/tags/elasticsearch6/</link>
+    <description>Recent content in ElasticSearch6 on BGBiao的SRE人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 12 Aug 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/elasticsearch6/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Golang的ElasticSearch6的SDK问题处理</title>
+      <link>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</link>
+      <pubDate>Mon, 12 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</guid>
+      <description>&lt;h2 id=&#34;es6-版本的golang-sdk问题处理&#34;&gt;es6 版本的golang-sdk问题处理&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;ElasticSearch6版本的Golang SDK问题处理.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://olivere.github.io/elastic/&#34;&gt;golang-sdk&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;es_version: 6.4.3&lt;/p&gt;
+
+&lt;p&gt;官方建议的sdk版本:     &lt;a href=&#34;https://github.com/olivere/elastic&#34;&gt;https://github.com/olivere/elastic&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:很好奇,作者其他版本都采用vN来标记版本，但是在v6的时候直接采用github版本&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
