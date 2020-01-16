@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-01-12T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-01-16T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,50 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/">关于如何挣钱的35条建议</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2020-01-09" class="post-time">
+        2020-01-09
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/%E7%94%9F%E6%B4%BB/"> 生活 </a>
+          
+        </div>
+      <span class="more-meta"> 11018 words </span>
+      <span class="more-meta"> 22 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      这篇《关于如何挣钱的35条建议》，是波波从《How to Get Rich : Every Episode》[附录1]这篇长文(超过3.6万英文单词)翻译整理而来。波波非常
+    </div>
+    <div class="read-more">
+      <a href="/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/">2019年总结之瞎扯淡</a>
     </h1>
     
@@ -535,53 +579,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E8%B4%A2%E5%8A%A1%E6%8A%95%E8%B5%84/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/">CronJob控制器中的一些绕坑指南</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-12-29" class="post-time">
-        2019-12-29
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 2722 words </span>
-      <span class="more-meta"> 6 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>背景: 作为企业里唯一熟悉各种云产品的工种，通常需要和各种云产品打交道。当前，我们大部分的云基础设施和云服务都运行在阿里云上，而每个云产品都有独立的管理系统，这使得我们在运维过程中经常无法将相关产品和关联信息有效的组织在一起，来进行快速的问题诊断和信息查询，这对于运维和开发同学来说，在多个系统之间来回跳转查找关联信息是一个低效且极易出错的事务，因此通常来讲，不论是作为运维和开发，我们都希望将企业关联的云资源和服务进行整合关联，以实现效率的最大化。而在这过程中，我们采用Kubernetes集群的CronJob来定期获取阿里云的一些资源，在这过程中，遇到一些问题，根据问题重新细读CronJob官方文档，特记录于此。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/" class="read-more-link">Read more</a>
     </div>
     
   </div>

@@ -6,10 +6,497 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 12 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 16 Jan 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang中的逃逸分析</title>
+      <link>https://bgbiao.top/post/golang-%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</link>
+      <pubDate>Thu, 16 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</guid>
+      
+        <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具来实现生产环境的各种常规操作以及日常运维管理，而对于整个Golang语言内部的一些细节都不甚了解。但随着对Ops要求的提高，以及向SRE理念转型的需要，我们越来越需要深入理解一些内部底层的原理，这样在我们去管理的我们的Kubernetes集群，或者其他的一些内部系统时才能真正做到游刃有余。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在Golang中，一个对象最终是分配到&lt;code&gt;堆&lt;/code&gt;还是&lt;code&gt;栈&lt;/code&gt;呢，接下来我们就一起通过&lt;code&gt;逃逸分析&lt;/code&gt;来一起学习学习。&lt;/p&gt;
+
+&lt;h3 id=&#34;概念介绍&#34;&gt;概念介绍&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;逃逸分析&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;逃逸分析&lt;/code&gt;是编译器用来确定由程序创建的值所处位置的过程。具体来说，&lt;code&gt;编译器执行静态代码分析&lt;/code&gt;，以确定是否可以将值放在构造函数的&lt;code&gt;栈(帧)&lt;/code&gt;上，或者该值是否必须&lt;code&gt;逃逸&lt;/code&gt;到&lt;code&gt;堆&lt;/code&gt;上。&lt;/p&gt;
+
+&lt;p&gt;所以，更通俗一点讲，逃逸分析就是确定一个对象是要放在&lt;code&gt;堆&lt;/code&gt;还是&lt;code&gt;栈&lt;/code&gt;上，一般遵循如下规则:
+- 1.是否有非局部调用(对象定义之外的调用).即:如果有可能被&lt;code&gt;引用&lt;/code&gt;，那通常会被分配到堆上，否则就在&lt;code&gt;栈上&lt;/code&gt;
+- 2.如果对象太大(即使没有被引用),无法放在栈区也是可能放到&lt;code&gt;堆&lt;/code&gt;上的&lt;/p&gt;
+
+&lt;p&gt;总结起来就是: &lt;code&gt;如果在函数外部引用，必定在堆中分配;如果没有外部引用，优先在栈中分配;如果一个函数返回的是一个（局部）变量的地址，那么这个变量就发生逃逸&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;避免逃逸的好处:&lt;/code&gt;
+- 1.减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除
+- 2.逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(系统开销少)
+- 3.减少动态分配所造成的内存碎片&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;如何进行逃逸分析&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Golang程序中是在编译阶段确定逃逸的，而非运行时，因此我们可以使用&lt;code&gt;go build&lt;/code&gt;的相关工具来进行逃逸分析.&lt;/p&gt;
+
+&lt;p&gt;分析工具:
+- 1.通过编译工具查看详细的逃逸分析过程(&lt;code&gt;go build -gcflags &#39;-m -l&#39; main.go&lt;/code&gt;)
+- 2.通过反编译命令查看&lt;code&gt;go tool compile -S main.go&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;编译参数介绍(-gcflags):&lt;/code&gt;
+- &lt;code&gt;-N&lt;/code&gt;: 禁止编译优化
+- &lt;code&gt;-l&lt;/code&gt;: 禁止内联(可以有效减少程序大小)
+- &lt;code&gt;-m&lt;/code&gt;: 逃逸分析(最多可重复四次)
+- &lt;code&gt;-benchmem&lt;/code&gt;: 压测时打印内存分配统计&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;堆&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;堆是除栈之外的第二个内存区域，用于存储值，&lt;code&gt;全局变量、内存占用大的局部变量、发生了逃逸的局部变量存在的地方就是堆&lt;/code&gt;，这块的内存没有特定的结构，也没有固定大小，可以根据需要进行调整(但也造成管理成本)，因此堆不像栈那样是自清理的，使用这个内存的成本更大(一般各个语言都会有自己的GC机制，在Golang中会使用&lt;code&gt;三色标记法&lt;/code&gt;来进行堆内存的垃圾回收)。&lt;/p&gt;
+
+&lt;p&gt;首先，成本与垃圾收集器(GC)有关，垃圾收集器必须参与进来以保持该区域的清洁。当GC运行时，它将使用25%的可用CPU资源。此外，它可能会产生微秒级的“stop the world”延迟。拥有GC的好处是你不需要担心内存的管理问题，因为内存管理是相当复杂、也容易出错的。&lt;/p&gt;
+
+&lt;p&gt;堆上的值构成Go中的内存分配。这些分配对GC造成压力，因为堆中不再被指针引用的每个值都需要删除。需要检查和删除的值越多，GC每次运行时必须执行的工作就越多。因此，GC算法一直在努力在堆的大小分配和运行速度之间寻求平衡。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;堆是进程级别的&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;栈&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在程序中，每个函数块都会有自己的&lt;code&gt;内存区域&lt;/code&gt;用来存自己的&lt;code&gt;局部变量&lt;/code&gt;（内存占用少）、返回&lt;code&gt;地址、返回值&lt;/code&gt;之类的数据，这一块内存区域有特定的结构和寻址方式，&lt;code&gt;大小在编译时已经确定&lt;/code&gt;，寻址起来也十分迅速，开销很少。&lt;/p&gt;
+
+&lt;p&gt;这块内存地址称为&lt;code&gt;栈&lt;/code&gt;，&lt;code&gt;栈是线程级别&lt;/code&gt;的，&lt;code&gt;大小在创建的时候已经确定&lt;/code&gt;，所以当数据太大的时候，就会发生&amp;rdquo;stack overflow&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;在Golang程序中，函数都是运行在&lt;code&gt;栈&lt;/code&gt;上的，在栈上声明临时变量分配内存，函数运行完成后回收该段栈空间，并且每个函数的栈空间都是独立的，其他代码不可访问的。但是在某些场景下，&lt;code&gt;栈上的空间&lt;/code&gt;需要在该函数被释放后依旧能访问到(函数外调用)，这时候就涉及到内存的逃逸了，而逃逸往往会对应对象的内存分配到堆上.&lt;/p&gt;
+
+&lt;h3 id=&#34;逃逸分析示例&#34;&gt;逃逸分析示例&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;1.示例-参数泄露&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;测试代码&lt;/span&gt;
+&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;cat&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;// 定义一个简单的结构体
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;    &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;age&lt;/span&gt;     &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;webSite&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;// 获取用户信息
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;GetUserInfo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;u&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;u&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;// 获取用户名称
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;GetName&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;u&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;c1&#34;&gt;// 初始化user结构体的指针对象
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;BGBiao&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;https://bgbiao.top&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;nf&#34;&gt;GetUserInfo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;nf&#34;&gt;GetName&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;使用&lt;code&gt;逃逸分析&lt;/code&gt;来进行内存分析&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ go build -gcflags &amp;#39;-m -m  -l&amp;#39; taoyi.go
+# command-line-arguments
+./taoyi.go:21:18: leaking param: u to result ~r1 level=0
+./taoyi.go:25:14: leaking param: u to result ~r1 level=1
+./taoyi.go:31:31: main &amp;amp;user literal does not escape&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;由上述输出的&lt;code&gt;leaking param&lt;/code&gt;可以看到，在&lt;code&gt;GetUserInfo&lt;/code&gt;和&lt;code&gt;GetName&lt;/code&gt;函数中的&lt;code&gt;指针变量u&lt;/code&gt;是一个泄露参数，在两个函数中均没有对&lt;code&gt;u&lt;/code&gt;进行变量操作，就直接返回了变量内容，因此最后的该变量&lt;code&gt;user&lt;/code&gt;并没有发生逃逸，&lt;code&gt;&amp;amp;user&lt;/code&gt;对象还是作用在了&lt;code&gt;main()&lt;/code&gt;函数中。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.示例-未知类型&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这个时候，我们把上面的代码稍微改动一下:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;....
+....
+func main() {
+    user := &amp;amp;user{&amp;#34;BGBiao&amp;#34;,18,&amp;#34;https://bgbiao.top&amp;#34;}
+    fmt.Println(GetUserInfo(user))
+    fmt.Println(GetName(user))
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;再次进行逃逸分析:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ go build -gcflags &amp;#39;-m -m  -l&amp;#39; taoyi.go
+# command-line-arguments
+./taoyi.go:21:18: leaking param: u to result ~r1 level=0
+./taoyi.go:25:14: leaking param: u to result ~r1 level=1
+./taoyi.go:31:31: &amp;amp;user literal escapes to heap
+./taoyi.go:32:16: main ... argument does not escape
+./taoyi.go:32:28: GetUserInfo(user) escapes to heap
+./taoyi.go:33:16: main ... argument does not escape
+./taoyi.go:33:24: GetName(user) escapes to heap&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;由上可以发现我们的指针对象&lt;code&gt;&amp;amp;user&lt;/code&gt;在该程序中发生了逃逸，具体是在&lt;code&gt;GetUserInfo(user)&lt;/code&gt;和&lt;code&gt;GetName(user)&lt;/code&gt;发生了逃逸.&lt;/p&gt;
+
+&lt;p&gt;这是为什么呢？怎么加了个&lt;code&gt;fmt.Println&lt;/code&gt;之后对象就发生了逃逸呢?&lt;/p&gt;
+
+&lt;p&gt;其实主要原因为&lt;code&gt;fmt.Println&lt;/code&gt;函数的原因:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;func Println(a ...interface{}) (n int, err error)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;我们可以看到&lt;code&gt;fmt.Println(a)&lt;/code&gt;函数中入参为&lt;code&gt;interface{}&lt;/code&gt;类型，在编译阶段编译器无法确定其具体的类型。因此会产生逃逸，最终分配到堆上(最本质的原因是interface{}类型一般情况下底层会进行&lt;code&gt;reflect&lt;/code&gt;，而使用的&lt;code&gt;reflect.TypeOf(arg).Kind()&lt;/code&gt;获取接口类型对象的底层数据类型时发生了堆逃逸，最终就会反映为当入参是空接口类型时发生了逃逸)。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.示例-指针&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;此时，我们再小改点代码:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;// 返回结构体对象的指针，此时就会产生逃逸
+func GetUserInfo(u user) (*user) {
+    return &amp;amp;u
+}
+
+func main() {
+    user := user{&amp;#34;BGBiao&amp;#34;,18,&amp;#34;https://bgbiao.top&amp;#34;}
+    GetUserInfo(user)
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;逃逸分析:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ go build -gcflags &amp;#39;-m -m  -l&amp;#39; taoyi.go
+# command-line-arguments
+./taoyi.go:21:18: moved to heap: u
+
+# 查看汇编代码(可以看到有个CALL	runtime.newobject(SB)的系统调用)
+$ go tool compile -S taoyi.go | grep taoyi.go:21
+	0x0000 00000 (taoyi.go:21)	TEXT	&amp;#34;&amp;#34;.GetUserInfo(SB), ABIInternal, $40-48
+	0x0000 00000 (taoyi.go:21)	MOVQ	(TLS), CX
+	0x0009 00009 (taoyi.go:21)	CMPQ	SP, 16(CX)
+	0x000d 00013 (taoyi.go:21)	JLS	147
+	0x0013 00019 (taoyi.go:21)	SUBQ	$40, SP
+	0x0017 00023 (taoyi.go:21)	MOVQ	BP, 32(SP)
+	0x001c 00028 (taoyi.go:21)	LEAQ	32(SP), BP
+	0x0021 00033 (taoyi.go:21)	FUNCDATA	$0, gclocals·fb57040982f53920ad6a8ad662a1594f(SB)
+	0x0021 00033 (taoyi.go:21)	FUNCDATA	$1, gclocals·263043c8f03e3241528dfae4e2812ef4(SB)
+	0x0021 00033 (taoyi.go:21)	FUNCDATA	$2, gclocals·9fb7f0986f647f17cb53dda1484e0f7a(SB)
+	0x0021 00033 (taoyi.go:21)	PCDATA	$0, $1
+	0x0021 00033 (taoyi.go:21)	PCDATA	$1, $0
+	0x0021 00033 (taoyi.go:21)	LEAQ	type.&amp;#34;&amp;#34;.user(SB), AX
+	0x0028 00040 (taoyi.go:21)	PCDATA	$0, $0
+	0x0028 00040 (taoyi.go:21)	MOVQ	AX, (SP)
+	0x002c 00044 (taoyi.go:21)	CALL	runtime.newobject(SB)
+	0x0031 00049 (taoyi.go:21)	PCDATA	$0, $1
+	0x0031 00049 (taoyi.go:21)	MOVQ	8(SP), AX
+	0x0036 00054 (taoyi.go:21)	PCDATA	$0, $-2
+	0x0036 00054 (taoyi.go:21)	PCDATA	$1, $-2
+	0x0036 00054 (taoyi.go:21)	CMPL	runtime.writeBarrier(SB), $0
+	0x003d 00061 (taoyi.go:21)	JNE	104
+	0x003f 00063 (taoyi.go:21)	MOVQ	&amp;#34;&amp;#34;.u+48(SP), CX
+	0x0044 00068 (taoyi.go:21)	MOVQ	CX, (AX)
+	0x0047 00071 (taoyi.go:21)	MOVUPS	&amp;#34;&amp;#34;.u+56(SP), X0
+	0x004c 00076 (taoyi.go:21)	MOVUPS	X0, 8(AX)
+	0x0050 00080 (taoyi.go:21)	MOVUPS	&amp;#34;&amp;#34;.u+72(SP), X0
+	0x0055 00085 (taoyi.go:21)	MOVUPS	X0, 24(AX)
+	0x0068 00104 (taoyi.go:21)	PCDATA	$0, $-2
+	0x0068 00104 (taoyi.go:21)	PCDATA	$1, $-2
+	0x0068 00104 (taoyi.go:21)	MOVQ	AX, &amp;#34;&amp;#34;.&amp;amp;u+24(SP)
+	0x006d 00109 (taoyi.go:21)	LEAQ	type.&amp;#34;&amp;#34;.user(SB), CX
+	0x0074 00116 (taoyi.go:21)	MOVQ	CX, (SP)
+	0x0078 00120 (taoyi.go:21)	MOVQ	AX, 8(SP)
+	0x007d 00125 (taoyi.go:21)	LEAQ	&amp;#34;&amp;#34;.u+48(SP), CX
+	0x0082 00130 (taoyi.go:21)	MOVQ	CX, 16(SP)
+	0x0087 00135 (taoyi.go:21)	CALL	runtime.typedmemmove(SB)
+	0x0091 00145 (taoyi.go:21)	JMP	89
+	0x0093 00147 (taoyi.go:21)	NOP
+	0x0093 00147 (taoyi.go:21)	PCDATA	$1, $-1
+	0x0093 00147 (taoyi.go:21)	PCDATA	$0, $-1
+	0x0093 00147 (taoyi.go:21)	CALL	runtime.morestack_noctxt(SB)
+	0x0098 00152 (taoyi.go:21)	JMP	0&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;由以上输出可以看到在&lt;code&gt;GetUserInfo(u user)&lt;/code&gt;函数中的对象u已经被移到&lt;code&gt;堆&lt;/code&gt;上了，这是因为该函数返回的是&lt;code&gt;指针对象&lt;/code&gt;，引用对象被返回到方法之外了(此时该引用对象可以在外部被调用和修改)，因此编译器会把该对象分配到堆上(否则方法结束后，局部变量被回收岂不是很惨)。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;4.示例-综合案例&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;cat&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;2.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;BGBiao&amp;#34;&lt;/span&gt;
+
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;go&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;build&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gcflags&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;m&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;2.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;line&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;arguments&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;does&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escape&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;在上面第三个示例中我们提到，当返回对象是&lt;code&gt;指针类型&lt;/code&gt;(引用对象)时，就会发现逃逸，但上面的示例其实告诉我们虽然&lt;code&gt;*name&lt;/code&gt;是一个指针类型，但是并未发生逃逸，这是因为&lt;code&gt;该引用类型未被外部使用&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;但是又如第二个示例中所说，如果我们在上面的示例中增加&lt;code&gt;fmt.Println(name)&lt;/code&gt;后，会发现该实例又会出现逃逸.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;:虽然当使用fmt.Println的时候又会出现逃逸，但是当使用fmt.Println(*name)和fmt.Println(name)，也是不同的。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;cat&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;demo1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;BGBiao&amp;#34;&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;fmt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Println&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;go&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;build&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gcflags&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;m&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;line&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;arguments&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;does&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escape&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;...&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;argument&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;does&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escape&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escapes&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;heap&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;由上述输出可看到，当使用引用类型来获取底层的值时，在&lt;code&gt;fmt.Println&lt;/code&gt;的入参处&lt;code&gt;*name&lt;/code&gt;发生了逃逸.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;cat&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;demo2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
+&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;BGBiao&amp;#34;&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;fmt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Println&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;go&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;build&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gcflags&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;m&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
+&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;line&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;arguments&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escapes&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;heap&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;...&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;argument&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;does&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escape&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taoyi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;demo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;escapes&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;heap&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;而这次我们使用&lt;code&gt;fmt.Println(name)&lt;/code&gt;来输出底层值，就会发现变量&lt;code&gt;name&lt;/code&gt;在初始化的时候就会出现逃逸&lt;code&gt;new(string)&lt;/code&gt;，&lt;/p&gt;
+
+&lt;h3 id=&#34;总结&#34;&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;通过上面的概念和实例分析，我们基本知道了逃逸分析的概念和规则，并且大概知道何时，那种对象会被分配到堆或栈内存中，在实际情况中可能情况会更加复杂，需要具体分析。&lt;/p&gt;
+
+&lt;p&gt;不过，有如下几点可能在我们实际使用过程中要注意下:
+- 静态分配到栈上，性能一定比动态分配到堆上好
+- 底层分配到堆，还是栈。实际上对你来说是透明的，不需要过度关心
+- 每个 Go 版本的逃逸分析都会有所不同（会改变，会优化)
+- 直接通过&lt;code&gt;go build -gcflags &#39;-m -l&#39;&lt;/code&gt; 就可以看到逃逸分析的过程和结果
+- 到处都用&lt;code&gt;指针传递并不一定是最好的&lt;/code&gt;，要用对
+- map &amp;amp; slice 初始化时，预估容量，避免由扩展导致的内存分配。但是如果太大（10000）也会逃逸，因为栈的空间是有限的&lt;/p&gt;
+
+&lt;h3 id=&#34;思考&#34;&gt;思考&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;函数传递指针真的比传值效率高吗？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;我们知道传递指针可以减少底层值的拷贝，可以提高效率，但是如果拷贝的数据量小，由于指针传递会产生逃逸，可能会使用堆，也可能会增加GC的负担，所以传递指针不一定是高效的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;内存碎片化问题&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;实际项目基本都是通过 &lt;code&gt;c := make([]int, 0, l)&lt;/code&gt; 来申请内存，长度都是不确定的，自然而然这些变量都会申请到堆上面了.&lt;/p&gt;
+
+&lt;p&gt;Golang使用的垃圾回收算法是『标记——清除』.&lt;/p&gt;
+
+&lt;p&gt;简单得说，就是程序要从操作系统申请一块比较大的内存，内存分成小块，通过链表链接。&lt;/p&gt;
+
+&lt;p&gt;每次程序申请内存，就从链表上面遍历每一小块，找到符合的就返回其地址，没有合适的就从操作系统再申请。如果申请内存次数较多，而且申请的大小不固定，就会引起内存碎片化的问题。&lt;/p&gt;
+
+&lt;p&gt;申请的堆内存并没有用完，但是用户申请的内存的时候却没有合适的空间提供。这样会遍历整个链表，还会继续向操作系统申请内存。这就能解释我一开始描述的问题，申请一块内存变成了慢语句。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>深入Gin框架内幕2</title>
@@ -2403,7 +2890,7 @@ dnsall-1577598300-hdl4z           0/1     Completed   0          3m29s&lt;/pre&g
 &lt;span class=&#34;mi&#34;&gt;9&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;**2.context方式传递数据给主线程 **&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.context方式传递数据给主线程&lt;/strong&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -2725,7 +3212,10 @@ dnsall-1577598300-hdl4z           0/1     Completed   0          3m29s&lt;/pre&g
 &lt;span class=&#34;nx&#34;&gt;begin&lt;/span&gt;
 &lt;span class=&#34;mi&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;AB34CD56EF78GH910IJ&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;</description>
+&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
       
     </item>
     
@@ -7041,672 +7531,6 @@ New version of tweet &amp;#34;1&amp;#34; is now 6&lt;/pre&gt;&lt;/td&gt;&lt;/tr&
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>Prometheus入门实践</title>
-      <link>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</link>
-      <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</guid>
-      
-        <description>&lt;h2 id=&#34;prometheus入门实践&#34;&gt;Prometheus入门实践&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
-&lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
-&lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;一-基本原理&#34;&gt;一、基本原理&lt;/h3&gt;
-
-&lt;p&gt;通过&lt;code&gt;HTTP协议周期性抓取被监控组件的状态&lt;/code&gt;,任意组件只要提供对应的HTTP接口就可以接入监控。&lt;/p&gt;
-
-&lt;p&gt;输出被监控组件信息的HTTP接口被叫做&lt;code&gt;exporter&lt;/code&gt;,也就是数据采集端，通常来说，最需要接入改造的就是expoter. 当前互联网上已经有很多成熟的&lt;code&gt;exporter&lt;/code&gt;组件，当然用户也可用根据官方提供的sdk自行编写exporter.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.bookstack.cn/read/prometheus-manual/instrumenting-exporters.md&#34;&gt;开箱即用的exporter&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://prometheus.io/docs/instrumenting/clientlibs/&#34;&gt;官方的sdk&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/oliver006/redis_exporter&#34;&gt;redis-exporter&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;注意:prometheus的时间序列数据分为四种类型&lt;/code&gt;
-- Counter: 收集的数据是按照某个趋势（增加／减少）一直变化的，我们往往用它记录服务请求总量，错误总数等
-- Gauge: 搜集的数据是一个瞬时的，与时间没有关系，可以任意变高变低，往往可以用来记录内存使用率、磁盘使用率等
-- Histogram: 用于表示一段时间范围内对数据进行采样,并能够对其指定区间以及总数进行统计，通常我们用它计算分位数的直方图。
-- Summary: 和Histogram类似，用于表示一段时间内数据采样结果。它直接存储了 quantile 数据，而不是根据统计区间计算出来的&lt;/p&gt;
-
-&lt;h3 id=&#34;二-组件介绍&#34;&gt;二、组件介绍&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1. Prometheus-server: 负责&lt;code&gt;数据采集和存储(TSDB)&lt;/code&gt;,提供PromQL查询语言的支持&lt;/li&gt;
-&lt;li&gt;2. Alertmanager: 警告管理器，用来进行报警&lt;/li&gt;
-&lt;li&gt;3. Push Gateway: 支持临时性Job主动推送指标的中间网关(通常对应于短声明周期的任务监控)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;三-服务过程&#34;&gt;三、服务过程&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1. &lt;code&gt;Prometheus Daemon&lt;/code&gt;定时去目标上抓取&lt;code&gt;metrics(指标)数据&lt;/code&gt;,每个抓取目标需要暴露一个http服务的接口给server进行定时获取。支持配置文件、文本文件、Zookeeper、Consul、DNS SRV Lookup方式抓取目标；对于长生命周期的服务，采用Pull模式定期拉取数据，对于段生命周期的任务，通过push-gateway来主动推送数据&lt;/li&gt;
-&lt;li&gt;2. &lt;code&gt;Prometheus&lt;/code&gt;本地存储抓取的所有数据，并通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。&lt;/li&gt;
-&lt;li&gt;3. Prometheus通过PromQL和其他API可视化地展示收集的数据. 可以作为&lt;code&gt;Grafana&lt;/code&gt;的数据源进行图标输出，也可通过API对外提供数据展示&lt;/li&gt;
-&lt;li&gt;4. &lt;code&gt;PushGateway&lt;/code&gt;支持client主动推送metrics到push-gateway(相当于是一个常驻的exporter服务),prometheus定期去push-gateway中获取数据&lt;/li&gt;
-&lt;li&gt;5. &lt;code&gt;Alertmanager&lt;/code&gt;是独立于prometheus的一个组件，支持PromQL查询语句，提供灵活的报警功能&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;四-pronetheus服务构建使用&#34;&gt;四、pronetheus服务构建使用&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;下载地址&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;源码安装&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 三个组件
-$ wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz -O node_exporter-0.18.1.tar.gz
-
-$ wget https://github.com/prometheus/prometheus/releases/download/v2.10.0/prometheus-2.10.0.linux-amd64.tar.gz -O prometheus-2.10.0.linux-amd64.tar.gz
-
-$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;docker方式安装&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:prometheus默认使用yaml格式来定义配置文件&lt;/code&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 编写prometheus默认配置文件
-$ cat prometheus.yml
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
-
-rule_files:
-  # - &amp;#34;first.rules&amp;#34;
-  # - &amp;#34;second.rules&amp;#34;
-
-scrape_configs:
-  # 会在每个metrics数据中增加job=&amp;#34;prometheus&amp;#34;和instance=&amp;#34;localhost:9090&amp;#34;的基本数据
-  - job_name: prometheus
-    static_configs:
-      - targets: [&amp;#39;localhost:9090&amp;#39;]
-
-# 热启动prometheus服务
-$ docker run --name=prometheus -d -p 9090:9090  -v /Users/xuxuebiao/Desktop/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
-
-$ docker ps -l
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-5e1698a320b2        prom/prometheus     &amp;#34;/bin/prometheus -...&amp;#34;   3 days ago          Up 2 minutes        0.0.0.0:9090-&amp;gt;9090/tcp   prometheus&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; prometheus为golang编写的程序，因此只有一个二进制文件，使用&amp;ndash;config.file来制定配置文件，使用&amp;ndash;web.enable-lifecycle来启用远程热加载配置文件. 调用指令&lt;code&gt;curl -X POST http://localhost:9090/-/reload&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;此时可以访问&lt;a href=&#34;http://localhost:9090&#34;&gt;prometheus-web&lt;/a&gt;即可查看prometheus的状态页面。此时它会每30s对自己暴露的http metrics数据进行采集。可以访问prometheus本身的&lt;a href=&#34;http://localhost:9090/metrics&#34;&gt;metrics数据&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e6e1d386fcd43a0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus-graph&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-64dcaa81e432aa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus-metrics&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-746ef7f040089d80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus-当前收集上来的指标项&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-5d97ef27b313ef6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;go-info指标&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-943befcf74a6d6a0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;单metrics指标数据&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;通过node exporter提供metrics&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 启动node-exporter
-$ docker run -d --name=node-exporter -p 9100:9100  prom/node-exporter
-$ docker ps -l
-CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                    NAMES
-0f60bcce1ea6        prom/node-exporter   &amp;#34;/bin/node_exporter&amp;#34;   3 days ago          Up 42 seconds       0.0.0.0:9100-&amp;gt;9100/tcp   node-exporter
-# 查看服务暴露的metrics
-$ curl http://localhost:9100/metrics
-
-# 将配置暴露给prometheus，并重载prometheus
-$ cat prometheus.yml
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
-
-rule_files:
-  # - &amp;#34;first.rules&amp;#34;
-  # - &amp;#34;second.rules&amp;#34;
-
-scrape_configs:
-  - job_name: prometheus
-    static_configs:
-      - targets: [&amp;#39;localhost:9090&amp;#39;]
-			# 增加一个target 并附加一个label来标记该metrics
-      # 注意:在prometheus启动时增加了一些参数,因此target不需要写协议和uri(http和/metrics)
-      - targets: [&amp;#39;10.13.13.60:9100&amp;#39;]
-        labels:
-          group: &amp;#34;client-node-exporter&amp;#34;
-
-
-# prometheus服务重载
-$ curl -X POST http://localhost:9090/-/reload&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-0daae077328b80f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;node-exporter数据采集到prometheus&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-4461cc2d08501e1f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;node-exporter采集的15分钟平均负载&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:如果需要同时查找多个项，其实需要熟悉prometheus的表达式编写&lt;/code&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;五-安装pushgateway&#34;&gt;五、安装pushgateway&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;注意:push-gateway服务启动后也需要将endpoint加入prometheus中&lt;/code&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 启动push-gateway服务
-docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
-
-# 查看push-gateway服务
-$ curl localhost:9091
-
-# 测试push一条metrics数据到Push-gateway
-echo &amp;#34;tps 100&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-
-# 多指标推送
-cat &amp;lt;&amp;lt;EOF | curl --data-binary @- http://localhost:9091/metrics/job/xxb/instance/bgbiao
-tps{label=&amp;#34;xxb&amp;#34;} 8800
-tps1 100
-tps2 160
-tps3 160
-EOF&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e7a94dd04483137d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;push-gateway服务&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-1956a56a26dda95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus增加push-gateway&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-1b3319b62dfd036d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;push-gateway采集上来的数据&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e2e614fc197f2a50.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus上查看push-gateway上报的数据&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;六-安装grafana进行图标展示&#34;&gt;六、安装Grafana进行图标展示&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 创建grafana服务
-$ docker run -d -p 3000:3000 --name grafana grafana/grafana
-
-$ curl localhost:3000&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;添加数据源，以及基本数据验证&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 向prometheus的push-gateway上主动push数据模拟数据上报
-➜  Desktop echo &amp;#34;tps 10&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &amp;#34;tps 9&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &amp;#34;tps 20&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &amp;#34;tps 30&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &amp;#34;tps 310&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &amp;#34;tps 222&amp;#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-d442c89b5796b2da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;grafana数据源配置&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-6f234d69ad8ff8e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;grafana查看prometheus中收集的metrics数据&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;七-安装altermanager&#34;&gt;七、安装AlterManager&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;Prometheus&lt;/code&gt;中的告警由独立的两部分组成
-- 1. Prometheus服务中的警告规则发送警告到Alertmanager
-- 2. Alertmanager管理这些警告.包含:silencing, inhibition, aggregation 并通过一些方式发送通知&lt;/p&gt;
-
-&lt;p&gt;建立告警和通知的基本步骤:
-- 1. 创建和配置alertmanager
-- 2. 启动prometheus服务时，通过alertmanager.url 配置报警服务alertmanager服务，prometheus和alertmanager通信连接&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;启动altermanager服务&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 编辑alertmanager配置文件
-$cat alertmanager.yml
-global:
-  resolve_timeout: 5m
-route:
-  group_by: [&amp;#39;cqh&amp;#39;]
-  group_wait: 10s #组报警等待时间
-  group_interval: 10s #组报警间隔时间
-  repeat_interval: 1m #重复报警间隔时间
-  receiver: &amp;#39;web.hook&amp;#39;
-receivers:
-  - name: &amp;#39;web.hook&amp;#39;
-    webhook_configs:
-      - url: &amp;#39;http://10.13.118.71:8889/open/test&amp;#39;
-inhibit_rules:
-  - source_match:
-      severity: &amp;#39;critical&amp;#39;
-    target_match:
-      severity: &amp;#39;warning&amp;#39;
-    equal: [&amp;#39;alertname&amp;#39;, &amp;#39;dev&amp;#39;, &amp;#39;instance&amp;#39;]
-
-# 启动服务
-$ docker run -d -p 9093:9093 --name alertmanager -v /Users/xuxuebiao/Desktop/alertmanager.yml:/etc/alertmanager/alertmanager.yml prom/alertmanager
-
-$ docker ps -l
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-c6ba74bfd03b        prom/alertmanager   &amp;#34;/bin/alertmanager...&amp;#34;   3 days ago          Up 7 seconds        0.0.0.0:9093-&amp;gt;9093/tcp   alertmanager&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-f2e6dec465c35f4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;alertmanager服务&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;在prometheus中配置altermanager服务&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 编辑rule配置
-$ cat rules.yml
-groups:
-  # tps 超过150 并且持续10s就报警告通知
-  - name: bgbiao
-    rules:
-      - alert: bgbiao测试
-        expr: tps &amp;gt; 150
-        for: 10s
-        labels:
-          status: warning
-        annotations:
-          summary: &amp;#34;{{$labels.instance}}:tps 超过阈值150.&amp;#34;
-          description: &amp;#34;{{$labels.instance}}:tps 超过阈值!. 当前值: {{ $value }}&amp;#34;
-
-
-
-# 修改prometheus主配置文件
-$ cat prometheus.yml
-global:
-  # 默认抓取时间间隔为15s
-  scrape_interval:     15s
-  # 计算rule的间隔
-  evaluation_interval: 15s
-  # 定义额外的label
-  external_labels:
-    monitor: &amp;#34;bgbiao-monitor&amp;#34;
-
-rule_files:
-  - /etc/prometheus/rules.yml
-  # - &amp;#34;first.rules&amp;#34;
-  # - &amp;#34;second.rules&amp;#34;
-
-# 抓取对象
-scrape_configs:
-  - job_name: prometheus
-    # 重写数据抓取时间(局部生效)
-    scrape_interval: 5s
-    static_configs:
-      - targets: [&amp;#39;localhost:9090&amp;#39;]
-        labels:
-          group: &amp;#34;prom&amp;#34;
-      - targets: [&amp;#39;10.13.118.71:9100&amp;#39;]
-        labels:
-          group: &amp;#34;node-exporter&amp;#34;
-      - targets: [&amp;#39;10.13.118.71:9091&amp;#39;]
-        labels:
-          group: &amp;#34;push-gateway&amp;#34;
-
-# 配置报警对象
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets: [&amp;#34;10.13.118.71:9093&amp;#34;]&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;重载prometheus服务&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;curl -X POST http://localhost:9090/-/reload&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;重新导入数据测试&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 循环向push-gateway推送数据&lt;/span&gt;
-$ cat test-abc.sh
-&lt;span class=&#34;c1&#34;&gt;#!/bin/bash&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;#Author_by:Andy_xu @JR-OPS&lt;/span&gt;
-&lt;span class=&#34;nv&#34;&gt;num&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;date +%s &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; cut -c10-13&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
-&lt;span class=&#34;nv&#34;&gt;metrics&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;date +%s &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; cut -c&lt;span class=&#34;si&#34;&gt;${&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;num&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;-13&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
-&lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;$metrics&lt;/span&gt;
-&lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;tps &lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$metrics&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; curl --data-binary @- http://localhost:9091/metrics/job/xxb&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-b710723c6e4f9e9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;模拟报警数据&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-2e90930e7db5d1e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;alertmanager中显示的报警规则&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-e3fb656620be40e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus中已出现红色报警&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-1e0a57bafbb71e5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&#34; alt=&#34;prometheus报警详细内容&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;八-后续优化&#34;&gt;八、后续优化&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 此时使用prometheus可以监控到基础服务的资源使用情况，并且也可用借用&lt;code&gt;alertmanager&lt;/code&gt;服务对相关报警规则进行检测和报警，那么需要如何把相关报警及时的通知到相关负责人呢。我们前面在&lt;code&gt;alertmanager&lt;/code&gt;服务中配置了一个web-hook,即&lt;code&gt;http://10.13.118.71:8889/open/test&lt;/code&gt;，可以在alertmanager服务的&lt;code&gt;status&lt;/code&gt;中找到。我们可以很好的借助这个web-hook来对相关的报警发送。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;一个临时用来测试的web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook服务&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;cat&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;/**
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @File Name: test-web-hook.go
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @Author: xxbandy @http://xxbandy.github.io
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @Email:
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @Create Date: 2019-06-19 14:06:48
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @Last Modified: 2019-06-19 15:06:13
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @Description: 一个临时用来测试的web-hook服务
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; * @build:
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; GOOS=darwin GOARCH=amd64 CGO_ENABLED=0  build -ldflags &amp;#39;-w -s&amp;#39; -o prometheus-web-hook test-web-hook.go
-&lt;/span&gt;&lt;span class=&#34;cm&#34;&gt; */&lt;/span&gt;
-
-&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
-&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
-    &lt;span class=&#34;s&#34;&gt;&amp;#34;github.com/gin-gonic/gin&amp;#34;&lt;/span&gt;
-    &lt;span class=&#34;s&#34;&gt;&amp;#34;net/http&amp;#34;&lt;/span&gt;
-    &lt;span class=&#34;s&#34;&gt;&amp;#34;io/ioutil&amp;#34;&lt;/span&gt;
-    &lt;span class=&#34;s&#34;&gt;&amp;#34;fmt&amp;#34;&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-   &lt;span class=&#34;nx&#34;&gt;router&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Default&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-   &lt;span class=&#34;nx&#34;&gt;router&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;GET&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;/open/test&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;CollectData&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-   &lt;span class=&#34;nx&#34;&gt;router&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;POST&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;/open/test&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;CollectData&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-   &lt;span class=&#34;nx&#34;&gt;router&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;:8889&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;CollectData&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;alertdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;_&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;ioutil&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;ReadAll&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Body&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;fmt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Println&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;alertdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;JSON&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;http&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;StatusOK&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;nil&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;构建成二进制文件&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GOOS&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;darwin&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GOARCH&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;amd64&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;CGO_ENABLED&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;  &lt;span class=&#34;nx&#34;&gt;build&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ldflags&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;w&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;o&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;prometheus&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;chmod&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;prometheus&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook&lt;/span&gt;
-
-&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;运行web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook并收集报警信息&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;➜&lt;/span&gt;  &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;prometheus&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;web&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hook&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;WARNING&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Now&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Gin&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;requires&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Go&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.6&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;or&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;later&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Go&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.7&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;will&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;be&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;required&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;soon&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;WARNING&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Creating&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;an&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Engine&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;instance&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;the&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Logger&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Recovery&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;middleware&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;already&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;attached&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;WARNING&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Running&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;debug&amp;#34;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;mode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Switch&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;release&amp;#34;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;mode&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;production&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;
- &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;using&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;env&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GIN_MODE&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;release&lt;/span&gt;
- &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;using&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;code&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;SetMode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ReleaseMode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GET&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;                &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;CollectData&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;POST&lt;/span&gt;   &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;                &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;CollectData&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Listening&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;serving&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;HTTP&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;on&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8889&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;receiver&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;web\\.hook&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;firing&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;alerts&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:[{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;firing&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;labels&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;alertname&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao测试&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;exported_job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;xxb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;group&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;push-gateway&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;instance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao-monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;warning&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;annotations&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;summary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值150.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;startsAt&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;2019-06-19T06:17:19.247257311Z&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;endsAt&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;0001-01-01T00:00:00Z&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;generatorURL&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}],&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;groupLabels&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;commonLabels&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;alertname&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao测试&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;exported_job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;xxb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;group&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;push-gateway&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;instance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao-monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;warning&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;commonAnnotations&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;summary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值150.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;externalURL&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;http://c6ba74bfd03b:9093&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;4&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;groupKey&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;{}:{}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2019&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;mo&#34;&gt;06&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;19&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;24&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;200&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     &lt;span class=&#34;mf&#34;&gt;727.873&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;µs&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;    &lt;span class=&#34;mf&#34;&gt;10.13.118.71&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;POST&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;receiver&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;web\\.hook&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;firing&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;alerts&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:[{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;firing&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;labels&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;alertname&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao测试&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;exported_job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;xxb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;group&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;push-gateway&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;instance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao-monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;warning&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;annotations&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;summary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值150.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;startsAt&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;2019-06-19T06:17:19.247257311Z&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;endsAt&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;0001-01-01T00:00:00Z&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;generatorURL&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}],&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;groupLabels&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;commonLabels&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;alertname&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao测试&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;exported_job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;xxb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;group&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;push-gateway&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;instance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;job&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;bgbiao-monitor&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;status&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;warning&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;commonAnnotations&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:{&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;summary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;10.13.118.71:9091:tps 超过阈值150.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;externalURL&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;http://c6ba74bfd03b:9093&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;4&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;groupKey&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;{}:{}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2019&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;mo&#34;&gt;06&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;19&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;25&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;20&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;200&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     &lt;span class=&#34;mf&#34;&gt;129.897&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;µs&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;    &lt;span class=&#34;mf&#34;&gt;10.13.118.71&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;POST&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;test&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;code&gt;注意:我们这里的web-hook服务其实是将报警信息临时全部打印出来了，其实可以根据用户关心程度，将相关值取出来直接发送至用户终端，比如钉钉，微信，或者短信&lt;/code&gt;&lt;/p&gt;</description>
       
     </item>
     
