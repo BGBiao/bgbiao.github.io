@@ -73,7 +73,7 @@
 
 <meta itemprop="datePublished" content="2020-01-16T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-01-16T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4249">
+<meta itemprop="wordCount" content="4238">
 
 
 
@@ -467,7 +467,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> golang </a>
             
           </div>
-        <span class="more-meta"> 4249 words </span>
+        <span class="more-meta"> 4238 words </span>
           <span class="more-meta"> 9 min read </span>
 
         
@@ -516,30 +516,42 @@ if (!doNotTrack) {
 
 <p><code>逃逸分析</code>是编译器用来确定由程序创建的值所处位置的过程。具体来说，<code>编译器执行静态代码分析</code>，以确定是否可以将值放在构造函数的<code>栈(帧)</code>上，或者该值是否必须<code>逃逸</code>到<code>堆</code>上。</p>
 
-<p>所以，更通俗一点讲，逃逸分析就是确定一个对象是要放在<code>堆</code>还是<code>栈</code>上，一般遵循如下规则:
-- 1.是否有非局部调用(对象定义之外的调用).即:如果有可能被<code>引用</code>，那通常会被分配到堆上，否则就在<code>栈上</code>
-- 2.如果对象太大(即使没有被引用),无法放在栈区也是可能放到<code>堆</code>上的</p>
+<p>所以，更通俗一点讲，逃逸分析就是确定一个对象是要放在<code>堆</code>还是<code>栈</code>上，一般遵循如下规则:</p>
+
+<ul>
+<li>1.是否有非局部调用(对象定义之外的调用).即:如果有可能被<code>引用</code>，那通常会被分配到堆上，否则就在<code>栈上</code></li>
+<li>2.如果对象太大(即使没有被引用),无法放在栈区也是可能放到<code>堆</code>上的</li>
+</ul>
 
 <p>总结起来就是: <code>如果在函数外部引用，必定在堆中分配;如果没有外部引用，优先在栈中分配;如果一个函数返回的是一个（局部）变量的地址，那么这个变量就发生逃逸</code></p>
 
-<p><code>避免逃逸的好处:</code>
-- 1.减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除
-- 2.逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(系统开销少)
-- 3.减少动态分配所造成的内存碎片</p>
+<p><code>避免逃逸的好处:</code></p>
+
+<ul>
+<li>1.减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除</li>
+<li>2.逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(系统开销少)</li>
+<li>3.减少动态分配所造成的内存碎片</li>
+</ul>
 
 <p><strong>如何进行逃逸分析</strong></p>
 
 <p><code>注意:</code> Golang程序中是在编译阶段确定逃逸的，而非运行时，因此我们可以使用<code>go build</code>的相关工具来进行逃逸分析.</p>
 
-<p>分析工具:
-- 1.通过编译工具查看详细的逃逸分析过程(<code>go build -gcflags '-m -l' main.go</code>)
-- 2.通过反编译命令查看<code>go tool compile -S main.go</code></p>
+<p>分析工具:</p>
 
-<p><code>编译参数介绍(-gcflags):</code>
-- <code>-N</code>: 禁止编译优化
-- <code>-l</code>: 禁止内联(可以有效减少程序大小)
-- <code>-m</code>: 逃逸分析(最多可重复四次)
-- <code>-benchmem</code>: 压测时打印内存分配统计</p>
+<ul>
+<li>1.通过编译工具查看详细的逃逸分析过程(<code>go build -gcflags '-m -l' main.go</code>)</li>
+<li>2.通过反编译命令查看<code>go tool compile -S main.go</code></li>
+</ul>
+
+<p><code>编译参数介绍(-gcflags):</code></p>
+
+<ul>
+<li><code>-N</code>: 禁止编译优化</li>
+<li><code>-l</code>: 禁止内联(可以有效减少程序大小)</li>
+<li><code>-m</code>: 逃逸分析(最多可重复四次)</li>
+<li><code>-benchmem</code>: 压测时打印内存分配统计</li>
+</ul>
 
 <p><strong>堆</strong></p>
 

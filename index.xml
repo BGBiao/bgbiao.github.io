@@ -32,30 +32,42 @@
 
 &lt;p&gt;&lt;code&gt;逃逸分析&lt;/code&gt;是编译器用来确定由程序创建的值所处位置的过程。具体来说，&lt;code&gt;编译器执行静态代码分析&lt;/code&gt;，以确定是否可以将值放在构造函数的&lt;code&gt;栈(帧)&lt;/code&gt;上，或者该值是否必须&lt;code&gt;逃逸&lt;/code&gt;到&lt;code&gt;堆&lt;/code&gt;上。&lt;/p&gt;
 
-&lt;p&gt;所以，更通俗一点讲，逃逸分析就是确定一个对象是要放在&lt;code&gt;堆&lt;/code&gt;还是&lt;code&gt;栈&lt;/code&gt;上，一般遵循如下规则:
-- 1.是否有非局部调用(对象定义之外的调用).即:如果有可能被&lt;code&gt;引用&lt;/code&gt;，那通常会被分配到堆上，否则就在&lt;code&gt;栈上&lt;/code&gt;
-- 2.如果对象太大(即使没有被引用),无法放在栈区也是可能放到&lt;code&gt;堆&lt;/code&gt;上的&lt;/p&gt;
+&lt;p&gt;所以，更通俗一点讲，逃逸分析就是确定一个对象是要放在&lt;code&gt;堆&lt;/code&gt;还是&lt;code&gt;栈&lt;/code&gt;上，一般遵循如下规则:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.是否有非局部调用(对象定义之外的调用).即:如果有可能被&lt;code&gt;引用&lt;/code&gt;，那通常会被分配到堆上，否则就在&lt;code&gt;栈上&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;2.如果对象太大(即使没有被引用),无法放在栈区也是可能放到&lt;code&gt;堆&lt;/code&gt;上的&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;总结起来就是: &lt;code&gt;如果在函数外部引用，必定在堆中分配;如果没有外部引用，优先在栈中分配;如果一个函数返回的是一个（局部）变量的地址，那么这个变量就发生逃逸&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;避免逃逸的好处:&lt;/code&gt;
-- 1.减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除
-- 2.逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(系统开销少)
-- 3.减少动态分配所造成的内存碎片&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;避免逃逸的好处:&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除&lt;/li&gt;
+&lt;li&gt;2.逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(系统开销少)&lt;/li&gt;
+&lt;li&gt;3.减少动态分配所造成的内存碎片&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;&lt;strong&gt;如何进行逃逸分析&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Golang程序中是在编译阶段确定逃逸的，而非运行时，因此我们可以使用&lt;code&gt;go build&lt;/code&gt;的相关工具来进行逃逸分析.&lt;/p&gt;
 
-&lt;p&gt;分析工具:
-- 1.通过编译工具查看详细的逃逸分析过程(&lt;code&gt;go build -gcflags &#39;-m -l&#39; main.go&lt;/code&gt;)
-- 2.通过反编译命令查看&lt;code&gt;go tool compile -S main.go&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;分析工具:&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;编译参数介绍(-gcflags):&lt;/code&gt;
-- &lt;code&gt;-N&lt;/code&gt;: 禁止编译优化
-- &lt;code&gt;-l&lt;/code&gt;: 禁止内联(可以有效减少程序大小)
-- &lt;code&gt;-m&lt;/code&gt;: 逃逸分析(最多可重复四次)
-- &lt;code&gt;-benchmem&lt;/code&gt;: 压测时打印内存分配统计&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.通过编译工具查看详细的逃逸分析过程(&lt;code&gt;go build -gcflags &#39;-m -l&#39; main.go&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;2.通过反编译命令查看&lt;code&gt;go tool compile -S main.go&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;编译参数介绍(-gcflags):&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-N&lt;/code&gt;: 禁止编译优化&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;: 禁止内联(可以有效减少程序大小)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-m&lt;/code&gt;: 逃逸分析(最多可重复四次)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-benchmem&lt;/code&gt;: 压测时打印内存分配统计&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;&lt;strong&gt;堆&lt;/strong&gt;&lt;/p&gt;
 
