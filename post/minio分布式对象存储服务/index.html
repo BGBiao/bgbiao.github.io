@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="开源分布式对象存储服务-Minio  背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
+  <meta name="description" content=" 背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
@@ -63,9 +63,7 @@
 
 
 <meta property="og:title" content="开源分布式对象存储服务-MinIO" />
-<meta property="og:description" content="开源分布式对象存储服务-Minio
-
-
+<meta property="og:description" content="
 背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
 " />
 <meta property="og:type" content="article" />
@@ -73,25 +71,21 @@
 <meta property="article:published_time" content="2020-01-22T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-01-22T00:00:00+00:00" />
 <meta itemprop="name" content="开源分布式对象存储服务-MinIO">
-<meta itemprop="description" content="开源分布式对象存储服务-Minio
-
-
+<meta itemprop="description" content="
 背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
 ">
 
 
 <meta itemprop="datePublished" content="2020-01-22T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-01-22T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5082">
+<meta itemprop="wordCount" content="5149">
 
 
 
 <meta itemprop="keywords" content="golang,minio,对象存储,oss," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="开源分布式对象存储服务-MinIO"/>
-<meta name="twitter:description" content="开源分布式对象存储服务-Minio
-
-
+<meta name="twitter:description" content="
 背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
 "/>
 
@@ -480,7 +474,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 5082 words </span>
+        <span class="more-meta"> 5149 words </span>
           <span class="more-meta"> 11 min read </span>
 
         
@@ -500,12 +494,24 @@ if (!doNotTrack) {
 <ul>
 <li>
 <ul>
-<li><a href="#开源分布式对象存储服务-minio">开源分布式对象存储服务-Minio</a>
-<ul>
 <li>
 <ul>
-<li><a href="#minio介绍">Minio介绍</a></li>
-<li><a href="#minio集群实操">Minio集群实操</a></li>
+<li><a href="#minio介绍">Minio介绍</a>
+<ul>
+<li><a href="#纠错码介绍-erasure-code">纠错码介绍(erasure code)</a></li>
+<li><a href="#为什么纠错码有用">为什么纠错码有用</a></li>
+<li><a href="#什么是-bit-rot-保护">什么是<code>Bit Rot</code>保护</a></li>
+<li><a href="#drivers是如何使用纠错码的">Drivers是如何使用纠错码的</a></li>
+</ul></li>
+<li><a href="#minio集群实操">Minio集群实操</a>
+<ul>
+<li><a href="#使用纠错码模式运行minio服务">使用纠错码模式运行minio服务</a></li>
+<li><a href="#分布式minio集群">分布式MinIO集群</a></li>
+<li><a href="#运行分布式minio集群">运行分布式MinIO集群</a></li>
+</ul></li>
+<li><a href="#minio分布式对象存储服务使用">Minio分布式对象存储服务使用</a>
+<ul>
+<li><a href="#minio客户端mc的使用">minio客户端mc的使用</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
@@ -516,9 +522,7 @@ if (!doNotTrack) {
 
     
     <div class="post-content">
-      <h2 id="开源分布式对象存储服务-minio">开源分布式对象存储服务-Minio</h2>
-
-<blockquote>
+      <blockquote>
 <p>背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-<a href="https://github.com/minio/minio">Minio</a></p>
 </blockquote>
 
@@ -532,7 +536,7 @@ if (!doNotTrack) {
 
 <p>所以，在后来GlusterFS后来被收购后，据说创始团队又开源了一个分布式存储软件，就是这个用Golang编写的小而美的对象存储<a href="https://min.io/">Minio</a>.</p>
 
-<h4 id="minio介绍">Minio介绍</h4>
+<h3 id="minio介绍">Minio介绍</h3>
 
 <p><code>MinIO</code>是一个用<code>Golang</code>开发的基于<code>Apache License v2.0</code>开源协议的<code>对象存储服务</code>。</p>
 
@@ -542,7 +546,7 @@ if (!doNotTrack) {
 
 <p>因此，即便您丢失一半数量（N/2）的硬盘，您仍然可以恢复数据。</p>
 
-<p><strong>纠错码介绍(erasure code)</strong></p>
+<h4 id="纠错码介绍-erasure-code">纠错码介绍(erasure code)</h4>
 
 <p>纠删码是一种恢复丢失和损坏数据的数学算法， Minio采用<code>Reed-Solomon code</code>将对象拆分成<code>可变数据块</code>和<code>奇偶校验块</code>。 比如12块盘(driver)，一个对象可以被切分到所有驱动器上的可变数量的数据和奇偶校验块—从6个数据和6个奇偶校验块到10个数据和2个奇偶校验块。</p>
 
@@ -550,17 +554,17 @@ if (!doNotTrack) {
 
 <p>在上面的12个驱动器示例(使用默认配置)中，您可以丢失6个驱动器中的任何一个，但仍然可以从其余驱动器可靠地重构和恢复数据。</p>
 
-<p><strong>为什么纠错码有用</strong></p>
+<h4 id="为什么纠错码有用">为什么纠错码有用</h4>
 
 <p>与RAID或复制不同，纠错码可以保护数据不受多个驱动器故障的影响。</p>
 
 <p>比如，在经典的<code>RAID6</code>中可以在损失两块盘的情况下不丢数据，然而在Minio中纠错码可以保证当一般的盘故障时依然不会影响到数据。此外，纠错码在在对象级别，并且每次就可以修复一个对象。对于<code>RAID</code>而言，数据的修复在卷(volume)级别，这就意味比较高的修复时间。由于MinIO对每个对象单独编码，所以它可以逐步的对对象进行修复。一旦部署了存储服务器，就不需要在服务器的生命周期内更换或修复驱动器。MinIO的纠错码后端是为提高操作效率而设计的，它可以更加高效的利用硬件而达到加速的效果。</p>
 
-<p><strong>什么是<code>Bit Rot</code>保护</strong></p>
+<h4 id="什么是-bit-rot-保护">什么是<code>Bit Rot</code>保护</h4>
 
 <p>Bit Rot，也称为Data Rot或静默数据损坏，是当今磁盘驱动器面临的数据丢失问题。驱动器上的数据可能在不发出错误信号的情况下被损坏，这使得比特损坏比永久的硬盘驱动器故障更危险。而在Minio内部的设计中采用了高速的<a href="https://github.com/minio/highwayhash">HighwayHash</a>校验和来保护<code>Bit Bot</code></p>
 
-<p><strong>Drivers是如何使用纠错码的</strong></p>
+<h4 id="drivers是如何使用纠错码的">Drivers是如何使用纠错码的</h4>
 
 <p>MinIO将您提供的驱动器分为4、6、8、10、12、14或16个驱动器的纠错码集，因此，在你构建一个Minio集群时，需要确保提供的驱动器的数量是这些数据之一的倍数，然后每个对象都会被写入一个单一的纠错码集中。</p>
 
@@ -568,9 +572,9 @@ if (!doNotTrack) {
 
 <p>驱动器的大小应该大致相同。</p>
 
-<h4 id="minio集群实操">Minio集群实操</h4>
+<h3 id="minio集群实操">Minio集群实操</h3>
 
-<p><strong>使用纠错码模式运行minio服务</strong></p>
+<h4 id="使用纠错码模式运行minio服务">使用纠错码模式运行minio服务</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -607,7 +611,7 @@ $ docker run -p 9000:9000 --name minio \
 </div>
 <p>以纠错码方式运行服务后，你就可以尝试将任意一半盘毁坏，依然不会影响整个系统的IO。但是<code>如果要求不影响写，处于正常的的驱动器个数必须大于N/2</code></p>
 
-<p><strong>分布式MinIO集群</strong></p>
+<h4 id="分布式minio集群">分布式MinIO集群</h4>
 
 <p>通常情况下，为了成本和效率的考虑开发同学可能会使用上述方式快速创建一个minio服务，但是从稳定性和可用性的角度来考虑，上述方式均无法保证，因此MinIO也提供了分布式的模式。</p>
 
@@ -621,7 +625,7 @@ $ docker run -p 9000:9000 --name minio \
 <li><code>一致性保障</code>: MinIO在所有的IO操作中都严格遵循<code>read-after-write</code>和<code>list-after-write</code>一致性模型</li>
 </ul>
 
-<p><strong>运行分布式MinIO集群</strong></p>
+<h4 id="运行分布式minio集群">运行分布式MinIO集群</h4>
 
 <p>想要运行一个分布式的MinIO集群，你只需要将驱动器的位置参数传给minio指令即可，然后需要在全部节点运行相同的命令。</p>
 
@@ -720,7 +724,7 @@ WantedBy=multi-user.target
 $ systemctl restart minio</pre></td></tr></table>
 </div>
 </div>
-<p><strong>使用minio的对象存储服务</strong></p>
+<h3 id="minio分布式对象存储服务使用">Minio分布式对象存储服务使用</h3>
 
 <p>当使用前面的方式成功运行minio的对象服务后，我们就可以使用以下几种方式进行访问:</p>
 
@@ -732,205 +736,50 @@ $ systemctl restart minio</pre></td></tr></table>
 <li><code>minio-go</code>: 使用minio的golang客户端操作集群</li>
 </ul>
 
+<p><code>注意</code>: 当我们成功运行minio服务后，默认会提供一个简单的web管理页面.</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gb5hep7kazj31zm0u0aer.jpg" alt="web管理页面" /></p>
+
 <p>这里我们使用<code>mc</code>客户端命令进行操作(<code>值得一提的是，有了mc客户端之后操作oss就如同本地操作一样方便快捷</code>)</p>
+
+<h4 id="minio客户端mc的使用">minio客户端mc的使用</h4>
+
+<p><strong>客户端配置管理</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">  1
-</span><span class="lnt">  2
-</span><span class="lnt">  3
-</span><span class="lnt">  4
-</span><span class="lnt">  5
-</span><span class="lnt">  6
-</span><span class="lnt">  7
-</span><span class="lnt">  8
-</span><span class="lnt">  9
-</span><span class="lnt"> 10
-</span><span class="lnt"> 11
-</span><span class="lnt"> 12
-</span><span class="lnt"> 13
-</span><span class="lnt"> 14
-</span><span class="lnt"> 15
-</span><span class="lnt"> 16
-</span><span class="lnt"> 17
-</span><span class="lnt"> 18
-</span><span class="lnt"> 19
-</span><span class="lnt"> 20
-</span><span class="lnt"> 21
-</span><span class="lnt"> 22
-</span><span class="lnt"> 23
-</span><span class="lnt"> 24
-</span><span class="lnt"> 25
-</span><span class="lnt"> 26
-</span><span class="lnt"> 27
-</span><span class="lnt"> 28
-</span><span class="lnt"> 29
-</span><span class="lnt"> 30
-</span><span class="lnt"> 31
-</span><span class="lnt"> 32
-</span><span class="lnt"> 33
-</span><span class="lnt"> 34
-</span><span class="lnt"> 35
-</span><span class="lnt"> 36
-</span><span class="lnt"> 37
-</span><span class="lnt"> 38
-</span><span class="lnt"> 39
-</span><span class="lnt"> 40
-</span><span class="lnt"> 41
-</span><span class="lnt"> 42
-</span><span class="lnt"> 43
-</span><span class="lnt"> 44
-</span><span class="lnt"> 45
-</span><span class="lnt"> 46
-</span><span class="lnt"> 47
-</span><span class="lnt"> 48
-</span><span class="lnt"> 49
-</span><span class="lnt"> 50
-</span><span class="lnt"> 51
-</span><span class="lnt"> 52
-</span><span class="lnt"> 53
-</span><span class="lnt"> 54
-</span><span class="lnt"> 55
-</span><span class="lnt"> 56
-</span><span class="lnt"> 57
-</span><span class="lnt"> 58
-</span><span class="lnt"> 59
-</span><span class="lnt"> 60
-</span><span class="lnt"> 61
-</span><span class="lnt"> 62
-</span><span class="lnt"> 63
-</span><span class="lnt"> 64
-</span><span class="lnt"> 65
-</span><span class="lnt"> 66
-</span><span class="lnt"> 67
-</span><span class="lnt"> 68
-</span><span class="lnt"> 69
-</span><span class="lnt"> 70
-</span><span class="lnt"> 71
-</span><span class="lnt"> 72
-</span><span class="lnt"> 73
-</span><span class="lnt"> 74
-</span><span class="lnt"> 75
-</span><span class="lnt"> 76
-</span><span class="lnt"> 77
-</span><span class="lnt"> 78
-</span><span class="lnt"> 79
-</span><span class="lnt"> 80
-</span><span class="lnt"> 81
-</span><span class="lnt"> 82
-</span><span class="lnt"> 83
-</span><span class="lnt"> 84
-</span><span class="lnt"> 85
-</span><span class="lnt"> 86
-</span><span class="lnt"> 87
-</span><span class="lnt"> 88
-</span><span class="lnt"> 89
-</span><span class="lnt"> 90
-</span><span class="lnt"> 91
-</span><span class="lnt"> 92
-</span><span class="lnt"> 93
-</span><span class="lnt"> 94
-</span><span class="lnt"> 95
-</span><span class="lnt"> 96
-</span><span class="lnt"> 97
-</span><span class="lnt"> 98
-</span><span class="lnt"> 99
-</span><span class="lnt">100
-</span><span class="lnt">101
-</span><span class="lnt">102
-</span><span class="lnt">103
-</span><span class="lnt">104
-</span><span class="lnt">105
-</span><span class="lnt">106
-</span><span class="lnt">107
-</span><span class="lnt">108
-</span><span class="lnt">109
-</span><span class="lnt">110
-</span><span class="lnt">111
-</span><span class="lnt">112
-</span><span class="lnt">113
-</span><span class="lnt">114
-</span><span class="lnt">115
-</span><span class="lnt">116
-</span><span class="lnt">117
-</span><span class="lnt">118
-</span><span class="lnt">119
-</span><span class="lnt">120
-</span><span class="lnt">121
-</span><span class="lnt">122
-</span><span class="lnt">123
-</span><span class="lnt">124
-</span><span class="lnt">125
-</span><span class="lnt">126
-</span><span class="lnt">127
-</span><span class="lnt">128
-</span><span class="lnt">129
-</span><span class="lnt">130
-</span><span class="lnt">131
-</span><span class="lnt">132
-</span><span class="lnt">133
-</span><span class="lnt">134
-</span><span class="lnt">135
-</span><span class="lnt">136
-</span><span class="lnt">137
-</span><span class="lnt">138
-</span><span class="lnt">139
-</span><span class="lnt">140
-</span><span class="lnt">141
-</span><span class="lnt">142
-</span><span class="lnt">143
-</span><span class="lnt">144
-</span><span class="lnt">145
-</span><span class="lnt">146
-</span><span class="lnt">147
-</span><span class="lnt">148
-</span><span class="lnt">149
-</span><span class="lnt">150
-</span><span class="lnt">151
-</span><span class="lnt">152
-</span><span class="lnt">153
-</span><span class="lnt">154
-</span><span class="lnt">155
-</span><span class="lnt">156
-</span><span class="lnt">157
-</span><span class="lnt">158
-</span><span class="lnt">159
-</span><span class="lnt">160
-</span><span class="lnt">161
-</span><span class="lnt">162
-</span><span class="lnt">163
-</span><span class="lnt">164
-</span><span class="lnt">165
-</span><span class="lnt">166
-</span><span class="lnt">167
-</span><span class="lnt">168
-</span><span class="lnt">169
-</span><span class="lnt">170
-</span><span class="lnt">171
-</span><span class="lnt">172
-</span><span class="lnt">173
-</span><span class="lnt">174
-</span><span class="lnt">175
-</span><span class="lnt">176
-</span><span class="lnt">177
-</span><span class="lnt">178
-</span><span class="lnt">179
-</span><span class="lnt">180
-</span><span class="lnt">181
-</span><span class="lnt">182
-</span><span class="lnt">183
-</span><span class="lnt">184
-</span><span class="lnt">185
-</span><span class="lnt">186
-</span><span class="lnt">187
-</span><span class="lnt">188
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
 </span></pre></td>
 <td class="lntd">
 <pre class="chroma"># 添加minio云存储服务(会将数据存入~/.mc/config.json)
 # mc config host add &lt;ALIAS&gt; &lt;YOUR-S3-ENDPOINT&gt; &lt;YOUR-ACCESS-KEY&gt; &lt;YOUR-SECRET-KEY&gt; &lt;API-SIGNATURE&gt;
-$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4
-
-
-# 查看minio集群中的bucket
+$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4</pre></td></tr></table>
+</div>
+</div>
+<p><strong>查看bucket</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 查看minio集群中的bucket
 $ mc ls minio
 [2020-01-10 20:54:19 CST]      0B test11/
 [2019-07-08 19:51:02 CST]      0B test23/
@@ -946,15 +795,109 @@ $ mc ls minio/test11
 [2019-07-09 14:24:23 CST]   66KiB 117.jpg
 [2019-07-09 14:33:17 CST]   66KiB 118.jpg
 [2019-07-09 14:52:36 CST]   66KiB 119.jpg
-[2020-01-10 20:52:28 CST]  7.4KiB server.xml
-
-# 创建一个bucket
+[2020-01-10 20:52:28 CST]  7.4KiB server.xml</pre></td></tr></table>
+</div>
+</div>
+<p><strong>bucket管理</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 创建一个bucket
 $ mc mb minio/bgbiao
 Bucket created successfully `minio/bgbiao`.
 $ mc ls minio/ | grep bgbiao
 [2020-01-22 16:32:43 CST]      0B bgbiao/
 
-# 将本地文件拷贝到minio的oss服务
+# rb可以直接删除指定的bucket
+$ mc rb minio/bgbiao
+Removed `minio/bgbiao` successfully.
+
+# tree可以打印出来bucket组织的文件系统树形结构
+$ mc tree --depth 2 --files minio/bgbiao
+minio/bgbiao
+└─ hostname.txt
+
+# du可以查看某个bucket或者object的大小
+$ mc du minio/bgbiao
+10B bgbiao
+$ mc du minio/
+9.1GiB</pre></td></tr></table>
+</div>
+</div>
+<p><strong>对象管理</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 将本地文件拷贝到minio的oss服务
 # 并直接使用cat命令访问
 $ hostname &gt; hostname.txt
 $ mc cp hostname.txt minio/bgbiao/
@@ -1000,13 +943,112 @@ $ mc diff . minio/bgbiao/
 # rm可以直接删除指定的对象(--force --recursive就相当于我们linux中的rm -rf)
 $ mc rm --force --recursive   minio/bgbiao
 Removing `minio/bgbiao/hostname.txt`.
-Removing `minio/bgbiao/path.txt`.
-
-# rb可以直接删除指定的bucket
-$ mc rb minio/bgbiao
-Removed `minio/bgbiao` successfully.
-
-# stat可以查看minio服务的元数据信息
+Removing `minio/bgbiao/path.txt`.</pre></td></tr></table>
+</div>
+</div>
+<p><strong>minio运维管理</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span><span class="lnt">96
+</span><span class="lnt">97
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># stat可以查看minio服务的元数据信息
 $ mc stat minio/bgbiao
 Name      : bgbiao/
 Date      : 1970-01-01 08:00:00 CST
@@ -1022,16 +1064,6 @@ Metadata  :
   Content-Type         : text/plain
   X-Minio-Deployment-Id: 80525c40-fec3-459e-8080-6f5210548647
 
-# tree可以打印出来bucket组织的文件系统树形结构
-$ mc tree --depth 2 --files minio/bgbiao
-minio/bgbiao
-└─ hostname.txt
-
-# du可以查看某个bucket或者object的大小
-$ mc du minio/bgbiao
-10B	bgbiao
-$ mc du minio/
-9.1GiB
 
 # retention指令可以设置指定前缀的对象的保留时间
 

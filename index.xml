@@ -18,9 +18,7 @@
       
       <guid>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</guid>
       
-        <description>&lt;h2 id=&#34;开源分布式对象存储服务-minio&#34;&gt;开源分布式对象存储服务-Minio&lt;/h2&gt;
-
-&lt;blockquote&gt;
+        <description>&lt;blockquote&gt;
 &lt;p&gt;背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-&lt;a href=&#34;https://github.com/minio/minio&#34;&gt;Minio&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
@@ -34,7 +32,7 @@
 
 &lt;p&gt;所以，在后来GlusterFS后来被收购后，据说创始团队又开源了一个分布式存储软件，就是这个用Golang编写的小而美的对象存储&lt;a href=&#34;https://min.io/&#34;&gt;Minio&lt;/a&gt;.&lt;/p&gt;
 
-&lt;h4 id=&#34;minio介绍&#34;&gt;Minio介绍&lt;/h4&gt;
+&lt;h3 id=&#34;minio介绍&#34;&gt;Minio介绍&lt;/h3&gt;
 
 &lt;p&gt;&lt;code&gt;MinIO&lt;/code&gt;是一个用&lt;code&gt;Golang&lt;/code&gt;开发的基于&lt;code&gt;Apache License v2.0&lt;/code&gt;开源协议的&lt;code&gt;对象存储服务&lt;/code&gt;。&lt;/p&gt;
 
@@ -44,7 +42,7 @@
 
 &lt;p&gt;因此，即便您丢失一半数量（N/2）的硬盘，您仍然可以恢复数据。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;纠错码介绍(erasure code)&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;纠错码介绍-erasure-code&#34;&gt;纠错码介绍(erasure code)&lt;/h4&gt;
 
 &lt;p&gt;纠删码是一种恢复丢失和损坏数据的数学算法， Minio采用&lt;code&gt;Reed-Solomon code&lt;/code&gt;将对象拆分成&lt;code&gt;可变数据块&lt;/code&gt;和&lt;code&gt;奇偶校验块&lt;/code&gt;。 比如12块盘(driver)，一个对象可以被切分到所有驱动器上的可变数量的数据和奇偶校验块—从6个数据和6个奇偶校验块到10个数据和2个奇偶校验块。&lt;/p&gt;
 
@@ -52,17 +50,17 @@
 
 &lt;p&gt;在上面的12个驱动器示例(使用默认配置)中，您可以丢失6个驱动器中的任何一个，但仍然可以从其余驱动器可靠地重构和恢复数据。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;为什么纠错码有用&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;为什么纠错码有用&#34;&gt;为什么纠错码有用&lt;/h4&gt;
 
 &lt;p&gt;与RAID或复制不同，纠错码可以保护数据不受多个驱动器故障的影响。&lt;/p&gt;
 
 &lt;p&gt;比如，在经典的&lt;code&gt;RAID6&lt;/code&gt;中可以在损失两块盘的情况下不丢数据，然而在Minio中纠错码可以保证当一般的盘故障时依然不会影响到数据。此外，纠错码在在对象级别，并且每次就可以修复一个对象。对于&lt;code&gt;RAID&lt;/code&gt;而言，数据的修复在卷(volume)级别，这就意味比较高的修复时间。由于MinIO对每个对象单独编码，所以它可以逐步的对对象进行修复。一旦部署了存储服务器，就不需要在服务器的生命周期内更换或修复驱动器。MinIO的纠错码后端是为提高操作效率而设计的，它可以更加高效的利用硬件而达到加速的效果。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;什么是&lt;code&gt;Bit Rot&lt;/code&gt;保护&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;什么是-bit-rot-保护&#34;&gt;什么是&lt;code&gt;Bit Rot&lt;/code&gt;保护&lt;/h4&gt;
 
 &lt;p&gt;Bit Rot，也称为Data Rot或静默数据损坏，是当今磁盘驱动器面临的数据丢失问题。驱动器上的数据可能在不发出错误信号的情况下被损坏，这使得比特损坏比永久的硬盘驱动器故障更危险。而在Minio内部的设计中采用了高速的&lt;a href=&#34;https://github.com/minio/highwayhash&#34;&gt;HighwayHash&lt;/a&gt;校验和来保护&lt;code&gt;Bit Bot&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Drivers是如何使用纠错码的&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;drivers是如何使用纠错码的&#34;&gt;Drivers是如何使用纠错码的&lt;/h4&gt;
 
 &lt;p&gt;MinIO将您提供的驱动器分为4、6、8、10、12、14或16个驱动器的纠错码集，因此，在你构建一个Minio集群时，需要确保提供的驱动器的数量是这些数据之一的倍数，然后每个对象都会被写入一个单一的纠错码集中。&lt;/p&gt;
 
@@ -70,9 +68,9 @@
 
 &lt;p&gt;驱动器的大小应该大致相同。&lt;/p&gt;
 
-&lt;h4 id=&#34;minio集群实操&#34;&gt;Minio集群实操&lt;/h4&gt;
+&lt;h3 id=&#34;minio集群实操&#34;&gt;Minio集群实操&lt;/h3&gt;
 
-&lt;p&gt;&lt;strong&gt;使用纠错码模式运行minio服务&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;使用纠错码模式运行minio服务&#34;&gt;使用纠错码模式运行minio服务&lt;/h4&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -109,7 +107,7 @@ $ docker run -p 9000:9000 --name minio \
 &lt;/div&gt;
 &lt;p&gt;以纠错码方式运行服务后，你就可以尝试将任意一半盘毁坏，依然不会影响整个系统的IO。但是&lt;code&gt;如果要求不影响写，处于正常的的驱动器个数必须大于N/2&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;分布式MinIO集群&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;分布式minio集群&#34;&gt;分布式MinIO集群&lt;/h4&gt;
 
 &lt;p&gt;通常情况下，为了成本和效率的考虑开发同学可能会使用上述方式快速创建一个minio服务，但是从稳定性和可用性的角度来考虑，上述方式均无法保证，因此MinIO也提供了分布式的模式。&lt;/p&gt;
 
@@ -123,7 +121,7 @@ $ docker run -p 9000:9000 --name minio \
 &lt;li&gt;&lt;code&gt;一致性保障&lt;/code&gt;: MinIO在所有的IO操作中都严格遵循&lt;code&gt;read-after-write&lt;/code&gt;和&lt;code&gt;list-after-write&lt;/code&gt;一致性模型&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;strong&gt;运行分布式MinIO集群&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;运行分布式minio集群&#34;&gt;运行分布式MinIO集群&lt;/h4&gt;
 
 &lt;p&gt;想要运行一个分布式的MinIO集群，你只需要将驱动器的位置参数传给minio指令即可，然后需要在全部节点运行相同的命令。&lt;/p&gt;
 
@@ -222,7 +220,7 @@ WantedBy=multi-user.target
 $ systemctl restart minio&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;使用minio的对象存储服务&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;minio分布式对象存储服务使用&#34;&gt;Minio分布式对象存储服务使用&lt;/h3&gt;
 
 &lt;p&gt;当使用前面的方式成功运行minio的对象服务后，我们就可以使用以下几种方式进行访问:&lt;/p&gt;
 
@@ -234,205 +232,50 @@ $ systemctl restart minio&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;li&gt;&lt;code&gt;minio-go&lt;/code&gt;: 使用minio的golang客户端操作集群&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;: 当我们成功运行minio服务后，默认会提供一个简单的web管理页面.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gb5hep7kazj31zm0u0aer.jpg&#34; alt=&#34;web管理页面&#34; /&gt;&lt;/p&gt;
+
 &lt;p&gt;这里我们使用&lt;code&gt;mc&lt;/code&gt;客户端命令进行操作(&lt;code&gt;值得一提的是，有了mc客户端之后操作oss就如同本地操作一样方便快捷&lt;/code&gt;)&lt;/p&gt;
+
+&lt;h4 id=&#34;minio客户端mc的使用&#34;&gt;minio客户端mc的使用&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;客户端配置管理&lt;/strong&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;  1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;106
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;107
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;108
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;109
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;110
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;111
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;112
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;113
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;114
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;115
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;116
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;117
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;118
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;119
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;120
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;121
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;122
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;123
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;124
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;125
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;126
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;127
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;128
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;129
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;130
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;131
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;132
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;133
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;134
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;135
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;136
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;137
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;138
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;139
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;140
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;141
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;142
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;143
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;144
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;145
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;146
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;147
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;148
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;149
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;150
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;151
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;152
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;153
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;154
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;155
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;156
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;157
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;158
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;159
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;160
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;161
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;162
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;163
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;164
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;165
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;166
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;167
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;168
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;169
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;170
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;171
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;172
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;173
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;174
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;175
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;176
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;177
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;178
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;179
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;180
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;181
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;182
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;183
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;184
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;185
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;186
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;187
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;188
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;# 添加minio云存储服务(会将数据存入~/.mc/config.json)
 # mc config host add &amp;lt;ALIAS&amp;gt; &amp;lt;YOUR-S3-ENDPOINT&amp;gt; &amp;lt;YOUR-ACCESS-KEY&amp;gt; &amp;lt;YOUR-SECRET-KEY&amp;gt; &amp;lt;API-SIGNATURE&amp;gt;
-$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4
-
-
-# 查看minio集群中的bucket
+$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;查看bucket&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 查看minio集群中的bucket
 $ mc ls minio
 [2020-01-10 20:54:19 CST]      0B test11/
 [2019-07-08 19:51:02 CST]      0B test23/
@@ -448,15 +291,109 @@ $ mc ls minio/test11
 [2019-07-09 14:24:23 CST]   66KiB 117.jpg
 [2019-07-09 14:33:17 CST]   66KiB 118.jpg
 [2019-07-09 14:52:36 CST]   66KiB 119.jpg
-[2020-01-10 20:52:28 CST]  7.4KiB server.xml
-
-# 创建一个bucket
+[2020-01-10 20:52:28 CST]  7.4KiB server.xml&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;bucket管理&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 创建一个bucket
 $ mc mb minio/bgbiao
 Bucket created successfully `minio/bgbiao`.
 $ mc ls minio/ | grep bgbiao
 [2020-01-22 16:32:43 CST]      0B bgbiao/
 
-# 将本地文件拷贝到minio的oss服务
+# rb可以直接删除指定的bucket
+$ mc rb minio/bgbiao
+Removed `minio/bgbiao` successfully.
+
+# tree可以打印出来bucket组织的文件系统树形结构
+$ mc tree --depth 2 --files minio/bgbiao
+minio/bgbiao
+└─ hostname.txt
+
+# du可以查看某个bucket或者object的大小
+$ mc du minio/bgbiao
+10B bgbiao
+$ mc du minio/
+9.1GiB&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;对象管理&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 将本地文件拷贝到minio的oss服务
 # 并直接使用cat命令访问
 $ hostname &amp;gt; hostname.txt
 $ mc cp hostname.txt minio/bgbiao/
@@ -502,13 +439,112 @@ $ mc diff . minio/bgbiao/
 # rm可以直接删除指定的对象(--force --recursive就相当于我们linux中的rm -rf)
 $ mc rm --force --recursive   minio/bgbiao
 Removing `minio/bgbiao/hostname.txt`.
-Removing `minio/bgbiao/path.txt`.
-
-# rb可以直接删除指定的bucket
-$ mc rb minio/bgbiao
-Removed `minio/bgbiao` successfully.
-
-# stat可以查看minio服务的元数据信息
+Removing `minio/bgbiao/path.txt`.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;minio运维管理&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;90
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;91
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;92
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;93
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;94
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;95
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;96
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;97
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# stat可以查看minio服务的元数据信息
 $ mc stat minio/bgbiao
 Name      : bgbiao/
 Date      : 1970-01-01 08:00:00 CST
@@ -524,16 +560,6 @@ Metadata  :
   Content-Type         : text/plain
   X-Minio-Deployment-Id: 80525c40-fec3-459e-8080-6f5210548647
 
-# tree可以打印出来bucket组织的文件系统树形结构
-$ mc tree --depth 2 --files minio/bgbiao
-minio/bgbiao
-└─ hostname.txt
-
-# du可以查看某个bucket或者object的大小
-$ mc du minio/bgbiao
-10B	bgbiao
-$ mc du minio/
-9.1GiB
 
 # retention指令可以设置指定前缀的对象的保留时间
 
