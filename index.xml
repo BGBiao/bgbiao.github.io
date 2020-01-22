@@ -535,13 +535,6 @@ Removing `minio/bgbiao/path.txt`.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;88
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;89
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;90
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;91
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;92
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;93
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;94
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;95
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;96
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;97
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;# stat可以查看minio服务的元数据信息
@@ -633,14 +626,7 @@ play
   AccessKey : Q3AM3UQ867SPQQA43P2F
   SecretKey : zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
   API       : S3v4
-  Lookup    : auto
-
-
-policy   管理访问策略。
-session  为cp命令管理保存的会话。
-config   管理mc配置文件。
-update   检查软件更新。
-version  输出版本信息。&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+  Lookup    : auto&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
