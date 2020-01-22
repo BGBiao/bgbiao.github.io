@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>开源分布式对象存储服务-MinIO - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="开源分布式对象存储服务-Minio  背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
+" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="开源分布式对象存储服务-MinIO" />
+<meta property="og:description" content="开源分布式对象存储服务-Minio
+
+
+背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/" />
+<meta property="article:published_time" content="2020-01-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-01-22T00:00:00+00:00" />
+<meta itemprop="name" content="开源分布式对象存储服务-MinIO">
+<meta itemprop="description" content="开源分布式对象存储服务-Minio
+
+
+背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
+">
+
+
+<meta itemprop="datePublished" content="2020-01-22T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-01-22T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5082">
+
+
+
+<meta itemprop="keywords" content="golang,minio,对象存储,oss," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="开源分布式对象存储服务-MinIO"/>
+<meta name="twitter:description" content="开源分布式对象存储服务-Minio
+
+
+背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-Minio
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">开源分布式对象存储服务-MinIO</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-01-22" class="post-time">
+          2020-01-22
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 5082 words </span>
+          <span class="more-meta"> 11 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#开源分布式对象存储服务-minio">开源分布式对象存储服务-Minio</a>
+<ul>
+<li>
+<ul>
+<li><a href="#minio介绍">Minio介绍</a></li>
+<li><a href="#minio集群实操">Minio集群实操</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h2 id="开源分布式对象存储服务-minio">开源分布式对象存储服务-Minio</h2>
+
+<blockquote>
+<p>背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-<a href="https://github.com/minio/minio">Minio</a></p>
+</blockquote>
+
+<p><strong>前言</strong></p>
+
+<p>Minio可能在国内知道和用的人不是很多，我第一次接触Minio是也是当时我们需要使用Spinnaker集群来管理和维护内部的Kubernetes集群，而Spinnaker的中的持久化存储就使用的是Minio。<a href="https://mp.weixin.qq.com/s/uN0RoGtcK1jT4QXlzkf4Bg">Spinnaker集群搭建</a></p>
+
+<p>但其实，Minio这款开源的分布式对象存储服务在国外已经相当受欢迎，并且国内也有多中小型互联网公司使用它来作为对象存储服务。</p>
+
+<p>有意思的是当年在开源的分布式存储方案中，比较有名的就是<code>GlusterFS</code>和<code>Ceph</code>。前者虽然也提供了块存储和对象存储的接口，但对于企业来说更多用于了分布式文件系统存储，其实就是一种高可用版本的NAS解决方案(通常用于替换NFS)，而后者则针对多种存储场景设计了不同的产品，针对分布式文件系统存储有<code>CephFS</code>，针对分布式块存储有<code>Ceph RBD</code>，针对分布式对象存储有<code>Ceph Radosgw</code>，基本上可以做到开箱即用。</p>
+
+<p>所以，在后来GlusterFS后来被收购后，据说创始团队又开源了一个分布式存储软件，就是这个用Golang编写的小而美的对象存储<a href="https://min.io/">Minio</a>.</p>
+
+<h4 id="minio介绍">Minio介绍</h4>
+
+<p><code>MinIO</code>是一个用<code>Golang</code>开发的基于<code>Apache License v2.0</code>开源协议的<code>对象存储服务</code>。</p>
+
+<p>它兼容亚马逊S3云存储服务接口，非常适合于存储大容量非结构化的数据，例如图片、视频、日志文件、备份数据和容器/虚拟机镜像等，而一个对象文件可以是任意大小，从几kb到最大5T不等。</p>
+
+<p>Minio使用纠删码<code>erasure code</code>和校验和<code>checksum</code>来保护数据免受硬件故障和数据损坏。</p>
+
+<p>因此，即便您丢失一半数量（N/2）的硬盘，您仍然可以恢复数据。</p>
+
+<p><strong>纠错码介绍(erasure code)</strong></p>
+
+<p>纠删码是一种恢复丢失和损坏数据的数学算法， Minio采用<code>Reed-Solomon code</code>将对象拆分成<code>可变数据块</code>和<code>奇偶校验块</code>。 比如12块盘(driver)，一个对象可以被切分到所有驱动器上的可变数量的数据和奇偶校验块—从6个数据和6个奇偶校验块到10个数据和2个奇偶校验块。</p>
+
+<p>但是，默认情况下，MinIO在<code>N/2</code>个数据块和<code>N/2</code>个奇偶校验驱动器上分片对象，当然用户可以通过<a href="https://github.com/minio/minio/tree/master/docs/erasure/storage-class">storage classes</a>来自定义配置，不过官方还是建议采用使用N/2个节点来分配数据块和奇偶校验块，这样能够以最佳的方式保护防止驱动器(driver)故障.</p>
+
+<p>在上面的12个驱动器示例(使用默认配置)中，您可以丢失6个驱动器中的任何一个，但仍然可以从其余驱动器可靠地重构和恢复数据。</p>
+
+<p><strong>为什么纠错码有用</strong></p>
+
+<p>与RAID或复制不同，纠错码可以保护数据不受多个驱动器故障的影响。</p>
+
+<p>比如，在经典的<code>RAID6</code>中可以在损失两块盘的情况下不丢数据，然而在Minio中纠错码可以保证当一般的盘故障时依然不会影响到数据。此外，纠错码在在对象级别，并且每次就可以修复一个对象。对于<code>RAID</code>而言，数据的修复在卷(volume)级别，这就意味比较高的修复时间。由于MinIO对每个对象单独编码，所以它可以逐步的对对象进行修复。一旦部署了存储服务器，就不需要在服务器的生命周期内更换或修复驱动器。MinIO的纠错码后端是为提高操作效率而设计的，它可以更加高效的利用硬件而达到加速的效果。</p>
+
+<p><strong>什么是<code>Bit Rot</code>保护</strong></p>
+
+<p>Bit Rot，也称为Data Rot或静默数据损坏，是当今磁盘驱动器面临的数据丢失问题。驱动器上的数据可能在不发出错误信号的情况下被损坏，这使得比特损坏比永久的硬盘驱动器故障更危险。而在Minio内部的设计中采用了高速的<a href="https://github.com/minio/highwayhash">HighwayHash</a>校验和来保护<code>Bit Bot</code></p>
+
+<p><strong>Drivers是如何使用纠错码的</strong></p>
+
+<p>MinIO将您提供的驱动器分为4、6、8、10、12、14或16个驱动器的纠错码集，因此，在你构建一个Minio集群时，需要确保提供的驱动器的数量是这些数据之一的倍数，然后每个对象都会被写入一个单一的纠错码集中。</p>
+
+<p>Minio会使用尽可能大的EC集(除以给定驱动器的数量)，比如，18个驱动器可以配置为3组6个驱动器，但是24个驱动器最大只能分配2组12个驱动器。</p>
+
+<p>驱动器的大小应该大致相同。</p>
+
+<h4 id="minio集群实操">Minio集群实操</h4>
+
+<p><strong>使用纠错码模式运行minio服务</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 使用二进制方式运行有12个驱动器的minio服务
+$ minio server /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8 /data9 /data10 /data11 /data12
+
+# 使用docker方式运行有8驱动器的minio服务
+$ docker run -p 9000:9000 --name minio \
+  -v /mnt/data1:/data1 \
+  -v /mnt/data2:/data2 \
+  -v /mnt/data3:/data3 \
+  -v /mnt/data4:/data4 \
+  -v /mnt/data5:/data5 \
+  -v /mnt/data6:/data6 \
+  -v /mnt/data7:/data7 \
+  -v /mnt/data8:/data8 \
+  minio/minio server /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8</pre></td></tr></table>
+</div>
+</div>
+<p>以纠错码方式运行服务后，你就可以尝试将任意一半盘毁坏，依然不会影响整个系统的IO。但是<code>如果要求不影响写，处于正常的的驱动器个数必须大于N/2</code></p>
+
+<p><strong>分布式MinIO集群</strong></p>
+
+<p>通常情况下，为了成本和效率的考虑开发同学可能会使用上述方式快速创建一个minio服务，但是从稳定性和可用性的角度来考虑，上述方式均无法保证，因此MinIO也提供了分布式的模式。</p>
+
+<p>分布式Minio可以让你将多块硬盘（甚至在不同的机器上）组成一个对象存储服务。由于硬盘分布在不同的节点上，分布式Minio避免了单点故障。</p>
+
+<p>分布式的Minio的优势:</p>
+
+<ul>
+<li><code>数据保护</code>: 采用纠错码<code>erasure code</code>防止多节点或者驱动器异常，采用<code>bit rot</code>来进行数据保护。一个分布式的Minio集群最小需要4块盘(其实是纠错码要求最小4块)来驱动整个集群，当我们启动分布式集群后，纠错码会自动启动</li>
+<li><code>高可用</code>: 多节点组成的分布式minio可保证服务的高可用(一个N节点的分布式Minio,只要有N/2节点在线，你的数据就是安全的。不过你需要至少有N/2+1个节点才能创建新的对象。)</li>
+<li><code>一致性保障</code>: MinIO在所有的IO操作中都严格遵循<code>read-after-write</code>和<code>list-after-write</code>一致性模型</li>
+</ul>
+
+<p><strong>运行分布式MinIO集群</strong></p>
+
+<p>想要运行一个分布式的MinIO集群，你只需要将驱动器的位置参数传给minio指令即可，然后需要在全部节点运行相同的命令。</p>
+
+<p><code>注意事项</code>:</p>
+
+<ul>
+<li>所有的节点需要有相同的access key 和 secret key，推荐在启动之前使用<code>MINIO_ACCESS_KEY</code>和<code>MINIO_SECRET_KEY</code>变量来共享key</li>
+<li>MinIO创建一组4, 6, 8, 10, 12, 14 or 16个驱动器的纠错码，因此提供的驱动数量必须是前面数字的倍数</li>
+<li>MinIO会选择给定驱动中，较大的一个EC集合，比如8个驱动将会使用一个大小为8的EC集，而不是两个大小为4的EC集</li>
+<li>每一个对象都会写到一个EC集中，因此对象的分布不可能超过16个驱动</li>
+<li>MinIO集群中的所有节点应该是同构的(比如:相同的OS,相同的磁盘和相同的网络架构)</li>
+<li>MinIO分布式模式需要<code>fresh directories</code>(即干净的目录)，如果需要可以和其他应用程序共享驱动器(使用子目录的方式)</li>
+<li>运行分布式MinIO实例的服务器之间的间隔应该小于15分钟，你可以使用<code>NTP</code>服务来保证服务器时间同步</li>
+<li><code>MINIO_DOMAIN</code>环境变量应该被定义成<code>bucket DNS</code>样式的支持(可以给每个bucket设置子域名)</li>
+<li>在<code>Windows</code>上的分布式集群是实验性的，需要谨慎</li>
+</ul>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gb4fbrthg2j30qo0f0myz.jpg" alt="官方提供的有32个驱动器的32节点的分布式集群" /></p>
+
+<p><code>注意:</code>一个EC Set 上包含多少个Drive是由系统自动根据集群规模算出来的，当然你可以自己去配置.</p>
+
+<p>我们以1个驱动器的4节点来组成集群:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># tree -L 1 /opt/app/
+/opt/app/
+├── minio
+├── minio.conf
+
+$ cat minio.conf
+MINIO_ACCESS_KEY=BGBiao
+MINIO_SECRET_KEY=BGBiao
+ENDPOINTS=&#34;http://10.0.0.148:9000/data/minio http://172.16.62.149:9000/data/minio http://172.16.62.150:9000/data/minio http://172.16.62.151:9000/data/minio&#34;
+
+$ cat /usr/lib/systemd/system/minio.service
+[Unit]
+Description=Minio
+Documentation=https://docs.minio.io
+Wants=network-online.target
+After=network-online.target
+AssertFileIsExecutable=/opt/app/minio
+
+[Service]
+EnvironmentFile=-/opt/app/minio.conf
+ExecStart=/opt/app/minio server $ENDPOINTS
+
+# Let systemd restart this service always
+Restart=always
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65536
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=infinity
+SendSIGKILL=no
+[Install]
+WantedBy=multi-user.target
+
+
+# 将上述配置同步到4个节点，并启动，minio实例之间会自行发现各个节点
+$ systemctl restart minio</pre></td></tr></table>
+</div>
+</div>
+<p><strong>使用minio的对象存储服务</strong></p>
+
+<p>当使用前面的方式成功运行minio的对象服务后，我们就可以使用以下几种方式进行访问:</p>
+
+<ul>
+<li><code>web</code>: 默认我们可以访问实例的9000端口，通过access key和secret key进行访问实例</li>
+<li><code>mc</code>: 使用minio官方提供的兼容s3的客户端</li>
+<li><code>aws-cli</code>: 使用aws的客户端命令</li>
+<li><code>s3cmd</code>: 使用3s的开源客户端执行</li>
+<li><code>minio-go</code>: 使用minio的golang客户端操作集群</li>
+</ul>
+
+<p>这里我们使用<code>mc</code>客户端命令进行操作(<code>值得一提的是，有了mc客户端之后操作oss就如同本地操作一样方便快捷</code>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 添加minio云存储服务(会将数据存入~/.mc/config.json)
+# mc config host add &lt;ALIAS&gt; &lt;YOUR-S3-ENDPOINT&gt; &lt;YOUR-ACCESS-KEY&gt; &lt;YOUR-SECRET-KEY&gt; &lt;API-SIGNATURE&gt;
+$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4
+
+
+# 查看minio集群中的bucket
+$ mc ls minio
+[2020-01-10 20:54:19 CST]      0B test11/
+[2019-07-08 19:51:02 CST]      0B test23/
+[2019-07-08 20:10:58 CST]      0B test4/
+
+# 查看bucket的内容
+$ mc ls minio/test11
+[2019-07-05 21:22:34 CST]   88KiB 111
+[2019-07-07 11:03:21 CST]   88KiB 112
+[2019-07-08 10:50:51 CST]   88KiB 113
+[2019-07-08 18:17:17 CST]   88KiB 114
+[2019-07-09 11:51:30 CST]   66KiB 116
+[2019-07-09 14:24:23 CST]   66KiB 117.jpg
+[2019-07-09 14:33:17 CST]   66KiB 118.jpg
+[2019-07-09 14:52:36 CST]   66KiB 119.jpg
+[2020-01-10 20:52:28 CST]  7.4KiB server.xml
+
+# 创建一个bucket
+$ mc mb minio/bgbiao
+Bucket created successfully `minio/bgbiao`.
+$ mc ls minio/ | grep bgbiao
+[2020-01-22 16:32:43 CST]      0B bgbiao/
+
+# 将本地文件拷贝到minio的oss服务
+# 并直接使用cat命令访问
+$ hostname &gt; hostname.txt
+$ mc cp hostname.txt minio/bgbiao/
+hostname.txt:         10 B / 10 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  132 B/s 0s%
+$ mc ls minio/bgbiao/
+[2020-01-22 16:33:52 CST]     10B hostname.txt
+$ mc cat  minio/bgbiao/hostname.txt
+localhost
+
+# 使用pipe命令可以将标准输入的数据直接写入到minio的存储中
+$ echo ${PATH} | mc pipe minio/bgbiao/path.txt
+$ mc ls minio/bgbiao/
+[2020-01-22 16:33:52 CST]     10B hostname.txt
+[2020-01-22 16:43:43 CST]    111B path.txt
+$ mc cat minio/bgbiao/path.txt
+/Users/BGBiao/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/soul/bin
+
+
+# 受用share命令生成可供外部匿名下载的临时链接地址
+# 生成后我们就可以使用共享链接在4小时内随意下载
+$ mc share download --expire 4h minio/bgbiao/hostname.txt
+URL: http://bgbiao.top:9000/bgbiao/hostname.txt
+Expire: 4 hours 0 minutes 0 seconds
+Share: http://bgbiao.top:9000/bgbiao/hostname.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T083619Z&amp;X-Amz-Expires=14400&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=ec49806b7c249bbeb140af759afeff907672ebd97637b759efd11d4f9b1a20b3
+
+# 使用mirror指令对bucket内容进行镜像(最实用的一个指令)
+# 将minio这个对象服务下的bgbiao的整个bucket的对象镜像到本地
+# 使用minio的mc客户端可以在多个minio服务之间进行数据镜像
+$ mc mirror minio/bgbiao .
+...iao/hostname.txt:  10 B / 10 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  39 B/s 0s %
+
+# 使用find指令来直接查找内容(相对比较实用,find指令支持很多方便快捷的参数，和Linux本地的find命令内容相似)
+# 查找名称为*.txt的文件并打印临时url下载地址
+$ mc find minio/bgbiao/ --name &#34;*.txt&#34; --print {url}
+http://bgbiao.top:9000/bgbiao/hostname.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T084926Z&amp;X-Amz-Expires=604800&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=a02a370575cae5d5cf92c565d02918e20d734f80afed3e5eebf5fe1433aa348a
+http://bgbiao.top:9000/bgbiao/path.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T084926Z&amp;X-Amz-Expires=604800&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=d7d87f6a4f9d406ae02a6844574f02f6e1479215bee8401feea58e95e98b8b36
+ 
+# diff命令可以列出两个bucket之间对象的大小，名字，时间的不同
+$ mc diff . minio/bgbiao/
+&gt; http://bgbiao.top:9000/bgbiao/path.txt
+&lt; readme.md
+
+# rm可以直接删除指定的对象(--force --recursive就相当于我们linux中的rm -rf)
+$ mc rm --force --recursive   minio/bgbiao
+Removing `minio/bgbiao/hostname.txt`.
+Removing `minio/bgbiao/path.txt`.
+
+# rb可以直接删除指定的bucket
+$ mc rb minio/bgbiao
+Removed `minio/bgbiao` successfully.
+
+# stat可以查看minio服务的元数据信息
+$ mc stat minio/bgbiao
+Name      : bgbiao/
+Date      : 1970-01-01 08:00:00 CST
+Size      : 0 B
+Type      : folder
+$ mc stat minio/bgbiao/hostname.txt
+Name      : hostname.txt
+Date      : 2020-01-22 17:04:27 CST
+Size      : 10 B
+ETag      : 902f570940ba8d4b74743a3a97f5aff6-1
+Type      : file
+Metadata  :
+  Content-Type         : text/plain
+  X-Minio-Deployment-Id: 80525c40-fec3-459e-8080-6f5210548647
+
+# tree可以打印出来bucket组织的文件系统树形结构
+$ mc tree --depth 2 --files minio/bgbiao
+minio/bgbiao
+└─ hostname.txt
+
+# du可以查看某个bucket或者object的大小
+$ mc du minio/bgbiao
+10B	bgbiao
+$ mc du minio/
+9.1GiB
+
+# retention指令可以设置指定前缀的对象的保留时间
+
+# events指令可以查看和添加对象的事件
+
+# watch可以实时监听对象的events
+
+# policy用来管理匿名用户对bucket和object的访问
+# 设置bgbiao这个bucket匿名用户仅可以下载(download/public/upload)
+$ mc policy set download minio/bgbiao
+$ mc policy list minio/bgbiao 
+
+# admin用来管理minio服务
+# mc admin info 查看minio服务基本信息
+# mc admin service 重启和停止minio服务
+# mc admin config  管理minio服务的配置信息
+$ mc admin info minio
+●  10.0.0.149:9000
+   Uptime: 1 day
+   Version: 2020-01-16T22:40:29Z
+   Network: 4/4 OK
+   Drives: 1/1 OK
+
+●  10.0.0.150:9000
+   Uptime: 1 day
+   Version: 2020-01-16T22:40:29Z
+   Network: 4/4 OK
+   Drives: 1/1 OK
+
+●  10.0.0.151:9000
+   Uptime: 1 day
+   Version: 2020-01-16T22:40:29Z
+   Network: 4/4 OK
+   Drives: 1/1 OK
+
+●  10.0.0.148:9000
+   Uptime: 1 day
+   Version: 2020-01-16T22:40:29Z
+   Network: 4/4 OK
+   Drives: 1/1 OK
+
+13 GiB Used, 2 Buckets, 166,580 Objects
+4 drives online, 0 drives offline
+ 
+# config 用来管理客户端的配置文件(还记得我们刚开始配置本地环境的时候吗)
+# minio默认帮我们配置了一些公共的对象存储服务，同时也配置了一个本地的oss服务
+$ mc config host list
+gcs
+  URL       : https://storage.googleapis.com
+  AccessKey : YOUR-ACCESS-KEY-HERE
+  SecretKey : YOUR-SECRET-KEY-HERE
+  API       : S3v2
+  Lookup    : dns
+
+local
+  URL       : http://localhost:9000
+  AccessKey :
+  SecretKey :
+  API       :
+  Lookup    : auto
+
+minio
+  URL       : http://bgbiao.top:9000
+  AccessKey : BGBiao
+  SecretKey : BGBiao
+  API       : s3v4
+  Lookup    : auto
+
+play
+  URL       : https://play.min.io
+  AccessKey : Q3AM3UQ867SPQQA43P2F
+  SecretKey : zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+  API       : S3v4
+  Lookup    : auto
+
+
+policy   管理访问策略。
+session  为cp命令管理保存的会话。
+config   管理mc配置文件。
+update   检查软件更新。
+version  输出版本信息。</pre></td></tr></table>
+</div>
+</div>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-01-22
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/golang/">golang</a>
+          <a href="https://bgbiao.top/tags/minio/">minio</a>
+          <a href="https://bgbiao.top/tags/%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/">对象存储</a>
+          <a href="https://bgbiao.top/tags/oss/">oss</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/2020-%E6%80%9D%E8%80%83%E8%87%AA%E5%B7%B1%E7%9A%84%E4%BB%B7%E5%80%BC%E7%B3%BB%E7%BB%9F/">
+            <span class="next-text nav-default">思考自己的价值系统</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

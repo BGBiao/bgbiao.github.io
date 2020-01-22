@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>oss on BGBiao的SRE人生</title>
+    <link>https://bgbiao.top/tags/oss/</link>
+    <description>Recent content in oss on BGBiao的SRE人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/oss/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>开源分布式对象存储服务-MinIO</title>
+      <link>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</guid>
+      <description>&lt;h2 id=&#34;开源分布式对象存储服务-minio&#34;&gt;开源分布式对象存储服务-Minio&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-&lt;a href=&#34;https://github.com/minio/minio&#34;&gt;Minio&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

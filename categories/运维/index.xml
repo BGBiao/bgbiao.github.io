@@ -6,10 +6,23 @@
     <description>Recent content in 运维 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 29 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>开源分布式对象存储服务-MinIO</title>
+      <link>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</guid>
+      <description>&lt;h2 id=&#34;开源分布式对象存储服务-minio&#34;&gt;开源分布式对象存储服务-Minio&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的工作，这部分数据较为敏感，因此对于敏感数据的存储我们选择了兼容S3协议的开源分布式对象存储-&lt;a href=&#34;https://github.com/minio/minio&#34;&gt;Minio&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>CronJob控制器中的一些绕坑指南</title>
@@ -229,17 +242,6 @@
 
 &lt;p&gt;&lt;a href=&#34;http://www.jianshu.com/p/e72a352a2bd7&#34;&gt;从GPU到GPGPU&lt;/a&gt;
 &lt;a href=&#34;http://www.jianshu.com/p/609e0530a19c&#34;&gt;CPU与GPU&lt;/a&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>手把手构建Etcd镜像</title>
-      <link>https://bgbiao.top/post/dockerfile-etcd/</link>
-      <pubDate>Sat, 26 Aug 2017 17:56:15 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/dockerfile-etcd/</guid>
-      <description>&lt;blockquote&gt;
-&lt;p&gt;本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境&lt;/p&gt;
-&lt;/blockquote&gt;</description>
     </item>
     
   </channel>

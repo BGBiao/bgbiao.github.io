@@ -6,10 +6,28 @@
     <description>Recent content in Categories on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 16 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>运维</title>
+      <link>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>生活</title>
+      <link>https://bgbiao.top/categories/%E7%94%9F%E6%B4%BB/</link>
+      <pubDate>Sat, 18 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/categories/%E7%94%9F%E6%B4%BB/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>golang</title>
@@ -30,15 +48,6 @@
     </item>
     
     <item>
-      <title>生活</title>
-      <link>https://bgbiao.top/categories/%E7%94%9F%E6%B4%BB/</link>
-      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/categories/%E7%94%9F%E6%B4%BB/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>投资</title>
       <link>https://bgbiao.top/categories/%E6%8A%95%E8%B5%84/</link>
       <pubDate>Mon, 30 Dec 2019 00:00:00 +0000</pubDate>
@@ -53,15 +62,6 @@
       <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/categories/kubernetes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</guid>
       <description></description>
     </item>
     
