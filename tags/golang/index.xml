@@ -6,10 +6,19 @@
     <description>Recent content in Golang on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang语言中的ORM框架之gorm</title>
+      <link>https://bgbiao.top/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      <description>前言:gorm是Golang语言中一款性能极好的ORM库，对开发人员相对是比较友好的。当然还有另外一个xorm库也是比较出名的，感兴趣的也可</description>
+    </item>
     
     <item>
       <title>开源分布式对象存储服务-MinIO</title>

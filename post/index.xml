@@ -6,10 +6,19 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang语言中的ORM框架之gorm</title>
+      <link>https://bgbiao.top/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      <description>前言:gorm是Golang语言中一款性能极好的ORM库，对开发人员相对是比较友好的。当然还有另外一个xorm库也是比较出名的，感兴趣的也可</description>
+    </item>
     
     <item>
       <title>过去这一个月的所思所想</title>
@@ -213,17 +222,6 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;使用kubernetes来调度和管理nvidia gpu资源。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>Traefik-v2.0快速入门</title>
-      <link>https://bgbiao.top/post/k8s-traefik-v2/</link>
-      <pubDate>Fri, 27 Sep 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/k8s-traefik-v2/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/&#34;&gt;traefik官方文档&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面&lt;/code&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

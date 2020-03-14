@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://bgbiao.top/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/</loc>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -367,28 +374,56 @@
   
   <url>
     <loc>https://bgbiao.top/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/golang/</loc>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/categories/golang/</loc>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/gorm/</loc>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/orm/</loc>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/</loc>
-    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-14T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -410,13 +445,6 @@
   <url>
     <loc>https://bgbiao.top/tags/%E7%94%9F%E6%B4%BB/</loc>
     <lastmod>2020-03-01T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/golang/</loc>
-    <lastmod>2020-01-22T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -485,13 +513,6 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/categories/golang/</loc>
-    <lastmod>2020-01-16T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://bgbiao.top/tags/%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</loc>
     <lastmod>2020-01-16T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -548,14 +569,14 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/categories/kubernetes/</loc>
+    <loc>https://bgbiao.top/tags/kubernetes/</loc>
     <lastmod>2020-01-15T16:53:30+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/kubernetes/</loc>
+    <loc>https://bgbiao.top/categories/kubernetes/</loc>
     <lastmod>2020-01-15T16:53:30+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
