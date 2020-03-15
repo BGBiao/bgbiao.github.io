@@ -6,10 +6,19 @@
     <description>Recent content in Golang on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用jwt-go验证API</title>
+      <link>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      <description>背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行</description>
+    </item>
     
     <item>
       <title>Golang语言中的ORM框架之gorm</title>

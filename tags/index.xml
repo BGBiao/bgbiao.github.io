@@ -6,17 +6,53 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>gin</title>
+      <link>https://bgbiao.top/tags/gin/</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/gin/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Golang</title>
       <link>https://bgbiao.top/tags/golang/</link>
-      <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/golang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>jwt</title>
+      <link>https://bgbiao.top/tags/jwt/</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/jwt/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>jwt-go</title>
+      <link>https://bgbiao.top/tags/jwt-go/</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/jwt-go/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>token</title>
+      <link>https://bgbiao.top/tags/token/</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/token/</guid>
       <description></description>
     </item>
     
@@ -129,15 +165,6 @@
     </item>
     
     <item>
-      <title>Gin</title>
-      <link>https://bgbiao.top/tags/gin/</link>
-      <pubDate>Sun, 12 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/gin/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>挣钱</title>
       <link>https://bgbiao.top/tags/%E6%8C%A3%E9%92%B1/</link>
       <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
@@ -161,33 +188,6 @@
       <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/cronjob/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Docker</title>
-      <link>https://bgbiao.top/tags/docker/</link>
-      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/docker/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>kubernetes</title>
-      <link>https://bgbiao.top/tags/kubernetes/</link>
-      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/kubernetes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
       <description></description>
     </item>
     

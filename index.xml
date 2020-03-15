@@ -6,10 +6,832 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用jwt-go验证API</title>
+      <link>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      
+        <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行实现。本篇文章主要分享下在Golang语言下使用&lt;a href=&#34;https://github.com/dgrijalva/jwt-go&#34;&gt;jwt-go&lt;/a&gt;来实现后端的token认证逻辑。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;code&gt;JSON Web Token(JWT)&lt;/code&gt;是一个常用语HTTP的客户端和服务端间进行身份认证和鉴权的标准规范，使用JWT可以允许我们在用户和服务器之间传递安全可靠的信息。&lt;/p&gt;
+
+&lt;p&gt;在开始学习&lt;a href=&#34;https://jwt.io/&#34;&gt;JWT&lt;/a&gt;之前，我们可以先了解下早期的几种方案。&lt;/p&gt;
+
+&lt;h3 id=&#34;token-cookie-session的区别&#34;&gt;token、cookie、session的区别&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Cookie&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Cookie总是保存在客户端中，按在客户端中的存储位置，可分为&lt;code&gt;内存Cookie&lt;/code&gt;和&lt;code&gt;硬盘Cookie&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;内存Cookie由浏览器维护，保存在内存中，浏览器关闭后就消失了，其存在时间是短暂的。硬盘Cookie保存在硬盘里，有一个过期时间，除非用户手工清理或到了过期时间，硬盘Cookie不会被删除，其存在时间是长期的。所以，按存在时间，可分为&lt;code&gt;非持久Cookie和持久Cookie&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;cookie 是一个非常具体的东西，指的就是浏览器里面能永久存储的一种数据，仅仅是浏览器实现的一种数据存储功能。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;cookie由服务器生成，发送给浏览器&lt;/code&gt;，浏览器把cookie以key-value形式保存到某个目录下的文本文件内，下一次请求同一网站时会把该cookie发送给服务器。由于cookie是存在客户端上的，所以浏览器加入了一些限制确保cookie不会被恶意使用，同时不会占据太多磁盘空间，所以每个域的cookie数量是有限的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Session&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Session字面意思是会话，主要用来标识自己的身份。比如在无状态的api服务在多次请求数据库时，如何知道是同一个用户，这个就可以通过session的机制，服务器要知道当前发请求给自己的是谁&lt;/p&gt;
+
+&lt;p&gt;为了区分客户端请求，&lt;code&gt;服务端会给具体的客户端生成身份标识session&lt;/code&gt;，然后客户端每次向服务器发请求的时候，都带上这个“身份标识”，服务器就知道这个请求来自于谁了。&lt;/p&gt;
+
+&lt;p&gt;至于客户端如何保存该标识，可以有很多方式，对于浏览器而言，一般都是使用&lt;code&gt;cookie&lt;/code&gt;的方式&lt;/p&gt;
+
+&lt;p&gt;服务器使用session把用户信息临时保存了服务器上，用户离开网站就会销毁，这种凭证存储方式相对于cookie来说更加安全，但是session会有一个缺陷: 如果web服务器做了负载均衡，那么下一个操作请求到了另一台服务器的时候session会丢失。&lt;/p&gt;
+
+&lt;p&gt;因此，通常企业里会使用&lt;code&gt;redis,memcached&lt;/code&gt;缓存中间件来实现session的共享，此时web服务器就是一个完全无状态的存在，所有的用户凭证可以通过共享session的方式存取，当前session的过期和销毁机制需要用户做控制。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Token&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;token的意思是“令牌”，是用户身份的验证方式，最简单的token组成: &lt;code&gt;uid(用户唯一标识)&lt;/code&gt;+&lt;code&gt;time(当前时间戳)&lt;/code&gt;+&lt;code&gt;sign(签名,由token的前几位+盐以哈希算法压缩成一定长度的十六进制字符串)&lt;/code&gt;，同时还可以将不变的参数也放进token&lt;/p&gt;
+
+&lt;p&gt;这里我们主要想讲的就是&lt;code&gt;Json Web Token&lt;/code&gt;，也就是本篇的主题:JWT&lt;/p&gt;
+
+&lt;h3 id=&#34;json-web-token-jwt-介绍&#34;&gt;Json-Web-Token(JWT)介绍&lt;/h3&gt;
+
+&lt;p&gt;一般而言，用户注册登陆后会生成一个jwt token返回给浏览器，浏览器向服务端请求数据时携带&lt;code&gt;token&lt;/code&gt;，服务器端使用&lt;code&gt;signature&lt;/code&gt;中定义的方式进行解码，进而对token进行解析和验证。&lt;/p&gt;
+
+&lt;h4 id=&#34;jwt-token组成部分&#34;&gt;JWT Token组成部分&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpwngvonhj30hx03xwf0.jpg&#34; alt=&#34;JWT-Token组成部分&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;header: 用来指定使用的算法(HMAC SHA256 RSA)和token类型(如JWT)&lt;/li&gt;
+&lt;li&gt;payload: 包含声明(要求)，声明通常是用户信息或其他数据的声明，比如用户id，名称，邮箱等. 声明可分为三种: registered,public,private&lt;/li&gt;
+&lt;li&gt;signature: 用来保证JWT的真实性，可以使用不同的算法&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;header&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;{
+    &amp;#34;alg&amp;#34;: &amp;#34;HS256&amp;#34;,
+    &amp;#34;typ&amp;#34;: &amp;#34;JWT&amp;#34;
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;对上面的json进行base64编码即可得到JWT的第一个部分&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;payload&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;registered claims: 预定义的声明，通常会放置一些预定义字段，比如过期时间，主题等(iss:issuer,exp:expiration time,sub:subject,aud:audience)&lt;/li&gt;
+&lt;li&gt;public claims: 可以设置公开定义的字段&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;private claims: 用于统一使用他们的各方之间的共享信息&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;{
+&amp;#34;sub&amp;#34;: &amp;#34;xxx-api&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;bgbiao.top&amp;#34;,
+&amp;#34;admin&amp;#34;: true
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;对payload部分的json进行base64编码后即可得到JWT的第二个部分&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 不要在header和payload中放置敏感信息，除非信息本身已经做过脱敏处理&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;signature&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;为了得到签名部分，必须有编码过的header和payload，以及一个秘钥，签名算法使用header中指定的那个，然后对其进行签名即可&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;HMACSHA256(base64UrlEncode(header)+&amp;quot;.&amp;quot;+base64UrlEncode(payload),secret)&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;签名是&lt;code&gt;用于验证消息在传递过程中有没有被更改&lt;/code&gt;，并且，对于使用私钥签名的token，它还可以验证JWT的发送方是否为它所称的发送方。&lt;/p&gt;
+
+&lt;p&gt;在&lt;a href=&#34;https://jwt.io&#34;&gt;jwt.io&lt;/a&gt;网站中，提供了一些JWT token的编码，验证以及生成jwt的工具。&lt;/p&gt;
+
+&lt;p&gt;下图就是一个典型的jwt-token的组成部分。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpxe1ungej30wq0mygo8.jpg&#34; alt=&#34;jwt官方签名结构&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;什么时候用jwt&#34;&gt;什么时候用JWT&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Authorization(授权): 典型场景，用户请求的token中包含了该令牌允许的路由，服务和资源。单点登录其实就是现在广泛使用JWT的一个特性&lt;/li&gt;
+&lt;li&gt;Information Exchange(信息交换):  对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式.因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;jwt-json-web-tokens-是如何工作的&#34;&gt;JWT(Json Web Tokens)是如何工作的&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcptxpqcrxj30ct0bsq3h.jpg&#34; alt=&#34;JWT认证过程&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;所以，基本上整个过程分为两个阶段，第一个阶段，客户端向服务端获取token，第二阶段，客户端带着该token去请求相关的资源.&lt;/p&gt;
+
+&lt;p&gt;通常比较重要的是，服务端如何根据指定的规则进行token的生成。&lt;/p&gt;
+
+&lt;p&gt;在认证的时候，当用户用他们的凭证成功登录以后，一个JSON Web Token将会被返回。&lt;/p&gt;
+
+&lt;p&gt;此后，token就是用户凭证了，你必须非常小心以防止出现安全问题。&lt;/p&gt;
+
+&lt;p&gt;一般而言，你保存令牌的时候不应该超过你所需要它的时间。&lt;/p&gt;
+
+&lt;p&gt;无论何时用户想要访问受保护的路由或者资源的时候，用户代理（通常是浏览器）都应该带上JWT，典型的，通常放在Authorization header中，用Bearer schema:
+&lt;code&gt;Authorization: Bearer &amp;lt;token&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;服务器上的受保护的路由将会检查Authorization header中的JWT是否有效，如果有效，则用户可以访问受保护的资源。如果JWT包含足够多的必需的数据，那么就可以减少对某些操作的数据库查询的需要，尽管可能并不总是如此。&lt;/p&gt;
+
+&lt;p&gt;如果token是在授权头（Authorization header）中发送的，那么跨源资源共享(CORS)将不会成为问题，因为它不使用cookie.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpxi6z1dmj315o0fvab0.jpg&#34; alt=&#34;获取JWT以及访问APIs以及资源&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;客户端向授权接口请求授权&lt;/li&gt;
+&lt;li&gt;服务端授权后返回一个access token给客户端&lt;/li&gt;
+&lt;li&gt;客户端使用access token访问受保护的资源&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;基于token的身份认证和基于服务器的身份认证&#34;&gt;基于Token的身份认证和基于服务器的身份认证&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;1.基于服务器的认证&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;前面说到过session，cookie以及token的区别，在之前传统的做法就是基于存储在服务器上的session来做用户的身份认证，但是通常会有如下问题:
+- Sessions: 认证通过后需要将用户的session数据保存在内存中，随着认证用户的增加，内存开销会大
+- 扩展性: 由于session存储在内存中，扩展性会受限，虽然后期可以使用redis,memcached来缓存数据
+- CORS: 当多个终端访问同一份数据时，可能会遇到禁止请求的问题
+- CSRF: 用户容易受到CSRF攻击&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.Session和JWT Token的异同&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;都可以存储用户相关信息，但是session存储在服务端，JWT存储在客户端&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpxunv5qcj30dd0gfgmp.jpg&#34; alt=&#34;session和jwt数据存储位置&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.基于Token的身份认证如何工作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;基于Token的身份认证是无状态的，服务器或者session中不会存储任何用户信息.(很好的解决了共享session的问题)&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;用户携带用户名和密码请求获取token(接口数据中可使用appId,appKey)&lt;/li&gt;
+&lt;li&gt;服务端校验用户凭证，并返回用户或客户端一个Token&lt;/li&gt;
+&lt;li&gt;客户端存储token,并在请求头中携带Token&lt;/li&gt;
+&lt;li&gt;服务端校验token并返回数据&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;
+- 随后客户端的每次请求都需要使用token
+- token应该放在header中
+- 需要将服务器设置为接收所有域的请求: &lt;code&gt;Access-Control-Allow-Origin: *&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;4.用Token的好处&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;无状态和可扩展性&lt;/li&gt;
+&lt;li&gt;安全: 防止CSRF攻击;token过期重新认证&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;5.JWT和OAuth的区别&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.OAuth2是一种授权框架 ，JWT是一种认证协议&lt;/li&gt;
+&lt;li&gt;2.无论使用哪种方式切记用HTTPS来保证数据的安全性&lt;/li&gt;
+&lt;li&gt;3.OAuth2用在&lt;code&gt;使用第三方账号登录的情况&lt;/code&gt;(比如使用weibo, qq, github登录某个app)，而&lt;code&gt;JWT是用在前后端分离&lt;/code&gt;, 需要简单的对后台API进行保护时使用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;使用gin框架集成jwt&#34;&gt;使用Gin框架集成JWT&lt;/h3&gt;
+
+&lt;p&gt;在Golang语言中，&lt;a href=&#34;https://github.com/dgrijalva/jwt-go&#34;&gt;jwt-go&lt;/a&gt;库提供了一些jwt编码和验证的工具，因此我们很容易使用该库来实现token认证。&lt;/p&gt;
+
+&lt;p&gt;另外，我们也知道&lt;a href=&#34;https://github.com/gin-gonic/gin&#34;&gt;gin&lt;/a&gt;框架中支持用户自定义middleware，我们可以很好的将jwt相关的逻辑封装在middleware中，然后对具体的接口进行认证。&lt;/p&gt;
+
+&lt;h4 id=&#34;自定义中间件&#34;&gt;自定义中间件&lt;/h4&gt;
+
+&lt;p&gt;在gin框架中，自定义中间件比较容易，只要返回一个&lt;code&gt;gin.HandlerFunc&lt;/code&gt;即完成一个中间件定义。&lt;/p&gt;
+
+&lt;p&gt;接下来，我们先定义一个用于jwt认证的中间件.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;// 定义一个JWTAuth的中间件
+func JWTAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 通过http header中的token解析来认证
+		token := c.Request.Header.Get(&amp;#34;token&amp;#34;)
+		if token == &amp;#34;&amp;#34; {
+			c.JSON(http.StatusOK, gin.H{
+				&amp;#34;status&amp;#34;: -1,
+				&amp;#34;msg&amp;#34;:    &amp;#34;请求未携带token，无权限访问&amp;#34;,
+				&amp;#34;data&amp;#34;:   nil,
+			})
+			c.Abort()
+			return
+		}
+
+		log.Print(&amp;#34;get token: &amp;#34;, token)
+
+		// 初始化一个JWT对象实例，并根据结构体方法来解析token
+		j := NewJWT()
+		// 解析token中包含的相关信息(有效载荷)
+		claims, err := j.ParserToken(token)
+
+		if err != nil {
+			// token过期
+			if err == TokenExpired {
+				c.JSON(http.StatusOK, gin.H{
+					&amp;#34;status&amp;#34;: -1,
+					&amp;#34;msg&amp;#34;:    &amp;#34;token授权已过期，请重新申请授权&amp;#34;,
+					&amp;#34;data&amp;#34;:   nil,
+				})
+				c.Abort()
+				return
+			}
+			// 其他错误
+			c.JSON(http.StatusOK, gin.H{
+				&amp;#34;status&amp;#34;: -1,
+				&amp;#34;msg&amp;#34;:    err.Error(),
+				&amp;#34;data&amp;#34;:   nil,
+			})
+			c.Abort()
+			return
+		}
+
+		// 将解析后的有效载荷claims重新写入gin.Context引用对象中
+		c.Set(&amp;#34;claims&amp;#34;, claims)
+
+	}
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;定义jwt编码和解码逻辑&#34;&gt;定义jwt编码和解码逻辑&lt;/h4&gt;
+
+&lt;p&gt;根据前面提到的jwt-token的组成部分，以及&lt;code&gt;jwt-go&lt;/code&gt;中相关的定义，我们可以使用如下方法进行生成token.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;// 定义一个jwt对象
+type JWT struct {
+	// 声明签名信息
+	SigningKey []byte
+}
+
+// 初始化jwt对象
+func NewJWT() *JWT {
+	return &amp;amp;JWT{
+		[]byte(&amp;#34;bgbiao.top&amp;#34;),
+	}
+}
+
+// 自定义有效载荷(这里采用自定义的Name和Email作为有效载荷的一部分)
+type CustomClaims struct {
+	Name  string `json:&amp;#34;name&amp;#34;`
+	Email string `json:&amp;#34;email&amp;#34;`
+	// StandardClaims结构体实现了Claims接口(Valid()函数)
+	jwt.StandardClaims
+}
+
+
+// 调用jwt-go库生成token
+// 指定编码的算法为jwt.SigningMethodHS256
+func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
+	// https://gowalker.org/github.com/dgrijalva/jwt-go#Token
+	// 返回一个token的结构体指针
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(j.SigningKey)
+}
+
+
+// token解码
+func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
+	// https://gowalker.org/github.com/dgrijalva/jwt-go#ParseWithClaims
+	// 输入用户自定义的Claims结构体对象,token,以及自定义函数来解析token字符串为jwt的Token结构体指针
+	// Keyfunc是匿名函数类型: type Keyfunc func(*Token) (interface{}, error)
+	// func ParseWithClaims(tokenString string, claims Claims, keyFunc Keyfunc) (*Token, error) {}
+	token, err := jwt.ParseWithClaims(tokenString, &amp;amp;CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return j.SigningKey, nil
+	})
+
+	if err != nil {
+		// https://gowalker.org/github.com/dgrijalva/jwt-go#ValidationError
+		// jwt.ValidationError 是一个无效token的错误结构
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			// ValidationErrorMalformed是一个uint常量，表示token不可用
+			if ve.Errors&amp;amp;jwt.ValidationErrorMalformed != 0 {
+				return nil, fmt.Errorf(&amp;#34;token不可用&amp;#34;)
+				// ValidationErrorExpired表示Token过期
+			} else if ve.Errors&amp;amp;jwt.ValidationErrorExpired != 0 {
+				return nil, fmt.Errorf(&amp;#34;token过期&amp;#34;)
+				// ValidationErrorNotValidYet表示无效token
+			} else if ve.Errors&amp;amp;jwt.ValidationErrorNotValidYet != 0 {
+				return nil, fmt.Errorf(&amp;#34;无效的token&amp;#34;)
+			} else {
+				return nil, fmt.Errorf(&amp;#34;token不可用&amp;#34;)
+			}
+
+		}
+	}
+
+	// 将token中的claims信息解析出来并断言成用户自定义的有效载荷结构
+	if claims, ok := token.Claims.(*CustomClaims); ok &amp;amp;&amp;amp; token.Valid {
+		return claims, nil
+	}
+
+	return nil, fmt.Errorf(&amp;#34;token无效&amp;#34;)
+
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;定义登陆验证逻辑&#34;&gt;定义登陆验证逻辑&lt;/h4&gt;
+
+&lt;p&gt;接下来的部分就是普通api的具体逻辑了，比如可以在登陆时进行用户校验，成功后未该次认证请求生成token。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;// 定义登陆逻辑
+// model.LoginReq中定义了登陆的请求体(name,passwd)
+func Login(c *gin.Context) {
+	var loginReq model.LoginReq
+	if c.BindJSON(&amp;amp;loginReq) == nil {
+		// 登陆逻辑校验(查库，验证用户是否存在以及登陆信息是否正确)
+		isPass, user, err := model.LoginCheck(loginReq)
+		// 验证通过后为该次请求生成token
+		if isPass {
+			generateToken(c, user)
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				&amp;#34;status&amp;#34;: -1,
+				&amp;#34;msg&amp;#34;:    &amp;#34;验证失败&amp;#34; + err.Error(),
+				&amp;#34;data&amp;#34;:   nil,
+			})
+		}
+
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			&amp;#34;status&amp;#34;: -1,
+			&amp;#34;msg&amp;#34;:    &amp;#34;用户数据解析失败&amp;#34;,
+			&amp;#34;data&amp;#34;:   nil,
+		})
+	}
+}
+
+// token生成器
+// md 为上面定义好的middleware中间件
+func generateToken(c *gin.Context, user model.User) {
+	// 构造SignKey: 签名和解签名需要使用一个值
+	j := md.NewJWT()
+
+	// 构造用户claims信息(负荷)
+	claims := md.CustomClaims{
+		user.Name,
+		user.Email,
+		jwtgo.StandardClaims{
+			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
+			ExpiresAt: int64(time.Now().Unix() + 3600), // 签名过期时间
+			Issuer:    &amp;#34;bgbiao.top&amp;#34;,                    // 签名颁发者
+		},
+	}
+
+	// 根据claims生成token对象
+	token, err := j.CreateToken(claims)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			&amp;#34;status&amp;#34;: -1,
+			&amp;#34;msg&amp;#34;:    err.Error(),
+			&amp;#34;data&amp;#34;:   nil,
+		})
+	}
+
+	log.Println(token)
+	// 封装一个响应数据,返回用户名和token
+	data := LoginResult{
+		Name:  user.Name,
+		Token: token,
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		&amp;#34;status&amp;#34;: 0,
+		&amp;#34;msg&amp;#34;:    &amp;#34;登陆成功&amp;#34;,
+		&amp;#34;data&amp;#34;:   data,
+	})
+	return
+
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;定义普通待验证接口&#34;&gt;定义普通待验证接口&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;// 定义一个普通controller函数，作为一个验证接口逻辑
+func GetDataByTime(c *gin.Context) {
+	// 上面我们在JWTAuth()中间中将&amp;#39;claims&amp;#39;写入到gin.Context的指针对象中，因此在这里可以将之解析出来
+	claims := c.MustGet(&amp;#34;claims&amp;#34;).(*md.CustomClaims)
+	if claims != nil {
+		c.JSON(http.StatusOK, gin.H{
+			&amp;#34;status&amp;#34;: 0,
+			&amp;#34;msg&amp;#34;:    &amp;#34;token有效&amp;#34;,
+			&amp;#34;data&amp;#34;:   claims,
+		})
+	}
+}
+
+
+// 在主函数中定义路由规则
+	router := gin.Default()
+	v1 := router.Group(&amp;#34;/apis/v1/&amp;#34;)
+	{
+		v1.POST(&amp;#34;/register&amp;#34;, controller.RegisterUser)
+		v1.POST(&amp;#34;/login&amp;#34;, controller.Login)
+	}
+
+	// secure v1
+	sv1 := router.Group(&amp;#34;/apis/v1/auth/&amp;#34;)
+	// 加载自定义的JWTAuth()中间件,在整个sv1的路由组中都生效
+	sv1.Use(md.JWTAuth())
+	{
+		sv1.GET(&amp;#34;/time&amp;#34;, controller.GetDataByTime)
+
+	}
+	router.Run(&amp;#34;:8081&amp;#34;)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;验证使用jwt后的接口&#34;&gt;验证使用JWT后的接口&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 运行项目
+$ go run main.go
+127.0.0.1
+13306
+root:bgbiao.top@tcp(127.0.0.1:13306)/test_api?charset=utf8mb4&amp;amp;parseTime=True&amp;amp;loc=Local
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in &amp;#34;debug&amp;#34; mode. Switch to &amp;#34;release&amp;#34; mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /apis/v1/register         --&amp;gt; warnning-trigger/controller.RegisterUser (3 handlers)
+[GIN-debug] POST   /apis/v1/login            --&amp;gt; warnning-trigger/controller.Login (3 handlers)
+[GIN-debug] GET    /apis/v1/auth/time        --&amp;gt; warnning-trigger/controller.GetDataByTime (4 handlers)
+[GIN-debug] Listening and serving HTTP on :8081
+
+# 注册用户
+$ curl -i -X POST \
+   -H &amp;#34;Content-Type:application/json&amp;#34; \
+   -d \
+&amp;#39;{
+  &amp;#34;name&amp;#34;: &amp;#34;hahaha1&amp;#34;,
+  &amp;#34;password&amp;#34;: &amp;#34;hahaha1&amp;#34;,
+  &amp;#34;email&amp;#34;: &amp;#34;hahaha1@bgbiao.top&amp;#34;,
+  &amp;#34;phone&amp;#34;: 10000000000
+}&amp;#39; \
+ &amp;#39;http://localhost:8081/apis/v1/register&amp;#39;
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sun, 15 Mar 2020 07:09:28 GMT
+Content-Length: 41
+
+{&amp;#34;data&amp;#34;:null,&amp;#34;msg&amp;#34;:&amp;#34;success &amp;#34;,&amp;#34;status&amp;#34;:0}%
+
+
+# 登陆用户以获取token
+$ curl -i -X POST \
+   -H &amp;#34;Content-Type:application/json&amp;#34; \
+   -d \
+&amp;#39;{
+  &amp;#34;name&amp;#34;:&amp;#34;hahaha1&amp;#34;,
+  &amp;#34;password&amp;#34;:&amp;#34;hahaha1&amp;#34;
+}&amp;#39; \
+ &amp;#39;http://localhost:8081/apis/v1/login&amp;#39;
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sun, 15 Mar 2020 07:10:41 GMT
+Content-Length: 290
+
+{&amp;#34;data&amp;#34;:{&amp;#34;token&amp;#34;:&amp;#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&amp;#34;,&amp;#34;name&amp;#34;:&amp;#34;hahaha1&amp;#34;},&amp;#34;msg&amp;#34;:&amp;#34;登陆成功&amp;#34;,&amp;#34;status&amp;#34;:0}
+
+
+# 访问需要认证的接口
+# 因为我们对/apis/v1/auth/的分组路由中加载了jwt的middleware，因此该分组下的api都需要使用jwt-token认证
+$ curl http://localhost:8081/apis/v1/auth/time
+{&amp;#34;data&amp;#34;:null,&amp;#34;msg&amp;#34;:&amp;#34;请求未携带token，无权限访问&amp;#34;,&amp;#34;status&amp;#34;:-1}%
+
+# 使用token认证
+$ curl http://localhost:8081/apis/v1/auth/time -H &amp;#39;token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&amp;#39;
+{&amp;#34;data&amp;#34;:{&amp;#34;userName&amp;#34;:&amp;#34;hahaha1&amp;#34;,&amp;#34;email&amp;#34;:&amp;#34;hahaha1@bgbiao.top&amp;#34;,&amp;#34;exp&amp;#34;:1584259841,&amp;#34;iss&amp;#34;:&amp;#34;bgbiao.top&amp;#34;,&amp;#34;nbf&amp;#34;:1584255241},&amp;#34;msg&amp;#34;:&amp;#34;token有效&amp;#34;,&amp;#34;status&amp;#34;:0}%&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/BGBiao/gin-jwt-token&#34;&gt;gin-jwt-go源码&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>Golang语言中的ORM框架之gorm</title>
@@ -8018,256 +8840,6 @@ $ go tool pprof -http=:8080 -nodecount=10 ./unittest.test cpu.log
 &lt;p&gt;&lt;strong&gt;示例程序&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://johng.cn/go-test-profile-and-cover/&#34;&gt;Go性能测试、单元测试以及代码覆盖率&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>Kubernetes-1.15管理NVIDIA GPU容器</title>
-      <link>https://bgbiao.top/post/k8s-nvidia-gpu/</link>
-      <pubDate>Tue, 08 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/k8s-nvidia-gpu/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;使用kubernetes来调度和管理nvidia gpu资源。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;参考链接:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/NVIDIA/k8s-device-plugin/&#34;&gt;nvidia-k8s-device-plugin&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://v1-15.docs.kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/&#34;&gt;k8s-1.15调度GPU文档&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/NVIDIA/nvidia-docker&#34;&gt;nvidia-docker&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;0. GPU主机依赖&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.下载&lt;code&gt;nvidia-driver&lt;/code&gt;(官方提示要约等于361.93)&lt;/li&gt;
-&lt;li&gt;2.安装&lt;code&gt;nvidia-docker2.x&lt;/code&gt;(nvidia-docker1.x和2.x完全不同)&lt;/li&gt;
-&lt;li&gt;3.&lt;code&gt;docker&lt;/code&gt;配置成&lt;code&gt;nvidia&lt;/code&gt;的默认运行时&lt;/li&gt;
-&lt;li&gt;4.&lt;code&gt;kubernetes&lt;/code&gt;版本大于1.10&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;1. systemd服务配置文件&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;在企业级生产环境里通常都会使用&lt;code&gt;Centos&lt;/code&gt;来运行服务，但由于&lt;code&gt;GPU&lt;/code&gt;环境下需要安装GPU驱动、cuda、cudnn之类的依赖库，导致操作不方便，因此可能会使用&lt;code&gt;Ubuntu&lt;/code&gt;来运行GPU相关服务，两种发型版的&lt;code&gt;systemd&lt;/code&gt;服务启动配置默认不同，因此在自动化安装时需要适配到多个发行版&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.centos服务默认目录: /usr/lib/systemd/system/docker.service&lt;/li&gt;
-&lt;li&gt;2.ubuntu服务默认目录: /lib/systemd/system/docker.service&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;可在手动部署服务时，将服务配置文件都放置到&lt;code&gt;/etc/systemd/system/&lt;/code&gt;目录&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;提示:systemd加载配置文件的顺序和优先级可自行查阅&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2. kubelet默认配置&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;k8s官方文档依然标明需要添加&lt;code&gt;--feature-gates=&amp;quot;Accelerators=true&amp;quot;&lt;/code&gt;参数，但其实在&lt;code&gt;k8s-v1.15&lt;/code&gt;版本&lt;code&gt;Accelerators&lt;/code&gt;已经废弃，改为使用&lt;code&gt;&amp;quot;DevicePlugins=true&amp;quot;&lt;/code&gt;参数了。&lt;/p&gt;
-
-&lt;p&gt;另外，在&lt;code&gt;k8s&lt;/code&gt;比较高版本后(至少v1.15)，&lt;code&gt;kubelet&lt;/code&gt;相关参数建议在&lt;code&gt;--config&lt;/code&gt;中进行指定，大概内容如下:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;$ cat kubelet.config
-...
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-port: 10250
-featureGates:
-  DevicePlugins: true
-clusterDomain: cluster.local.
-...
-...&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;3. docker默认配置&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;增加&lt;code&gt;nvidia&lt;/code&gt;的默认运行时
-安装&lt;code&gt;nvidia-docker 2+&lt;/code&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;$ cat /etc/docker/daemon.json
-{
-    &amp;#34;default-runtime&amp;#34;: &amp;#34;nvidia&amp;#34;,
-    &amp;#34;runtimes&amp;#34;: {
-        &amp;#34;nvidia&amp;#34;: {
-            &amp;#34;path&amp;#34;: &amp;#34;/usr/bin/nvidia-container-runtime&amp;#34;,
-            &amp;#34;runtimeArgs&amp;#34;: []
-        }
-    }
-}
-
-# 重启docker和kubelet
-$ systemctl daemon-reload &amp;amp;&amp;amp; systemctl restart docker kubelet&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;4. 给gpu节点打标签&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;kubectl label nodes 172.16.21.0 gpu=nvidia-tesla-p100&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;5. 给gpu节点部署nvidia-device-plugin插件&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 给gpu节点创建nvidia-device-plugin插件
-$ kubectl  apply -f nvidia-device-plugin-v1.9.yaml
-daemonset.extensions/nvidia-device-plugin-daemonset created
-
-$ kubectl  get pods -n kube-system  -o wide | grep nvidia-device
-nvidia-device-plugin-daemonset-p9kff   1/1     Running   0          2s     20.0.52.3       172.16.21.0     &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-# 查看device-plugin日志详情
-$ kubectl  logs nvidia-device-plugin-daemonset-p9kff -n kube-system
-2019/09/30 08:05:44 Loading NVML
-2019/09/30 08:05:44 Fetching devices.
-2019/09/30 08:05:44 Starting FS watcher.
-2019/09/30 08:05:44 Starting OS watcher.
-2019/09/30 08:05:44 Starting to serve on /var/lib/kubelet/device-plugins/nvidia.sock
-2019/09/30 08:05:44 Registered device plugin with Kubelet
-
-# 也可以在docker上测试该驱动
-$ docker run --security-opt=no-new-privileges --cap-drop=ALL --network=none -it -v /var/lib/kubelet/device-plugins:/var/lib/kubelet/device-plugins nvidia/k8s-device-plugin:1.11&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;6. 在k8s集群中调度gpu业务容器&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;$ kubectl apply -f gpu-deploy-svc.yaml
-...
-...
-
-# 查看gpu容器的deploy和svc(使用了service，并且使用nodePort类型)
-$ kubectl  get pods,svc | grep gpu
-
-pod/gpu-image-cluster-6565586479-x89bk   1/1     Running   0          9m1s
-service/gpu-image-cluster   NodePort    10.253.172.218   &amp;lt;none&amp;gt;        8080:38080/TCP   8m21s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;7. 测试GPU容器业务&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;:想要测试GPU容器，可以直接使用nvidia/cuda:8.0-runtime-ubuntu14.04镜像，容器运行后执行&lt;code&gt;nvidia-smi&lt;/code&gt;可以显示GPU卡，即为生产。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;$ kubectl  get nodes
-NAME            STATUS   ROLES    AGE     VERSION
-172.16.21.0     Ready    &amp;lt;none&amp;gt;   7h11m   v1.15.0
-172.16.21.26    Ready    &amp;lt;none&amp;gt;   24d     v1.15.0
-172.16.21.27    Ready    &amp;lt;none&amp;gt;   24d     v1.15.0
-172.16.21.28    Ready    &amp;lt;none&amp;gt;   24d     v1.15.0
-
-# 使用service 进行访问
-$ curl -H &amp;#39;Content-Type:application/json&amp;#39; -X POST -d &amp;#39;{&amp;#34;imgUrl&amp;#34;: &amp;#34;https://img.bgbiao.cn/image/2019-08-27/f208b338-af03-4557-8d23-9cf308c38ba9-1566921008172.png&amp;#34;}&amp;#39; &amp;#34;http://10.253.172.218:8080/api/predict/class&amp;#34;
-{&amp;#34;class_id&amp;#34;:958,&amp;#34;class_name&amp;#34;:&amp;#34;\u5c0f\u718a\u732b\u5927\u6bb5\u6587\u5b57\uff08\u53d7\u4e0d\u4e86\u7f51\u604b\uff09\u8868\u60c5\u5305&amp;#34;,&amp;#34;code&amp;#34;:200,&amp;#34;message&amp;#34;:&amp;#34;OK&amp;#34;}
-
-
-# 由于是使用的nodePort类型的service，可以直接访问每个node节点的28080
-$ curl -H &amp;#39;Content-Type:application/json&amp;#39; -X POST -d &amp;#39;{&amp;#34;imgUrl&amp;#34;: &amp;#34;https://img.bgbiao.cn/image/2019-08-27/f208b338-af03-4557-8d23-9cf308c38ba9-1566921008172.png&amp;#34;}&amp;#39; &amp;#34;http://172.16.21.0:38080/api/predict/class&amp;#34;
-{&amp;#34;class_id&amp;#34;:958,&amp;#34;class_name&amp;#34;:&amp;#34;\u5c0f\u718a\u732b\u5927\u6bb5\u6587\u5b57\uff08\u53d7\u4e0d\u4e86\u7f51\u604b\uff09\u8868\u60c5\u5305&amp;#34;,&amp;#34;code&amp;#34;:200,&amp;#34;message&amp;#34;:&amp;#34;OK&amp;#34;}
-
-$ curl -H &amp;#39;Content-Type:application/json&amp;#39; -X POST -d &amp;#39;{&amp;#34;imgUrl&amp;#34;: &amp;#34;https://img.bgbiao.cn/image/2019-08-27/f208b338-af03-4557-8d23-9cf308c38ba9-1566921008172.png&amp;#34;}&amp;#39; &amp;#34;http://172.16.21.26:38080/api/predict/class&amp;#34;
-{&amp;#34;class_id&amp;#34;:958,&amp;#34;class_name&amp;#34;:&amp;#34;\u5c0f\u718a\u732b\u5927\u6bb5\u6587\u5b57\uff08\u53d7\u4e0d\u4e86\u7f51\u604b\uff09\u8868\u60c5\u5305&amp;#34;,&amp;#34;code&amp;#34;:200,&amp;#34;message&amp;#34;:&amp;#34;OK&amp;#34;}
-
-$ curl -H &amp;#39;Content-Type:application/json&amp;#39; -X POST -d &amp;#39;{&amp;#34;imgUrl&amp;#34;: &amp;#34;https://img.bgbiao.cn/image/2019-08-27/f208b338-af03-4557-8d23-9cf308c38ba9-1566921008172.png&amp;#34;}&amp;#39; &amp;#34;http://172.16.21.27:38080/api/predict/class&amp;#34;
-{&amp;#34;class_id&amp;#34;:958,&amp;#34;class_name&amp;#34;:&amp;#34;\u5c0f\u718a\u732b\u5927\u6bb5\u6587\u5b57\uff08\u53d7\u4e0d\u4e86\u7f51\u604b\uff09\u8868\u60c5\u5305&amp;#34;,&amp;#34;code&amp;#34;:200,&amp;#34;message&amp;#34;:&amp;#34;OK&amp;#34;}
-
-$ curl -H &amp;#39;Content-Type:application/json&amp;#39; -X POST -d &amp;#39;{&amp;#34;imgUrl&amp;#34;: &amp;#34;https://img.bgbiao.cn/image/2019-08-27/f208b338-af03-4557-8d23-9cf308c38ba9-1566921008172.png&amp;#34;}&amp;#39; &amp;#34;http://172.16.21.28:38080/api/predict/class&amp;#34;
-{&amp;#34;class_id&amp;#34;:958,&amp;#34;class_name&amp;#34;:&amp;#34;\u5c0f\u718a\u732b\u5927\u6bb5\u6587\u5b57\uff08\u53d7\u4e0d\u4e86\u7f51\u604b\uff09\u8868\u60c5\u5305&amp;#34;,&amp;#34;code&amp;#34;:200,&amp;#34;message&amp;#34;:&amp;#34;OK&amp;#34;}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;hr /&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
