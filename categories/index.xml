@@ -6,10 +6,37 @@
     <description>Recent content in Categories on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 22 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kubernetes</title>
+      <link>https://bgbiao.top/categories/kubernetes/</link>
+      <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/categories/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>效率</title>
+      <link>https://bgbiao.top/categories/%E6%95%88%E7%8E%87/</link>
+      <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/categories/%E6%95%88%E7%8E%87/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>运维</title>
+      <link>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>golang</title>
@@ -26,15 +53,6 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/categories/%E6%88%90%E9%95%BF/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</guid>
       <description></description>
     </item>
     
@@ -62,24 +80,6 @@
       <pubDate>Mon, 30 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/categories/%E6%8A%95%E8%B5%84/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>kubernetes</title>
-      <link>https://bgbiao.top/categories/kubernetes/</link>
-      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/categories/kubernetes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>效率</title>
-      <link>https://bgbiao.top/categories/%E6%95%88%E7%8E%87/</link>
-      <pubDate>Mon, 16 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/categories/%E6%95%88%E7%8E%87/</guid>
       <description></description>
     </item>
     

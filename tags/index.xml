@@ -6,10 +6,28 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 22 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Docker</title>
+      <link>https://bgbiao.top/tags/docker/</link>
+      <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/docker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>image</title>
+      <link>https://bgbiao.top/tags/image/</link>
+      <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/image/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>gin</title>
@@ -170,24 +188,6 @@
       <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/%E6%8C%A3%E9%92%B1/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>2019</title>
-      <link>https://bgbiao.top/tags/2019/</link>
-      <pubDate>Thu, 02 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>cronjob</title>
-      <link>https://bgbiao.top/tags/cronjob/</link>
-      <pubDate>Sun, 29 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/cronjob/</guid>
       <description></description>
     </item>
     

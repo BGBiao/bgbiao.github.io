@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Tags - BGBiao的SRE人生</title>
+  <title>构建更小Docker镜像的一些建议 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="BGBiao的SRE人生." />
+  <meta name="description" content="背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomc" />
+
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
@@ -34,8 +35,8 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.top/tags/" />
-<link href="/tags/index.xml" rel="alternate" type="application/rss+xml" title="BGBiao的SRE人生" />
+<link rel="canonical" href="https://bgbiao.top/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/" />
+
 
 
 
@@ -60,18 +61,26 @@
 <link rel="stylesheet" href="/css/custom.css">
 
 
-<meta property="og:title" content="Tags" />
-<meta property="og:description" content="BGBiao的SRE人生." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://bgbiao.top/tags/" />
+<meta property="og:title" content="构建更小Docker镜像的一些建议" />
+<meta property="og:description" content="背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomc" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/" />
+<meta property="article:published_time" content="2020-03-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-22T00:00:00+00:00" />
+<meta itemprop="name" content="构建更小Docker镜像的一些建议">
+<meta itemprop="description" content="背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomc">
 
-<meta property="og:updated_time" content="2020-03-22T00:00:00+00:00" />
-<meta itemprop="name" content="Tags">
-<meta itemprop="description" content="BGBiao的SRE人生.">
 
+<meta itemprop="datePublished" content="2020-03-22T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-03-22T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1908">
+
+
+
+<meta itemprop="keywords" content="docker,image," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Tags"/>
-<meta name="twitter:description" content="BGBiao的SRE人生."/>
+<meta name="twitter:title" content="构建更小Docker镜像的一些建议"/>
+<meta name="twitter:description" content="背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomc"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -340,7 +349,7 @@ if (!doNotTrack) {
 
       </li>
     
-        <li class="menu-item active">
+        <li class="menu-item">
         
           
           
@@ -445,859 +454,231 @@ if (!doNotTrack) {
     <main id="main" class="main bg-llight">
       <div class="content-wrapper">
         <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">构建更小Docker镜像的一些建议</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-03-22" class="post-time">
+          2020-03-22
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+            <a href="https://bgbiao.top/categories/%E6%95%88%E7%8E%87/"> 效率 </a>
+            
+          </div>
+        <span class="more-meta"> 1908 words </span>
+          <span class="more-meta"> 4 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用<code>RUN</code>指令，执行了一次<code>chmod a+x tomcat</code>，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。</p>
+</blockquote>
+
+<p>首先，镜像的大小最终取决于如下几点:</p>
+
+<ul>
+<li>1.业务需求和debug的便利性(比如科学计算和普通的java或者golang程序)</li>
+<li>2.业务镜像构建的依赖特性(构建过程和交付物的依赖关系)</li>
+<li>3.交付物的定义过程(Dockerfile分层过程中的变更层)</li>
+</ul>
+
+<p>接下来，从三个点来谈谈我个人的想法。</p>
+
+<p><strong>一、单从镜像大小的角度考虑</strong></p>
+
+<p>如果仅从镜像的大小角度来讲，为了镜像尽可能的小，有如下的base镜像可供选择:</p>
+
+<ul>
+<li>alpine: 专为容器而生的基础镜像，缺点是默认使用的<code>musl libc</code>，但是大多数运行在Linux下的程序几乎都是<code>glibc</code></li>
+<li>scratch: 没有任何<code>杂念</code>的基础镜像，优点就是没有杂念，缺点也明显就是各种动态链接库，shell等等都没有(所以对应静态依赖的程序还是可以的)</li>
+<li>busybox: 基本也是一个没有太多<code>杂念</code>的基础镜像，不过生态里包含了很多依赖镜像，比如<code>busybox:glibc</code></li>
+<li>centos: centos发行版的mini镜像，基础的库和工具包基本都有，base稍微大了点(200M左右吧,不过也可以精简)</li>
+<li>ubuntu: ubuntu发现版的mini镜像，同上，base大概在120M左右，不过两者的稳定性和包的管理有差异</li>
+</ul>
+
+<p>但以上几种的base均有利弊，而且企业内部通常业务场景也会有一定的变化，因此我们在维护内部的基础base镜像时一般不会为了<code>镜像小</code>这个伪目标而使用多种base来构建不同镜像，主要是考虑到后期的维护成本较高(稳定性，可操作性).</p>
+
+<p><strong>二、考虑业务的需求和debug的便利性</strong></p>
+
+<ul>
+<li>java: 程序依赖基本包含在程序中，仅对java依赖</li>
+<li>c: 可能需要指定的libc库以及动态链接库的依赖</li>
+<li>golang: 编译好的程序几乎不需要依赖</li>
+<li>python: 需要依赖python以及各个库的支持，同时库可能依赖系统的动态链接库</li>
+</ul>
+
+<p>通常在企业环境中，系统不可能长期只有一种语言来开发，因此不同语言生态下也就诞生了不同的需求。</p>
+
+<p>比如，当下不论是<code>DL(Deep Learning)</code>还是<code>ML(Machine Learning)</code>大部分对外的库基本都是使用Python开发的，因此在这种场景下，通常业务所需要的基础库是相当大，几个G的竟像也是司空见惯的。</p>
+
+<p>同时，还有一个比较常见的情况，就是我们的技术人员都有可能去容器内部进行简单的debug操作(比如使用curl,netstat等工具)，此时不同的base镜像会包含不同的生态工具，无疑也会增加大家的学习成本，如果对外推广可能会遭遇一定障碍。</p>
+
+<p>最后，还有一个点就是业务上层的base竟像的精简化。</p>
+
+<p>很多时候base环境内部可能存在一些基本工具，仅是程序构建时需要的工具，比如c程序的gcc,golang程序的go,java程序的jdk(其实仅jre就可以)，因此为了进一步减少空间，可以将构建过程相关的工具阉割掉。</p>
+
+<p><strong>三、交付物的定义过程</strong></p>
+
+<p>在传统的CI/CD流水线中，交付物通常是一个静态的压缩包，而在引入以Docker为代表的容器技术之后，交付物就是包含业务代码和其运行时环境的镜像，因此在交付物的定义过程中也可以做一些镜像精简的优化。</p>
+
+<p>这里主要是Docker的分层思想，在开源的容器市场中，基于<code>overlay</code>的存储引擎已经是不争的事实，所以，我们可以在分层过程中进行一些优化，对overlay不太了解的可以阅读以前的一篇文章<a href="https://www.jianshu.com/p/959e8e3da4b2">overlayfs的探究以及在docker的使用</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">FROM golang as golang-build
+WORKDIR /
+COPY hello.go .
+RUN go build -ldflags &#34;-s -w&#34; -o hello hello.go
+
+FROM alpine
+COPY --from=golang-build hello .
+RUN chmod a-x hello &amp;&amp; chmod a+x hello
+CMD [&#34;./hello&#34;]</pre></td></tr></table>
+</div>
+</div>
+<p>我们知道，在分层的思想中，每一层都是上一层的可写叠加，而在最新层变更的文件才是整个镜像或者容器增加的数据，所以如上的Dockerfile中，我们在<code>RUN</code>指令中增加了权限的操作(仅用来说明问题)，你会发现，最终的镜像会比不加<code>RUN</code>指令整整大了一个<code>hello</code>程序的空间，这其实就是镜像分层中的一个优化点。</p>
+
+<p>所以，在企业内部进行容器化改造和上线时，除了需要考虑各个适用方的场景问题和操作便利性，同时在构建过程中也需要进行一定的把控。</p>
+
+<p>当然啦，尽可能的将镜像压缩到最小，不仅可以减少磁盘的使用，同时在大规模分发镜像时也会表现的相对有效率，但在实际使用过程中，并不是所有的镜像越小越好，同时我们需要在镜像的通用性和可维护性上进行一定权重的考量</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-03-22
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/docker/">docker</a>
+          <a href="https://bgbiao.top/tags/image/">image</a>
           
-  
-  
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/">
+            <span class="next-text nav-default">使用jwt-go验证API</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
   
   
 
   
   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <div class="tag-cloud" style="padding: 5px 15px">
-      <div class="tag-cloud-title">
-        75 Tags In Total
-      </div>
-      <div class="tag-cloud-tags">
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/2019/"
-          style="font-size:1rem">2019</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/ai/"
-          style="font-size:1rem">ai</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/aliyun/"
-          style="font-size:1rem">aliyun</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/android/"
-          style="font-size:1rem">android</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/ansible/"
-          style="font-size:1.359718699852197rem">ansible</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/cpu%E6%9E%B6%E6%9E%84/"
-          style="font-size:1rem">cpu架构</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/cronjob/"
-          style="font-size:1rem">cronjob</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/devops/"
-          style="font-size:1rem">devops</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/docker/"
-          style="font-size:2.47033681894874rem">docker</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/dockerfile/"
-          style="font-size:1.359718699852197rem">dockerfile</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/draw/"
-          style="font-size:1rem">draw</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/elasticsearch6/"
-          style="font-size:1rem">elasticsearch6</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/etcd/"
-          style="font-size:1.5701406500739012rem">etcd</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/exception/"
-          style="font-size:1rem">exception</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/gin/"
-          style="font-size:1.5701406500739012rem">gin</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/golang/"
-          style="font-size:2.4053816055170727rem">golang</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/gorm/"
-          style="font-size:1rem">gorm</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/goroutine/"
-          style="font-size:1rem">goroutine</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/gpu/"
-          style="font-size:2.0098580625862277rem">gpu</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/grafana/"
-          style="font-size:1rem">grafana</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/hadoop/"
-          style="font-size:1rem">hadoop</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/hive/"
-          style="font-size:1rem">hive</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/image/"
-          style="font-size:1rem">image</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/jwt/"
-          style="font-size:1rem">jwt</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/jwt-go/"
-          style="font-size:1rem">jwt-go</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/k8s/"
-          style="font-size:1.359718699852197rem">k8s</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/kubernetes/"
-          style="font-size:2.0098580625862277rem">kubernetes</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/kvm/"
-          style="font-size:1rem">kvm</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/linux/"
-          style="font-size:1rem">linux</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/minio/"
-          style="font-size:1rem">minio</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/mysql/"
-          style="font-size:1rem">mysql</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/numa/"
-          style="font-size:1rem">numa</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/nvidia/"
-          style="font-size:2.0098580625862277rem">nvidia</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/nvidia-digits/"
-          style="font-size:1rem">nvidia-digits</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/nvidia-docker/"
-          style="font-size:1.5701406500739012rem">nvidia-docker</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/ocr/"
-          style="font-size:1rem">ocr</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/orm/"
-          style="font-size:1rem">orm</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/oss/"
-          style="font-size:1rem">oss</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/overlayfs/"
-          style="font-size:1rem">overlayfs</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/pcie/"
-          style="font-size:1rem">pcie</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/prometheus/"
-          style="font-size:1rem">prometheus</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/protobuf/"
-          style="font-size:1rem">protobuf</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/python/"
-          style="font-size:1.5701406500739012rem">python</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/regexp/"
-          style="font-size:1rem">regexp</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/salt/"
-          style="font-size:1rem">salt</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/spinnaker/"
-          style="font-size:1rem">spinnaker</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/systemd/"
-          style="font-size:1rem">systemd</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/terway/"
-          style="font-size:1rem">terway</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/tesseract4.0/"
-          style="font-size:1rem">tesseract4.0</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/testing/"
-          style="font-size:1rem">testing</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/token/"
-          style="font-size:1rem">token</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/traefik/"
-          style="font-size:1rem">traefik</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E4%BA%92%E8%81%94%E7%BD%91/"
-          style="font-size:1rem">互联网</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E4%BB%B7%E5%80%BC%E7%B3%BB%E7%BB%9F/"
-          style="font-size:1rem">价值系统</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E5%AE%89%E5%8D%93/"
-          style="font-size:1rem">安卓</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81/"
-          style="font-size:1rem">容器生态</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/"
-          style="font-size:1rem">对象存储</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E5%B7%A5%E5%85%B7/"
-          style="font-size:1rem">工具</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%80%9D%E8%80%83/"
-          style="font-size:1rem">思考</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%8A%95%E8%B5%84/"
-          style="font-size:1.359718699852197rem">投资</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"
-          style="font-size:1rem">持续集成</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%8C%A3%E9%92%B1/"
-          style="font-size:1rem">挣钱</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%95%88%E8%83%BD%E7%AE%A1%E7%90%86/"
-          style="font-size:1rem">效能管理</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
-          style="font-size:1rem">数据分析</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/"
-          style="font-size:1rem">数据检索</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%9E%B6%E6%9E%84%E5%9B%BE/"
-          style="font-size:1rem">架构图</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E6%B5%81%E7%A8%8B%E5%9B%BE/"
-          style="font-size:1rem">流程图</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E7%90%86%E8%B4%A2/"
-          style="font-size:1.5701406500739012rem">理财</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E7%94%9F%E6%B4%BB/"
-          style="font-size:1rem">生活</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E7%BA%BF%E7%A8%8B/"
-          style="font-size:1rem">线程</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E8%BF%90%E5%8A%A8/"
-          style="font-size:1rem">运动</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/"
-          style="font-size:1.7194373997043944rem">运维</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1/"
-          style="font-size:1rem">进程通信</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/"
-          style="font-size:1rem">逃逸分析</a>
-        
-      
-        
-        
-        
-        
-        
-        
-        
-        <a href="https://bgbiao.top/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/"
-          style="font-size:1rem">高可用</a>
-        
-      
-      </div>
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
     </div>
   
+
   
 
+  
+
+  
+
+    
+
+  
 
         </div>
       </div>

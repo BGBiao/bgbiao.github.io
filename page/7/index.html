@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-03-15T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-03-22T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,52 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/k8s-ali-terway/">基于阿里云Terway网络的Kubernetes集群实践</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2019-10-27" class="post-time">
+        2019-10-27
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+          
+        </div>
+      <span class="more-meta"> 4938 words </span>
+      <span class="more-meta"> 10 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <blockquote>
+<p>背景: 众所周知的是在构建一个Kubernetes集群时，容器网络通常会使用一个独立的私有子网来构建Kubernetes集群内部的pod网络和service网络，但在实际的业务场景中，没有企业会在一段时间内将内部全部的服务都迁移到Kubernetes集群中(因为涉及到业务架构以及整体业务的可靠性)，因而会产生一些Kubernetes集群内部服务和集群外部服务互相调用的场景，当然如果是HTTP服务，我们可以采用LVS、Nginx、HAProxy之类的代理工具工具进行集群内外的流量转发，但如果是TCP服务，比如使用Dubbo框架时，生产者和消费者需要直连，当生产者和消费者不在一个可以互联互通的网络下会比较麻烦，这也就是为什么大厂在规模化使用Kubernetes时首先需要解决的就是网络问题的原因了。比如我们在数科的时候就采用的是<a href="https://github.com/contiv/install">Contiv</a>+BGP的模式来实现容器网络和容器外网络的互联互通的，而这通常需要一个比较专业的SDN团队来构建和维护。而作为创业公司通常会使用公有云来承载自己的业务，这种轻资产模式的好处就是底层会有专业的团队来提供保障，因此考虑到业务需求我们采用了阿里云的terway网络插件来实现内部的Kubernetes集群网络.</p>
+</blockquote>
+    </div>
+    <div class="read-more">
+      <a href="/post/k8s-ali-terway/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/k8s-delete-namespace/">k8s删除Terminating状态的命名空间</a>
     </h1>
     
@@ -541,52 +587,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/golang-unit-test/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/k8s-nvidia-gpu/">Kubernetes-1.15管理NVIDIA GPU容器</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-10-08" class="post-time">
-        2019-10-08
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
-          
-        </div>
-      <span class="more-meta"> 1340 words </span>
-      <span class="more-meta"> 3 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>使用kubernetes来调度和管理nvidia gpu资源。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/k8s-nvidia-gpu/" class="read-more-link">Read more</a>
     </div>
     
   </div>
