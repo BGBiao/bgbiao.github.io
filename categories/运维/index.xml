@@ -17,7 +17,9 @@
       <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/</guid>
-      <description>背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomc</description>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用&lt;code&gt;RUN&lt;/code&gt;指令，执行了一次&lt;code&gt;chmod a+x tomcat&lt;/code&gt;，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
     </item>
     
     <item>
