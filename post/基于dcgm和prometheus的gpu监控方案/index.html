@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>基于DCGM和Prometheus的GPU监控方案 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="基于DCGM和Prometheus的GPU监控方案  背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
+" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="基于DCGM和Prometheus的GPU监控方案" />
+<meta property="og:description" content="基于DCGM和Prometheus的GPU监控方案
+
+
+背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/" />
+<meta property="article:published_time" content="2020-04-05T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-04-05T00:00:00+00:00" />
+<meta itemprop="name" content="基于DCGM和Prometheus的GPU监控方案">
+<meta itemprop="description" content="基于DCGM和Prometheus的GPU监控方案
+
+
+背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
+">
+
+
+<meta itemprop="datePublished" content="2020-04-05T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-04-05T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3138">
+
+
+
+<meta itemprop="keywords" content="prometheus,gpu,nvidia,prometheus," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="基于DCGM和Prometheus的GPU监控方案"/>
+<meta name="twitter:description" content="基于DCGM和Prometheus的GPU监控方案
+
+
+背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">基于DCGM和Prometheus的GPU监控方案</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-04-05" class="post-time">
+          2020-04-05
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 3138 words </span>
+          <span class="more-meta"> 7 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#基于dcgm和prometheus的gpu监控方案">基于DCGM和Prometheus的GPU监控方案</a>
+<ul>
+<li><a href="#dcgm工具部署">DCGM工具部署</a></li>
+<li><a href="#prometheus-gpu-metrics-exporter">prometheus gpu metrics exporter</a></li>
+<li><a href="#prometheus采集">prometheus采集</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h2 id="基于dcgm和prometheus的gpu监控方案">基于DCGM和Prometheus的GPU监控方案</h2>
+
+<blockquote>
+<p>背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过<code>nvidia-smi</code>这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于<a href="https://developer.nvidia.com/dcgm">DCGM</a>相关的监控解决方案。</p>
+</blockquote>
+
+<p>DCGM(Data Center GPU Manager)即数据中心GPU管理器，是一套用于在集群环境中管理和监视<code>Tesla™</code>GPU的工具。</p>
+
+<p>它包括主动健康监控，全面诊断，系统警报以及包括电源和时钟管理在内的治理策略。</p>
+
+<p>它可以由系统管理员独立使用，并且可以轻松地集成到NVIDIA合作伙伴的集群管理，资源调度和监视产品中。</p>
+
+<p>DCGM简化了数据中心中的GPU管理，提高了资源可靠性和正常运行时间，自动化了管理任务，并有助于提高整体基础架构效率。</p>
+
+<p><code>注意:</code> 虽然可以通过<code>nvidia-smi</code>命令将相关的信息采集，并定期汇报到数据存储进行数据分析计算和展现，但是涉及到一整套的监控体系的整合，仍然需要使用方进行一些列的改造。因此这里，我们采用NVIDIA官方提供的DCGM方案来进行GPU数据采集，并通过声称下一代监控系统的Prometheus进行整个监控和告警的集成。</p>
+
+<h3 id="dcgm工具部署">DCGM工具部署</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ git clone https://github.com/NVIDIA/gpu-monitoring-tools.git
+
+# 构建dcgm-exporter工具，其实就是nvidia官方对于nvidia-docker2.x推出的用于gpu数据监控的工具
+# 最终会将gpu卡的metrics基本信息存储以metrics的数据格式存储到文件中
+$ cd dcgm-exporter
+# nvidia/dcgm-exporter:latest
+$ make 
+
+$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
+
+# 查看dcgm-exporter收集到的gpu metrics数据
+$ docker exec -it nvidia-dcgm-exporter tail -n 10  /run/prometheus/dcgm.prom
+dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+# HELP dcgm_retired_pages_sbe Total number of retired pages due to single-bit errors.
+# TYPE dcgm_retired_pages_sbe counter
+dcgm_retired_pages_sbe{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+# HELP dcgm_retired_pages_dbe Total number of retired pages due to double-bit errors.
+# TYPE dcgm_retired_pages_dbe counter
+dcgm_retired_pages_dbe{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+# HELP dcgm_retired_pages_pending Total number of pages pending retirement.
+# TYPE dcgm_retired_pages_pending counter
+dcgm_retired_pages_pending{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0</pre></td></tr></table>
+</div>
+</div>
+<p>dcgm-exporter采集指标项以及含义:</p>
+
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>含义</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>dcgm_fan_speed_percent</td>
+<td>GPU 风扇转速占比（%）</td>
+</tr>
+
+<tr>
+<td>dcgm_sm_clock</td>
+<td>GPU sm 时钟(MHz)</td>
+</tr>
+
+<tr>
+<td>dcgm_memory_clock</td>
+<td>GPU 内存时钟(MHz)</td>
+</tr>
+
+<tr>
+<td>dcgm_gpu_temp</td>
+<td>GPU 运行的温度(℃)</td>
+</tr>
+
+<tr>
+<td>dcgm_power_usage</td>
+<td>GPU 的功率（w）</td>
+</tr>
+
+<tr>
+<td>dcgm_pcie_tx_throughput</td>
+<td>GPU PCIe TX传输的字节总数 （kb）</td>
+</tr>
+
+<tr>
+<td>dcgm_pcie_rx_throughput</td>
+<td>GPU PCIe RX接收的字节总数   （kb）</td>
+</tr>
+
+<tr>
+<td>dcgm_pcie_replay_counter</td>
+<td>GPU PCIe重试的总数</td>
+</tr>
+
+<tr>
+<td>dcgm_gpu_utilization</td>
+<td>GPU 利用率（%）</td>
+</tr>
+
+<tr>
+<td>dcgm_mem_copy_utilization</td>
+<td>GPU 内存利用率（%）</td>
+</tr>
+
+<tr>
+<td>dcgm_enc_utilization</td>
+<td>GPU 编码器利用率 （%）</td>
+</tr>
+
+<tr>
+<td>dcgm_dec_utilization</td>
+<td>GPU 解码器利用率 (%)</td>
+</tr>
+
+<tr>
+<td>dcgm_xid_errors</td>
+<td>GPU 上一个xid错误的值</td>
+</tr>
+
+<tr>
+<td>dcgm_power_violation</td>
+<td>GPU 功率限制导致的节流持续时间(us)</td>
+</tr>
+
+<tr>
+<td>dcgm_thermal_violation</td>
+<td>GPU 热约束节流持续时间(us)</td>
+</tr>
+
+<tr>
+<td>dcgm_sync_boost_violation</td>
+<td>GPU 同步增强限制，限制持续时间(us)</td>
+</tr>
+
+<tr>
+<td>dcgm_fb_free</td>
+<td>GPU fb（帧缓存）的剩余（MiB）</td>
+</tr>
+
+<tr>
+<td>dcgm_fb_used</td>
+<td>GPU fb （帧缓存）的使用 （MiB）</td>
+</tr>
+</tbody>
+</table>
+
+<p>其实到这，dcgm已经完整的将我们需要的gpu的metrics数据采集出来了，并且是符合prometheus的数据格式和标准的，此时，我们可以根据实际的情况编写一个简单的api程序，将采集到的数据以api的形式暴露出去，就可以让整个prometheus server对各个gpu主机的metrics进行采集和监控。</p>
+
+<p>不过官方提供了基于kubernetes集群中pod方式的api接口，采用golang语言开发，具体使用情况可参考如下文档。</p>
+
+<h3 id="prometheus-gpu-metrics-exporter">prometheus gpu metrics exporter</h3>
+
+<p>在<code>gpu-monitoring-tools</code>项目中，默认提供了一个<code>pod-gpu-metrics-exporter</code>模块，用于在kubernetes集群中的gpu-metrics的部署，官方的示例步骤如下:</p>
+
+<ul>
+<li>nvidia-k8s-device-plugin</li>
+<li>Deploy GPU Pods</li>
+</ul>
+
+<p><code>注意:</code> 在使kubernetes集群中部署的前提是你的GPU要托管在k8s集群内部，这也就意味着你得先成功将带GPU的主机成功托管到集群中，并且能够调度GPU资源</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 创建一个监控的命名空间
+# Create the monitoring namespace
+$ kubectl create namespace monitoring
+
+# Add gpu metrics endpoint to prometheus
+$ kubectl create -f prometheus/prometheus-configmap.yaml
+
+# Deploy prometheus
+$ kubectl create -f prometheus/prometheus-deployment.yaml
+
+$ kubectl create -f pod-gpu-metrics-exporter-daemonset.yaml
+
+# Open in browser: localhost:9090
+
+# 具体的docker镜像构建和运行
+# 依然是gpu-monitoring-tools项目
+$ cd  pod-gpu-metrics-exporter
+$ docker build -t pod-gpu-metrics-exporter .
+
+# 运行dcgm-exporter
+$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
+
+# 运行gpu-metrics-exporter
+$ docker run -d --privileged --rm -p 9400:9400 -v /var/lib/kubelet/pod-resources:/var/lib/kubelet/pod-resources --volumes-from nvidia-dcgm-exporter:ro nvidia/pod-gpu-metrics-exporter:v1.0.0-alpha
+
+# 此时就将上述的那个dcgm-exporter中采集到数据成功暴露到对外的接口了
+$ curl -s localhost:9400/gpu/metrics</pre></td></tr></table>
+</div>
+</div>
+<p>需要注意的是，在<code>gpu-metrics-exporter</code>的程序中，是针对pod的方式来采集gpu的metrics的信息，并且附带了pod本身的基本信息，因此如果你的<code>gpu</code>主机还未在kubernetes集群中托管，官方提供的镜像可能并不能使用，需要对<code>src/http.go</code>文件中采集的路径进行改变，将默认的<code>gpuPodMetrics</code>改成<code>gpuMetrics</code>即可，两者会去读取不同的dcgm-exporter暴露出来的metrics文件，否则访问api接口时会发现无法找到metrics文件.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">func getGPUmetrics(resp http.ResponseWriter, req *http.Request) {
+	//metrics, err := ioutil.ReadFile(gpuPodMetrics)
+	metrics, err := ioutil.ReadFile(gpuMetrics)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		glog.Errorf(&#34;error responding to %v%v: %v&#34;, req.Host, req.URL, err.Error())
+		return
+	}
+	resp.Write(metrics)
+}</pre></td></tr></table>
+</div>
+</div>
+<p>参考<a href="https://github.com/BGBiao/gpu-monitoring-tools/tree/master/gpu-metrics-exporter">gpu-metrics-exporter</a></p>
+
+<p>图省事的，可以直接下载如下两个镜像，在已经work 的GPU主机上直接运行.</p>
+
+<ul>
+<li>dcgm-exporter: <code>docker pull bgbiao/dcgm-exporter:latest</code></li>
+
+<li><p>gpu-metrics-exporter: <code>docker pull bgbiao/gpu-metrics-exporter:latest</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 确定dcgm-exporter是运行的
+$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter bgbiao/dcgm-exporter
+
+$ docker run -d --privileged --rm -p 9400:9400  --volumes-from nvidia-dcgm-exporter:ro bgbiao/gpu-metrics-exporter
+
+# 检查gpu暴露出来的基础信息
+$ curl -s localhost:9400/gpu/metrics
+dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+....
+....</pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<h3 id="prometheus采集">prometheus采集</h3>
+
+<p><code>注意:</code> 有了上述的gpu-metrics-exporter之后，我们的gpu相关的运行数据就可以以premetheus兼容的方式获取了，此时在prometheus-server上配置，去定期pull 数据即可，我们的prometheus-server目前部署在kubernetes集群内部，因此这里分享将gpu的数据采集到kubernetes集群内部的prometheus中。</p>
+
+<p><strong>创建endpoint以及对应的service</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># gpu-metrics的endpoint和service配置
+
+$ cat endpoint-gpus.yaml
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: gpu-metrics
+  namespace: monitoring
+  labels:
+    app: gpu-metrics
+subsets:
+- addresses:
+  - ip: 172.16.65.234
+  ports:
+  - port: 9400
+    name: http-metrics
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: monitoring
+  name: gpu-metrics
+  labels:
+    app: gpu-metrics
+spec:
+  ports:
+  - name: http-metrics
+    port: 19400
+    targetPort: 9400
+    protocol: TCP
+
+$ kubectl  apply -f endpoint-gpus.yaml
+
+# 查看创建的相关资源
+$ kubectl  get ep,svc -n monitoring  -l app=gpu-metrics
+NAME                    ENDPOINTS            AGE
+endpoints/gpu-metrics   172.16.65.234:9400   5m24s
+
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
+service/gpu-metrics   ClusterIP   10.253.138.97   &lt;none&gt;        19400/TCP   5m24s
+
+# 测试service暴露的端点
+# 确保集群内部可以访问service暴露出来的endpoint即可
+
+$ curl 10.253.138.97:19400/gpu/metrics
+# HELP dcgm_sm_clock SM clock frequency (in MHz).
+# TYPE dcgm_sm_clock gauge
+dcgm_sm_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 1328
+# HELP dcgm_memory_clock Memory clock frequency (in MHz).
+# TYPE dcgm_memory_clock gauge
+dcgm_memory_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 715</pre></td></tr></table>
+</div>
+</div>
+<p><strong>创建prometheus抓取数据的规则</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat prometheus-gpus.yml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: gpu-metrics
+  name: gpu-metrics
+  namespace: monitoring
+spec:
+  # 对应的端点是上面创建的svc的ports
+  endpoints:
+    # 定义endpoint采集的时间和采集的URI
+  - interval: 30s
+    port: http-metrics
+    path: /gpu/metrics
+  jobLabel: app
+  # 匹配monitoring命名空间的app=gpu-metrics的svc
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  selector:
+    matchLabels:
+      app: gpu-metrics
+
+$ kubectl  apply -f prometheus-gpus.yml
+servicemonitor.monitoring.coreos.com/gpu-metrics created
+
+$ kubectl  get servicemonitor  -n monitoring gpu-metrics
+NAME          AGE
+gpu-metrics   69s</pre></td></tr></table>
+</div>
+</div>
+<p>当上述资源创建完成后，在集群内部的prometheus-server中就可以找到对应的target，确认状态为up即表示prometheus已正常采集集群外gpu的metrics数据了，接下来数据就会以30s为间隔，源源不断的将数据采集到prometheus存储中.</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdiuxv5l47j31pk0aegon.jpg" alt="prometheus-gpu-targets" /></p>
+
+<p><strong>gpu监控信息的展示</strong></p>
+
+<p>到这里，我们已经到万里长征的最后一步了，就是把prometheus中gpu的监控数据用grafana展示出来，以实时去分析一些gpu的基本数据。</p>
+
+<p>在grafana官网中，已经有大佬制作了gpu监控的相关模板，比如<code>[GPU-Nodes-Metrics](https://grafana.com/grafana/dashboards/12027)</code>,因此，对于我们使用者来说，在grafana的面板中，将该模板导入即可使用。</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdiv4s5t9nj30ec0ek0tc.jpg" alt="选择导入方式创建" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdj0dzwdmjj31ly0u041p.jpg" alt="指定模板(dashboard id或json)" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdj0ftc6d8j31nd0u0djg.jpg" alt="注意:确认prometheus库正确后即可导入" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdj0h15tp5j31oi0u0n5x.jpg" alt="最终的GPU监控图" /></p>
+
+<p><strong>参考项目</strong></p>
+
+<p><a href="https://github.com/NVIDIA/gpu-monitoring-tools">gpu-monitor-tools</a></p>
+
+<p><a href="https://grafana.com/grafana/dashboards/11752">gpu-metrics-grafana</a></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-04-05
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/prometheus/">prometheus</a>
+          <a href="https://bgbiao.top/tags/gpu/">gpu</a>
+          <a href="https://bgbiao.top/tags/nvidia/">nvidia</a>
+          <a href="https://bgbiao.top/tags/prometheus/">prometheus</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/">
+            <span class="next-text nav-default">构建更小Docker镜像的一些建议</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -6,10 +6,536 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 22 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 05 Apr 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>基于DCGM和Prometheus的GPU监控方案</title>
+      <link>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</link>
+      <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</guid>
+      
+        <description>&lt;h2 id=&#34;基于dcgm和prometheus的gpu监控方案&#34;&gt;基于DCGM和Prometheus的GPU监控方案&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过&lt;code&gt;nvidia-smi&lt;/code&gt;这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于&lt;a href=&#34;https://developer.nvidia.com/dcgm&#34;&gt;DCGM&lt;/a&gt;相关的监控解决方案。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;DCGM(Data Center GPU Manager)即数据中心GPU管理器，是一套用于在集群环境中管理和监视&lt;code&gt;Tesla™&lt;/code&gt;GPU的工具。&lt;/p&gt;
+
+&lt;p&gt;它包括主动健康监控，全面诊断，系统警报以及包括电源和时钟管理在内的治理策略。&lt;/p&gt;
+
+&lt;p&gt;它可以由系统管理员独立使用，并且可以轻松地集成到NVIDIA合作伙伴的集群管理，资源调度和监视产品中。&lt;/p&gt;
+
+&lt;p&gt;DCGM简化了数据中心中的GPU管理，提高了资源可靠性和正常运行时间，自动化了管理任务，并有助于提高整体基础架构效率。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 虽然可以通过&lt;code&gt;nvidia-smi&lt;/code&gt;命令将相关的信息采集，并定期汇报到数据存储进行数据分析计算和展现，但是涉及到一整套的监控体系的整合，仍然需要使用方进行一些列的改造。因此这里，我们采用NVIDIA官方提供的DCGM方案来进行GPU数据采集，并通过声称下一代监控系统的Prometheus进行整个监控和告警的集成。&lt;/p&gt;
+
+&lt;h3 id=&#34;dcgm工具部署&#34;&gt;DCGM工具部署&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ git clone https://github.com/NVIDIA/gpu-monitoring-tools.git
+
+# 构建dcgm-exporter工具，其实就是nvidia官方对于nvidia-docker2.x推出的用于gpu数据监控的工具
+# 最终会将gpu卡的metrics基本信息存储以metrics的数据格式存储到文件中
+$ cd dcgm-exporter
+# nvidia/dcgm-exporter:latest
+$ make 
+
+$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
+
+# 查看dcgm-exporter收集到的gpu metrics数据
+$ docker exec -it nvidia-dcgm-exporter tail -n 10  /run/prometheus/dcgm.prom
+dcgm_ecc_dbe_aggregate_total{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
+# HELP dcgm_retired_pages_sbe Total number of retired pages due to single-bit errors.
+# TYPE dcgm_retired_pages_sbe counter
+dcgm_retired_pages_sbe{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
+# HELP dcgm_retired_pages_dbe Total number of retired pages due to double-bit errors.
+# TYPE dcgm_retired_pages_dbe counter
+dcgm_retired_pages_dbe{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
+# HELP dcgm_retired_pages_pending Total number of pages pending retirement.
+# TYPE dcgm_retired_pages_pending counter
+dcgm_retired_pages_pending{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;dcgm-exporter采集指标项以及含义:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;指标&lt;/th&gt;
+&lt;th&gt;含义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;dcgm_fan_speed_percent&lt;/td&gt;
+&lt;td&gt;GPU 风扇转速占比（%）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_sm_clock&lt;/td&gt;
+&lt;td&gt;GPU sm 时钟(MHz)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_memory_clock&lt;/td&gt;
+&lt;td&gt;GPU 内存时钟(MHz)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_gpu_temp&lt;/td&gt;
+&lt;td&gt;GPU 运行的温度(℃)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_power_usage&lt;/td&gt;
+&lt;td&gt;GPU 的功率（w）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_pcie_tx_throughput&lt;/td&gt;
+&lt;td&gt;GPU PCIe TX传输的字节总数 （kb）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_pcie_rx_throughput&lt;/td&gt;
+&lt;td&gt;GPU PCIe RX接收的字节总数   （kb）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_pcie_replay_counter&lt;/td&gt;
+&lt;td&gt;GPU PCIe重试的总数&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_gpu_utilization&lt;/td&gt;
+&lt;td&gt;GPU 利用率（%）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_mem_copy_utilization&lt;/td&gt;
+&lt;td&gt;GPU 内存利用率（%）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_enc_utilization&lt;/td&gt;
+&lt;td&gt;GPU 编码器利用率 （%）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_dec_utilization&lt;/td&gt;
+&lt;td&gt;GPU 解码器利用率 (%)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_xid_errors&lt;/td&gt;
+&lt;td&gt;GPU 上一个xid错误的值&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_power_violation&lt;/td&gt;
+&lt;td&gt;GPU 功率限制导致的节流持续时间(us)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_thermal_violation&lt;/td&gt;
+&lt;td&gt;GPU 热约束节流持续时间(us)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_sync_boost_violation&lt;/td&gt;
+&lt;td&gt;GPU 同步增强限制，限制持续时间(us)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_fb_free&lt;/td&gt;
+&lt;td&gt;GPU fb（帧缓存）的剩余（MiB）&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;dcgm_fb_used&lt;/td&gt;
+&lt;td&gt;GPU fb （帧缓存）的使用 （MiB）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;其实到这，dcgm已经完整的将我们需要的gpu的metrics数据采集出来了，并且是符合prometheus的数据格式和标准的，此时，我们可以根据实际的情况编写一个简单的api程序，将采集到的数据以api的形式暴露出去，就可以让整个prometheus server对各个gpu主机的metrics进行采集和监控。&lt;/p&gt;
+
+&lt;p&gt;不过官方提供了基于kubernetes集群中pod方式的api接口，采用golang语言开发，具体使用情况可参考如下文档。&lt;/p&gt;
+
+&lt;h3 id=&#34;prometheus-gpu-metrics-exporter&#34;&gt;prometheus gpu metrics exporter&lt;/h3&gt;
+
+&lt;p&gt;在&lt;code&gt;gpu-monitoring-tools&lt;/code&gt;项目中，默认提供了一个&lt;code&gt;pod-gpu-metrics-exporter&lt;/code&gt;模块，用于在kubernetes集群中的gpu-metrics的部署，官方的示例步骤如下:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;nvidia-k8s-device-plugin&lt;/li&gt;
+&lt;li&gt;Deploy GPU Pods&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在使kubernetes集群中部署的前提是你的GPU要托管在k8s集群内部，这也就意味着你得先成功将带GPU的主机成功托管到集群中，并且能够调度GPU资源&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 创建一个监控的命名空间
+# Create the monitoring namespace
+$ kubectl create namespace monitoring
+
+# Add gpu metrics endpoint to prometheus
+$ kubectl create -f prometheus/prometheus-configmap.yaml
+
+# Deploy prometheus
+$ kubectl create -f prometheus/prometheus-deployment.yaml
+
+$ kubectl create -f pod-gpu-metrics-exporter-daemonset.yaml
+
+# Open in browser: localhost:9090
+
+# 具体的docker镜像构建和运行
+# 依然是gpu-monitoring-tools项目
+$ cd  pod-gpu-metrics-exporter
+$ docker build -t pod-gpu-metrics-exporter .
+
+# 运行dcgm-exporter
+$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
+
+# 运行gpu-metrics-exporter
+$ docker run -d --privileged --rm -p 9400:9400 -v /var/lib/kubelet/pod-resources:/var/lib/kubelet/pod-resources --volumes-from nvidia-dcgm-exporter:ro nvidia/pod-gpu-metrics-exporter:v1.0.0-alpha
+
+# 此时就将上述的那个dcgm-exporter中采集到数据成功暴露到对外的接口了
+$ curl -s localhost:9400/gpu/metrics&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;需要注意的是，在&lt;code&gt;gpu-metrics-exporter&lt;/code&gt;的程序中，是针对pod的方式来采集gpu的metrics的信息，并且附带了pod本身的基本信息，因此如果你的&lt;code&gt;gpu&lt;/code&gt;主机还未在kubernetes集群中托管，官方提供的镜像可能并不能使用，需要对&lt;code&gt;src/http.go&lt;/code&gt;文件中采集的路径进行改变，将默认的&lt;code&gt;gpuPodMetrics&lt;/code&gt;改成&lt;code&gt;gpuMetrics&lt;/code&gt;即可，两者会去读取不同的dcgm-exporter暴露出来的metrics文件，否则访问api接口时会发现无法找到metrics文件.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;func getGPUmetrics(resp http.ResponseWriter, req *http.Request) {
+	//metrics, err := ioutil.ReadFile(gpuPodMetrics)
+	metrics, err := ioutil.ReadFile(gpuMetrics)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		glog.Errorf(&amp;#34;error responding to %v%v: %v&amp;#34;, req.Host, req.URL, err.Error())
+		return
+	}
+	resp.Write(metrics)
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;参考&lt;a href=&#34;https://github.com/BGBiao/gpu-monitoring-tools/tree/master/gpu-metrics-exporter&#34;&gt;gpu-metrics-exporter&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;图省事的，可以直接下载如下两个镜像，在已经work 的GPU主机上直接运行.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;dcgm-exporter: &lt;code&gt;docker pull bgbiao/dcgm-exporter:latest&lt;/code&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;gpu-metrics-exporter: &lt;code&gt;docker pull bgbiao/gpu-metrics-exporter:latest&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 确定dcgm-exporter是运行的
+$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter bgbiao/dcgm-exporter
+
+$ docker run -d --privileged --rm -p 9400:9400  --volumes-from nvidia-dcgm-exporter:ro bgbiao/gpu-metrics-exporter
+
+# 检查gpu暴露出来的基础信息
+$ curl -s localhost:9400/gpu/metrics
+dcgm_ecc_dbe_aggregate_total{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
+....
+....&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;prometheus采集&#34;&gt;prometheus采集&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 有了上述的gpu-metrics-exporter之后，我们的gpu相关的运行数据就可以以premetheus兼容的方式获取了，此时在prometheus-server上配置，去定期pull 数据即可，我们的prometheus-server目前部署在kubernetes集群内部，因此这里分享将gpu的数据采集到kubernetes集群内部的prometheus中。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;创建endpoint以及对应的service&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# gpu-metrics的endpoint和service配置
+
+$ cat endpoint-gpus.yaml
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: gpu-metrics
+  namespace: monitoring
+  labels:
+    app: gpu-metrics
+subsets:
+- addresses:
+  - ip: 172.16.65.234
+  ports:
+  - port: 9400
+    name: http-metrics
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: monitoring
+  name: gpu-metrics
+  labels:
+    app: gpu-metrics
+spec:
+  ports:
+  - name: http-metrics
+    port: 19400
+    targetPort: 9400
+    protocol: TCP
+
+$ kubectl  apply -f endpoint-gpus.yaml
+
+# 查看创建的相关资源
+$ kubectl  get ep,svc -n monitoring  -l app=gpu-metrics
+NAME                    ENDPOINTS            AGE
+endpoints/gpu-metrics   172.16.65.234:9400   5m24s
+
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
+service/gpu-metrics   ClusterIP   10.253.138.97   &amp;lt;none&amp;gt;        19400/TCP   5m24s
+
+# 测试service暴露的端点
+# 确保集群内部可以访问service暴露出来的endpoint即可
+
+$ curl 10.253.138.97:19400/gpu/metrics
+# HELP dcgm_sm_clock SM clock frequency (in MHz).
+# TYPE dcgm_sm_clock gauge
+dcgm_sm_clock{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 1328
+# HELP dcgm_memory_clock Memory clock frequency (in MHz).
+# TYPE dcgm_memory_clock gauge
+dcgm_memory_clock{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 715&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;创建prometheus抓取数据的规则&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ cat prometheus-gpus.yml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: gpu-metrics
+  name: gpu-metrics
+  namespace: monitoring
+spec:
+  # 对应的端点是上面创建的svc的ports
+  endpoints:
+    # 定义endpoint采集的时间和采集的URI
+  - interval: 30s
+    port: http-metrics
+    path: /gpu/metrics
+  jobLabel: app
+  # 匹配monitoring命名空间的app=gpu-metrics的svc
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  selector:
+    matchLabels:
+      app: gpu-metrics
+
+$ kubectl  apply -f prometheus-gpus.yml
+servicemonitor.monitoring.coreos.com/gpu-metrics created
+
+$ kubectl  get servicemonitor  -n monitoring gpu-metrics
+NAME          AGE
+gpu-metrics   69s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;当上述资源创建完成后，在集群内部的prometheus-server中就可以找到对应的target，确认状态为up即表示prometheus已正常采集集群外gpu的metrics数据了，接下来数据就会以30s为间隔，源源不断的将数据采集到prometheus存储中.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdiuxv5l47j31pk0aegon.jpg&#34; alt=&#34;prometheus-gpu-targets&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;gpu监控信息的展示&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;到这里，我们已经到万里长征的最后一步了，就是把prometheus中gpu的监控数据用grafana展示出来，以实时去分析一些gpu的基本数据。&lt;/p&gt;
+
+&lt;p&gt;在grafana官网中，已经有大佬制作了gpu监控的相关模板，比如&lt;code&gt;[GPU-Nodes-Metrics](https://grafana.com/grafana/dashboards/12027)&lt;/code&gt;,因此，对于我们使用者来说，在grafana的面板中，将该模板导入即可使用。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdiv4s5t9nj30ec0ek0tc.jpg&#34; alt=&#34;选择导入方式创建&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdj0dzwdmjj31ly0u041p.jpg&#34; alt=&#34;指定模板(dashboard id或json)&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdj0ftc6d8j31nd0u0djg.jpg&#34; alt=&#34;注意:确认prometheus库正确后即可导入&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdj0h15tp5j31oi0u0n5x.jpg&#34; alt=&#34;最终的GPU监控图&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;参考项目&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/gpu-monitoring-tools&#34;&gt;gpu-monitor-tools&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/grafana/dashboards/11752&#34;&gt;gpu-metrics-grafana&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>构建更小Docker镜像的一些建议</title>
@@ -98,7 +624,7 @@ CMD [&amp;#34;./hello&amp;#34;]&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 &lt;p&gt;所以，在企业内部进行容器化改造和上线时，除了需要考虑各个适用方的场景问题和操作便利性，同时在构建过程中也需要进行一定的把控。&lt;/p&gt;
 
-&lt;p&gt;当然啦，尽可能的将镜像压缩到最小，不仅可以减少磁盘的使用，同时在大规模分发镜像时也会表现的相对有效率，但在实际使用过程中，并不是所有的镜像越小越好，同时我们需要在镜像的通用性和可维护性上进行一定权重的考量&lt;/p&gt;
+&lt;p&gt;当然啦，尽可能的将镜像压缩到最小，不仅可以减少磁盘的使用，同时在大规模分发镜像时也会表现的相对有效率，但在实际使用过程中，并不是所有的镜像越小越好，同时我们需要在镜像的通用性和可维护性上进行一定权重的考量。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
@@ -8091,231 +8617,6 @@ Events:
 
 &lt;p&gt;&lt;a href=&#34;https://www.aliyun.com/product/kubernetes?aly_as=TZbDoxLq&amp;amp;source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;阅读全文&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>k8s删除Terminating状态的命名空间</title>
-      <link>https://bgbiao.top/post/k8s-delete-namespace/</link>
-      <pubDate>Mon, 21 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/k8s-delete-namespace/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;strong&gt;查看命名空间详情&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;$ kubectl  get ns  | grep rdb
-rdbms                  Terminating   6d21h
-
-$ kubectl  get ns rdbms -o yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {&amp;#34;apiVersion&amp;#34;:&amp;#34;v1&amp;#34;,&amp;#34;kind&amp;#34;:&amp;#34;Namespace&amp;#34;,&amp;#34;metadata&amp;#34;:{&amp;#34;annotations&amp;#34;:{},&amp;#34;name&amp;#34;:&amp;#34;rdbms&amp;#34;}}
-  creationTimestamp: &amp;#34;2019-10-14T12:17:44Z&amp;#34;
-  deletionTimestamp: &amp;#34;2019-10-14T12:30:27Z&amp;#34;
-  name: rdbms
-  resourceVersion: &amp;#34;8844754&amp;#34;
-  selfLink: /api/v1/namespaces/rdbms
-  uid: 29067ddf-56d7-4cce-afa3-1fbdbb221ab1
-spec:
-  finalizers:
-  - kubernetes
-status:
-  phase: Terminating&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;查看该命名空间下的资源&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 查看k8s集群中可以使用命名空间隔离的资源
-$ kubectl api-resources -o name --verbs=list --namespaced | xargs -n 1 kubectl get --show-kind --ignore-not-found -n rdbms
-
-# 发现rdbms命名空间下并无资源占用&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;尝试对命名空间进行删除&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 直接删除命名空间rdbms
-## 提示删除操作未能完成，说系统会在确定没用没用资源后将会被自动删除
-$ kubectl  delete ns rdbms
-Error from server (Conflict): Operation cannot be fulfilled on namespaces &amp;#34;rdbms&amp;#34;: The system is ensuring all content is removed from this namespace.  Upon completion, this namespace will automatically be purged by the system.
-
-
-# 使用强制删除(依然无法删除该命名空间)
-$ kubectl  delete ns rdbms --force --grace-period=0
-warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
-Error from server (Conflict): Operation cannot be fulfilled on namespaces &amp;#34;rdbms&amp;#34;: The system is ensuring all content is removed from this namespace.  Upon completion, this namespace will automatically be purged by the system.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;使用原生接口删除&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 获取namespace的详情信息
-$ kubectl  get ns rdbms  -o json &amp;gt; rdbms.json
-
-# 查看napespace定义的json配置
-## 删除掉spec部分即可
-$ cat rdbms.json
-{
-    &amp;#34;apiVersion&amp;#34;: &amp;#34;v1&amp;#34;,
-    &amp;#34;kind&amp;#34;: &amp;#34;Namespace&amp;#34;,
-    &amp;#34;metadata&amp;#34;: {
-        &amp;#34;annotations&amp;#34;: {
-            &amp;#34;kubectl.kubernetes.io/last-applied-configuration&amp;#34;: &amp;#34;{\&amp;#34;apiVersion\&amp;#34;:\&amp;#34;v1\&amp;#34;,\&amp;#34;kind\&amp;#34;:\&amp;#34;Namespace\&amp;#34;,\&amp;#34;metadata\&amp;#34;:{\&amp;#34;annotations\&amp;#34;:{},\&amp;#34;name\&amp;#34;:\&amp;#34;rdbms\&amp;#34;}}\n&amp;#34;
-        },
-        &amp;#34;creationTimestamp&amp;#34;: &amp;#34;2019-10-14T12:17:44Z&amp;#34;,
-        &amp;#34;deletionTimestamp&amp;#34;: &amp;#34;2019-10-14T12:30:27Z&amp;#34;,
-        &amp;#34;name&amp;#34;: &amp;#34;rdbms&amp;#34;,
-        &amp;#34;resourceVersion&amp;#34;: &amp;#34;8844754&amp;#34;,
-        &amp;#34;selfLink&amp;#34;: &amp;#34;/api/v1/namespaces/rdbms&amp;#34;,
-        &amp;#34;uid&amp;#34;: &amp;#34;29067ddf-56d7-4cce-afa3-1fbdbb221ab1&amp;#34;
-    },
-    &amp;#34;spec&amp;#34;: {
-        &amp;#34;finalizers&amp;#34;: [
-            &amp;#34;kubernetes&amp;#34;
-        ]
-    },
-    &amp;#34;status&amp;#34;: {
-        &amp;#34;phase&amp;#34;: &amp;#34;Terminating&amp;#34;
-    }
-}
-
-# 使用http接口进行删除
-$ curl -k -H &amp;#34;Content-Type:application/json&amp;#34; -X PUT --data-binary @rdbms.json https://x.x.x.x:6443/api/v1/namespaces/rdbms/finalize
-{
-  &amp;#34;kind&amp;#34;: &amp;#34;Namespace&amp;#34;,
-  &amp;#34;apiVersion&amp;#34;: &amp;#34;v1&amp;#34;,
-  &amp;#34;metadata&amp;#34;: {
-    &amp;#34;name&amp;#34;: &amp;#34;rdbms&amp;#34;,
-    &amp;#34;selfLink&amp;#34;: &amp;#34;/api/v1/namespaces/rdbms/finalize&amp;#34;,
-    &amp;#34;uid&amp;#34;: &amp;#34;29067ddf-56d7-4cce-afa3-1fbdbb221ab1&amp;#34;,
-    &amp;#34;resourceVersion&amp;#34;: &amp;#34;8844754&amp;#34;,
-    &amp;#34;creationTimestamp&amp;#34;: &amp;#34;2019-10-14T12:17:44Z&amp;#34;,
-    &amp;#34;deletionTimestamp&amp;#34;: &amp;#34;2019-10-14T12:30:27Z&amp;#34;,
-    &amp;#34;annotations&amp;#34;: {
-      &amp;#34;kubectl.kubernetes.io/last-applied-configuration&amp;#34;: &amp;#34;{\&amp;#34;apiVersion\&amp;#34;:\&amp;#34;v1\&amp;#34;,\&amp;#34;kind\&amp;#34;:\&amp;#34;Namespace\&amp;#34;,\&amp;#34;metadata\&amp;#34;:{\&amp;#34;annotations\&amp;#34;:{},\&amp;#34;name\&amp;#34;:\&amp;#34;rdbms\&amp;#34;}}\n&amp;#34;
-    }
-  },
-  &amp;#34;spec&amp;#34;: {
-
-  },
-  &amp;#34;status&amp;#34;: {
-    &amp;#34;phase&amp;#34;: &amp;#34;Terminating&amp;#34;
-  }
-
-# 再次查看namespace发现已经被删除了
-$ kubectl  get ns  | grep rdb&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>

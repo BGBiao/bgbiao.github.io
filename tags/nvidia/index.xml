@@ -6,10 +6,23 @@
     <description>Recent content in NVIDIA on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 08 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 05 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/nvidia/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>基于DCGM和Prometheus的GPU监控方案</title>
+      <link>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</link>
+      <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</guid>
+      <description>&lt;h2 id=&#34;基于dcgm和prometheus的gpu监控方案&#34;&gt;基于DCGM和Prometheus的GPU监控方案&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过&lt;code&gt;nvidia-smi&lt;/code&gt;这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于&lt;a href=&#34;https://developer.nvidia.com/dcgm&#34;&gt;DCGM&lt;/a&gt;相关的监控解决方案。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>Kubernetes-1.15管理NVIDIA GPU容器</title>
