@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Traefik的可观测性方案 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="Traefik的可观测性支持 traefik-observability
+注意: 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中
+ 服务日志: Traefik进程本身相关的操作日志 访问日志: 由Traefik接管的代理服务的访问日志(access.log) Metrics: Traefik提供的自身详细的metrics数据 Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况 " />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="Traefik的可观测性方案" />
+<meta property="og:description" content="Traefik的可观测性支持
+
+traefik-observability
+
+注意: 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中
+
+
+服务日志: Traefik进程本身相关的操作日志
+访问日志: 由Traefik接管的代理服务的访问日志(access.log)
+Metrics: Traefik提供的自身详细的metrics数据
+Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/" />
+<meta property="article:published_time" content="2020-04-07T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-04-07T00:00:00+00:00" />
+<meta itemprop="name" content="Traefik的可观测性方案">
+<meta itemprop="description" content="Traefik的可观测性支持
+
+traefik-observability
+
+注意: 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中
+
+
+服务日志: Traefik进程本身相关的操作日志
+访问日志: 由Traefik接管的代理服务的访问日志(access.log)
+Metrics: Traefik提供的自身详细的metrics数据
+Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况
+">
+
+
+<meta itemprop="datePublished" content="2020-04-07T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-04-07T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5057">
+
+
+
+<meta itemprop="keywords" content="traefik,kubernetes,可观测性,prometheus,grafana," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Traefik的可观测性方案"/>
+<meta name="twitter:description" content="Traefik的可观测性支持
+
+traefik-observability
+
+注意: 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中
+
+
+服务日志: Traefik进程本身相关的操作日志
+访问日志: 由Traefik接管的代理服务的访问日志(access.log)
+Metrics: Traefik提供的自身详细的metrics数据
+Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Traefik的可观测性方案</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-04-07" class="post-time">
+          2020-04-07
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 5057 words </span>
+          <span class="more-meta"> 11 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#traefik的可观测性支持">Traefik的可观测性支持</a>
+<ul>
+<li><a href="#服务日志">服务日志</a></li>
+<li><a href="#访问日志">访问日志</a></li>
+<li><a href="#metrics">Metrics</a></li>
+<li><a href="#tracing">Tracing</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h2 id="traefik的可观测性支持">Traefik的可观测性支持</h2>
+
+<p><a href="https://docs.traefik.io/observability/logs/">traefik-observability</a></p>
+
+<p><code>注意:</code> 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中</p>
+
+<ul>
+<li>服务日志: Traefik进程本身相关的操作日志</li>
+<li>访问日志: 由Traefik接管的代理服务的访问日志(access.log)</li>
+<li>Metrics: Traefik提供的自身详细的metrics数据</li>
+<li>Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况</li>
+</ul>
+
+<h3 id="服务日志">服务日志</h3>
+
+<p><code>注意:</code>默认的环境中,Traefik会将日志以<code>text</code>格式写入到stdout中，如果使用docker的方式部署的话，想要查看日志需要使用<code>docker logs container_name</code>方式来查看日志。</p>
+
+<p><code>相关配置</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+$ cat traefik.toml
+[log]
+  filePath = &#34;/path/to/traefik.log&#34;   # 配置traefik的进程日志路径
+  format = &#34;json&#34;                     # 配置日志文件的格式[text(text|json)]
+  level = &#34;DEBUG&#34;                     # 指定日志输出的级别[ERROR(ERROR|DEBUG|INFO|PANIC|FATAL|WARN)]
+
+# cli 配置
+--log.filePath=/path/to/traefik.log
+--log.format=json
+--log.level=DEBUG</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:</code> 具体的日志配置参数需要和当前环境中的traefik大版本兼容，否则可能会出现意想不到的问题。</p>
+
+<h3 id="访问日志">访问日志</h3>
+
+<p>访问日志用来记录通过traefik进来的各个请求的访问详情，包含HTTP请求的各个header以及响应时间等数据，类似于Nginx中的<code>access.log</code>，通常情况，我们可以使用访问日志来分析整个traefik的整体流量以及各个服务流量以及状态详情。</p>
+
+<p><code>注意:</code> 访问日志默认也是以<code>text</code>格式被写到标准输出的</p>
+
+<p><code>相关配置</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+$ cat traefik.toml
+[accessLog]
+  filePath = &#34;/path/to/traefik.log&#34;
+  format = &#34;&#34;                       # 指定访问日志的格式，默认使用CLF(Common Log Format)，可以指定为json格式
+  bufferingSize = 100               # 以异步方式写入日志需要指定该参数，表示写入到指定输出设备前保留在内存中的日志行数
+  [accessLog.filters]               # 指定一组逻辑上是Or的过滤连接器,指定多个过滤器将比只指定一个过滤器保留更多的访问日志
+    statusCodes = [&#34;200&#34;, &#34;300-302&#34;] # 过滤指定状态码范围的请求日志
+    retryAttempts = true             # 当有重试时保留日志
+    minDuration = &#34;10ms&#34;             # 当请求花费的时间超过指定的持续时间时，保留访问日志
+    
+  [accessLog.fields]                # 限制访问日志中的字段(可以使用fields.names和fields.header选项来决定字段的输出)
+    defaultMode = &#34;keep&#34;            # 每种字段可以设置成如下字段(keep:保留字段,drop:丢弃,redact:使用redacted替换值)
+    [accessLog.fields.names]        # 指定限制的字段名称
+      &#34;ClientUsername&#34; = &#34;drop&#34;     # 设置ClientUsername字段为丢弃
+    [accessLog.fields.headers]      # 设置headers相关字段
+      defaultMode = &#34;keep&#34;          # 对全部的header进行默认保留
+      [accessLog.fields.headers.names] # 对指定的header字段设置保留规则
+        &#34;User-Agent&#34; = &#34;redact&#34;
+        &#34;Authorization&#34; = &#34;drop&#34;
+        &#34;Content-Type&#34; = &#34;keep&#34;
+
+# cli 配置
+--accesslog=true
+--accesslog.filepath=/path/to/access.log
+--accesslog.format=json
+--accesslog.bufferingsize=100
+--accesslog.filters.statuscodes=200,300-302
+--accesslog.filters.retryattempts
+--accesslog.filters.minduration=10ms
+--accesslog.fields.defaultmode=keep
+--accesslog.fields.names.ClientUsername=drop
+--accesslog.fields.headers.defaultmode=keep
+--accesslog.fields.headers.names.User-Agent=redact
+--accesslog.fields.headers.names.Authorization=drop
+--accesslog.fields.headers.names.Content-Type=keep</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:</code> 由于我们是将Traefik当做Kubernetes集群中的边缘节点，去代理内部HTTP服务的，因此Traefik部署在集群内部,将进程日志和访问日志都以volume的方式挂载到边缘节点的数据目录中。</p>
+
+<p>使用<code>DaemonSet</code>方式将Traefik部署在k8s集群内部，具体的配置如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span><span class="lnt">96
+</span><span class="lnt">97
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat traefik-ds.yml
+---
+kind: DaemonSet
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      affinity:
+        # 定义node的亲和性，不允许调度到master节点
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      containers:
+      - image: traefik:v1.7.16
+        name: traefik-ingress-lb
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8080
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+        args:
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+        - --traefikLog.filePath=/logdata/traefik.log
+        - --configfile=/config/traefik.toml
+        - --accesslog.filepath=/logdata/access.log
+        - --accesslog.bufferingsize=100
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /logdata
+          name: access-log
+      volumes:
+      - configMap:
+          name: traefik-config
+        name: config
+      - name: access-log
+        hostPath:
+          path: /opt/logs/ingress/
+
+# 查看traefik 的状态
+$ kubectl  get pods -n kube-system  | grep traefik
+traefik-ingress-controller-2dx7k   1/1     Running   0          5h28m
+...
+...
+
+$ kubectl  get svc -n kube-system  | grep traefik
+traefik-ingress-service   ClusterIP   10.253.132.216   &lt;none&gt;        80/TCP,8080/TCP          123d
+traefik-web-ui            ClusterIP   10.253.54.184    &lt;none&gt;        80/TCP                   172d
+
+
+# 可以通过节点的ping接口和admin接口来查看traefik服务是否正常
+$ curl 10.253.132.216/ping
+OK
+
+$ curl 10.253.132.216:8080
+&lt;a href=&#34;/dashboard/&#34;&gt;Found&lt;/a&gt;.
+
+
+# 在调度到treafik的节点上查看进程日志和访问日志
+$ tree -L 2 /opt/logs/ingress/
+/opt/logs/ingress/
+├── access.log
+└── traefik.log
+
+$ tail -n 10 /opt/logs/ingress/traefik.log
+time=&#34;2020-04-07T08:53:38Z&#34; level=warning msg=&#34;Endpoints not available for my-data/my-data-selfaccess-dev&#34;
+time=&#34;2020-04-07T08:53:38Z&#34; level=warning msg=&#34;Endpoints not available for my-data/my-data-metadata-prod1&#34;
+
+
+$ tail -n 10 /opt/logs/ingress/access.log
+172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;POST /.kibana/_search?ignore_unavailable=true&amp;filter_path=aggregations.types.buckets HTTP/1.1&#34; 503 161 &#34;-&#34; &#34;-&#34; 491674 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.41.10:9200&#34; 1ms
+172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;POST /.kibana/_search?ignore_unavailable=true&amp;filter_path=aggregations.types.buckets HTTP/1.1&#34; 503 161 &#34;-&#34; &#34;-&#34; 491671 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.26.20:9200&#34; 1ms
+172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;GET /.kibana/doc/config%3A6.4.0 HTTP/1.1&#34; 503 301 &#34;-&#34; &#34;-&#34; 491675 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.14.6:9200&#34; 1ms</pre></td></tr></table>
+</div>
+</div>
+<p>从访问日志的输出格式中，我们可以看到，traefik的访问日志和Nginx的访问日志会比较相似，有了这份日志后，我们可以通过一些ELK之类的日志分析方案来分期网站的整体状态，比如UV,PV,区域分布，状态分布以及响应时间等等。</p>
+
+<p>另外，我们是将访问日志直接持久化输出到node节点上，后面可以通过node主机上的日志采集插件，将日志发送到ELK Stack中，进行分析，当然也可以直接将ELK Stack的日志采集端部署到traefik的pod中，也是可以的。</p>
+
+<h3 id="metrics">Metrics</h3>
+
+<p>Traefik默认支持四种Metrics的后端实现:
+- <a href="https://docs.traefik.io/observability/metrics/datadog/">Datadog</a>
+- <a href="https://docs.traefik.io/observability/metrics/influxdb/">Influxdb</a>
+- <a href="https://docs.traefik.io/observability/metrics/prometheus/">Prometheus</a>
+- <a href="https://docs.traefik.io/observability/metrics/statsd/">StatsD</a></p>
+
+<p>想要开启<code>metrics</code>的支持，只需要做如下配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+    [metrics]
+      [metrics.prometheus]
+      buckets=[0.1,0.3,1.2,5.0]
+      entryPoint = &#34;traefik&#34;
+
+# yaml 配置文件
+metrics: {}
+
+# cli 配置
+--metrics=true</pre></td></tr></table>
+</div>
+</div>
+<p><strong>Datadog后端支持</strong></p>
+
+<p>配置详情:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml配置文件
+[metrics]
+  [metrics.datadog]
+    address = &#34;127.0.0.1:8125&#34;
+    addEntryPointsLabels = true   #在入口处增加metrics标签[true]
+    addServicesLabels = true      #在service中启用meirtcs[true]
+    pushInterval = 10s            #push metrics到datalog的间隔时间[10s]
+
+# cli 配置
+--metrics.datadog=true
+--metrics.datadog.address=127.0.0.1:8125
+--metrics.datadog.addEntryPointsLabels=true
+--metrics.datadog.addServicesLabels=true
+--metrics.datadog.pushInterval=10s</pre></td></tr></table>
+</div>
+</div>
+<p><strong>InfluxDB后端支持</strong></p>
+
+<p>配置详情:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml配置
+[metrics]
+  [metrics.influxDB]
+    address = &#34;localhost:8089&#34;     #指定influxdb地址 [localhost:8089]
+    protocol = &#34;udp&#34;               #influxdb的传输协议 [udp(udp|http)]
+    database = &#34;db&#34;                #指定metrics写入的库[&#34;&#34;]
+    retentionPolicy = &#34;two_hours&#34;  #metrics在influxdb中的保留策略 [&#34;&#34;]
+    username = &#34;&#34;                  #influxdb用户名
+    password = &#34;&#34;                  #influxdb密码
+    addEntryPointsLabels = true    #入口处增加metrics标签[true]
+    addServicesLabels = true       #在service中启用meirtcs[true]
+    pushInterval = 10s             #push metrics到datalog的间隔时间[10s]
+
+# cli 配置
+--metrics.influxdb=true
+--metrics.influxdb.address=localhost:8089
+--metrics.influxdb.protocol=udp
+--metrics.influxdb.database=db
+--metrics.influxdb.retentionPolicy=two_hours
+--metrics.influxdb.username=john
+--metrics.influxdb.password=secret
+--metrics.influxdb.addEntryPointsLabels=true
+--metrics.influxdb.addServicesLabels=true
+--metrics.influxdb.pushInterval=10s</pre></td></tr></table>
+</div>
+</div>
+<p><strong>Prometheus后端支持</strong></p>
+
+<p>配置详情:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml配置
+[metrics]
+  [metrics.prometheus]
+    buckets = [0.1,0.3,1.2,5.0]      #延迟的metrics的bucket存储[0.100000, 0.300000, 1.200000, 5.000000]
+    addEntryPointsLabels = true      #入口处增加metrics标签[true]
+    addServicesLabels = true         #在service中启用meirtcs[true]
+    entryPoint = &#34;traefik&#34;           #指定metrics的端点[traefik(默认是管理端口8080/metrics)],也可以自定义
+    manualRouting = true             #是否禁用内部路由[false]
+
+# cli配置
+--metrics.prometheus=true
+--metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
+--metrics.prometheus.addEntryPointsLabels=true
+--metrics.prometheus.addServicesLabels=true
+## 自定义了一个metrics端点，并指定了端口
+--metrics.prometheus.entryPoint=metrics
+--entryPoints.metrics.address=:8082
+--metrics.prometheus.manualrouting=true</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:</code>和其他两种方式不同的是，prometheus仅会暴露metrics，是需要使用prometheus-server定期进行<code>pull</code>来收集数据的。</p>
+
+<p>配置生效后，可以访问如下端口进行测试:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 自定义了metrics端点
+$ curl localhost:8082/metrics
+
+# 使用默认的traefik端点(用的是admin的端口)
+$ curl localhost:8080/metrics</pre></td></tr></table>
+</div>
+</div>
+<p><strong>StatsD后端支持</strong></p>
+
+<p>详细配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置
+[metrics]
+  [metrics.statsD]
+    address = &#34;localhost:8125&#34;          # 指定statsD服务地址
+    addEntryPointsLabels = true         # 入口处增加metrics标签[true] 
+    addServicesLabels = true            # 在service中启用meirtcs[true]
+    pushInterval = 10s                  # push间隔
+    prefix = &#34;traefik&#34;                  # 定义metrics收集的前缀[traefik]
+
+# cli 配置
+--metrics.statsd=true
+--metrics.statsd.address=localhost:8125
+--metrics.statsd.addEntryPointsLabels=true
+--metrics.statsd.addServicesLabels=true
+--metrics.statsd.pushInterval=10s
+--metrics.statsd.prefix=&#34;traefik&#34;</pre></td></tr></table>
+</div>
+</div>
+<p><strong>Prometheus后端的Metrics示例</strong></p>
+
+<p><code>注意:</code> 由于在生产环境使用的是traefik-1.7.6版本，因此上述的一些配置参数可能并不适用于该版本，详细的参数需要查看具体版本的支持参数，同时我们将traefik当做kubernetes集群中的ingress方案，因此如下操作在一个可用的k8s集群内部。</p>
+
+<p><a href="https://docs.traefik.io/v1.7/configuration/metrics/">traefik-1.7-metrics</a></p>
+
+<p><code>1.traefik的metrics配置</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># traefik metrics 配置
+$ cat traefik-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-config
+  namespace: kube-system
+data:
+  traefik.toml: |
+    defaultEntryPoints = [&#34;http&#34;,&#34;https&#34;]
+    debug = false
+    logLevel = &#34;INFO&#34;
+
+    InsecureSkipVerify = true
+    [entryPoints]
+      [entryPoints.http]
+      address = &#34;:80&#34;
+      compress = true
+      [entryPoints.https]
+      address = &#34;:443&#34;
+        [entryPoints.https.tls]
+    [web]
+      address = &#34;:8080&#34;
+    [kubernetes]
+    # 定义metrics相关参数
+    [metrics]
+      [metrics.prometheus]
+      buckets=[0.1,0.3,1.2,5.0]
+      entryPoint = &#34;traefik&#34;
+    [ping]
+    entryPoint = &#34;http&#34;
+
+# 重新调度pod后，即可查看暴露的endpoint
+
+$ kubectl  get ep -A | grep traefik
+kube-system            traefik-ingress-service                    172.16.171.163:80,172.16.21.26:80,172.16.21.27:80 + 11 more...            122d
+kube-system            traefik-web-ui                             172.16.171.163:8080,172.16.21.26:8080,172.16.21.27:8080 + 4 more...       171d
+
+$ kubectl  get svc -n kube-system | grep traefik
+traefik-ingress-service   ClusterIP   10.253.132.216   &lt;none&gt;        80/TCP,8080/TCP          122d
+traefik-web-ui            ClusterIP   10.253.54.184    &lt;none&gt;        80/TCP                   171d
+
+# 测试访问metrics服务(因为和traefik相关的两个service均路由到了traefil-ingress的pod上,下面两个效果是一致的)
+$ curl -s  10.253.132.216:8080/metrics  | head -10
+....
+....
+$ curl -s  10.253.54.184/metrics | head -10</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:</code> 推荐使用traefik-web-ui暴露的svc地址</p>
+
+<p>指标以及相关含义:</p>
+
+<table>
+<thead>
+<tr>
+<th>指标项</th>
+<th>含义</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>process_max_fds</td>
+<td>traefik进程最大的fd</td>
+</tr>
+
+<tr>
+<td>process_open_fds</td>
+<td>进程打开的fd</td>
+</tr>
+
+<tr>
+<td>process_resident_memory_bytes</td>
+<td>进程占用内存</td>
+</tr>
+
+<tr>
+<td>process_start_time_seconds</td>
+<td>进程启动时间</td>
+</tr>
+
+<tr>
+<td>process_virtual_memory_bytes</td>
+<td>进程占用虚拟内存</td>
+</tr>
+
+<tr>
+<td>traefik_backend_open_connections</td>
+<td>traefik后端打开链接</td>
+</tr>
+
+<tr>
+<td>traefik_backend_request_duration_seconds_bucket</td>
+<td>traefik后端请求处理时间</td>
+</tr>
+
+<tr>
+<td>traefik_backend_request_duration_seconds_sum</td>
+<td>总时间</td>
+</tr>
+
+<tr>
+<td>traefik_backend_request_duration_seconds_count</td>
+<td>总请求时间</td>
+</tr>
+
+<tr>
+<td>traefik_backend_requests_total</td>
+<td>一个后端处理的总请求数(按status code, protocol, and method划分)</td>
+</tr>
+
+<tr>
+<td>traefik_backend_server_up</td>
+<td>后端是否up(0</td>
+</tr>
+
+<tr>
+<td>traefik_config_last_reload_failure</td>
+<td>traefik上次失败reload的时间</td>
+</tr>
+
+<tr>
+<td>traefik_config_last_reload_success</td>
+<td>上次成功reload的时间</td>
+</tr>
+
+<tr>
+<td>traefik_config_reloads_failure_total</td>
+<td>失败次数</td>
+</tr>
+
+<tr>
+<td>traefik_config_reloads_total</td>
+<td>成功次数</td>
+</tr>
+
+<tr>
+<td>traefik_entrypoint_open_connections</td>
+<td>入口点存在打开链接的数量(method and protocol划分)</td>
+</tr>
+
+<tr>
+<td>traefik_entrypoint_request_duration_seconds_bucket</td>
+<td>在入口点处理请求花费的时间(status code, protocol, and method.)</td>
+</tr>
+
+<tr>
+<td>traefik_entrypoint_requests_total</td>
+<td>一个入口点处理的总请求数(状态码分布)</td>
+</tr>
+</tbody>
+</table>
+
+<p><code>2.配置prometheus-server</code></p>
+
+<p>注意，此时我们需要配置prometheus-server来对traefik暴露的metrics进行定期的pull采集。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 在k8s中创建一个prometheus monitor service
+$ cat prometheus-traefik.yml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: traefik-ingress-lb
+  name: traefik-metrics
+  namespace: monitoring
+spec:
+  # 对应的端点是上面创建的svc的ports
+  endpoints:
+    # 定义endpoint采集的时间
+  - interval: 30s
+    port: admin
+    path: /metrics
+  jobLabel: k8s-app
+  # 匹配monitoring命名空间的app=gpu-metrics的svc
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+
+$ kubectl apply -f prometheus-traefik.yml</pre></td></tr></table>
+</div>
+</div>
+<p>配置完成后，即可在prometheus中查看相关的metrics数据。</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdl4lcmvwsj32620o0ah5.jpg" alt="prometheus-traefik-metrics" /></p>
+
+<p><code>3.根据指标配置Grafana</code></p>
+
+<p><a href="https://grafana.com/grafana/dashboards/12041">grafana模板</a></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdl6drdnotj31kw0u0gxk.jpg" alt="Traefik-全局监控详情" /></p>
+
+<p>有了Merics的可视化后，针对于HTTP服务来说做各种滚动升级以及切流发布时，就很容易能够看到整个流量的变化。</p>
+
+<h3 id="tracing">Tracing</h3>
+
+<p>追踪系统可以开发人员可视化其基础架构中的调用流程.</p>
+
+<p>Traefik遵循OpenTracing规范(一个为分布式跟踪而设计的开放标准)</p>
+
+<p>Traefik支持五种追踪系统后端:
+- <a href="https://docs.traefik.io/observability/tracing/jaeger/">Jaeger</a>
+- <a href="https://docs.traefik.io/observability/tracing/zipkin/">Zipkin</a>
+- <a href="https://docs.traefik.io/observability/tracing/datadog/">Datadog</a>
+- <a href="https://docs.traefik.io/observability/tracing/instana/">Instana</a>
+- <a href="https://docs.traefik.io/observability/tracing/haystack/">Haystack</a>
+- <a href="https://docs.traefik.io/observability/tracing/elastic/">Elastic</a></p>
+
+<p><code>注意:</code> Datadog,Instana,Haystack为商业解决方案，以下不做介绍</p>
+
+<p><strong>1.配置</strong></p>
+
+<p><code>注意:</code> 默认情况下，traefik使用<code>Jaeger</code>来最为追踪系统的后端实现.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+$ cat traefik.toml
+[tracing]
+  serviceName = &#34;traefik&#34;			# 选择追踪系统的后端实现[traefik(表示使用jaeger)]
+  spanNameLimit = 150					# 限制长名称的名称阶段(这可以防止某些跟踪提供程序删除超过其长度限制的跟踪)
+
+# cli 配置
+--tracing=true
+--tracing.serviceName=traefik
+--tracing.spanNameLimit=150</pre></td></tr></table>
+</div>
+</div>
+<p><strong>2.Jaeger</strong></p>
+
+<p>相关配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+$ cat traefik.toml
+[tracing]
+  [tracing.jaeger]					# 开启jaeger的追踪支持
+    samplingServerURL = &#34;http://localhost:5778/sampling&#34; 		# 指定jaeger-agent的http采样地址
+    samplingType = &#34;const&#34;	# 指定采样类型[const(const|probabilistic|rateLimiting)]
+    samplingParam = 1.0			# 采样参数的值[1.0(const:0|1,probabilistic:0-1,rateLimiting:每秒的span数)]
+    localAgentHostPort = &#34;127.0.0.1:6831&#34;										# 本地agent主机和端口(会发送到jaeger-agent)
+    gen128Bit = true				# 生成128位的traceId,兼容OpenCensus
+    propagation = &#34;jaeger&#34;  # 设置数据传输的header类型[jaeger(jaeger|b3兼容OpenZipkin)]
+    traceContextHeaderName = &#34;uber-trace-id&#34;  # 跟踪上下文的header,用于传输跟踪上下文的http头名
+  [tracing.jaeger.collector]  # 指定jaeger的collector服务
+    endpoint = &#34;http://127.0.0.1:14268/api/traces?format=jaeger.thrift&#34;
+    user = &#34;my-user&#34;          # 向collector提交时的http认证用户[&#34;&#34;]
+    password = &#34;my-password&#34;  # 向collector提交时的http认证密码[&#34;&#34;]
+
+
+# cli 配置
+--tracing.jaeger=true
+--tracing.jaeger.samplingServerURL=http://localhost:5778/sampling
+--tracing.jaeger.samplingType=const
+--tracing.jaeger.samplingParam=1.0
+--tracing.jaeger.localAgentHostPort=127.0.0.1:6831
+--tracing.jaeger.gen128Bit
+--tracing.jaeger.propagation=jaeger
+--tracing.jaeger.traceContextHeaderName=uber-trace-id
+--tracing.jaeger.collector.endpoint=http://127.0.0.1:14268/api/traces?format=jaeger.thrift
+--tracing.jaeger.collector.user=my-user
+--tracing.jaeger.collector.password=my-password</pre></td></tr></table>
+</div>
+</div>
+<p><strong>3.Zipkin</strong></p>
+
+<p>相关配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+[tracing]
+  [tracing.zipkin]                  # 指定使用zipkin追踪系统
+    httpEndpoint = &#34;http://localhost:9411/api/v2/spans&#34;   # 指定zipkip收集数据的http端点
+    sameSpan = true                 # 使用Zipkin SameSpan RPC 类型追踪方式
+    id128Bit = true                 # 使用Zipkin 128 bit的追踪id(true)
+    sampleRate = 0.2                # 指定请求trace系统的频率[1.0(0.1-1.0)]
+
+# cli 配置
+--tracing.zipkin=true
+--tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans
+--tracing.zipkin.sameSpan=true
+--tracing.zipkin.id128Bit=false
+--tracing.zipkin.sampleRate=0.2</pre></td></tr></table>
+</div>
+</div>
+<p><strong>4.Elastic</strong></p>
+
+<p>相关配置:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># toml 配置文件
+$ cat traefik.toml
+[tracing]
+  [tracing.elastic]
+    serverURL = &#34;http://apm:8200&#34;     # 指定Elastic APM服务地址
+    secretToken = &#34;&#34;                  # 指定Elastic APM服务的安全token
+    serviceEnvironment = &#34;&#34;           # 指定APM Server的环境
+
+# cli 配置
+--tracing.elastic=true
+--tracing.elastic.serverurl=&#34;http://apm:8200&#34;
+--tracing.elastic.secrettoken=&#34;mytoken&#34;
+--tracing.elastic.serviceenvironment=&#34;production&#34;</pre></td></tr></table>
+</div>
+</div>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-04-07
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/traefik/">traefik</a>
+          <a href="https://bgbiao.top/tags/kubernetes/">kubernetes</a>
+          <a href="https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/">可观测性</a>
+          <a href="https://bgbiao.top/tags/prometheus/">prometheus</a>
+          <a href="https://bgbiao.top/tags/grafana/">grafana</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/">
+            <span class="next-text nav-default">基于DCGM和Prometheus的GPU监控方案</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

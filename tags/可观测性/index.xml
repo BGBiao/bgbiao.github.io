@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Grafana on BGBiao的SRE人生</title>
-    <link>https://bgbiao.top/tags/grafana/</link>
-    <description>Recent content in Grafana on BGBiao的SRE人生</description>
+    <title>可观测性 on BGBiao的SRE人生</title>
+    <link>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</link>
+    <description>Recent content in 可观测性 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Tue, 07 Apr 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://bgbiao.top/tags/grafana/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -29,19 +29,6 @@
 &lt;li&gt;Metrics: Traefik提供的自身详细的metrics数据&lt;/li&gt;
 &lt;li&gt;Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况&lt;/li&gt;
 &lt;/ul&gt;</description>
-    </item>
-    
-    <item>
-      <title>Prometheus入门实践</title>
-      <link>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</link>
-      <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</guid>
-      <description>&lt;h2 id=&#34;prometheus入门实践&#34;&gt;Prometheus入门实践&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
-&lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
-&lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

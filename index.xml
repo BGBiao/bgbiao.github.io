@@ -6,10 +6,1068 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 05 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Apr 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Traefik的可观测性方案</title>
+      <link>https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</link>
+      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
+      
+        <description>&lt;h2 id=&#34;traefik的可观测性支持&#34;&gt;Traefik的可观测性支持&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/observability/logs/&#34;&gt;traefik-observability&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;服务日志: Traefik进程本身相关的操作日志&lt;/li&gt;
+&lt;li&gt;访问日志: 由Traefik接管的代理服务的访问日志(access.log)&lt;/li&gt;
+&lt;li&gt;Metrics: Traefik提供的自身详细的metrics数据&lt;/li&gt;
+&lt;li&gt;Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;服务日志&#34;&gt;服务日志&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;默认的环境中,Traefik会将日志以&lt;code&gt;text&lt;/code&gt;格式写入到stdout中，如果使用docker的方式部署的话，想要查看日志需要使用&lt;code&gt;docker logs container_name&lt;/code&gt;方式来查看日志。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;相关配置&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+$ cat traefik.toml
+[log]
+  filePath = &amp;#34;/path/to/traefik.log&amp;#34;   # 配置traefik的进程日志路径
+  format = &amp;#34;json&amp;#34;                     # 配置日志文件的格式[text(text|json)]
+  level = &amp;#34;DEBUG&amp;#34;                     # 指定日志输出的级别[ERROR(ERROR|DEBUG|INFO|PANIC|FATAL|WARN)]
+
+# cli 配置
+--log.filePath=/path/to/traefik.log
+--log.format=json
+--log.level=DEBUG&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 具体的日志配置参数需要和当前环境中的traefik大版本兼容，否则可能会出现意想不到的问题。&lt;/p&gt;
+
+&lt;h3 id=&#34;访问日志&#34;&gt;访问日志&lt;/h3&gt;
+
+&lt;p&gt;访问日志用来记录通过traefik进来的各个请求的访问详情，包含HTTP请求的各个header以及响应时间等数据，类似于Nginx中的&lt;code&gt;access.log&lt;/code&gt;，通常情况，我们可以使用访问日志来分析整个traefik的整体流量以及各个服务流量以及状态详情。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 访问日志默认也是以&lt;code&gt;text&lt;/code&gt;格式被写到标准输出的&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;相关配置&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+$ cat traefik.toml
+[accessLog]
+  filePath = &amp;#34;/path/to/traefik.log&amp;#34;
+  format = &amp;#34;&amp;#34;                       # 指定访问日志的格式，默认使用CLF(Common Log Format)，可以指定为json格式
+  bufferingSize = 100               # 以异步方式写入日志需要指定该参数，表示写入到指定输出设备前保留在内存中的日志行数
+  [accessLog.filters]               # 指定一组逻辑上是Or的过滤连接器,指定多个过滤器将比只指定一个过滤器保留更多的访问日志
+    statusCodes = [&amp;#34;200&amp;#34;, &amp;#34;300-302&amp;#34;] # 过滤指定状态码范围的请求日志
+    retryAttempts = true             # 当有重试时保留日志
+    minDuration = &amp;#34;10ms&amp;#34;             # 当请求花费的时间超过指定的持续时间时，保留访问日志
+    
+  [accessLog.fields]                # 限制访问日志中的字段(可以使用fields.names和fields.header选项来决定字段的输出)
+    defaultMode = &amp;#34;keep&amp;#34;            # 每种字段可以设置成如下字段(keep:保留字段,drop:丢弃,redact:使用redacted替换值)
+    [accessLog.fields.names]        # 指定限制的字段名称
+      &amp;#34;ClientUsername&amp;#34; = &amp;#34;drop&amp;#34;     # 设置ClientUsername字段为丢弃
+    [accessLog.fields.headers]      # 设置headers相关字段
+      defaultMode = &amp;#34;keep&amp;#34;          # 对全部的header进行默认保留
+      [accessLog.fields.headers.names] # 对指定的header字段设置保留规则
+        &amp;#34;User-Agent&amp;#34; = &amp;#34;redact&amp;#34;
+        &amp;#34;Authorization&amp;#34; = &amp;#34;drop&amp;#34;
+        &amp;#34;Content-Type&amp;#34; = &amp;#34;keep&amp;#34;
+
+# cli 配置
+--accesslog=true
+--accesslog.filepath=/path/to/access.log
+--accesslog.format=json
+--accesslog.bufferingsize=100
+--accesslog.filters.statuscodes=200,300-302
+--accesslog.filters.retryattempts
+--accesslog.filters.minduration=10ms
+--accesslog.fields.defaultmode=keep
+--accesslog.fields.names.ClientUsername=drop
+--accesslog.fields.headers.defaultmode=keep
+--accesslog.fields.headers.names.User-Agent=redact
+--accesslog.fields.headers.names.Authorization=drop
+--accesslog.fields.headers.names.Content-Type=keep&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 由于我们是将Traefik当做Kubernetes集群中的边缘节点，去代理内部HTTP服务的，因此Traefik部署在集群内部,将进程日志和访问日志都以volume的方式挂载到边缘节点的数据目录中。&lt;/p&gt;
+
+&lt;p&gt;使用&lt;code&gt;DaemonSet&lt;/code&gt;方式将Traefik部署在k8s集群内部，具体的配置如下:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;90
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;91
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;92
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;93
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;94
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;95
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;96
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;97
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ cat traefik-ds.yml
+---
+kind: DaemonSet
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      affinity:
+        # 定义node的亲和性，不允许调度到master节点
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      containers:
+      - image: traefik:v1.7.16
+        name: traefik-ingress-lb
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8080
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+        args:
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+        - --traefikLog.filePath=/logdata/traefik.log
+        - --configfile=/config/traefik.toml
+        - --accesslog.filepath=/logdata/access.log
+        - --accesslog.bufferingsize=100
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /logdata
+          name: access-log
+      volumes:
+      - configMap:
+          name: traefik-config
+        name: config
+      - name: access-log
+        hostPath:
+          path: /opt/logs/ingress/
+
+# 查看traefik 的状态
+$ kubectl  get pods -n kube-system  | grep traefik
+traefik-ingress-controller-2dx7k   1/1     Running   0          5h28m
+...
+...
+
+$ kubectl  get svc -n kube-system  | grep traefik
+traefik-ingress-service   ClusterIP   10.253.132.216   &amp;lt;none&amp;gt;        80/TCP,8080/TCP          123d
+traefik-web-ui            ClusterIP   10.253.54.184    &amp;lt;none&amp;gt;        80/TCP                   172d
+
+
+# 可以通过节点的ping接口和admin接口来查看traefik服务是否正常
+$ curl 10.253.132.216/ping
+OK
+
+$ curl 10.253.132.216:8080
+&amp;lt;a href=&amp;#34;/dashboard/&amp;#34;&amp;gt;Found&amp;lt;/a&amp;gt;.
+
+
+# 在调度到treafik的节点上查看进程日志和访问日志
+$ tree -L 2 /opt/logs/ingress/
+/opt/logs/ingress/
+├── access.log
+└── traefik.log
+
+$ tail -n 10 /opt/logs/ingress/traefik.log
+time=&amp;#34;2020-04-07T08:53:38Z&amp;#34; level=warning msg=&amp;#34;Endpoints not available for my-data/my-data-selfaccess-dev&amp;#34;
+time=&amp;#34;2020-04-07T08:53:38Z&amp;#34; level=warning msg=&amp;#34;Endpoints not available for my-data/my-data-metadata-prod1&amp;#34;
+
+
+$ tail -n 10 /opt/logs/ingress/access.log
+172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &amp;#34;POST /.kibana/_search?ignore_unavailable=true&amp;amp;filter_path=aggregations.types.buckets HTTP/1.1&amp;#34; 503 161 &amp;#34;-&amp;#34; &amp;#34;-&amp;#34; 491674 &amp;#34;prod-es-cluster.soulapp-inc.cn&amp;#34; &amp;#34;http://20.0.41.10:9200&amp;#34; 1ms
+172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &amp;#34;POST /.kibana/_search?ignore_unavailable=true&amp;amp;filter_path=aggregations.types.buckets HTTP/1.1&amp;#34; 503 161 &amp;#34;-&amp;#34; &amp;#34;-&amp;#34; 491671 &amp;#34;prod-es-cluster.soulapp-inc.cn&amp;#34; &amp;#34;http://20.0.26.20:9200&amp;#34; 1ms
+172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &amp;#34;GET /.kibana/doc/config%3A6.4.0 HTTP/1.1&amp;#34; 503 301 &amp;#34;-&amp;#34; &amp;#34;-&amp;#34; 491675 &amp;#34;prod-es-cluster.soulapp-inc.cn&amp;#34; &amp;#34;http://20.0.14.6:9200&amp;#34; 1ms&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;从访问日志的输出格式中，我们可以看到，traefik的访问日志和Nginx的访问日志会比较相似，有了这份日志后，我们可以通过一些ELK之类的日志分析方案来分期网站的整体状态，比如UV,PV,区域分布，状态分布以及响应时间等等。&lt;/p&gt;
+
+&lt;p&gt;另外，我们是将访问日志直接持久化输出到node节点上，后面可以通过node主机上的日志采集插件，将日志发送到ELK Stack中，进行分析，当然也可以直接将ELK Stack的日志采集端部署到traefik的pod中，也是可以的。&lt;/p&gt;
+
+&lt;h3 id=&#34;metrics&#34;&gt;Metrics&lt;/h3&gt;
+
+&lt;p&gt;Traefik默认支持四种Metrics的后端实现:
+- &lt;a href=&#34;https://docs.traefik.io/observability/metrics/datadog/&#34;&gt;Datadog&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/metrics/influxdb/&#34;&gt;Influxdb&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/metrics/prometheus/&#34;&gt;Prometheus&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/metrics/statsd/&#34;&gt;StatsD&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;想要开启&lt;code&gt;metrics&lt;/code&gt;的支持，只需要做如下配置:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+    [metrics]
+      [metrics.prometheus]
+      buckets=[0.1,0.3,1.2,5.0]
+      entryPoint = &amp;#34;traefik&amp;#34;
+
+# yaml 配置文件
+metrics: {}
+
+# cli 配置
+--metrics=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Datadog后端支持&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;配置详情:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml配置文件
+[metrics]
+  [metrics.datadog]
+    address = &amp;#34;127.0.0.1:8125&amp;#34;
+    addEntryPointsLabels = true   #在入口处增加metrics标签[true]
+    addServicesLabels = true      #在service中启用meirtcs[true]
+    pushInterval = 10s            #push metrics到datalog的间隔时间[10s]
+
+# cli 配置
+--metrics.datadog=true
+--metrics.datadog.address=127.0.0.1:8125
+--metrics.datadog.addEntryPointsLabels=true
+--metrics.datadog.addServicesLabels=true
+--metrics.datadog.pushInterval=10s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;InfluxDB后端支持&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;配置详情:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml配置
+[metrics]
+  [metrics.influxDB]
+    address = &amp;#34;localhost:8089&amp;#34;     #指定influxdb地址 [localhost:8089]
+    protocol = &amp;#34;udp&amp;#34;               #influxdb的传输协议 [udp(udp|http)]
+    database = &amp;#34;db&amp;#34;                #指定metrics写入的库[&amp;#34;&amp;#34;]
+    retentionPolicy = &amp;#34;two_hours&amp;#34;  #metrics在influxdb中的保留策略 [&amp;#34;&amp;#34;]
+    username = &amp;#34;&amp;#34;                  #influxdb用户名
+    password = &amp;#34;&amp;#34;                  #influxdb密码
+    addEntryPointsLabels = true    #入口处增加metrics标签[true]
+    addServicesLabels = true       #在service中启用meirtcs[true]
+    pushInterval = 10s             #push metrics到datalog的间隔时间[10s]
+
+# cli 配置
+--metrics.influxdb=true
+--metrics.influxdb.address=localhost:8089
+--metrics.influxdb.protocol=udp
+--metrics.influxdb.database=db
+--metrics.influxdb.retentionPolicy=two_hours
+--metrics.influxdb.username=john
+--metrics.influxdb.password=secret
+--metrics.influxdb.addEntryPointsLabels=true
+--metrics.influxdb.addServicesLabels=true
+--metrics.influxdb.pushInterval=10s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Prometheus后端支持&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;配置详情:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml配置
+[metrics]
+  [metrics.prometheus]
+    buckets = [0.1,0.3,1.2,5.0]      #延迟的metrics的bucket存储[0.100000, 0.300000, 1.200000, 5.000000]
+    addEntryPointsLabels = true      #入口处增加metrics标签[true]
+    addServicesLabels = true         #在service中启用meirtcs[true]
+    entryPoint = &amp;#34;traefik&amp;#34;           #指定metrics的端点[traefik(默认是管理端口8080/metrics)],也可以自定义
+    manualRouting = true             #是否禁用内部路由[false]
+
+# cli配置
+--metrics.prometheus=true
+--metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
+--metrics.prometheus.addEntryPointsLabels=true
+--metrics.prometheus.addServicesLabels=true
+## 自定义了一个metrics端点，并指定了端口
+--metrics.prometheus.entryPoint=metrics
+--entryPoints.metrics.address=:8082
+--metrics.prometheus.manualrouting=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;和其他两种方式不同的是，prometheus仅会暴露metrics，是需要使用prometheus-server定期进行&lt;code&gt;pull&lt;/code&gt;来收集数据的。&lt;/p&gt;
+
+&lt;p&gt;配置生效后，可以访问如下端口进行测试:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 自定义了metrics端点
+$ curl localhost:8082/metrics
+
+# 使用默认的traefik端点(用的是admin的端口)
+$ curl localhost:8080/metrics&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;StatsD后端支持&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;详细配置:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置
+[metrics]
+  [metrics.statsD]
+    address = &amp;#34;localhost:8125&amp;#34;          # 指定statsD服务地址
+    addEntryPointsLabels = true         # 入口处增加metrics标签[true] 
+    addServicesLabels = true            # 在service中启用meirtcs[true]
+    pushInterval = 10s                  # push间隔
+    prefix = &amp;#34;traefik&amp;#34;                  # 定义metrics收集的前缀[traefik]
+
+# cli 配置
+--metrics.statsd=true
+--metrics.statsd.address=localhost:8125
+--metrics.statsd.addEntryPointsLabels=true
+--metrics.statsd.addServicesLabels=true
+--metrics.statsd.pushInterval=10s
+--metrics.statsd.prefix=&amp;#34;traefik&amp;#34;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Prometheus后端的Metrics示例&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 由于在生产环境使用的是traefik-1.7.6版本，因此上述的一些配置参数可能并不适用于该版本，详细的参数需要查看具体版本的支持参数，同时我们将traefik当做kubernetes集群中的ingress方案，因此如下操作在一个可用的k8s集群内部。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/v1.7/configuration/metrics/&#34;&gt;traefik-1.7-metrics&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;1.traefik的metrics配置&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# traefik metrics 配置
+$ cat traefik-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-config
+  namespace: kube-system
+data:
+  traefik.toml: |
+    defaultEntryPoints = [&amp;#34;http&amp;#34;,&amp;#34;https&amp;#34;]
+    debug = false
+    logLevel = &amp;#34;INFO&amp;#34;
+
+    InsecureSkipVerify = true
+    [entryPoints]
+      [entryPoints.http]
+      address = &amp;#34;:80&amp;#34;
+      compress = true
+      [entryPoints.https]
+      address = &amp;#34;:443&amp;#34;
+        [entryPoints.https.tls]
+    [web]
+      address = &amp;#34;:8080&amp;#34;
+    [kubernetes]
+    # 定义metrics相关参数
+    [metrics]
+      [metrics.prometheus]
+      buckets=[0.1,0.3,1.2,5.0]
+      entryPoint = &amp;#34;traefik&amp;#34;
+    [ping]
+    entryPoint = &amp;#34;http&amp;#34;
+
+# 重新调度pod后，即可查看暴露的endpoint
+
+$ kubectl  get ep -A | grep traefik
+kube-system            traefik-ingress-service                    172.16.171.163:80,172.16.21.26:80,172.16.21.27:80 + 11 more...            122d
+kube-system            traefik-web-ui                             172.16.171.163:8080,172.16.21.26:8080,172.16.21.27:8080 + 4 more...       171d
+
+$ kubectl  get svc -n kube-system | grep traefik
+traefik-ingress-service   ClusterIP   10.253.132.216   &amp;lt;none&amp;gt;        80/TCP,8080/TCP          122d
+traefik-web-ui            ClusterIP   10.253.54.184    &amp;lt;none&amp;gt;        80/TCP                   171d
+
+# 测试访问metrics服务(因为和traefik相关的两个service均路由到了traefil-ingress的pod上,下面两个效果是一致的)
+$ curl -s  10.253.132.216:8080/metrics  | head -10
+....
+....
+$ curl -s  10.253.54.184/metrics | head -10&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 推荐使用traefik-web-ui暴露的svc地址&lt;/p&gt;
+
+&lt;p&gt;指标以及相关含义:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;指标项&lt;/th&gt;
+&lt;th&gt;含义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;process_max_fds&lt;/td&gt;
+&lt;td&gt;traefik进程最大的fd&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;process_open_fds&lt;/td&gt;
+&lt;td&gt;进程打开的fd&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;process_resident_memory_bytes&lt;/td&gt;
+&lt;td&gt;进程占用内存&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;process_start_time_seconds&lt;/td&gt;
+&lt;td&gt;进程启动时间&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;process_virtual_memory_bytes&lt;/td&gt;
+&lt;td&gt;进程占用虚拟内存&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_backend_open_connections&lt;/td&gt;
+&lt;td&gt;traefik后端打开链接&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_backend_request_duration_seconds_bucket&lt;/td&gt;
+&lt;td&gt;traefik后端请求处理时间&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_backend_request_duration_seconds_sum&lt;/td&gt;
+&lt;td&gt;总时间&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_backend_request_duration_seconds_count&lt;/td&gt;
+&lt;td&gt;总请求时间&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_backend_requests_total&lt;/td&gt;
+&lt;td&gt;一个后端处理的总请求数(按status code, protocol, and method划分)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_backend_server_up&lt;/td&gt;
+&lt;td&gt;后端是否up(0&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_config_last_reload_failure&lt;/td&gt;
+&lt;td&gt;traefik上次失败reload的时间&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_config_last_reload_success&lt;/td&gt;
+&lt;td&gt;上次成功reload的时间&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_config_reloads_failure_total&lt;/td&gt;
+&lt;td&gt;失败次数&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_config_reloads_total&lt;/td&gt;
+&lt;td&gt;成功次数&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_entrypoint_open_connections&lt;/td&gt;
+&lt;td&gt;入口点存在打开链接的数量(method and protocol划分)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_entrypoint_request_duration_seconds_bucket&lt;/td&gt;
+&lt;td&gt;在入口点处理请求花费的时间(status code, protocol, and method.)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;traefik_entrypoint_requests_total&lt;/td&gt;
+&lt;td&gt;一个入口点处理的总请求数(状态码分布)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;code&gt;2.配置prometheus-server&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;注意，此时我们需要配置prometheus-server来对traefik暴露的metrics进行定期的pull采集。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 在k8s中创建一个prometheus monitor service
+$ cat prometheus-traefik.yml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: traefik-ingress-lb
+  name: traefik-metrics
+  namespace: monitoring
+spec:
+  # 对应的端点是上面创建的svc的ports
+  endpoints:
+    # 定义endpoint采集的时间
+  - interval: 30s
+    port: admin
+    path: /metrics
+  jobLabel: k8s-app
+  # 匹配monitoring命名空间的app=gpu-metrics的svc
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+
+$ kubectl apply -f prometheus-traefik.yml&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;配置完成后，即可在prometheus中查看相关的metrics数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdl4lcmvwsj32620o0ah5.jpg&#34; alt=&#34;prometheus-traefik-metrics&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;3.根据指标配置Grafana&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/grafana/dashboards/12041&#34;&gt;grafana模板&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdl6drdnotj31kw0u0gxk.jpg&#34; alt=&#34;Traefik-全局监控详情&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有了Merics的可视化后，针对于HTTP服务来说做各种滚动升级以及切流发布时，就很容易能够看到整个流量的变化。&lt;/p&gt;
+
+&lt;h3 id=&#34;tracing&#34;&gt;Tracing&lt;/h3&gt;
+
+&lt;p&gt;追踪系统可以开发人员可视化其基础架构中的调用流程.&lt;/p&gt;
+
+&lt;p&gt;Traefik遵循OpenTracing规范(一个为分布式跟踪而设计的开放标准)&lt;/p&gt;
+
+&lt;p&gt;Traefik支持五种追踪系统后端:
+- &lt;a href=&#34;https://docs.traefik.io/observability/tracing/jaeger/&#34;&gt;Jaeger&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/tracing/zipkin/&#34;&gt;Zipkin&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/tracing/datadog/&#34;&gt;Datadog&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/tracing/instana/&#34;&gt;Instana&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/tracing/haystack/&#34;&gt;Haystack&lt;/a&gt;
+- &lt;a href=&#34;https://docs.traefik.io/observability/tracing/elastic/&#34;&gt;Elastic&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Datadog,Instana,Haystack为商业解决方案，以下不做介绍&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1.配置&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 默认情况下，traefik使用&lt;code&gt;Jaeger&lt;/code&gt;来最为追踪系统的后端实现.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+$ cat traefik.toml
+[tracing]
+  serviceName = &amp;#34;traefik&amp;#34;			# 选择追踪系统的后端实现[traefik(表示使用jaeger)]
+  spanNameLimit = 150					# 限制长名称的名称阶段(这可以防止某些跟踪提供程序删除超过其长度限制的跟踪)
+
+# cli 配置
+--tracing=true
+--tracing.serviceName=traefik
+--tracing.spanNameLimit=150&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;2.Jaeger&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;相关配置:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+$ cat traefik.toml
+[tracing]
+  [tracing.jaeger]					# 开启jaeger的追踪支持
+    samplingServerURL = &amp;#34;http://localhost:5778/sampling&amp;#34; 		# 指定jaeger-agent的http采样地址
+    samplingType = &amp;#34;const&amp;#34;	# 指定采样类型[const(const|probabilistic|rateLimiting)]
+    samplingParam = 1.0			# 采样参数的值[1.0(const:0|1,probabilistic:0-1,rateLimiting:每秒的span数)]
+    localAgentHostPort = &amp;#34;127.0.0.1:6831&amp;#34;										# 本地agent主机和端口(会发送到jaeger-agent)
+    gen128Bit = true				# 生成128位的traceId,兼容OpenCensus
+    propagation = &amp;#34;jaeger&amp;#34;  # 设置数据传输的header类型[jaeger(jaeger|b3兼容OpenZipkin)]
+    traceContextHeaderName = &amp;#34;uber-trace-id&amp;#34;  # 跟踪上下文的header,用于传输跟踪上下文的http头名
+  [tracing.jaeger.collector]  # 指定jaeger的collector服务
+    endpoint = &amp;#34;http://127.0.0.1:14268/api/traces?format=jaeger.thrift&amp;#34;
+    user = &amp;#34;my-user&amp;#34;          # 向collector提交时的http认证用户[&amp;#34;&amp;#34;]
+    password = &amp;#34;my-password&amp;#34;  # 向collector提交时的http认证密码[&amp;#34;&amp;#34;]
+
+
+# cli 配置
+--tracing.jaeger=true
+--tracing.jaeger.samplingServerURL=http://localhost:5778/sampling
+--tracing.jaeger.samplingType=const
+--tracing.jaeger.samplingParam=1.0
+--tracing.jaeger.localAgentHostPort=127.0.0.1:6831
+--tracing.jaeger.gen128Bit
+--tracing.jaeger.propagation=jaeger
+--tracing.jaeger.traceContextHeaderName=uber-trace-id
+--tracing.jaeger.collector.endpoint=http://127.0.0.1:14268/api/traces?format=jaeger.thrift
+--tracing.jaeger.collector.user=my-user
+--tracing.jaeger.collector.password=my-password&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;3.Zipkin&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;相关配置:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+[tracing]
+  [tracing.zipkin]                  # 指定使用zipkin追踪系统
+    httpEndpoint = &amp;#34;http://localhost:9411/api/v2/spans&amp;#34;   # 指定zipkip收集数据的http端点
+    sameSpan = true                 # 使用Zipkin SameSpan RPC 类型追踪方式
+    id128Bit = true                 # 使用Zipkin 128 bit的追踪id(true)
+    sampleRate = 0.2                # 指定请求trace系统的频率[1.0(0.1-1.0)]
+
+# cli 配置
+--tracing.zipkin=true
+--tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans
+--tracing.zipkin.sameSpan=true
+--tracing.zipkin.id128Bit=false
+--tracing.zipkin.sampleRate=0.2&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;4.Elastic&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;相关配置:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# toml 配置文件
+$ cat traefik.toml
+[tracing]
+  [tracing.elastic]
+    serverURL = &amp;#34;http://apm:8200&amp;#34;     # 指定Elastic APM服务地址
+    secretToken = &amp;#34;&amp;#34;                  # 指定Elastic APM服务的安全token
+    serviceEnvironment = &amp;#34;&amp;#34;           # 指定APM Server的环境
+
+# cli 配置
+--tracing.elastic=true
+--tracing.elastic.serverurl=&amp;#34;http://apm:8200&amp;#34;
+--tracing.elastic.secrettoken=&amp;#34;mytoken&amp;#34;
+--tracing.elastic.serviceenvironment=&amp;#34;production&amp;#34;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>基于DCGM和Prometheus的GPU监控方案</title>
@@ -7899,727 +8957,6 @@ CSM（电视收视率） &lt;a href=&#34;http://www.csm.com.cn/&#34;&gt;http://w
 上海证券交易所 www.sse.com.cn/
 深圳证券交易所 www.szse.cn/
 最常用wind股票数据库。&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>基于阿里云Terway网络的Kubernetes集群实践</title>
-      <link>https://bgbiao.top/post/k8s-ali-terway/</link>
-      <pubDate>Sun, 27 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/k8s-ali-terway/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 众所周知的是在构建一个Kubernetes集群时，容器网络通常会使用一个独立的私有子网来构建Kubernetes集群内部的pod网络和service网络，但在实际的业务场景中，没有企业会在一段时间内将内部全部的服务都迁移到Kubernetes集群中(因为涉及到业务架构以及整体业务的可靠性)，因而会产生一些Kubernetes集群内部服务和集群外部服务互相调用的场景，当然如果是HTTP服务，我们可以采用LVS、Nginx、HAProxy之类的代理工具工具进行集群内外的流量转发，但如果是TCP服务，比如使用Dubbo框架时，生产者和消费者需要直连，当生产者和消费者不在一个可以互联互通的网络下会比较麻烦，这也就是为什么大厂在规模化使用Kubernetes时首先需要解决的就是网络问题的原因了。比如我们在数科的时候就采用的是&lt;a href=&#34;https://github.com/contiv/install&#34;&gt;Contiv&lt;/a&gt;+BGP的模式来实现容器网络和容器外网络的互联互通的，而这通常需要一个比较专业的SDN团队来构建和维护。而作为创业公司通常会使用公有云来承载自己的业务，这种轻资产模式的好处就是底层会有专业的团队来提供保障，因此考虑到业务需求我们采用了阿里云的terway网络插件来实现内部的Kubernetes集群网络.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&#34;现有网络插件&#34;&gt;现有网络插件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/coreos/flannel&#34;&gt;Flannel&lt;/a&gt;: Flannel是最早CoreOS团队开源的网络插件，用于让集群中不同节点创建的容器都具有集群内全局唯一的网络(集群外无法感知)，也是当前Kubernetes开源方案中比较成熟的方案，支持HostGW和VXLAN模式&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/projectcalico/&#34;&gt;Calico&lt;/a&gt;: Calico是一个纯3层的数据中心网络方案，支持IPIP和BGP模式，后者可以无缝集成像OpenStack这种IaaS云架构，能够提供可控的VM、容器、裸机之间的IP通信，但是需要网络设备对BGP的支持(阿里云vpc子网内应该是不支持BGP的); 同时可以支持基于iptables的网络策略控制&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/contiv/install&#34;&gt;Contiv&lt;/a&gt;: Contiv是思科开源的用于跨虚拟机、裸机、公有云或私有云的异构容器部署的开源容器网络架构，可支持2层、3层网络(通常也需要BGP的支持)&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/AliyunContainerService/terway&#34;&gt;Terway&lt;/a&gt;: Terway是阿里云开源的基于VPC网络的CNI插件，支持VPC和ENI模式，后者可实现容器网络使用vpc子网网络&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;以上就是当前开源Kubernetes集群中使用较多的集中网络方案，我们的业务需求中也是需要打通容器内外的网络，因此在成本、效率以及稳定性上优先选择采用阿里云的Terway网络方案来满足我们的Kubernetes集群需求.&lt;/p&gt;
-
-&lt;h3 id=&#34;基于阿里云ecs搭建terway网络的kubernetes集群&#34;&gt;基于阿里云ECS搭建Terway网络的Kubernetes集群&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; &lt;a href=&#34;https://www.aliyun.com/product/kubernetes?aly_as=TZbDoxLq&amp;amp;source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;阿里云容器服务ACK&lt;/a&gt;默认也支持两种网络，Flannel和Terway，前者和开源插件基本一致，后者支持VPC模式和ENI模式，VPC模式可实现容器网络使用vpc内交换机子网地址，但是默认无法和其他交换机下的ecs主机通信，ENI模式会给pod容器组分配一块弹性网卡来实现和集群外网络的互联互通，但Terway网络下的ENI模式需要部分特殊机型才可以支持。&lt;/p&gt;
-
-&lt;p&gt;由于&lt;a href=&#34;https://www.aliyun.com/product/kubernetes?aly_as=TZbDoxLq&amp;amp;source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;ACK&lt;/a&gt;下Terway的ENI模式对机型的要求，我们采用购买&lt;a href=&#34;https://www.aliyun.com/product/ecs?aly_as=UfM12PdU&amp;amp;source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;ECS&lt;/a&gt;来自己搭建单节点集群测试&lt;code&gt;Terway&lt;/code&gt;网络下容器的互联互通.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;前提条件:&lt;/code&gt;
-- 已经创建了VPC子网
-- 在VPC子网下创建2个虚拟交换机(模拟Kubernetes集群网络和ECS网络)
-- 分别在两个子网购买两台ECS主机(模拟ECS到容器的互联互通)&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Terway网络插件官方验证过的os镜像为&lt;code&gt;Centos 7.4/7.6&lt;/code&gt;，购买ecs时需要注意&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;1.使用kubeadm安装k8s单节点集群&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 因为要使用terway网络将pod和ecs网络打通，因此需要将内核参数&lt;code&gt;rp_filter&lt;/code&gt;全部设置为&lt;code&gt;0&lt;/code&gt;(对数据包源地址不进行校验)&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 更新yum源并安装k8s相关组件
-$ yum update
-$ cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
-enabled=1
-gpgcheck=0
-repo_gpgcheck=0
-gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
-        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
-EOF
-
-$ yum clean all
-$ yum install kubelet kubeadm kubectl --disableexcludes=kubernetes -y
-$ yum install docker -y
-
-
-# 启动kubelet
-## 此时kubelet会无限重试，因为会链接apiserver
-$ systemctl restart kubelet
-
-# 启动docker
-## 注意:需要注意kubelet中的cgroupfs类型要和docker的cgroupfs一致
-$ systemctl restart docker
-
-# 查看kubeadm 启动集群时所需镜像
-# 注意:kubeadm默认使用的是谷歌的镜像仓库，可将镜像仓库换成阿里云镜像仓库
-# 将k8s.gcr.io 替换成registry.cn-hangzhou.aliyuncs.com/google_containers 即可
-$ kubeadm config images list
-k8s.gcr.io/kube-apiserver:v1.16.2
-k8s.gcr.io/kube-controller-manager:v1.16.2
-k8s.gcr.io/kube-scheduler:v1.16.2
-k8s.gcr.io/kube-proxy:v1.16.2
-k8s.gcr.io/pause:3.1
-k8s.gcr.io/etcd:3.3.15-0
-k8s.gcr.io/coredns:1.6.2
-
-# 初始化集群
-## 注意:初始化时需要指定vpc的子网，否则后期可能会发现无法识别vpc子网
-$ kubeadm  init  --pod-network-cidr=172.16.48.0/20
-....
-....
-Your Kubernetes control-plane has initialized successfully!
-
-To start using your cluster, you need to run the following as a regular user:
-
-  mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-You should now deploy a pod network to the cluster.
-Run &amp;#34;kubectl apply -f [podnetwork].yaml&amp;#34; with one of the options listed at:
-  https://kubernetes.io/docs/concepts/cluster-administration/addons/
-
-Then you can join any number of worker nodes by running the following on each as root:
-
-kubeadm join 172.16.62.70:6443 --token j4b3xp.78izi2bmitxxx \
-    --discovery-token-ca-cert-hash sha256:fd1ff50cbabd4fb22cb9a866052fbdc0db7da662168cda702exxxxxxxx
-
-# 接下来按照上述提示创建配置文件
-$ mkdir -p $HOME/.kube
-$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-# 查看k8s的node节点(当前处于NotReady状态,因为kubelet还没有成功启动)
-$ # kubectl version
-Client Version: version.Info{Major:&amp;#34;1&amp;#34;, Minor:&amp;#34;16&amp;#34;, GitVersion:&amp;#34;v1.16.2&amp;#34;, GitCommit:&amp;#34;c97fe5036ef3df2967d086711e6c0c405941e14b&amp;#34;, GitTreeState:&amp;#34;clean&amp;#34;, BuildDate:&amp;#34;2019-10-15T19:18:23Z&amp;#34;, GoVersion:&amp;#34;go1.12.10&amp;#34;, Compiler:&amp;#34;gc&amp;#34;, Platform:&amp;#34;linux/amd64&amp;#34;}
-Server Version: version.Info{Major:&amp;#34;1&amp;#34;, Minor:&amp;#34;16&amp;#34;, GitVersion:&amp;#34;v1.16.2&amp;#34;, GitCommit:&amp;#34;c97fe5036ef3df2967d086711e6c0c405941e14b&amp;#34;, GitTreeState:&amp;#34;clean&amp;#34;, BuildDate:&amp;#34;2019-10-15T19:09:08Z&amp;#34;, GoVersion:&amp;#34;go1.12.10&amp;#34;, Compiler:&amp;#34;gc&amp;#34;, Platform:&amp;#34;linux/amd64&amp;#34;}
-
-$ kubectl  get nodes
-NAME                      STATUS     ROLES    AGE     VERSION
-izbp18diszrt8m41b2fbpsz   NotReady   master   7m19s   v1.16.2&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;2. 给k8s集群创建terway网络&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 使用kubeadm创建的k8s集群是v1.16的，官方提供的yaml文件中需要稍微修改下DaemonSet的相关部分&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 给集群创建k8s的cni网络插件，也就是前面说的terway插件
-# 需要修改阿里云相关的配置(ak,as,subnet,security_group)
-$ curl -O https://raw.githubusercontent.com/BGBiao/k8s-ansible-playbooks/master/manifest/cni/terway/podnetwork.yaml
-
-# 修改podnetwork.yaml中的配置(指定阿里云的ak和as认证信息以及vpc子网和安全组信息)
-$ cat podnetwork.yaml
-...
-...
-  eni_conf: |
-    {
-      &amp;#34;version&amp;#34;: &amp;#34;1&amp;#34;,
-      &amp;#34;access_key&amp;#34;: &amp;#34;your ak&amp;#34;,
-      &amp;#34;access_secret&amp;#34;: &amp;#34;your as&amp;#34;,
-      &amp;#34;service_cidr&amp;#34;: &amp;#34;your vpc subnet&amp;#34;,
-      &amp;#34;security_group&amp;#34;: &amp;#34;your 安全组id&amp;#34;,
-      &amp;#34;max_pool_size&amp;#34;: 5,
-      &amp;#34;min_pool_size&amp;#34;: 0
-    }
-....
-....
-          - name: Network
-            value: &amp;#34;your vpc subnet&amp;#34;
-....
-
-# 创建terway网络
-$ kubectl apply -f podnetwork.yaml
-serviceaccount/terway created
-clusterrole.rbac.authorization.k8s.io/terway-pod-reader created
-clusterrolebinding.rbac.authorization.k8s.io/terway-binding created
-configmap/eni-config created
-daemonset.apps/terway created
-customresourcedefinition.apiextensions.k8s.io/felixconfigurations.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/bgpconfigurations.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/ippools.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/hostendpoints.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/clusterinformations.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/globalnetworkpolicies.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/globalnetworksets.crd.projectcalico.org created
-customresourcedefinition.apiextensions.k8s.io/networkpolicies.crd.projectcalico.org created
-
-# 查看cni相关容器以及node状态
-$ kubectl  get nodes
-NAME                      STATUS   ROLES    AGE   VERSION
-izbp18diszrt8m41b2fbpsz   Ready    master   28m   v1.16.2
-
-$ kubectl  get pods -A | grep terway
-kube-system   terway-b9vm8                                      2/2     Running   0          6m53s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;至此，我们就已经完成了kubernetes的terway网络单节点集群，接下来就可以尝试让k8s集群中的pod来使用vpc的网络了，以便可以实现k8s集群内部的容器网络和其他ecs主机的网络是平行的.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;3. 测试terway网络&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 我们使用kubeadm构建的k8s单节点集群，而kubeadm默认给master节点设置了taint，因此测试前需要去除taint&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 去除taint
-$ kubectl taint nodes --all node-role.kubernetes.io/master-
-node/izbp18diszrt8m41b2fbpsz untainted
-
-# 默认创建一个vpc模式的deployment
-$ kubectl  apply -f https://raw.githubusercontent.com/BGBiao/k8s-ansible-playbooks/master/manifest/cni/terway/nginx.yaml
-namespace/myapp configured
-deployment.apps/nginx-test created
-
-# 可以看到容器网络地址其实是指定的vpc子网内地址
-$ kubectl  get pods -n myapp  -o wide
-NAME                         READY   STATUS    RESTARTS   AGE     IP            NODE                      NOMINATED NODE   READINESS GATES
-nginx-test-d56c87dd9-26mzs   1/1     Running   0          2m40s   172.16.48.5   izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-test-d56c87dd9-hp2rv   1/1     Running   0          2m40s   172.16.48.4   izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-$ curl 172.16.48.4 -I
-HTTP/1.1 200 OK
-Server: nginx/1.17.5
-Date: Sat, 26 Oct 2019 08:21:28 GMT
-Content-Type: text/html
-Content-Length: 612
-Last-Modified: Tue, 22 Oct 2019 14:30:00 GMT
-Connection: keep-alive
-ETag: &amp;#34;5daf1268-264&amp;#34;
-Accept-Ranges: bytes
-
-$ curl 172.16.48.5 -I
-HTTP/1.1 200 OK
-Server: nginx/1.17.5
-Date: Sat, 26 Oct 2019 08:21:31 GMT
-Content-Type: text/html
-Content-Length: 612
-Last-Modified: Tue, 22 Oct 2019 14:30:00 GMT
-Connection: keep-alive
-ETag: &amp;#34;5daf1268-264&amp;#34;
-Accept-Ranges: bytes&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;可以发现，在集群内部使用terway网络已经没有任何问题了,但是我们在其他ECS主机去访问pod网络时发现依然无法访问(因为默认使用的是terway的VPC模式，其实就是类似于calico的模式了.这个时候就需要用到eni模式了，即给k8s节点增加eni弹性网卡，然后pod的网络流量统一通过node节点的eni网卡传输，此时就可以很好的和整个内网vpc打通了)&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;4.测试ENI模式&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在上面的nginx配置中增加&lt;code&gt;limits: aliyun/eni: N&lt;/code&gt;即可,需要注意的是N表示node节点上eni弹性网卡的数量，该数量取决于阿里云ecs不同规格对eni的限制.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://help.aliyun.com/document_detail/25378.html?spm=a2c4g.11174283.6.594.7eda52fear19UA&#34;&gt;阿里云ecs规格详情&lt;/a&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 注意:
-# 由于实验中采用的是4c8g的k8s单节点集群，因此只能创建2个弹性网卡，这也就意味着如果不增加任何网络配置，该node节点最多只能运行2个和整个VPC网络中其他ecs主机互联互通的pod
-
-$ cat nginx.yaml
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-v2
-  namespace: myapp
-spec:
-  revisionHistoryLimit: 10
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-  replicas: 2
-  selector:
-    matchLabels:
-      app: nginx-v2
-      profile: prod
-  template:
-    metadata:
-      labels:
-        app: nginx-v2
-        profile: prod
-    spec:
-      containers:
-      - name: nginx-v2
-        image: nginx:latest
-        imagePullPolicy: IfNotPresent
-        resources:
-          requests:
-            cpu: 200m
-            memory: 215Mi
-          limits:
-            cpu: 200m
-            memory: 215Mi
-            aliyun/eni: 1
-
-
-# 创建带eni的pod
-$ kubectl  apply -f nginx.yaml
-deployment.apps/nginx-v2 configured
-
-# 查看pod状态
-$ kubectl  get pods -n myapp -o wide
-NAME                         READY   STATUS    RESTARTS   AGE   IP             NODE                      NOMINATED NODE   READINESS GATES
-nginx-test-d56c87dd9-26mzs   1/1     Running   0          19m   172.16.48.5    izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-test-d56c87dd9-hp2rv   1/1     Running   0          19m   172.16.48.4    izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-v2-7548466fc8-d4klv    1/1     Running   0          61s   172.16.62.74   izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-v2-7548466fc8-x7ft9    1/1     Running   0          61s   172.16.62.75   izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-# 在k8snode节点访问
-$ curl 172.16.62.75 -I
-HTTP/1.1 200 OK
-Server: nginx/1.17.5
-Date: Sat, 26 Oct 2019 08:38:20 GMT
-Content-Type: text/html
-Content-Length: 612
-Last-Modified: Tue, 22 Oct 2019 14:30:00 GMT
-Connection: keep-alive
-ETag: &amp;#34;5daf1268-264&amp;#34;
-Accept-Ranges: bytes
-
-$ curl 172.16.62.74 -I
-HTTP/1.1 200 OK
-Server: nginx/1.17.5
-Date: Sat, 26 Oct 2019 08:38:23 GMT
-Content-Type: text/html
-Content-Length: 612
-Last-Modified: Tue, 22 Oct 2019 14:30:00 GMT
-Connection: keep-alive
-ETag: &amp;#34;5daf1268-264&amp;#34;
-Accept-Ranges: bytes
-
-# 此时发现创建的带eni和不带eni的两个pod在k8s集群内部已经完全可以访问&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;5. 测试集群内外部网络互联互通&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; k8s集群使用的是vpc网络，因此默认集群访问外部ECS网络默认是没有问题，这里主要测试外部ECS网络是否可以直连pod网络进行通信&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 在同vpc环境下其他ecs主机上访问
-# 首先分别ping 上述四个pod的网络(可以发现eni模式下容器默认可以ping通)
-$ for i in 172.16.48.5 172.16.48.4 172.16.62.74 172.16.62.75 ;do ping -c 1 -w 1 $i;done
-PING 172.16.48.5 (172.16.48.5) 56(84) bytes of data.
-
---- 172.16.48.5 ping statistics ---
-2 packets transmitted, 0 received, 100% packet loss, time 999ms
-
-PING 172.16.48.4 (172.16.48.4) 56(84) bytes of data.
-
---- 172.16.48.4 ping statistics ---
-1 packets transmitted, 0 received, 100% packet loss, time 0ms
-
-PING 172.16.62.74 (172.16.62.74) 56(84) bytes of data.
-64 bytes from 172.16.62.74: icmp_seq=1 ttl=64 time=0.782 ms
-
---- 172.16.62.74 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 0.782/0.782/0.782/0.000 ms
-PING 172.16.62.75 (172.16.62.75) 56(84) bytes of data.
-64 bytes from 172.16.62.75: icmp_seq=1 ttl=64 time=0.719 ms
-
---- 172.16.62.75 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 0.719/0.719/0.719/0.000 ms
-
-# 测试nginx服务(依然是带eni的网络可达)
-$ for i in 172.16.48.5 172.16.48.4 172.16.62.74 172.16.62.75 ;do curl --connect-timeout 1 -I  $i;done
-curl: (28) Connection timed out after 1001 milliseconds
-curl: (28) Connection timed out after 1001 milliseconds
-HTTP/1.1 200 OK
-Server: nginx/1.17.5
-Date: Sat, 26 Oct 2019 08:44:21 GMT
-Content-Type: text/html
-Content-Length: 612
-Last-Modified: Tue, 22 Oct 2019 14:30:00 GMT
-Connection: keep-alive
-ETag: &amp;#34;5daf1268-264&amp;#34;
-Accept-Ranges: bytes
-
-HTTP/1.1 200 OK
-Server: nginx/1.17.5
-Date: Sat, 26 Oct 2019 08:44:21 GMT
-Content-Type: text/html
-Content-Length: 612
-Last-Modified: Tue, 22 Oct 2019 14:30:00 GMT
-Connection: keep-alive
-ETag: &amp;#34;5daf1268-264&amp;#34;
-Accept-Ranges: bytes&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;此时，我们查看该node节点上的网卡信息时可以看到，增加了两块辅助网卡&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://upload-images.jianshu.io/upload_images/2577135-13753a99b3036e4c.jpeg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;6. 其他问题&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;前面我们提到过，如果使用&lt;code&gt;eni&lt;/code&gt;模式，不同的ECS规格可以绑定的&lt;code&gt;ENI&lt;/code&gt;弹性网卡是有限的，也就是说可以创建互联互通的容器是有限的，我们这里验证下&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 如果我们这个时候再创建带eni的pod时，就会发现无法创建成功(因为4c8g的ecs最大只支持两个eni)
-$ kubectl  apply -f nginx-v3.yaml
-deployment.apps/nginx-v3 created
-[root@iZbp18diszrt8m41b2fbpsZ ~]# kubectl  get pods -n myapp -o wide
-NAME                         READY   STATUS    RESTARTS   AGE   IP             NODE                      NOMINATED NODE   READINESS GATES
-nginx-test-d56c87dd9-26mzs   1/1     Running   0          48m   172.16.48.5    izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-test-d56c87dd9-hp2rv   1/1     Running   0          48m   172.16.48.4    izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-v2-7548466fc8-d4klv    1/1     Running   0          29m   172.16.62.74   izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-v2-7548466fc8-x7ft9    1/1     Running   0          29m   172.16.62.75   izbp18diszrt8m41b2fbpsz   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-v3-79dd8fb956-4ghgb    0/1     Pending   0          2s    &amp;lt;none&amp;gt;         &amp;lt;none&amp;gt;                    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-nginx-v3-79dd8fb956-str2k    0/1     Pending   0          2s    &amp;lt;none&amp;gt;         &amp;lt;none&amp;gt;                    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-# 查看Pending的详情
-$ kubectl  describe pods -n myapp nginx-v3-79dd8fb956-4ghgb
-....
-....
-Events:
-  Type     Reason            Age        From               Message
-  ----     ------            ----       ----               -------
-  Warning  FailedScheduling  &amp;lt;unknown&amp;gt;  default-scheduler  0/1 nodes are available: 1 Insufficient aliyun/eni.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;可以发现，当使用terway网络的&lt;code&gt;ENI&lt;/code&gt;模式时，如果该ecs可支持的弹性网卡达到限制，k8s就会调度失败。&lt;/p&gt;
-
-&lt;p&gt;所以问题就来了，通常情况下，我们是希望使用k8s来弹性扩容，我们会希望k8s节点上运行更多的pod，但用了terway网络之后我们发现，创建和k8s集群外ecs主机通信的pod数量竟然受eni的限制，这可得了?&lt;/p&gt;
-
-&lt;p&gt;其实不用担心，阿里云同学的回复是，这种情况下在vpc上设置静态路由即可实现node节点上的多pod和集群外ecs主机互通，此时ecs主机上的eni仅相当于是整个容器的网络出口，到这里其实我们就可以放心了，因为使用terway后，及时不用eni模式，pod网络也是全局唯一的，这个时候适当增加一些静态路由，即可实现整个vpc内k8s容器网络和容器外的ecs主机网络互联互通，很好的解决了我们一开始的问题。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;阿里云容器服务ACK的terway网络模式下的集群会默认创建一些路由规则，因此当你使用ACK集群时，只要购买了支持&lt;code&gt;terway&lt;/code&gt;规格的节点，默认创建的容器都可以实现和外部ecs主机的互联互通，此时，该ecs上创建的弹性网卡将作为节点上k8s容器的网络出口，而ecs主机本身的&lt;code&gt;eth0&lt;/code&gt;将仅作为管理网络而存在，感兴趣的同学可以点击&lt;code&gt;阅读原文&lt;/code&gt;尝试使用阿里云ACK的&lt;code&gt;terway&lt;/code&gt;网络模式.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://www.aliyun.com/product/kubernetes?aly_as=TZbDoxLq&amp;amp;source=5176.11533457&amp;amp;userCode=n0qkvlxu&amp;amp;type=copy&#34;&gt;阅读全文&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
       
     </item>
     
