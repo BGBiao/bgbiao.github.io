@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-04-07T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-04-12T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,54 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/">构建更小Docker镜像的一些建议</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2020-03-22" class="post-time">
+        2020-03-22
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+          <a href="https://bgbiao.top/categories/%E6%95%88%E7%8E%87/"> 效率 </a>
+          
+        </div>
+      <span class="more-meta"> 1909 words </span>
+      <span class="more-meta"> 4 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <blockquote>
+<p>背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用<code>RUN</code>指令，执行了一次<code>chmod a+x tomcat</code>，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。</p>
+</blockquote>
+    </div>
+    <div class="read-more">
+      <a href="/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/">使用jwt-go验证API</a>
     </h1>
     
@@ -535,50 +583,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/">过去这一个月的所思所想</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-03-01" class="post-time">
-        2020-03-01
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E6%88%90%E9%95%BF/"> 成长 </a>
-          
-        </div>
-      <span class="more-meta"> 1884 words </span>
-      <span class="more-meta"> 4 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      这一个月以来，受疫情的影响，一直在家办公，可能对外人而言，觉得在家办公会相对比较轻松，能够除工作外做更多的事情，但这一个月下来，我却有颇多的
-    </div>
-    <div class="read-more">
-      <a href="/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/" class="read-more-link">Read more</a>
     </div>
     
   </div>

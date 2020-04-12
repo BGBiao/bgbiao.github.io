@@ -6,10 +6,350 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 07 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 12 Apr 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>分布式对象存储Minio的可观测性方案</title>
+      <link>https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</link>
+      <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
+      
+        <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;rdquo;裸奔&amp;rdquo;上线的，除了一些传统的主机级别的监控之外，很难有一些额外的性能指标来描述该服务的整体性能情况。因此，在我们的&lt;a href=&#34;https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/&#34;&gt;Minio对象存储服务&lt;/a&gt;上线到最近一直也是裸奔的，虽然暂时也没出现过故障，但是作为一名专业搞笑的SRE来讲，服务的可观测性一定得跟上，不然后期铁锅是妥妥的背定了，这篇文章就主要介绍下&lt;code&gt;Minio&lt;/code&gt;的可观测性方案。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;开源组件的可观测性现状&#34;&gt;开源组件的可观测性现状&lt;/h3&gt;
+
+&lt;p&gt;在开头提到了，初创企业的开源服务初期大多都是裸奔上线的，出现这种情况我认为一般分为内因和外因:&lt;/p&gt;
+
+&lt;p&gt;内因是开源的基础中间件性能指标通常很多，不容易抽象，因此这些服务的性能指标数据通常可以通过内部的api或cli来获取，不太容易直接和开源的监控系统进行集成;&lt;/p&gt;
+
+&lt;p&gt;外因是对于初创企业来说，人力有限并且对于众多开源组件的理解不够深入导致前面说的&amp;rdquo;裸奔&amp;rdquo;上线的现象。&lt;/p&gt;
+
+&lt;p&gt;不过随着以Kubernetes，Prometheus为代表的CloudNative理念不断发展，越来越多的开源中间件也支持了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的性能指标，这对于初创企业的技术团队来说可谓是一个福音。&lt;/p&gt;
+
+&lt;p&gt;截止目前，我们所熟知的很多开源软件已经内置了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;的API接口，不再需要第三方的&lt;code&gt;exporter&lt;/code&gt;来导出一些性能指标数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;[内置Metrics接口的开源软件](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics):&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://docs.ceph.com/docs/master/mgr/prometheus/&#34;&gt;Ceph&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-metrics&#34;&gt;Docker&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.envoyproxy.io/docs/envoy/latest/operations/admin.html#get--stats?format=prometheus&#34;&gt;Envoy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/coreos/etcd&#34;&gt;Etcd&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/apache/flink&#34;&gt;Flink&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://docs.grafana.org/administration/metrics/&#34;&gt;Grafana&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/Kong/kong-plugin-prometheus&#34;&gt;Kong&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes&#34;&gt;Kubernetes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/BuoyantIO/linkerd&#34;&gt;Linkerd&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/minio/minio&#34;&gt;Minio&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://rabbitmq.com/prometheus.html&#34;&gt;RabbitMQ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/influxdata/telegraf/tree/master/plugins/outputs/prometheus_client&#34;&gt;Telegraf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/containous/traefik&#34;&gt;Traefik&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/openzipkin/zipkin/tree/master/zipkin-server#metrics&#34;&gt;Zipkin&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;minio集群的可观测性方案&#34;&gt;Minio集群的可观测性方案&lt;/h3&gt;
+
+&lt;p&gt;得益于&lt;code&gt;Minio&lt;/code&gt;的云原生化，这款分布式的对象存储服务天然的支持了&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的指标数据以及服务端点(API)，因此，如果想要在已有的Minio集群中增加性能指标的监控，将是一件很容易的事情。&lt;/p&gt;
+
+&lt;p&gt;Minio服务通过内置的服务端点暴露监控数据，用来监控服务整体的健康状态以及性能指标:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Healthcheck 探针: 提供两个服务探活接口，一个用于检测服务是否启动，另外一个用于检测服务是否可以正常对外提供服务(服务就绪)&lt;/li&gt;
+&lt;li&gt;- 探活接口: &lt;code&gt;/minio/health/live&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;- 就绪接口: &lt;code&gt;/minio/health/ready&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Prometheus 探针: 提供了prometheus metrics格式的性能指标数据&lt;/li&gt;
+&lt;li&gt;- Metrics接口: &lt;code&gt;/minio/prometheus/metrics&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Healthcheck相关的探针默认是非认证的接口，服务启动后可直接访问; Prometheus探针的接口默认是基于&lt;code&gt;JWT认证&lt;/code&gt;的接口，需要额外设置来访问其Metrics数据。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Minio的Metrics数据暴露&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;管理员可通过下述方式获取Metrics端点的jwt token:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 获取token
+$ mc admin prometheus generate  minio
+scrape_configs:
+- job_name: minio-job
+  bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjQ3NDAwMzM4MjAsImlzcyI6InByb21ldGhldXMiLCJzdWIiOiJNaW5pb1NvdWwifQ.1QiANgXVCpAPWCdF9EejhH608rZbdCRcHe3RtalC2XnScWtYMk_OG0ih-Z3t4ADb1cnYREdTrQwWscFw6Xvk3Q
+  metrics_path: /minio/prometheus/metrics
+  scheme: http
+  static_configs:
+  - targets: [minio.bgbiao.top]
+
+# 在配置prometheus的scrape时配置如上相关参数&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;通常对于内部系统间的调用来说，权限可能没那么重要，可以增加如下环境变量来开启metrics的非认证方式:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;MINIO_PROMETHEUS_AUTH_TYPE=&amp;#34;public&amp;#34;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;此时，直接访问接口可以获取到如下的Metrics数据:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ curl -s  minio.bgbiao.top/minio/prometheus/metrics | head -10
+# HELP disk_storage_available Total available space left on the disk
+# TYPE disk_storage_available gauge
+disk_storage_available{disk=&amp;#34;/data/minio&amp;#34;} 2.78376280064e+11
+# HELP disk_storage_total Total space on the disk
+# TYPE disk_storage_total gauge
+disk_storage_total{disk=&amp;#34;/data/minio&amp;#34;} 3.00809048064e+11
+# HELP disk_storage_used Total disk storage used on the disk
+# TYPE disk_storage_used gauge
+disk_storage_used{disk=&amp;#34;/data/minio&amp;#34;} 2.2432768e+10
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;minio-metrics相关定义&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;标准的运行时指标使用以&lt;code&gt;go_&lt;/code&gt;开头&lt;/li&gt;
+&lt;li&gt;进程级别的指标以&lt;code&gt;process_&lt;/code&gt;开头&lt;/li&gt;
+&lt;li&gt;prometheus暴露的指标&lt;code&gt;promhttp_&lt;/code&gt;开头&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;disk_storage_used&lt;/code&gt;: 磁盘使用空间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;disk_storage_available&lt;/code&gt;: 磁盘可用空间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;disk_storage_total&lt;/code&gt;: 磁盘总空间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;minio_disks_offline&lt;/code&gt;: 当前minio实例中处于下线状态的个数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;minio_disks_total&lt;/code&gt;: 当前minio实例的磁盘总数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s3_requests_total&lt;/code&gt;: 当前minio实例中s3接口总请求数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s3_errors_total&lt;/code&gt;: s3接口错误请求数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s3_requests_current&lt;/code&gt;: 活动状态的s3请求数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;internode_rx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例接收的节点间字节的总数(bytes)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;internode_tx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例发送到其他节点的字节总数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s3_rx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例接收的s3字节总数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s3_tx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例发送的s3字节总数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;s3_ttfb_seconds_&lt;/code&gt;: 统计s3请求的延迟信息&lt;/li&gt;
+&lt;li&gt;- bucket: bucket操作相关的延迟&lt;/li&gt;
+&lt;li&gt;- count: 延迟统计&lt;/li&gt;
+&lt;li&gt;- sum: 总延迟&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Minio不同的版本的Metrics数据有区别，需要查看具体暴露的数据指标&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;示例&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 打开文件数
+process_open_fds{job=&amp;#34;minio-metrics&amp;#34;}
+
+# 启动时间(时间戳)
+process_start_time_seconds{job=&amp;#34;minio-metrics&amp;#34;}
+
+# 虚拟内存使用
+process_virtual_memory_bytes{job=&amp;#34;minio-metrics&amp;#34;}
+
+# cpu占用时间
+process_cpu_seconds_total{job=&amp;#34;minio-metrics&amp;#34;}
+
+# minio对外的http接口状态
+promhttp_metric_handler_requests_total{job=&amp;#34;minio-metrics&amp;#34;}
+
+# 链接中的http请求
+promhttp_metric_handler_requests_in_flight{job=&amp;#34;minio-metrics&amp;#34;}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;配置prometheus数据抓取&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 我们的Prometheus是使用CRD方式部署在Kubernetes集群中的，因此抓取外部Metrics数据需要做如下的操作.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 暴露minio服务
+$ cat endpoint-minio.yaml
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: minio-metrics
+  namespace: monitoring
+  labels:
+    app: minio-metrics
+subsets:
+- addresses:
+  - ip: 192.168.0.148
+  - ip: 192.168.0.149
+  - ip: 192.168.0.150
+  - ip: 192.168.0.151
+  ports:
+  - port: 9000
+    name: http-metrics
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: monitoring
+  name: minio-metrics
+  labels:
+    app: minio-metrics
+spec:
+  ports:
+  - name: http-metrics
+    port: 9000
+    targetPort: 9000
+    protocol: TCP
+
+# prometheus servicemonitor
+$ cat prometheus-minio.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: minio-metrics
+  name: minio-metrics
+  namespace: monitoring
+spec:
+  # 对应的端点是上面创建的svc的ports
+  endpoints:
+  # 可以定义两个采集端点，一个是minio服务本身的监控，一个是minio节点的基础监控
+  - interval: 30s
+    port: http-metrics
+    path: /minio/prometheus/metrics
+  jobLabel: app
+  # 匹配monitoring命名空间的app=minio-metrics的svc
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  selector:
+    matchLabels:
+      app: minio-metrics&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;查看prometheus监控的minio相关数据&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Prometheus成功抓取minio metrics数据后，即可在prometheus中查看到先关数据:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdnrt82rfpj324a0t47at.jpg&#34; alt=&#34;minio-prometheus-metrics&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在Grafana中配置关心的指标以及相关图表:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdofcrk9bbj31gr0u04a4.jpg&#34; alt=&#34;minio-grafana监控&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://grafana.com/grafana/dashboards/12063&#34;&gt;minio-grafana模板&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+</description>
+      
+    </item>
     
     <item>
       <title>Traefik的可观测性方案</title>
@@ -8797,166 +9137,6 @@ $ salt-key -a 10.0.79.90 -y&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;ul class=&#34;task-list&#34;&gt;
 &lt;li&gt;&lt;label&gt;&lt;input type=&#34;checkbox&#34; checked disabled class=&#34;task-list-item&#34;&gt; master设备会为每个minion的auth-request请求计算签名。 在有许多minions和频繁的auth请求时，这可以消耗掉master服务器上相当多的CPU资源.&lt;/label&gt;&lt;/li&gt;
 &lt;/ul&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>快速使用互联网检索有用数据</title>
-      <link>https://bgbiao.top/post/%E4%BA%92%E8%81%94%E7%BD%91%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/</link>
-      <pubDate>Tue, 10 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E4%BA%92%E8%81%94%E7%BD%91%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 随着互联网的普及和发展，互联网上充斥了大量的数据，如何从海量数据中识别自己最想要的数据成为了很多人头疼的问题，接下来给大家分享一些自己常用的检索数据的网站和方法.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&#34;搜索引擎&#34;&gt;搜索引擎&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;1.搜索关键字&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;在搜索关键字的时候，尽量选择具体的关键字，比如&lt;code&gt;大数据&lt;/code&gt;就没有&lt;code&gt;大数据就业&lt;/code&gt;，&lt;code&gt;大数据行业&lt;/code&gt;，&lt;code&gt;大数据企业&lt;/code&gt;具体；另外在搜索关键词的时候，通常推荐使用多次分词，也就是使用一个词一个词，词词之间使用空格分开，比如&lt;code&gt;大数据 云计算&lt;/code&gt;,同时在检索内容时，也可以根据关键程度将词前后位置进行转换。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2.搜索技巧&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.文件类型搜索:在搜索引擎搜索框最后增加&lt;code&gt;空格 filetype:type&lt;/code&gt; type可以是[pdf,ppt,xls,doc]中的任意一个&lt;/li&gt;
-&lt;li&gt;2.网站定位搜索:在搜索引擎搜索框最后增加&lt;code&gt;空格 site:URL&lt;/code&gt;  URL即为指定网站(其实各种搜索引擎都是去定向爬取各个网站的关键字进行收录的)&lt;/li&gt;
-&lt;li&gt;3.限制性搜索: 使用&lt;code&gt;intitle&lt;/code&gt;,如在百度键入&lt;code&gt;intitie:大数据&lt;/code&gt;，限定于搜索标题中含有&lt;code&gt;大数据&lt;/code&gt;网页，如果输入&lt;code&gt;intitie:大数据市场规模&lt;/code&gt;限定于搜索标题中含有&lt;code&gt;大数据&lt;/code&gt;和&lt;code&gt;市场规模&lt;/code&gt;的网页&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;其实上述三个搜索技巧，在各个搜索引擎中会默认支持工具，但是通常会被放在很隐蔽的地方&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1g9rfguy2qoj310m0hc42h.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;另外，除了常用的搜索引擎:百度,谷歌,必应,搜狗之外，通常还会有一些垂直领域或者非商业化的搜索引擎.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Google学术搜索: &lt;a href=&#34;http://scholar.google.com/&#34;&gt;http://scholar.google.com/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;科技文献搜索: &lt;a href=&#34;http://www.scirus.com&#34;&gt;http://www.scirus.com&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;学术搜索引擎: &lt;a href=&#34;http://www.base-search.net/&#34;&gt;http://www.base-search.net/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;交叉学科门户网站: &lt;a href=&#34;http://www.vascoda.de/&#34;&gt;http://www.vascoda.de/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;一个神奇的网站: &lt;a href=&#34;http://www.goole.com/&#34;&gt;http://www.goole.com/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Amazon推出的: &lt;a href=&#34;http://www.a9.com&#34;&gt;http://www.a9.com&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;免费paper检索: &lt;a href=&#34;http://www.findarticles.com/&#34;&gt;http://www.findarticles.com/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;计算机和信息科学: &lt;a href=&#34;http://citeseer.ist.psu.edu/&#34;&gt;http://citeseer.ist.psu.edu/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;谷歌马甲: &lt;a href=&#34;https://search.aol.com/&#34;&gt;https://search.aol.com/&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;数据库&#34;&gt;数据库&lt;/h3&gt;
-
-&lt;p&gt;数据库是研究人员重要的数据来源之一，目前券商、基金研究研究机构都购买有商业数据库，目前研究用的数据库主要分为两大类，一是商业数据库，二是学术数据库。&lt;/p&gt;
-
-&lt;p&gt;由于一般是个人使用，这里仅介绍一些免费可用的数据库.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;数据汇: &lt;a href=&#34;http://www.shujuhui.com/database/&#34;&gt;http://www.shujuhui.com/database/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;数据圈子: &lt;a href=&#34;http://www.shujuquan.com.cn/&#34;&gt;http://www.shujuquan.com.cn/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;FRED: &lt;a href=&#34;http://research.stlouisfed.org/fred2/&#34;&gt;http://research.stlouisfed.org/fred2/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;OECD: &lt;a href=&#34;http://www.oecd-ilibrary.org/economics&#34;&gt;http://www.oecd-ilibrary.org/economics&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;台湾学术数据库: &lt;a href=&#34;http://fedetd.mis.nsysu.edu.tw/&#34;&gt;http://fedetd.mis.nsysu.edu.tw/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;台湾大学电子书: &lt;a href=&#34;http://ebooks.lib.ntu.edu.tw/Home/ListBooks&#34;&gt;http://ebooks.lib.ntu.edu.tw/Home/ListBooks&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;共享文库&#34;&gt;共享文库&lt;/h3&gt;
-
-&lt;p&gt;主要介绍下国外的，国内的&lt;code&gt;百度文库&lt;/code&gt;,&lt;code&gt;道客巴巴&lt;/code&gt;之类的文档太差，而且还收费.&lt;/p&gt;
-
-&lt;p&gt;Scribd：&lt;a href=&#34;http://www.scribd.com&#34;&gt;http://www.scribd.com&lt;/a&gt;
-Docstoc: &lt;a href=&#34;http://www.docstoc.com&#34;&gt;http://www.docstoc.com&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;专业网站&#34;&gt;专业网站&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;人大经济论坛: &lt;a href=&#34;http://bbs.pinggu.org/&#34;&gt;http://bbs.pinggu.org/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;经济学家: &lt;a href=&#34;http://bbs.jjxj.org/&#34;&gt;http://bbs.jjxj.org/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;随意网-经济论坛: &lt;a href=&#34;http://economic.5d6d.net/&#34;&gt;http://economic.5d6d.net/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;理想在线: &lt;a href=&#34;http://www.55188.com&#34;&gt;股票券商研究报告&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;迈博汇金: &lt;a href=&#34;http://www.hibor.com.cn/&#34;&gt;股票券商研究报告&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;博瑞金融: &lt;a href=&#34;http://www.brjr.com.cn/forum.php&#34;&gt;金融行业专业型论坛&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;华尔街社区: &lt;a href=&#34;http://forum.cnwallstreet.com/index.php&#34;&gt;国内专业的金融论坛&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;中华股权投资论坛: &lt;a href=&#34;http://www.tzluntan.com/&#34;&gt;pe投资专业型论坛&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;政府数据&#34;&gt;政府数据&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;国家统计局: &lt;a href=&#34;http://www.stats.gov.cn/&#34;&gt;http://www.stats.gov.cn/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;工业和信息化部: &lt;a href=&#34;http://www.miit.gov.cn&#34;&gt;http://www.miit.gov.cn&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;中国人民银行: &lt;a href=&#34;http://www.pbc.gov.cn/&#34;&gt;http://www.pbc.gov.cn/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;银监会: &lt;a href=&#34;http://www.cbrc.gov.cn&#34;&gt;http://www.cbrc.gov.cn&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;中国海关: &lt;a href=&#34;http://www.customs.gov.cn&#34;&gt;http://www.customs.gov.cn&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;国家知识产权局: &lt;a href=&#34;http://www.sipo.gov.cn&#34;&gt;http://www.sipo.gov.cn&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;中国证监会: &lt;a href=&#34;http://www.csrc.gov.cn&#34;&gt;http://www.csrc.gov.cn&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;巨潮信息网:&lt;a href=&#34;http://www.cninfo.com.cn/&#34;&gt;中国资本市场指定披露平台&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;证券交易所&#34;&gt;证券交易所&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;上海证券交易所: &lt;a href=&#34;http://www.sse.com.cn/&#34;&gt;http://www.sse.com.cn/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;深圳证券交易所: &lt;a href=&#34;http://www.szse.cn/&#34;&gt;http://www.szse.cn/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;全国中小企业股份转让系统: &lt;a href=&#34;http://www.neeq.com.cn/&#34;&gt;http://www.neeq.com.cn/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;香港证券交易所: &lt;a href=&#34;http://www.hkexnews.hk/index_c.htm&#34;&gt;http://www.hkexnews.hk/index_c.htm&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;台湾证券交易所: &lt;a href=&#34;http://www.tse.com.tw/ch/index.php&#34;&gt;http://www.tse.com.tw/ch/index.php&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;新加坡证券交易所: &lt;a href=&#34;http://www.sgx.com/&#34;&gt;http://www.sgx.com/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;纽约证券交易所: &lt;a href=&#34;http://www.nyse.com&#34;&gt;http://www.nyse.com&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;纳斯达克证券交易所: &lt;a href=&#34;http://www.nasdaq.com&#34;&gt;http://www.nasdaq.com&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;行业网站&#34;&gt;行业网站&lt;/h3&gt;
-
-&lt;p&gt;互联网及传媒
-1）资讯类
-新浪科技 &lt;a href=&#34;http://tech.sina.com.cn/&#34;&gt;http://tech.sina.com.cn/&lt;/a&gt;
-腾讯科技 &lt;a href=&#34;http://tech.qq.com/&#34;&gt;http://tech.qq.com/&lt;/a&gt;
-艾瑞网 &lt;a href=&#34;http://www.iresearch.cn/&#34;&gt;http://www.iresearch.cn/&lt;/a&gt;
-艺恩网 &lt;a href=&#34;http://www.entgroup.cn/&#34;&gt;http://www.entgroup.cn/&lt;/a&gt;
-虎嗅网 &lt;a href=&#34;http://wwww.huxiu.com/&#34;&gt;http://wwww.huxiu.com/&lt;/a&gt;
-36kr &lt;a href=&#34;http://36kr.com/&#34;&gt;http://36kr.com/&lt;/a&gt;
-钛媒体 &lt;a href=&#34;http://www.tmtpost.com/&#34;&gt;http://www.tmtpost.com/&lt;/a&gt;
-游戏大观 &lt;a href=&#34;http://www.gamelook.com.cn/&#34;&gt;http://www.gamelook.com.cn/&lt;/a&gt;
-亿欧网 &lt;a href=&#34;http://www.iyiou.com/&#34;&gt;http://www.iyiou.com/&lt;/a&gt;
-媒介360 &lt;a href=&#34;http://www.chinamedia360.com/main&#34;&gt;http://www.chinamedia360.com/main&lt;/a&gt;
-　
-2）数据类
-中国票房 &lt;a href=&#34;http://www.cbooo.cn/&#34;&gt;http://www.cbooo.cn/&lt;/a&gt;
-中国互联网络信息中心 &lt;a href=&#34;http://www.cnnic.net.cn/&#34;&gt;http://www.cnnic.net.cn/&lt;/a&gt;
-艾瑞网
-&lt;a href=&#34;http://www.iresearch.com.cn/report/viewlist.aspx&#34;&gt;http://www.iresearch.com.cn/report/viewlist.aspx&lt;/a&gt;
-易观智库 &lt;a href=&#34;http://www.analysys.cn/&#34;&gt;http://www.analysys.cn/&lt;/a&gt;
-游戏产业网
-&lt;a href=&#34;http://www.cgigc.com.cn/list/79644663134.html&#34;&gt;http://www.cgigc.com.cn/list/79644663134.html&lt;/a&gt;
-百度指数 &lt;a href=&#34;http://index.baidu.com/&#34;&gt;http://index.baidu.com/&lt;/a&gt;
-大数据导航 &lt;a href=&#34;http://hao.199it.com/&#34;&gt;http://hao.199it.com/&lt;/a&gt;
-CSM（电视收视率） &lt;a href=&#34;http://www.csm.com.cn/&#34;&gt;http://www.csm.com.cn/&lt;/a&gt;
-微排片 &lt;a href=&#34;http://www.weipaipian.com&#34;&gt;http://www.weipaipian.com&lt;/a&gt;
-　
-医药行业
-1）样本医院数据
-化药、生物药和中药注射剂 &lt;a href=&#34;http://pdb.pharmadl.com/&#34;&gt;http://pdb.pharmadl.com/&lt;/a&gt;
-中成药、化药 &lt;a href=&#34;http://www.menet.com.cn/&#34;&gt;http://www.menet.com.cn/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;银行业
-1）新闻资讯
-中证网 &lt;a href=&#34;http://www.cs.com.cn/xwzx/hg/&#34;&gt;http://www.cs.com.cn/xwzx/hg/&lt;/a&gt;
-一财网 &lt;a href=&#34;http://www.yicai.com/economy&#34;&gt;http://www.yicai.com/economy&lt;/a&gt;
-财新网 &lt;a href=&#34;http://finance.caixin.com/bank/&#34;&gt;http://finance.caixin.com/bank/&lt;/a&gt;
-华尔街见闻 &lt;a href=&#34;http://wallstreetcn.com/news?cid=19&#34;&gt;http://wallstreetcn.com/news?cid=19&lt;/a&gt;
-新浪财经 finance.sina.com.cn/
-证券时报网 &lt;a href=&#34;http://www.stcn.com/&#34;&gt;http://www.stcn.com/&lt;/a&gt;
-中国金融新闻网
-&lt;a href=&#34;http://www.financialnews.com.cn/yh/xw/&#34;&gt;http://www.financialnews.com.cn/yh/xw/&lt;/a&gt;
-　
-2）公告、数据查找
-中国货币网 &lt;a href=&#34;http://www.chinamoney.com.cn/index.html&#34;&gt;http://www.chinamoney.com.cn/index.html&lt;/a&gt;
-巨潮网 &lt;a href=&#34;http://www.cninfo.com.cn/&#34;&gt;http://www.cninfo.com.cn/&lt;/a&gt;
-统计局 www.stats.gov.cn/
-中国人民银行 www.pbc.gov.cn
-银监会 &lt;a href=&#34;http://www.cbrc.gov.cn/index.html&#34;&gt;http://www.cbrc.gov.cn/index.html&lt;/a&gt;
-上海证券交易所 www.sse.com.cn/
-深圳证券交易所 www.szse.cn/
-最常用wind股票数据库。&lt;/p&gt;</description>
       
     </item>
     
