@@ -28,15 +28,17 @@
 
 &lt;p&gt;在开头提到了，初创企业的开源服务初期大多都是裸奔上线的，出现这种情况我认为一般分为内因和外因:&lt;/p&gt;
 
-&lt;p&gt;内因是开源的基础中间件性能指标通常很多，不容易抽象，因此这些服务的性能指标数据通常可以通过内部的api或cli来获取，不太容易直接和开源的监控系统进行集成;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;内因是开源的基础中间件性能指标通常很多，不容易抽象，因此这些服务的性能指标数据通常可以通过内部的api或cli来获取，不太容易直接和开源的监控系统进行集成;&lt;/p&gt;&lt;/li&gt;
 
-&lt;p&gt;外因是对于初创企业来说，人力有限并且对于众多开源组件的理解不够深入导致前面说的&amp;rdquo;裸奔&amp;rdquo;上线的现象。&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;外因是对于初创企业来说，人力有限并且对于众多开源组件的理解不够深入导致前面说的&amp;rdquo;裸奔&amp;rdquo;上线的现象。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
-&lt;p&gt;不过随着以Kubernetes，Prometheus为代表的CloudNative理念不断发展，越来越多的开源中间件也支持了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的性能指标，这对于初创企业的技术团队来说可谓是一个福音。&lt;/p&gt;
+&lt;p&gt;不过随着以&lt;code&gt;Kubernetes&lt;/code&gt;，&lt;code&gt;Prometheus&lt;/code&gt;为代表的CloudNative理念不断发展，越来越多的开源中间件也支持了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的性能指标，这对于初创企业的技术团队来说可谓是一个福音。&lt;/p&gt;
 
 &lt;p&gt;截止目前，我们所熟知的很多开源软件已经内置了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;的API接口，不再需要第三方的&lt;code&gt;exporter&lt;/code&gt;来导出一些性能指标数据。&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;[内置Metrics接口的开源软件](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics):&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;[内置Metrics接口的开源软件](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics)&lt;/code&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://docs.ceph.com/docs/master/mgr/prometheus/&#34;&gt;Ceph&lt;/a&gt;&lt;/li&gt;
@@ -55,9 +57,11 @@
 &lt;li&gt;&lt;a href=&#34;https://github.com/openzipkin/zipkin/tree/master/zipkin-server#metrics&#34;&gt;Zipkin&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;minio集群的可观测性方案&#34;&gt;Minio集群的可观测性方案&lt;/h3&gt;
+&lt;h3 id=&#34;minio集群的可观测性&#34;&gt;Minio集群的可观测性&lt;/h3&gt;
 
 &lt;p&gt;得益于&lt;code&gt;Minio&lt;/code&gt;的云原生化，这款分布式的对象存储服务天然的支持了&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的指标数据以及服务端点(API)，因此，如果想要在已有的Minio集群中增加性能指标的监控，将是一件很容易的事情。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.min.io/docs/how-to-monitor-minio-using-prometheus.html&#34;&gt;使用Prometheus监控Minio服务&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Minio服务通过内置的服务端点暴露监控数据，用来监控服务整体的健康状态以及性能指标:&lt;/p&gt;
 
@@ -342,11 +346,17 @@ spec:
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdofcrk9bbj31gr0u04a4.jpg&#34; alt=&#34;minio-grafana监控&#34; /&gt;&lt;/p&gt;
 
+&lt;p&gt;为了方便其他运维小伙伴们，我将Minio的Grafana模板开源出来，有需求的可以直接使用如下模板:&lt;/p&gt;
+
 &lt;p&gt;&lt;a href=&#34;https://grafana.com/grafana/dashboards/12063&#34;&gt;minio-grafana模板&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 </description>
       
     </item>
@@ -1405,7 +1415,9 @@ $ cat traefik.toml
 &lt;/div&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;</description>
       
     </item>
     
