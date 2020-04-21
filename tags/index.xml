@@ -6,13 +6,31 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 12 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 21 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Grafana</title>
+      <title>jvm</title>
+      <link>https://bgbiao.top/tags/jvm/</link>
+      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/jvm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>运维</title>
+      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>grafana</title>
       <link>https://bgbiao.top/tags/grafana/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
@@ -30,20 +48,11 @@
     </item>
     
     <item>
-      <title>Prometheus</title>
+      <title>prometheus</title>
       <link>https://bgbiao.top/tags/prometheus/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/prometheus/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
       <description></description>
     </item>
     
@@ -93,7 +102,7 @@
     </item>
     
     <item>
-      <title>docker</title>
+      <title>Docker</title>
       <link>https://bgbiao.top/tags/docker/</link>
       <pubDate>Sun, 22 Mar 2020 00:00:00 +0000</pubDate>
       
@@ -111,7 +120,7 @@
     </item>
     
     <item>
-      <title>Gin</title>
+      <title>gin</title>
       <link>https://bgbiao.top/tags/gin/</link>
       <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
       
@@ -179,15 +188,6 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/%E6%80%9D%E8%80%83/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>生活</title>
-      <link>https://bgbiao.top/tags/%E7%94%9F%E6%B4%BB/</link>
-      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E7%94%9F%E6%B4%BB/</guid>
       <description></description>
     </item>
     

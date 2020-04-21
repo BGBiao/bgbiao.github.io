@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>jvm on BGBiao的SRE人生</title>
+    <link>https://bgbiao.top/tags/jvm/</link>
+    <description>Recent content in jvm on BGBiao的SRE人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 21 Apr 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/jvm/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>你还记得你JVM的的初始堆大小吗</title>
+      <link>https://bgbiao.top/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/</link>
+      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/</guid>
+      <description>通常对于很多java应用来说，当打成jar包后会下意识的使用java -jar xxx.jar来运行应用，而不是根据自己业务或实际debug的一些需求</description>
+    </item>
+    
+  </channel>
+</rss>
