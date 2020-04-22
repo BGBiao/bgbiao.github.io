@@ -8848,6 +8848,28 @@ build-tools  cmake  licenses  platforms  platform-tools  tools
 &lt;li&gt;1.通常持续集成会使用&lt;code&gt;Jenkins&lt;/code&gt;来进行编译打包，因此以上环境再接入Jenkins-salve之前需要安装&lt;code&gt;git&lt;/code&gt;客户端名&lt;/li&gt;
 &lt;li&gt;2.通常客户端在测试包时会通过二维码扫描来下载包，因此环境上需要安装&lt;code&gt;qrencode&lt;/code&gt;软件，用于生成二维码&lt;/li&gt;
 &lt;li&gt;3.需要注意&lt;code&gt;gradle&lt;/code&gt;在编译过程中会启动一个守护进程，如果编译异常结束，该守护进程可能不会立即释放，此时立即再次编译将有可能导致OOM&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;4.虽然使用该环境可以正常打包，但是在jenkins上打包后，可能遇到如下异常，通常是无法识别环境变量，在jenkins任务中显式声明&lt;code&gt;ANDROID_HOME=/opt/sdkmanager&lt;/code&gt;或者&lt;code&gt;ANDROID_SDK_ROOT=/opt/sdkmanager&lt;/code&gt;即可&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;SDK location not found. Define location with sdk.dir in the local.properties file or with an ANDROID_HOME environment variable.
+
+# or 
+* What went wrong:
+Could not determine the dependencies of task &amp;#39;:app:lintVitalFNormalRelease&amp;#39;.
+&amp;gt; Could not resolve all artifacts for configuration &amp;#39;:app:fNormalSamsungDebugCompileClasspath&amp;#39;.
+&amp;gt; SDK location not found. Define location with an ANDROID_SDK_ROOT environment variable or by setting the sdk.dir path in your project&amp;#39;s local properties file at &amp;#39;/opt/data/jenkins/workspace/test-andorid-build/local.properties&amp;#39;.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
 &lt;/ul&gt;</description>
       
     </item>

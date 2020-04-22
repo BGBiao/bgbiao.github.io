@@ -78,7 +78,7 @@
 
 <meta itemprop="datePublished" content="2019-12-11T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-12-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3021">
+<meta itemprop="wordCount" content="3226">
 
 
 
@@ -474,7 +474,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 3021 words </span>
+        <span class="more-meta"> 3226 words </span>
           <span class="more-meta"> 7 min read </span>
 
         
@@ -957,6 +957,28 @@ build-tools  cmake  licenses  platforms  platform-tools  tools
 <li>1.通常持续集成会使用<code>Jenkins</code>来进行编译打包，因此以上环境再接入Jenkins-salve之前需要安装<code>git</code>客户端名</li>
 <li>2.通常客户端在测试包时会通过二维码扫描来下载包，因此环境上需要安装<code>qrencode</code>软件，用于生成二维码</li>
 <li>3.需要注意<code>gradle</code>在编译过程中会启动一个守护进程，如果编译异常结束，该守护进程可能不会立即释放，此时立即再次编译将有可能导致OOM</li>
+
+<li><p>4.虽然使用该环境可以正常打包，但是在jenkins上打包后，可能遇到如下异常，通常是无法识别环境变量，在jenkins任务中显式声明<code>ANDROID_HOME=/opt/sdkmanager</code>或者<code>ANDROID_SDK_ROOT=/opt/sdkmanager</code>即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">SDK location not found. Define location with sdk.dir in the local.properties file or with an ANDROID_HOME environment variable.
+
+# or 
+* What went wrong:
+Could not determine the dependencies of task &#39;:app:lintVitalFNormalRelease&#39;.
+&gt; Could not resolve all artifacts for configuration &#39;:app:fNormalSamsungDebugCompileClasspath&#39;.
+&gt; SDK location not found. Define location with an ANDROID_SDK_ROOT environment variable or by setting the sdk.dir path in your project&#39;s local properties file at &#39;/opt/data/jenkins/workspace/test-andorid-build/local.properties&#39;.</pre></td></tr></table>
+</div>
+</div></li>
 </ul>
     </div>
 
