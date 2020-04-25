@@ -6,10 +6,28 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 21 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Apr 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka</title>
+      <link>https://bgbiao.top/tags/kafka/</link>
+      <pubDate>Sat, 25 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/kafka/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>运维</title>
+      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Sat, 25 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>jvm</title>
@@ -21,16 +39,7 @@
     </item>
     
     <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Grafana</title>
+      <title>grafana</title>
       <link>https://bgbiao.top/tags/grafana/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
@@ -48,7 +57,7 @@
     </item>
     
     <item>
-      <title>Prometheus</title>
+      <title>prometheus</title>
       <link>https://bgbiao.top/tags/prometheus/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
@@ -179,15 +188,6 @@
       <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/orm/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>思考</title>
-      <link>https://bgbiao.top/tags/%E6%80%9D%E8%80%83/</link>
-      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E6%80%9D%E8%80%83/</guid>
       <description></description>
     </item>
     

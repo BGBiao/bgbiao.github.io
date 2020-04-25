@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>kafka生产规划和运维 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
+ 笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
+鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.
+" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="kafka生产规划和运维" />
+<meta property="og:description" content="
+前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
+
+
+笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
+
+鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" />
+<meta property="article:published_time" content="2020-04-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-04-25T00:00:00+00:00" />
+<meta itemprop="name" content="kafka生产规划和运维">
+<meta itemprop="description" content="
+前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
+
+
+笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
+
+鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.">
+
+
+<meta itemprop="datePublished" content="2020-04-25T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-04-25T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="15182">
+
+
+
+<meta itemprop="keywords" content="运维,kafka," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="kafka生产规划和运维"/>
+<meta name="twitter:description" content="
+前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
+
+
+笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
+
+鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">kafka生产规划和运维</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-04-25" class="post-time">
+          2020-04-25
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 15182 words </span>
+          <span class="more-meta"> 31 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#一-kafka集群运维和规划">一、Kafka集群运维和规划</a></li>
+<li><a href="#二-集群规划">二、集群规划</a>
+<ul>
+<li><a href="#1-硬件和os">1.硬件和OS</a>
+<ul>
+<li><a href="#1-0os">1.0OS</a></li>
+<li><a href="#1-1内存">1.1内存</a></li>
+<li><a href="#1-2cpu">1.2CPU</a></li>
+<li><a href="#1-3disk">1.3Disk</a></li>
+<li><a href="#1-4network">1.4Network</a></li>
+<li><a href="#1-5filesystem">1.5Filesystem</a></li>
+<li><a href="#1-6-application-vs-os-flush-management">1.6 Application vs. OS Flush Management</a></li>
+<li><a href="#1-7-理解linux操作系统的flush行为">1.7 理解Linux操作系统的Flush行为</a></li>
+</ul></li>
+<li><a href="#2-节点配置">2.节点配置</a></li>
+<li><a href="#3-jvm配置">3.JVM配置</a></li>
+<li><a href="#4-kafka核心配置">4.kafka核心配置</a>
+<ul>
+<li><a href="#4-1重要的客户端配置">4.1重要的客户端配置</a></li>
+<li><a href="#4-2broker核心配置">4.2broker核心配置</a></li>
+<li><a href="#4-3topic级别的动态参数调整">4.3Topic级别的动态参数调整</a></li>
+<li><a href="#4-3producer核心参数">4.3Producer核心参数</a></li>
+<li><a href="#4-4consumer核心参数">4.4Consumer核心参数</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#三-集群管理">三、集群管理</a></li>
+<li><a href="#四-集群监控">四、集群监控</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有<code>Redis集群</code>，<code>ElasticSearch</code>集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。</p>
+</blockquote>
+
+<p>笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为<code>日志收集</code>、<code>数据管道</code>、<code>流式计算</code>、<code>业务事件存储</code>几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的<code>可用性</code>，<code>可靠性</code>，<code>数据一致性</code>要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。</p>
+
+<p>鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.</p>
+
+<h2 id="一-kafka集群运维和规划">一、Kafka集群运维和规划</h2>
+
+<p>其实任何开源的分布式系统在开始规划时，就需要考虑到业务场景，以及生产环境的周边可观测系统，比如如下几个方面:</p>
+
+<ul>
+<li>规划和部署生产级别的集群(包含官方最佳实践以及一些针对不停场景推荐的配置项变更)</li>
+<li>执行一些部署后的操作(比如滚动重启集群，集群备份，数据迁移等等)</li>
+<li>集群的可观测性(监控重要统计数据，理解kafka内部行为的具体含义以及是否需要报警通知)</li>
+</ul>
+
+<h2 id="二-集群规划">二、集群规划</h2>
+
+<p>本节主要介绍，kafka集群在生产环境部署前的一些规划，包含硬件配置选择，网络以及文件系统和其他考虑的选型.</p>
+
+<h3 id="1-硬件和os">1.硬件和OS</h3>
+
+<p><code>注意:</code>通常对于分布式的开源服务来将对于硬件本身没有太高的要求，但当需要承载一定量级的业务时，我们需要考虑一些硬件是否能够支撑对应的业务场景，并且通常来讲针对不同的业务场景选择不同的硬件(如果可选择)，也许会适当降低资源成本。</p>
+
+<h4 id="1-0os">1.0OS</h4>
+
+<p>一般来说，对于运行Linux中的kafka集群不需要过多的OS以及kernel参数调整，但如下几种情况可以根据具体情况进行参考:</p>
+
+<ul>
+<li><code>文件描述符(fd)</code>: broker节点上fd限制可以参考<code>(number_of_partitions)*(partition_size/segment_size)</code>公式</li>
+<li><code>套接字缓冲区(socket buffer)</code>: 该参数可以增加多数据中心之间的数据传输(一般异地集群备份建议调整以增加吞吐)</li>
+<li><code>最大内存映射区域数(vm.max_map_count)</code>: 当kafka broker节点拥有太多分区时应该密切关注系统级别的该参数，默认为65535。每一个日志段，分配的分区，都需要一对<code>index/timeindex</code>文件，而每个文件都会消耗一个内存区域(一个日志段使用2个内存映射区域)，因此一个分区至少需要2个内存区域，一个broker上拥有50000分区时，将会消耗100000个内存区域，此时默认的参数就会导致broker 以<code>OutOfMemoryError</code>方式crash掉。</li>
+</ul>
+
+<p><code>注意:</code>每个分区的日志段的数量取决于段(segment)的大小，负载，以及保留策略</p>
+
+<p>kafka使用大量的文件以及socket和客户端进行通讯，我们都知道，在Linux下，一切皆文件，因此系统需要设置更多的可用文件描述符&gt;。</p>
+
+<p>在大多数的默认系统配置中，单个进程可用使用1024个文件描述符，对于kafka来说太小了，建议调整到至少<code>100000</code>，但是通常和操作
+系统以及发行版本有关系，需要根据具体的OS进行调整。</p>
+
+<p>可用通过计算Kafka数据目录中的<code>.index</code>文件来计算当前的mmap编号。<code>.index</code>文件大多数代表了内存映射文件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 1.统计.index文件个数
+$ find . -name &#39;*index&#39; | wc -l
+
+# 2.为每个session设置vm.max_map_count参数，这将计算当前内存映射文件的数量，mmap限制的最小值就是打开文件的ulimit限制
+# 该值要远大于index的数量
+$ sysctl -w vm.max_map_count=262144
+
+# 3.持久化mmap参数
+$ echo &#39;vm.max_map_count=262144&#39; &gt;&gt; /etc/sysctl.conf
+$ sysctl -p</pre></td></tr></table>
+</div>
+</div>
+<h4 id="1-1内存">1.1内存</h4>
+
+<p>Kafka严重依赖文件系统来存储和缓存消息。</p>
+
+<p>所有数据都会立即写入文件系统上的持久日志中，而不必刷新到磁盘。实际上，这仅意味着将其转移到内核的页面缓存<code>pagecache</code>中。 当回收内存时，操作系统会将可用内存转移到磁盘缓存中，而对性能的影响很小。</p>
+
+<p>同时，Kafka非常小心地使用堆空间<code>heap space</code>，不需要将堆大小设置为超过6 GB，这样将会在32G内存的机器上缓存28-30G的数据到文件系统。</p>
+
+<p>因此，生产集群需要足够的内存来缓存活动的reader和writer。在Confluent的使用建议中，提出了对内存需求的粗略估计方式，比如需要缓冲30s，那么内存需求大概为<code>write_throughput * 30</code>。</p>
+
+<p>通常来讲<code>64G</code>内存配置的机器是一个不错的选择.</p>
+
+<h4 id="1-2cpu">1.2CPU</h4>
+
+<p>大多数的kafka集群对于cpu的要求不是那么高，因此对于CPU的配置没有像其他资源那么重要(但是通常同等资源都是由一定比例配比的)。</p>
+
+<p><code>注意:</code> 如果开启了SSL，那么可能对集群的整体性能有一定影响，且对cpu有一定要求，具体需要考虑到cpu的类型以及具体的JVM实现细节(通常来讲内部服务均不会开启SSL，因为管理成本很高，且性能上略有损失，安全上可以通过整体的IT安全进行要求和管控)</p>
+
+<p>通常情况下建议使用较新的多核处理器，通用集群可以设置为<code>24</code>核心。</p>
+
+<p>如果需要在更快的CPU或更多的内核之间进行选择，请选择更多的内核，因为多核提供的额外并发性将远远超过稍快的时钟速度。</p>
+
+<h4 id="1-3disk">1.3Disk</h4>
+
+<p>生产集群建议使用多块磁盘来最大化整体的吞吐，不要与应用程序日志或其他OS文件系统活动共享用于Kafka数据的相同驱动器，以确保良好的延迟。</p>
+
+<p>在官方的最佳实践中建议，可以将多块磁盘构建成RAID，或者直接将每块磁盘作为独立的目录进行挂载。</p>
+
+<p><code>备注:</code>如果软RAID的话其实会在存储方面增加一层数据均衡，增加了集群的复杂度，因此一般可用选择后者，而且RAID主要用于提供冗余，对于开源分布式服务来讲，在软件层面上基本都会保证数据的冗余。</p>
+
+<p>不过在实际的场景中，具体选择使用多块盘做RAID还是直接使用多块盘挂载，以下有几种场景可以考虑:</p>
+
+<p>如果配置多个数据目录，则Broker将在路径中放置一个新分区，该分区中当前存储的分区数最少。每个分区将完全位于数据目录之一中，如果<code>分区之间的数据不平衡，就会导致磁盘之间的负载不平衡</code>。</p>
+
+<p>RAID在平衡磁盘之间的负载方面做得更好，它能在较低的水平上平衡负载。RAID的主要缺点是减少了可用的磁盘空间(RAID0之外)h，好处是可以容忍磁盘故障(RAID1)</p>
+
+<p>在生产中强烈不建议使用RAID 5 or RAID 6 ,会严重影响到写吞吐的性能，并且在磁盘故障时会有重建阵列的I/O成本(<code>RAID0下也存在重建I/O的成本</code>)</p>
+
+<p>如果额外的成本可以接受，建议使用RAID10(容量减半，多一份冗余)，否则，建议Kafka服务器配置多个日志目录，每个目录都安装在单独的驱动器上。</p>
+
+<p>linked使用8x7200转的sata磁盘，一般来说，磁盘吞吐量是性能瓶颈，磁盘越多越好。</p>
+
+<p>kafka官方文档中其实建议使用多个驱动器以获得良好的吞吐量</p>
+
+<h4 id="1-4network">1.4Network</h4>
+
+<p>在分布式系统中，快速可靠的网络是性能的一个重要组成部分(<code>因此通常分布式系统中建议在同机房</code>)。</p>
+
+<p>低延迟确保节点可以轻松通信，而高带宽有助于集群节点之前的副本移动和恢复(<code>往往在kafka集群中优先瓶颈点都是带宽</code>)。</p>
+
+<p>目前大多数的数据中心基本都是千兆(1 GbE)或万兆网络(10 GbE)，对于大多数集群通常都是足够的。</p>
+
+<p>应该尽量避免集群跨越多个数据中心，即使数据中心在很近的距离同地区，也要避免跨越巨大地理距离的集群。</p>
+
+<p><code>备注:</code>实际上在分布式系统中分区是肯定会发生的，通过避免跨机房部署能够降低分区的概率</p>
+
+<p>Kafka集群假设所有节点都是相等的，较大的延迟可能会加剧分布式系统中的问题，并使调试和解决变得更加困难。</p>
+
+<p><code>注意:</code> 如果业务上需要异地进行数据读写，推荐的方法是在每个数据中心中部署一个本地Kafka集群，每个数据中心中的应用程序实例只与它们的本地集群交互，并在集群之间进行镜像(kafka提供了mirror-maker工具)。</p>
+
+<h4 id="1-5filesystem">1.5Filesystem</h4>
+
+<p>现在操作系统中，大部分的系统应该都使用了<code>Ext4</code>或<code>XFS</code>系统，官方也推荐使用这两种文件系统，但是对于具体的文件系统的选择，官方提供了如下几种场景和需要注意的点。</p>
+
+<p>使用各种文件系统创建和挂载选项，在具有大量消息负载的集群上执行了比较测试，XFS带来了更好的本地时间(最好的EXT4配置是160ms vs. 250ms+)，以及更低的平均等待时间。XFS性能在磁盘性能方面的可变性也较小。</p>
+
+<p>不论是使用哪种文件系统，推荐修改默认的挂载参数:</p>
+
+<ul>
+<li><p><code>noatime</code>: 此选项禁止在读取文件时更新文件的atime(最后访问时间)属性,这可以消除大量的文件系统写操作，特别是在引导消费者的情况下,Kafka完全不依赖于atime属性，所以禁用它是安全的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ cat /etc/fstab
+UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults,noatime         0 2</pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<p>XFS文件系统挂载参数优化:</p>
+
+<ul>
+<li><code>largeio</code>: 这会影响stat调用报告的首选I/O大小，尽管这可以在较大的磁盘写入上实现更高的性能，但实际上对性能的影响很小或没有影响</li>
+<li><code>nobarrier</code>: 于具有电池后备缓存的基础设备，此选项可以通过禁用定期写刷新来提供更高的性能。 但是，如果基础设备的行为良&gt;好，它将向文件系统报告它不需要刷新，并且此选项将无效。</li>
+</ul>
+
+<p>EXT文件系统挂载参数优化:</p>
+
+<p><code>注意:</code> 在ext4文件系统下，要获得最佳性能，则需要调整几个参数。这些选项在故障情况下通常是不安全的，并且将导致更多的数据丢失和损坏，对于单个broker故障，可以擦除磁盘并从群集重建副本，在多数情况下，多broker异常意味着潜在的文件系统损坏，无法轻易恢复。</p>
+
+<ul>
+<li><code>data=writeback</code>: Ext4默认为data = ordered，这使某些写入操作具有很强的顺序，在Kafka场景下其实不需要该参数，此设置消除了排序约束，并且似乎大大减少了延迟</li>
+<li><code>Disabling journaling</code>: 日志记录是一个折衷:它使服务器崩溃后重新引导更快，但它引入了大量额外的锁定，增加了写入性能的差异</li>
+<li><code>commit=num_secs</code>: 这调整了ext4提交到其元数据日志的频率。 将此值设置为较低的值可以减少崩溃期间未刷新数据的丢失。 将此值设置为较高的值将提高吞吐量。</li>
+<li><code>nobh</code>: 此设置控制在使用data=writeback模式时附加的排序保证，可以提高吞吐量和延迟</li>
+<li><code>delalloc</code>: 延迟分配意味着文件系统避免在物理写入发生之前分配任何块，此功能非常适合吞吐量</li>
+</ul>
+
+<h4 id="1-6-application-vs-os-flush-management">1.6 Application vs. OS Flush Management</h4>
+
+<p>Kafka始终会立即将所有数据写入文件系统，并支持配置刷新策略的功能，该策略控制何时使用刷新将数据从OS缓存中强制出到磁盘上。
+ 可以控制此刷新策略，以在一段时间后或在写入一定数量的消息之后将数据强制到磁盘。 在此配置中有几种选择。</p>
+
+<p>Kafka必须最终调用fsync才能知道数据已刷新。 当从崩溃中恢复任何未知的日志段时，Kafka将通过检查其消息的CRC来检查每条消息的
+完整性，并在启动时执行的恢复过程中重建附带的偏移索引文件</p>
+
+<p>请注意，Kafka中的持久性不需要将数据同步到磁盘，因为发生故障的节点将始终从其副本中恢复。</p>
+
+<p>我们建议使用默认刷新设置，该设置将完全禁用应用程序fsync。 这意味着依靠操作系统和Kafka自己的后台刷新来完成后台刷新。 这 &gt;为所有用途提供了最佳的解决方案：无需调节旋钮，提高吞吐量和延迟，并提供完全恢复保证。 通常，我们认为复制提供的保证要强于同步到本地磁盘，但是偏执狂仍然更愿意同时拥有两者，并且仍然支持应用程序级fsync策略。</p>
+
+<p>使用应用程序级刷新设置的缺点是，其磁盘使用模式效率较低（它给操作系统减少了重新排序写操作的余地），并且由于大多数Linux文件系统中的fsync阻止了文件写入，因此它会引入延迟。 后台刷新进行更精细的页面级锁定。</p>
+
+<h4 id="1-7-理解linux操作系统的flush行为">1.7 理解Linux操作系统的Flush行为</h4>
+
+<p>在Linux中，写入文件系统的数据将保留在页面缓存中，直到必须将其写出到磁盘为止（由于应用程序级fsync或操作系统自身的刷新策&gt;略）。 数据刷新是通过一组称为pdflush的后台线程完成的（或在2.6.32版的内核“冲洗线程”中）。</p>
+
+<p>Pdflush具有可配置的策略，该策略控制可以在缓存中维护多少脏数据以及必须将多脏数据写回到磁盘的时间.</p>
+
+<p><a href="http://web.archive.org/web/20160518040713/http://www.westnet.com/~gsmith/content/linux-pdflush.htm">pdflush刷新策略</a></p>
+
+<p>当Pdflush无法跟上写入数据的速度时，它将最终导致写入过程阻塞写入中的延迟，从而减慢数据的累积。</p>
+
+<p>与进程内缓存相比，使用pagecache存储将写入磁盘的数据有几个优点：</p>
+
+<ul>
+<li>I/O调度将连续的小写批量写到更大的物理写中，从而提高吞吐量</li>
+<li>I/O调度尝试重新排序写操作，以最小化磁盘头的移动，从而提高吞吐量</li>
+<li>它会自动使用机器上所有的空闲内存</li>
+</ul>
+
+<h3 id="2-节点配置">2.节点配置</h3>
+
+<ul>
+<li>1.避免使用太小的节点配置，因为这样整个集群的节点数可能会特别多，在这种机器上运行kafka将会有更多的开销</li>
+<li>2.避免使用太高配计算机，因为它们经常导致资源使用不平衡，比如内存优先不够了，但cpu还剩余很多。如果在每个高配机器上运行多个broker节点，将会增加整体的复杂度</li>
+</ul>
+
+<h3 id="3-jvm配置">3.JVM配置</h3>
+
+<p>在当前大多数Java类应用下，基本都在使用JDK8(建议使用最新的jdk8)，在此环境下默认使用的是<code>G1</code>的垃圾回收器，因此一般情况下仅需要修改如下参数即可:</p>
+
+<ul>
+<li><code>MaxGCPauseMillis</code>: 指定每次垃圾回收默认的停顿时间，默认值200ms</li>
+<li><code>InitiatingHeapOccupancyPercent</code>: G1 启动新一轮垃圾回收之前可以使用的堆内存百分比，默认值是45</li>
+</ul>
+
+<p>官方推荐的GC参数如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20
+       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M
+       -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80</pre></td></tr></table>
+</div>
+</div>
+<p>作为参考，LinkedIn最繁忙的集群当前是如下情况:</p>
+
+<ul>
+<li>60 brokers</li>
+<li>50k partitions (replication factor 2)</li>
+<li>800k messages/sec in</li>
+<li>300 MBps inbound, 1 GBps + outbound</li>
+</ul>
+
+<p>上面的GC调优看起来比较激进，但集群中的所有broker都会有90%的gc中止时间，大概21ms，它们做不到每秒一个young GC</p>
+
+<h3 id="4-kafka核心配置">4.kafka核心配置</h3>
+
+<p>Kafka默认设置在大多数情况下都能工作，特别是与性能相关的设置和选项，但是考虑到集群的规划以及场景用途，有一些补充的配置参数可以对生产环境进行调优。</p>
+
+<p>通常配置上来讲会分为<code>broker端配置</code>、<code>produser端配置</code>、<code>consumer端配置</code>，由于各个业务方当前均使用开源客户端，因此对于客&gt;户端的配置无法做到严格管控(如果有内部的sdk封装可能会比较好)。</p>
+
+<h4 id="4-1重要的客户端配置">4.1重要的客户端配置</h4>
+
+<ul>
+<li>acks: 消息一致性保证(0:投递即成功,1:副本同步即成功,all/-1:全部ISR同步即成功)</li>
+<li>compression: 压缩类型</li>
+<li>batch size: 批处理大小</li>
+</ul>
+
+<p><code>注意:</code> 对于消费者来说，最重要的参数为<code>fetch size</code></p>
+
+<p>鉴于集群的整体可用性可靠性其实很大一部分和客户端的使用方式有关，后面会列举一些常见的生产者和消费者端的核心参数</p>
+
+<p><a href="http://kafka.apache.org/24/documentation.html#configuration">kafka详细参数列表</a></p>
+
+<h4 id="4-2broker核心配置">4.2broker核心配置</h4>
+
+<p><strong>zookeeper.connect</strong></p>
+
+<p>zk连接串，建议写全部的zk节点地址。</p>
+
+<p>brokers链接的zk集群地址，该值默认采用<code>host:ip/path</code>来指定一个zk中的znode节点，通常情况下用来隔离环境. kafka的zk路径中使
+用了<code>chroot</code>环境，如果不指定使用默认的<code>/</code>来作为存储路径。</p>
+
+<p><strong>broker.id</strong></p>
+
+<p>broker唯一标识，该值可以任意设定(int类型)。默认<code>reserved.broker.max</code>开始，每次+1</p>
+
+<p>在分布式集群中，可以手动指定每个broker的节点信息，同时也可以使用如下方式来自动生成每个broker的id</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">#broker.id
+broker.id.generation.enable=true</pre></td></tr></table>
+</div>
+</div>
+<p><strong>log.dirs</strong></p>
+
+<p>kafka存储的日志消息都是保存在该参数指定的日志路径下，该值可以指定多个磁盘路径，通常我们会绑定到多个磁盘上。比如<code>log.dirs=/exoprt/kafka1,/export/kafka2,/export/kafka3</code></p>
+
+<p>对应的另外一个默认参数为<code>log.dir</code>，默认值为<code>/tmp/kafka-logs</code></p>
+
+<p><strong>listeners</strong></p>
+
+<p>broker监听列表，默认将为<code>PLAINTEXT://myhost:9092</code></p>
+
+<p><strong>advertised.listeners</strong></p>
+
+<p>监听器发布到zk集群中的地址，供客户端使用，默认采用<code>listeners</code>参数值</p>
+
+<p><strong>num.recovery.threads.per.data.dir</strong></p>
+
+<p>每个数据目录用于在启动时进行日志恢复和在关闭时进行刷新的线程数，默认值为: <code>1</code></p>
+
+<p>对于如下几种情况，kafka会使用<code>可配置的线程池</code>来处理日志片段.</p>
+
+<ul>
+<li>服务器正常启动: 用于打开每个分区的日志片段</li>
+<li>服务器崩溃后重启: 用于检查和截断每个分区的日志片段</li>
+<li>服务器正常关闭: 用于关闭日志片段</li>
+</ul>
+
+<p>默认情况下，每个日志目录采用一个线程，因为这些线程仅有在启动和关闭时才用到，所以可以适当设置大一点，并不会影响到整体服&gt;务的性能，特别是对于包含大量分区的服务器来说，一旦发生崩愤，在进行恢复时使用井行操作可能会省下数小时的时间。</p>
+
+<p>需要注意的是，该值是每个日志目录的线程数，因此总线程数需要考虑到<code>log.dirs</code>的配置</p>
+
+<p><strong>delete.topic.enable</strong></p>
+
+<p>是否允许删除topic，默认为: <code>true</code></p>
+
+<p>如果为flase，通过管理工具删除topic仅为标记删除，此时使用<code>describe</code>命令可以查看到topic的详情信息，但是无法写入，可以通过删除<code>zk</code>中的节点来删除</p>
+
+<p><strong>auto.create.topics.enable</strong></p>
+
+<p>默认情况下，kafka会使用如下三种方式创建topic:</p>
+
+<ul>
+<li>当一个生产者开始往主题写入消息时</li>
+<li>当一个消费者开始从主题读取消息时</li>
+<li>当任意一个客户端向主题发送元数据请求时</li>
+</ul>
+
+<p>推荐是设置成<code>false</code>，不允许客户端直接创建topic，否则topic会无法管理。默认值为<code>true</code></p>
+
+<p><strong>auto.leader.rebalance.enable</strong></p>
+
+<p>是否开启<code>leader</code>自动平衡，默认值为<code>true</code>。后台会有线程进行定期检查leader的分布情况</p>
+
+<p>kafka中有一个被称为优先副本（preferred replicas）的概念(通常分区会有主分区和副本分区的概念，主分区先写入，然后push到其&gt;他副本分区)。</p>
+
+<p>如果一个分区有3个副本，且这3个副本的优先级别分别为0,1,2，根据优先副本的概念，0会作为leader 。</p>
+
+<p>当0节点的broker挂掉时，会启动1这个节点broker当做leader。</p>
+
+<p>当0节点的broker再次启动后，会自动恢复为此partition的leader。不会导致负载不均衡和资源浪费，这就是leader的均衡机制(前提是
+第一次partition在分配的时候，它本身就是一个相对平均的分配)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">auto.leader.rebalance.enable=true
+# 对应影响的其他两个参数
+# leader.imbalance.per.broker.percentage : 每个broker允许leader不平衡比例(如果每个broker上超过了这个值，controller将会&gt;执行分区再平衡)，默认值10.
+# leader.imbalance.check.interval.seconds: 主分区再平衡的频率，默认值为300s</pre></td></tr></table>
+</div>
+</div>
+<p><strong>num.partitions</strong></p>
+
+<p>自动创建topic的默认分区数，默认为1，通常生产集群不建议打开topic自动创建，一方面是不便于管理和追溯，另外一方面因为自动创建默认分区时1，且无法动态变更，造成的风险可能会比较大。</p>
+
+<p>多分区的topic有这更好的数据平衡能力，并且可以帮助消费者进行并行化消费。</p>
+
+<p><code>注意:</code> 对于有key的数据，避免改变分区的数量</p>
+
+<p><strong>default.replication.factor</strong></p>
+
+<p>适用于自动创建的主题的默认复制因子，推荐至少设置为2，默认为1</p>
+
+<p><strong>min.insync.replicas</strong></p>
+
+<p>当使用<code>required.acks=-1(all)</code>提交到生产请求所需的ISR中的最小副本数，默认为1，建议在数据一致性要求较高的topic中设置至少为2</p>
+
+<p>指定<code>ISR</code>的最小数量。当producer设置<code>ack=all(-1)</code>时，该值指定的副本必须全部写成功，才认为消息写入成功，否则生产者将抛异&gt;常(<code>either NotEnoughReplicas or NotEnoughReplicasAfterAppend</code>)</p>
+
+<p><code>注意</code>: <code>min.insync.replicas</code>参数和生产者<code>ack</code>参数一起使用，可以加强整个消息的持久性.示例:(3副本的topic,可以设置该值为2,同时生产者ack设置为all，这将确保大多数副本没有收到写操作时，生产者直接异常)</p>
+
+<p>默认值为:<code>1</code></p>
+
+<p><strong>unclean.leader.election.enable</strong></p>
+
+<p>是否启用不在ISR集中的副本以选作领导者，即使这样做可能会导致数据丢失。该参数可以提高整体Topic的可用性，但是可能会造成数据的整体不一致性(部分数据的丢失)。</p>
+
+<p><a href="http://kafka.apache.org/24/documentation.html#topicconfigs">kafka可用性和可靠性保证</a></p>
+
+<p>默认值为:<code>false</code></p>
+
+<p>为false，就只从ISR中获取leader保证了数据的可靠性，但是partition就失效了，<code>true</code>则从replica中获取，则可用性增强，但是数&gt;据可能存在丢失情况</p>
+
+<p><code>注意:</code>  该参数实际上在设置的时候也有一定的争议性，比如，我们知道副本是有<code>ISR</code>的，即正在同步的副本，如果当前的broker宕&gt;机导致需要选举leader partition，此时如果ISR内除了leader之外还有其他副本(但谁又能保证一定有呢)，那直接从ISR中选举leader&gt;即可，如果没有的话，当<code>auto.leader.rebalance.enable=true</code>时，就会去其他存活的副本中选举leader，此时可以增强整体的可用性
+，但是如果存活的副本不在ISR中，即意味着数据可能有一定的丢失了。但是如果该参数为false的话，ISR中没有，就直接异常了，为了
+保证数据的一致性</p>
+
+<p>该参数的存在其实是在可用性和可靠性之间做了一个权衡，为true时保证了可用性AP，为false时保证了一致性CP</p>
+
+<p><code>数据一致性保证</code>: ISR就保存了kafka认为可靠的副本，它们具备这样的条件：</p>
+
+<ul>
+<li>落后leader的消息条数在一定阈值内</li>
+<li>或者落后在一定时间内；</li>
+</ul>
+
+<p><strong>num.replica.fetchers</strong></p>
+
+<p>该参数指定了fetch线程的数量(从源broker中复制消息的fetch线程)，默认值: <code>1</code></p>
+
+<p>其实可以适当的调整大一些，可以增强副本之前的同步效率</p>
+
+<p><strong>num.io.threads</strong></p>
+
+<p>broker处理请求的 IO 线程数，需要考虑到磁盘的IO状况。默认值为:<code>8</code></p>
+
+<p><strong>num.network.threads</strong></p>
+
+<p>指定broker用来接收来自网络的请求和发送网络的响应的线程数，默认值为: <code>3</code></p>
+
+<p><strong>background.threads</strong></p>
+
+<p>后台任务处理线程数(例如过期消息删除等)。默认值为:<code>10</code></p>
+
+<p><strong>socket相关</strong></p>
+
+<ul>
+<li>socket.send.buffer.bytes: (socket发送缓冲区:SO_SNDBUFF) 默认值:<code>102400</code></li>
+<li>socket.receive.buffer.bytes: (socket接收缓冲区:SO_RCVBUFF) 默认值:<code>102400</code></li>
+<li>socket.request.max.bytes: (请求最大值，message.max.bytes要小于该值较好) 默认值:<code>104857600</code></li>
+</ul>
+
+<p><strong>message.max.bytes</strong></p>
+
+<p>该值表示kafka允许的最大的batch大小(不是单个message的大小)，默认值为<code>1000012</code>，即1Mb.</p>
+
+<p>在最新的消息格式版本中，为了提高效率，一般消息的提交都是采用batch的方式。</p>
+
+<p><code>注意:</code> 在以前的消息格式版本中，未压缩的记录不会分组成批，在这种情况下，此限制仅适用于单个记录。</p>
+
+<p>在每个topic级别可以使用<code>max.message.bytes</code>设置</p>
+
+<p><strong>log相关(具体到topic级别)</strong></p>
+
+<ul>
+<li>log.segment.bytes: 单个日志段(segment)的大小，默认为<code>1073741824</code>,即1GB</li>
+<li>log.segment.delete.delay.ms: 日志段从文件系统中删除前等待的时间，默认为<code>60000</code>，即1min</li>
+<li>log.cleanup.policy: 保留窗口之外的日志清理策略可同时指定多个策略如: [<code>delete</code>,compact]</li>
+<li>log.cleaner.enable: 启用日志清除器进程，和<code>cleanup.policy = compact</code>参数结合使用，默认为<code>true</code></li>
+<li>log.cleaner.threads: 日志清理的后台线程数量，默认为<code>1</code></li>
+<li>log.cleaner.delete.retention.ms: 删除的日志保留的时间，默认为<code>86400000</code></li>
+<li>log.retention.bytes: 删除日志前，日志最大的大小，超过该值即删除，默认<code>-1</code>，作用在每个partition，会影响整个topic的容量</li>
+<li>log.retention.minutes(hours|ms): 日志保留时间，如果没指定，默认使用hours参数</li>
+<li>log.retention.check.interval.ms: 日志清理器检查日志是否符合删除条件的频率，默认为<code>300000</code></li>
+<li>log.flush.interval.messages: 将消息刷新到磁盘之前在日志分区上累积的消息数，默认为<code>9223372036854775807</code></li>
+<li>log.flush.interval.ms: 主题中的消息在刷新到磁盘之前保存在内存中的最大时间，默认为<code>null</code>(log.flush.scheduler.interval.ms参数的值)</li>
+<li>log.flush.scheduler.interval.ms: 日志刷新器检查是否需要将日志刷新到磁盘的频率，默认<code>9223372036854775807</code></li>
+<li>log.flush.offset.checkpoint.interval.ms: 更新最后一次刷新的持久记录(被作为恢复点)的频率，默认为<code>60000</code></li>
+<li>log.flush.start.offset.checkpoint.interval.ms: 更新日志起始偏移量的持久记录的频率，默认<code>60000</code></li>
+<li>log.roll.hours: 新日志段(segment)被创建前的最大时间，默认<code>168</code>，如果没设置优先使用<code>log.roll.ms</code></li>
+</ul>
+
+<p><strong>offsets相关</strong></p>
+
+<ul>
+<li>offsets.commit.required.acks: offset提交之前是否需要ack确认,默认值:<code>-1</code></li>
+<li>offsets.commit.timeout.ms: 当偏移量注意<code>_offset</code>的所有副本接收到提交或超时达到该时间时，offset提交将延迟. 默认值:<code>5000</code></li>
+<li>offsets.load.buffer.size: 偏移量加载到缓存中时从偏移量段读取的批处理大小. 默认值:<code>5242880</code></li>
+<li>offsets.retention.check.interval.ms: 历史offset检查的频率，默认值:<code>600000</code></li>
+<li>offsets.retention.minutes: 在消费者组的消费者全部异常之后，offset保留的时间，默认值:<code>10080</code></li>
+<li>offsets.topic.compression.codec: 偏移量主题的压缩解码器，默认:<code>0</code></li>
+<li>offsets.topic.num.partitions: offset提交主题的分区数量，默认:<code>50</code>(<code>注意:</code>集群部署后不要改变)</li>
+<li>offsets.topic.replication.factor: offset提交主题的副本数，默认:<code>3</code> (在集群大小满足此复制因子要求之前，内部主题创建将&gt;失败,该主题非常重要，需要要求强一致性)</li>
+<li>offsets.topic.segment.bytes: offset提交主题的段大小，设置相对较小，以便更快地实现日志压缩和缓存负载，默认值:<code>104857600</code>，即1Mb</li>
+</ul>
+
+<p><strong>queue相关</strong></p>
+
+<ul>
+<li>queued.max.requests: 在网络阻塞线程前，数据平面允许的排队请求数，默认值:<code>500</code></li>
+</ul>
+
+<p><strong>replica相关</strong></p>
+
+<ul>
+<li>replica.fetch.min.bytes:每个fetch响应所需的最小字节数，默认值:<code>1</code></li>
+<li>replica.fetch.wait.max.ms: 由follow副本发起的每个fetch请求的最大等待时间，该值应小于<code>replica.lag.time.max.ms</code>，以避免
+为低吞吐量的主题频繁地收缩ISR，默认值:<code>500</code></li>
+<li>replica.lag.time.max.ms: follow副本在该时间内没有和leader副本同步，或没有发送任何同步请求，将会被leader副本从ISR中删&gt;除. 默认值:<code>10000</code>，即10s</li>
+<li>replica.socket.receive.buffer.bytes: 副本接收请求的网络缓冲区，默认值:<code>65535</code></li>
+<li>replica.socket.timeout.ms: 网络请求的超时时间，默认值:<code>30000</code></li>
+<li>replica.fetch.backoff.ms: 发生获取分区错误时要休眠的时间，参数不是很重要，默认值:<code>1000</code></li>
+<li>replica.fetch.max.bytes: 尝试为每个分区获取的消息字节数，参数不是很重要，默认值:<code>1048576</code>,即1M</li>
+</ul>
+
+<p><strong>broker.rack</strong></p>
+
+<p>broker所在的机架，用来感知机架的变化，通常多个分区不会放在同一个机架上</p>
+
+<p>示例: <code>RACK1</code>, <code>us-east-1d</code></p>
+
+<p><strong>controller控制器相关</strong></p>
+
+<ul>
+<li>controlled.shutdown.enable: 启用控制器关闭，默认:<code>true</code></li>
+<li>controlled.shutdown.max.retries: 控制器会因为各种原因而宕机，该值表示控制器的重试次数，默认:<code>3</code></li>
+<li>controlled.shutdown.retry.backoff.ms: 在每次重试之前，系统从前一次故障(控制器fail over或副本延迟)的状态中恢复过来的时
+间，默认:<code>5000</code></li>
+<li>controller.socket.timeout.ms: 控制器到broker角色转换的socket超时时间，默认:<code>30000</code></li>
+</ul>
+
+<p><strong>group相关(消费组)</strong></p>
+
+<ul>
+<li>group.max.size: 消费组中最大消费者数量</li>
+<li>group.initial.rebalance.delay.ms:注册消费者允许的最小会话超时，默认:<code>6000</code></li>
+</ul>
+
+<p><code>注意:</code> 很多参数是有不同级别的生效范围的，比如:</p>
+
+<ul>
+<li><code>read-only</code>: 仅在broker重启后才能生效</li>
+<li><code>per-broker</code>: 可以为每个broker动态更新</li>
+<li><code>cluster-wide</code>: 可作为集群范围内的值动态更新，也可以在每个broker上更新进行测试</li>
+</ul>
+
+<p><a href="http://kafka.apache.org/24/documentation.html#brokerconfigs">broker配置作用范围</a></p>
+
+<p><strong>示例配置</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># ZooKeeper地址
+zookeeper.connect=[list of ZooKeeper servers]
+
+# kafka log相关配置
+num.partitions=8
+default.replication.factor=3
+log.dirs=[List of directories. Kafka should have its own dedicated disk(s) or SSD(s).]
+
+# 其他配置核心配置
+broker.id=[An integer. Start with 0 and increment by 1 for each new broker.]
+listeners=[list of listeners]
+auto.create.topics.enable=false
+min.insync.replicas=2
+queued.max.requests=[number of concurrent requests]</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:</code> 在kafka集群中，当broker集群参数确定后，还有一些针对topic的参数是可以进行动态调整的，以提高kafka服务的灵活性。</p>
+
+<h4 id="4-3topic级别的动态参数调整">4.3Topic级别的动态参数调整</h4>
+
+<p><a href="http://kafka.apache.org/24/documentation.html#topicconfigs">Topic级别的配置</a></p>
+
+<p><strong>cleanup.policy</strong></p>
+
+<p>一个字符串是“删除”或“压缩”或两者兼而有之. 默认值: <code>[compact, delete]</code></p>
+
+<p><strong>compression.type</strong></p>
+
+<p>日志压缩类型，默认值为<code>producer</code></p>
+
+<p><strong>delete.retention.ms</strong></p>
+
+<p>用于日志压缩主题的删除保留时间。默认值:<code>86400000</code></p>
+
+<p><strong>max.message.bytes</strong></p>
+
+<p>指定每个topic可发送的最大消息(batch size)字节数.(区别于全局的<code>message.max.bytes</code>参数)</p>
+
+<p><strong>num.partitions</strong></p>
+
+<p>指定创建topic的默认分区数量，该值默认为1，建议根据具体的情况进行设定，越多的分区对于海量数据来说可以提高吞吐，但是对于&gt;少量数据来说，也可能增加网络消耗</p>
+
+<p><code>注意:</code>分区数一旦指定，只能增加，不能减少</p>
+
+<p><strong>default.replication.factor</strong></p>
+
+<p>指定kafka副本数，默认每个主题分区均有一个副本，当该副本所在主机异常，可能造成数据的丢失，建议在适当场景将副本至少设置成
+2个，以尽快保证数据的一致性。默认值:<code>1</code></p>
+
+<p><code>注意:</code>自动创建主题的副本因子</p>
+
+<p><strong>log.retention.ms</strong></p>
+
+<p>kafka的log保留时间，也可以使用<code>log.retention.hours</code>参数来配置保留时间，默认168小时，即一周</p>
+
+<p><strong>log.retention.bytes</strong></p>
+
+<p>指定log保留的大小，作用在每一个partition上，加入一个topic有3个partition，设置了<code>log.retention.bytes</code>为1GB，则表示整个topic仅可以存储3GB的数据，超过该容量的数据会被进行自动删除。</p>
+
+<p>此时，临时增加该topic的容量的方法就是调整该参数，或调整topic的partition个数。</p>
+
+<p><strong>log.segment.bytes</strong></p>
+
+<p>指定每个日志段的大小，通常在消息到达broker时，会被追加到分区的当前日志段上(segment)，当日志段大小超过该参数指定的值(默&gt;认1GB)，当前日志段就会被关闭，一个新的日志段被打开。</p>
+
+<p>如果一个日志片段被关闭，就开始等待过期，该值不建议设置太小。</p>
+
+<p><strong>log.segment.ms</strong></p>
+
+<p>上面会指定日志段的分割，该参数会指定历史的日志段的过期时间。该参数会和<code>log.retention.bytes</code>一起校验，谁先满足就生效。</p>
+
+<p><strong>message.max.bytes</strong></p>
+
+<p>该值用来限制单个消息的大小，默认值为<code>1000 000</code>即<code>1MB</code>，如果超过该大小，broker不会接受，而且会抛出相关异常</p>
+
+<p><code>注意:</code>该参数指的是消息被压缩后的大小，通常生产中的消息生产会使用gzip或snappy来进行压缩</p>
+
+<p><code>注意:</code>消息的大小对于性能有比较显著的影响，越大负责处理网络连接和请求的线程就需要花越多的时间来处理这些请求，还会增加磁
+盘写入块的大小，从而影响 IO 吞吐量。</p>
+
+<p><strong>retention.ms</strong></p>
+
+<p>规定了该主题消息被保存的时常，默认是7天，即该主题只能保存7天的消息，该值可设定在topic级别，此时会覆盖broker端的全局参数</p>
+
+<p><strong>retention.bytes</strong></p>
+
+<p>该值规定了要为该 Topic 预留多大的磁盘空间，默认为-1，该值通常情况用来设置topic的配额</p>
+
+<h4 id="4-3producer核心参数">4.3Producer核心参数</h4>
+
+<p><strong>bootstrap.servers</strong></p>
+
+<p>指定broker地址</p>
+
+<p><strong>key.serializer</strong></p>
+
+<p>broker 需要接收到序列化之后的<code>k/v</code>值，所以生产者需要将序列化后的值发送过来。</p>
+
+<p><code>org.apache.kafka.common.serialization.Serializer</code>该类表示把键对象序列化为字节数组</p>
+
+<ul>
+<li>ByteArraySerializer: 默认的序列化方式</li>
+<li>StringSerializer:</li>
+<li>IntegerSerializer:</li>
+</ul>
+
+<p><strong>value.serializer</strong></p>
+
+<p>指定序列化后的value，需要实现<code>org.apache.kafka.common.serialization.Serializer</code>接口</p>
+
+<p><code>org.apache.kafka.common.serialization.StringSerializer</code></p>
+
+<p><strong>compression.type</strong>
+指定消息压缩类型:gzip,snappy等，</p>
+
+<p>broker端也有该参数，默认值为:<code>producer</code>，表示遵循生产者的压缩方式</p>
+
+<p><code>注意:</code>生产者使用何种压缩方式，消费者将必须使用该方式进行解压缩</p>
+
+<p><strong>acks</strong></p>
+
+<p>该参数用来声明要有多少个分区副本接收消息后，生产者才认为消息写入成功，也就是数据一致性衡量，该参数对消息的丢失的影响较&gt;大. 默认值为:<code>1</code></p>
+
+<ul>
+<li><code>acks=0</code>: 表示生产者不知道消息是否被broker成功接收被处理，反正自己发出去了就认为是成功了，该种清理增加了吞吐，但是也&gt;增加的数据丢失的风险，因为程序的稳定性，网络的稳定性都可能会影响到消息的生产</li>
+<li><code>acks=1</code>: 只要集群中leader接收到消息并成功处理，就返回给生产者写入成功的消息。该种情况，如果发送过程中网络出现问题或&gt;者kafka集群异常导致leader没工作而导致消息写入失败，生产者会受到写入失败相关的异常，此时生产者可进行重试</li>
+<li><code>acks=all/-1</code>: 表示所有参与复制的节点都收到消息时，生产者才会接收到来自服务器端写入成功的消息，该种情况下，整体的消息
+确认延迟会更高一些，但是数据的一致性也更强一些</li>
+</ul>
+
+<p><code>注意:</code> 消息的发送其实也分<code>sync</code>和<code>async</code>，即同步和异步，kafka为了保证消息高效传输会决定是同步发送还是异步发送。如果让&gt;客户端等待服务器的响应(通过调用get()方法)也会增加延迟，如果采用客户端回调方式，延迟问题可能会有好转。</p>
+
+<p><strong>buffer.memory</strong></p>
+
+<p>该参数用来设置生产者内存缓冲区的大小，生产者会用它来缓冲要发送到服务器的消息，以此来提供消息传递的效率。默认值:<code>33554432</code></p>
+
+<p><code>注意:</code>如果应用程序发送消息的速度超过发送到服务器的速度，会导致生产者空间不足，此时<code>send()</code>方法就会阻塞或者直接异常，取
+决于<code>block.on.buffer.null</code>参数</p>
+
+<p><strong>retries</strong></p>
+
+<p>生产者从服务器收到的错误有可能是临时性的错误，比如暂时找不到<code>leader</code>或者当前partition正在迁移无法找到相关的partition，&gt;这种情况下，该参数可以决定生产者的行为，如果重试次数超过之后，生产者就会放弃重试，并返回错误。</p>
+
+<p>默认情况下，生产者在每次重试之间等待100ms，这个等待参数可以通过<code>retry.backoff.ms</code>来修改</p>
+
+<p><strong>batch.size</strong></p>
+
+<p>指定每次提交的batch大小，默认值:<code>16384</code></p>
+
+<p>当有多个消息需要被发送<code>同一个分区</code>(如何决定是发送到同一个分区?)时，生产者会把他们发送到同一个批次里.</p>
+
+<p>该参数用来指定一个批次提交的大小，当达到该batch的大小，所有的消息会被统一发送至broker</p>
+
+<p><strong>client.id</strong></p>
+
+<p>该参数用来指定客户端的id，不过可以不用指定，注册后为每个客户端生成64为的id</p>
+
+<p><strong>max.in.flight.requests.per.connection</strong></p>
+
+<p>此参数指定了生产者在收到服务器响应之前可以发送多少消息，它的值越高，就会占用越多的内存，不过也会提高吞吐量</p>
+
+<p>把它设为1 可以保证消息是<code>按照发送的顺序</code>写入服务器。</p>
+
+<p><strong>timeout相关参数</strong></p>
+
+<ul>
+<li><code>request.timeout.ms</code>: 生产者在发送数据时等待服务器返回的响应时间，默认值:<code>30000</code></li>
+<li><code>metadata.fetch.timeout.ms</code>: 指定了生产者在获取元数据（比如目标分区的首领是谁）时等待服务器返回响应的时间</li>
+<li><code>timeout.ms</code>: 指定了 broker 等待同步副本返回消息确认的时间，与 asks 的配置相匹配</li>
+</ul>
+
+<p><strong>max.block.ms</strong></p>
+
+<p>此参数指定了在调用 send() 方法或使用 partitionFor() 方法获取元数据时生产者的阻塞时间.</p>
+
+<p>当生产者的发送缓冲区已捕，或者没有可用的元数据时，这些方法就会阻塞，阻塞时间超过该参数值时，生产者抛出异常</p>
+
+<p><strong>max.request.size</strong></p>
+
+<p>该参数用于控制生产者发送的<code>请求大小</code>.</p>
+
+<p>它可以指能发送的单个消息的最大值，也可以指单个请求里所有消息的总大小</p>
+
+<p><strong>receive.buffer.bytes和send.buffer.bytes</strong></p>
+
+<p>为了保证可靠的消息传输，这两个参数分别指定了 TCP Socket <code>接收和发送数据包的缓冲区</code>的大小，默认为-1，表示使用操作系统的&gt;默认值。</p>
+
+<p><code>注意:</code> 如果生产者或消费者与broker所处的数据中心不同，该值可以适当调大</p>
+
+<h4 id="4-4consumer核心参数">4.4Consumer核心参数</h4>
+
+<p>在消费者组中的消费者重平衡期间，消费者无法读取消息，造成整个消费者组在重平衡的期间都不可用</p>
+
+<p>消费者通过向组织协调者（Kafka Broker）发送心跳来维护自己是消费者组的一员并确认其拥有的分区。</p>
+
+<p>对于不同步的消费群体来说，其组织协调者可以是不同的。</p>
+
+<p>只要消费者定期发送心跳，就会认为消费者是存活的并处理其分区中的消息。当消费者检索记录或者提交它所消费的记录时就会发送心&gt;跳。</p>
+
+<p>如果一段时间，消费者不发送心跳了，会话（Session）就会过期，组织协调者就会认为这个 Consumer 已经死亡，就会触发一次重平衡
+。</p>
+
+<p>如果消费者宕机并且停止发送消息，组织协调者会等待几秒钟，确认它死亡了才会触发重平衡.</p>
+
+<p><code>注意:</code> 在这段时间里，组里的消费者将不处理消息(STW)</p>
+
+<p><code>_consumer_offset</code>主题就主要是用来记录相关消费者的偏移量以及消费者分区分配的</p>
+
+<p><strong>fetch.min.bytes</strong></p>
+
+<p>指定了消费者从服务器获取记录的最小字节数，默认:<code>1</code></p>
+
+<p>broker 在收到消费者的数据请求时，如果可用的数据量小于 fetch.min.bytes 指定的大小，那么它会等到有足够的可用数据时才把它&gt;返回给消费者。</p>
+
+<p>这样可以降低消费者和 broker 的工作负载，因为它们在主题使用频率不是很高的时候就不用来回处理消息。</p>
+
+<p>如果没有很多可用数据，但消费者的 CPU 使用率很高，那么就需要把该属性的值设得比默认值大。</p>
+
+<p>如果消费者的数量比较多，把该属性的值调大可以降低 broker 的工作负载。</p>
+
+<p><strong>fetch.max.wait.ms</strong></p>
+
+<p>上面参数用来控制每次fetch时的最小数据量，但也不能一直等待数据的容量满足要求，因此还有另外一个参数，即<code>fetch.max.wait.ms</code>，指定多长时间还没满足数据容量就进行fetch数据，默认是<code>500ms</code></p>
+
+<p><strong>max.partition.fetch.bytes</strong></p>
+
+<p>指定了服务器从每个分区里返回给消费者的<code>最大字节数</code>，默认值为<code>1MB</code>.</p>
+
+<p>即<code>KafkaConsumer.poll()</code>方法从每个分区返回的记录最多不超过该值指定的大小。</p>
+
+<p>加入一个20分区的主题，拥有5个消费者，那么每个消费者必须至少<code>4MB</code>的内存来接收消息(每个消费者消费4个分区，每个分区返回消&gt;费者的最大字节数1MB)。</p>
+
+<p><code>注意:</code> 该参数的设置要适当的设置大一些，防止单个消费者异常后，整体内存受限。</p>
+
+<p>至少，该参数的值要大于<code>max.message.size</code>(broker接收消息的最大字节数)，否则消费者无法读取这些消息，导致消费者一直重试并&gt;挂起。</p>
+
+<p><strong>session.timeout.ms</strong></p>
+
+<p>指定了消费者在被认为死亡之前可以与服务器断开连接的时间，默认是 3s，在这个时间内没有发送心跳就会直接认为消费者死亡，此时
+协调器就会进行触发consumer rebalance.</p>
+
+<p>此参数与<code>heartbeat.interval.ms</code>(poll() 方法向群组协调器发送心跳的频率)强相关。</p>
+
+<p><strong>auto.offset.reset</strong></p>
+
+<p>指定了消费者在读取一个没有偏移量的分区或者偏移量无效的情况下的该如何处理，默认值为<code>latest</code>，意思是在偏移量无效的情况下&gt;，默认从最新的记录下开始读取数据。可选值为<code>earliest</code>，表示从最开始位置进行读取.</p>
+
+<p><strong>enable.auto.commit</strong></p>
+
+<p>指定了消费者是否自动提交偏移量，默认值是 true，对应<code>auto.commit.interval.ms</code>参数来保证每次提交偏移量的频率</p>
+
+<p>为了避免数据重复和丢失，消费者可以设置为false，由自己决定自己的消费位置(客户端保证数据消费的一致性)</p>
+
+<p><strong>partition.assignment.strategy</strong></p>
+
+<p><code>PartitionAssignor</code>(分区分配器)会根据给定的消费者和主题，决定哪些分区应该被分配到哪个消费者，默认有两个策略:<code>Range</code>和<code>RoundRobin</code></p>
+
+<p><strong>max.poll.records</strong></p>
+
+<p>用于控制<code>单次调用call()</code> 方法能够返回的记录数量，可以帮你控制在轮询中需要处理的数据量.</p>
+
+<p><strong>heartbeat.interval.ms</strong></p>
+
+<p>在消费组中，消费者心跳到消费者协调器的频率，默认值:<code>3000ms</code></p>
+
+<h2 id="三-集群管理">三、集群管理</h2>
+
+<h2 id="四-集群监控">四、集群监控</h2>
+
+<p><a href="http://kafka.apache.org/24/documentation.html#monitoring">kafka-doc-monitor</a></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg" alt="" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-04-25
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/kafka/">kafka</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/">
+            <span class="next-text nav-default">你还记得你JVM的的初始堆大小吗</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

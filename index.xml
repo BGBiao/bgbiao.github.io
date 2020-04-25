@@ -6,10 +6,843 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 21 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Apr 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka生产规划和运维</title>
+      <link>https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Sat, 25 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有&lt;code&gt;Redis集群&lt;/code&gt;，&lt;code&gt;ElasticSearch&lt;/code&gt;集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为&lt;code&gt;日志收集&lt;/code&gt;、&lt;code&gt;数据管道&lt;/code&gt;、&lt;code&gt;流式计算&lt;/code&gt;、&lt;code&gt;业务事件存储&lt;/code&gt;几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的&lt;code&gt;可用性&lt;/code&gt;，&lt;code&gt;可靠性&lt;/code&gt;，&lt;code&gt;数据一致性&lt;/code&gt;要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。&lt;/p&gt;
+
+&lt;p&gt;鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.&lt;/p&gt;
+
+&lt;h2 id=&#34;一-kafka集群运维和规划&#34;&gt;一、Kafka集群运维和规划&lt;/h2&gt;
+
+&lt;p&gt;其实任何开源的分布式系统在开始规划时，就需要考虑到业务场景，以及生产环境的周边可观测系统，比如如下几个方面:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;规划和部署生产级别的集群(包含官方最佳实践以及一些针对不停场景推荐的配置项变更)&lt;/li&gt;
+&lt;li&gt;执行一些部署后的操作(比如滚动重启集群，集群备份，数据迁移等等)&lt;/li&gt;
+&lt;li&gt;集群的可观测性(监控重要统计数据，理解kafka内部行为的具体含义以及是否需要报警通知)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;二-集群规划&#34;&gt;二、集群规划&lt;/h2&gt;
+
+&lt;p&gt;本节主要介绍，kafka集群在生产环境部署前的一些规划，包含硬件配置选择，网络以及文件系统和其他考虑的选型.&lt;/p&gt;
+
+&lt;h3 id=&#34;1-硬件和os&#34;&gt;1.硬件和OS&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;通常对于分布式的开源服务来将对于硬件本身没有太高的要求，但当需要承载一定量级的业务时，我们需要考虑一些硬件是否能够支撑对应的业务场景，并且通常来讲针对不同的业务场景选择不同的硬件(如果可选择)，也许会适当降低资源成本。&lt;/p&gt;
+
+&lt;h4 id=&#34;1-0os&#34;&gt;1.0OS&lt;/h4&gt;
+
+&lt;p&gt;一般来说，对于运行Linux中的kafka集群不需要过多的OS以及kernel参数调整，但如下几种情况可以根据具体情况进行参考:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;文件描述符(fd)&lt;/code&gt;: broker节点上fd限制可以参考&lt;code&gt;(number_of_partitions)*(partition_size/segment_size)&lt;/code&gt;公式&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;套接字缓冲区(socket buffer)&lt;/code&gt;: 该参数可以增加多数据中心之间的数据传输(一般异地集群备份建议调整以增加吞吐)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;最大内存映射区域数(vm.max_map_count)&lt;/code&gt;: 当kafka broker节点拥有太多分区时应该密切关注系统级别的该参数，默认为65535。每一个日志段，分配的分区，都需要一对&lt;code&gt;index/timeindex&lt;/code&gt;文件，而每个文件都会消耗一个内存区域(一个日志段使用2个内存映射区域)，因此一个分区至少需要2个内存区域，一个broker上拥有50000分区时，将会消耗100000个内存区域，此时默认的参数就会导致broker 以&lt;code&gt;OutOfMemoryError&lt;/code&gt;方式crash掉。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;每个分区的日志段的数量取决于段(segment)的大小，负载，以及保留策略&lt;/p&gt;
+
+&lt;p&gt;kafka使用大量的文件以及socket和客户端进行通讯，我们都知道，在Linux下，一切皆文件，因此系统需要设置更多的可用文件描述符&amp;gt;。&lt;/p&gt;
+
+&lt;p&gt;在大多数的默认系统配置中，单个进程可用使用1024个文件描述符，对于kafka来说太小了，建议调整到至少&lt;code&gt;100000&lt;/code&gt;，但是通常和操作
+系统以及发行版本有关系，需要根据具体的OS进行调整。&lt;/p&gt;
+
+&lt;p&gt;可用通过计算Kafka数据目录中的&lt;code&gt;.index&lt;/code&gt;文件来计算当前的mmap编号。&lt;code&gt;.index&lt;/code&gt;文件大多数代表了内存映射文件。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 1.统计.index文件个数
+$ find . -name &amp;#39;*index&amp;#39; | wc -l
+
+# 2.为每个session设置vm.max_map_count参数，这将计算当前内存映射文件的数量，mmap限制的最小值就是打开文件的ulimit限制
+# 该值要远大于index的数量
+$ sysctl -w vm.max_map_count=262144
+
+# 3.持久化mmap参数
+$ echo &amp;#39;vm.max_map_count=262144&amp;#39; &amp;gt;&amp;gt; /etc/sysctl.conf
+$ sysctl -p&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;1-1内存&#34;&gt;1.1内存&lt;/h4&gt;
+
+&lt;p&gt;Kafka严重依赖文件系统来存储和缓存消息。&lt;/p&gt;
+
+&lt;p&gt;所有数据都会立即写入文件系统上的持久日志中，而不必刷新到磁盘。实际上，这仅意味着将其转移到内核的页面缓存&lt;code&gt;pagecache&lt;/code&gt;中。 当回收内存时，操作系统会将可用内存转移到磁盘缓存中，而对性能的影响很小。&lt;/p&gt;
+
+&lt;p&gt;同时，Kafka非常小心地使用堆空间&lt;code&gt;heap space&lt;/code&gt;，不需要将堆大小设置为超过6 GB，这样将会在32G内存的机器上缓存28-30G的数据到文件系统。&lt;/p&gt;
+
+&lt;p&gt;因此，生产集群需要足够的内存来缓存活动的reader和writer。在Confluent的使用建议中，提出了对内存需求的粗略估计方式，比如需要缓冲30s，那么内存需求大概为&lt;code&gt;write_throughput * 30&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;通常来讲&lt;code&gt;64G&lt;/code&gt;内存配置的机器是一个不错的选择.&lt;/p&gt;
+
+&lt;h4 id=&#34;1-2cpu&#34;&gt;1.2CPU&lt;/h4&gt;
+
+&lt;p&gt;大多数的kafka集群对于cpu的要求不是那么高，因此对于CPU的配置没有像其他资源那么重要(但是通常同等资源都是由一定比例配比的)。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 如果开启了SSL，那么可能对集群的整体性能有一定影响，且对cpu有一定要求，具体需要考虑到cpu的类型以及具体的JVM实现细节(通常来讲内部服务均不会开启SSL，因为管理成本很高，且性能上略有损失，安全上可以通过整体的IT安全进行要求和管控)&lt;/p&gt;
+
+&lt;p&gt;通常情况下建议使用较新的多核处理器，通用集群可以设置为&lt;code&gt;24&lt;/code&gt;核心。&lt;/p&gt;
+
+&lt;p&gt;如果需要在更快的CPU或更多的内核之间进行选择，请选择更多的内核，因为多核提供的额外并发性将远远超过稍快的时钟速度。&lt;/p&gt;
+
+&lt;h4 id=&#34;1-3disk&#34;&gt;1.3Disk&lt;/h4&gt;
+
+&lt;p&gt;生产集群建议使用多块磁盘来最大化整体的吞吐，不要与应用程序日志或其他OS文件系统活动共享用于Kafka数据的相同驱动器，以确保良好的延迟。&lt;/p&gt;
+
+&lt;p&gt;在官方的最佳实践中建议，可以将多块磁盘构建成RAID，或者直接将每块磁盘作为独立的目录进行挂载。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;备注:&lt;/code&gt;如果软RAID的话其实会在存储方面增加一层数据均衡，增加了集群的复杂度，因此一般可用选择后者，而且RAID主要用于提供冗余，对于开源分布式服务来讲，在软件层面上基本都会保证数据的冗余。&lt;/p&gt;
+
+&lt;p&gt;不过在实际的场景中，具体选择使用多块盘做RAID还是直接使用多块盘挂载，以下有几种场景可以考虑:&lt;/p&gt;
+
+&lt;p&gt;如果配置多个数据目录，则Broker将在路径中放置一个新分区，该分区中当前存储的分区数最少。每个分区将完全位于数据目录之一中，如果&lt;code&gt;分区之间的数据不平衡，就会导致磁盘之间的负载不平衡&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;RAID在平衡磁盘之间的负载方面做得更好，它能在较低的水平上平衡负载。RAID的主要缺点是减少了可用的磁盘空间(RAID0之外)h，好处是可以容忍磁盘故障(RAID1)&lt;/p&gt;
+
+&lt;p&gt;在生产中强烈不建议使用RAID 5 or RAID 6 ,会严重影响到写吞吐的性能，并且在磁盘故障时会有重建阵列的I/O成本(&lt;code&gt;RAID0下也存在重建I/O的成本&lt;/code&gt;)&lt;/p&gt;
+
+&lt;p&gt;如果额外的成本可以接受，建议使用RAID10(容量减半，多一份冗余)，否则，建议Kafka服务器配置多个日志目录，每个目录都安装在单独的驱动器上。&lt;/p&gt;
+
+&lt;p&gt;linked使用8x7200转的sata磁盘，一般来说，磁盘吞吐量是性能瓶颈，磁盘越多越好。&lt;/p&gt;
+
+&lt;p&gt;kafka官方文档中其实建议使用多个驱动器以获得良好的吞吐量&lt;/p&gt;
+
+&lt;h4 id=&#34;1-4network&#34;&gt;1.4Network&lt;/h4&gt;
+
+&lt;p&gt;在分布式系统中，快速可靠的网络是性能的一个重要组成部分(&lt;code&gt;因此通常分布式系统中建议在同机房&lt;/code&gt;)。&lt;/p&gt;
+
+&lt;p&gt;低延迟确保节点可以轻松通信，而高带宽有助于集群节点之前的副本移动和恢复(&lt;code&gt;往往在kafka集群中优先瓶颈点都是带宽&lt;/code&gt;)。&lt;/p&gt;
+
+&lt;p&gt;目前大多数的数据中心基本都是千兆(1 GbE)或万兆网络(10 GbE)，对于大多数集群通常都是足够的。&lt;/p&gt;
+
+&lt;p&gt;应该尽量避免集群跨越多个数据中心，即使数据中心在很近的距离同地区，也要避免跨越巨大地理距离的集群。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;备注:&lt;/code&gt;实际上在分布式系统中分区是肯定会发生的，通过避免跨机房部署能够降低分区的概率&lt;/p&gt;
+
+&lt;p&gt;Kafka集群假设所有节点都是相等的，较大的延迟可能会加剧分布式系统中的问题，并使调试和解决变得更加困难。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 如果业务上需要异地进行数据读写，推荐的方法是在每个数据中心中部署一个本地Kafka集群，每个数据中心中的应用程序实例只与它们的本地集群交互，并在集群之间进行镜像(kafka提供了mirror-maker工具)。&lt;/p&gt;
+
+&lt;h4 id=&#34;1-5filesystem&#34;&gt;1.5Filesystem&lt;/h4&gt;
+
+&lt;p&gt;现在操作系统中，大部分的系统应该都使用了&lt;code&gt;Ext4&lt;/code&gt;或&lt;code&gt;XFS&lt;/code&gt;系统，官方也推荐使用这两种文件系统，但是对于具体的文件系统的选择，官方提供了如下几种场景和需要注意的点。&lt;/p&gt;
+
+&lt;p&gt;使用各种文件系统创建和挂载选项，在具有大量消息负载的集群上执行了比较测试，XFS带来了更好的本地时间(最好的EXT4配置是160ms vs. 250ms+)，以及更低的平均等待时间。XFS性能在磁盘性能方面的可变性也较小。&lt;/p&gt;
+
+&lt;p&gt;不论是使用哪种文件系统，推荐修改默认的挂载参数:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;noatime&lt;/code&gt;: 此选项禁止在读取文件时更新文件的atime(最后访问时间)属性,这可以消除大量的文件系统写操作，特别是在引导消费者的情况下,Kafka完全不依赖于atime属性，所以禁用它是安全的&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ cat /etc/fstab
+UUID=&amp;#34;4231b126-7e67-45c4-b8bf-554006291d35&amp;#34;  /export1    xfs    defaults,noatime         0 2&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;XFS文件系统挂载参数优化:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;largeio&lt;/code&gt;: 这会影响stat调用报告的首选I/O大小，尽管这可以在较大的磁盘写入上实现更高的性能，但实际上对性能的影响很小或没有影响&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nobarrier&lt;/code&gt;: 于具有电池后备缓存的基础设备，此选项可以通过禁用定期写刷新来提供更高的性能。 但是，如果基础设备的行为良&amp;gt;好，它将向文件系统报告它不需要刷新，并且此选项将无效。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;EXT文件系统挂载参数优化:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在ext4文件系统下，要获得最佳性能，则需要调整几个参数。这些选项在故障情况下通常是不安全的，并且将导致更多的数据丢失和损坏，对于单个broker故障，可以擦除磁盘并从群集重建副本，在多数情况下，多broker异常意味着潜在的文件系统损坏，无法轻易恢复。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;data=writeback&lt;/code&gt;: Ext4默认为data = ordered，这使某些写入操作具有很强的顺序，在Kafka场景下其实不需要该参数，此设置消除了排序约束，并且似乎大大减少了延迟&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Disabling journaling&lt;/code&gt;: 日志记录是一个折衷:它使服务器崩溃后重新引导更快，但它引入了大量额外的锁定，增加了写入性能的差异&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;commit=num_secs&lt;/code&gt;: 这调整了ext4提交到其元数据日志的频率。 将此值设置为较低的值可以减少崩溃期间未刷新数据的丢失。 将此值设置为较高的值将提高吞吐量。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nobh&lt;/code&gt;: 此设置控制在使用data=writeback模式时附加的排序保证，可以提高吞吐量和延迟&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;delalloc&lt;/code&gt;: 延迟分配意味着文件系统避免在物理写入发生之前分配任何块，此功能非常适合吞吐量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;1-6-application-vs-os-flush-management&#34;&gt;1.6 Application vs. OS Flush Management&lt;/h4&gt;
+
+&lt;p&gt;Kafka始终会立即将所有数据写入文件系统，并支持配置刷新策略的功能，该策略控制何时使用刷新将数据从OS缓存中强制出到磁盘上。
+ 可以控制此刷新策略，以在一段时间后或在写入一定数量的消息之后将数据强制到磁盘。 在此配置中有几种选择。&lt;/p&gt;
+
+&lt;p&gt;Kafka必须最终调用fsync才能知道数据已刷新。 当从崩溃中恢复任何未知的日志段时，Kafka将通过检查其消息的CRC来检查每条消息的
+完整性，并在启动时执行的恢复过程中重建附带的偏移索引文件&lt;/p&gt;
+
+&lt;p&gt;请注意，Kafka中的持久性不需要将数据同步到磁盘，因为发生故障的节点将始终从其副本中恢复。&lt;/p&gt;
+
+&lt;p&gt;我们建议使用默认刷新设置，该设置将完全禁用应用程序fsync。 这意味着依靠操作系统和Kafka自己的后台刷新来完成后台刷新。 这 &amp;gt;为所有用途提供了最佳的解决方案：无需调节旋钮，提高吞吐量和延迟，并提供完全恢复保证。 通常，我们认为复制提供的保证要强于同步到本地磁盘，但是偏执狂仍然更愿意同时拥有两者，并且仍然支持应用程序级fsync策略。&lt;/p&gt;
+
+&lt;p&gt;使用应用程序级刷新设置的缺点是，其磁盘使用模式效率较低（它给操作系统减少了重新排序写操作的余地），并且由于大多数Linux文件系统中的fsync阻止了文件写入，因此它会引入延迟。 后台刷新进行更精细的页面级锁定。&lt;/p&gt;
+
+&lt;h4 id=&#34;1-7-理解linux操作系统的flush行为&#34;&gt;1.7 理解Linux操作系统的Flush行为&lt;/h4&gt;
+
+&lt;p&gt;在Linux中，写入文件系统的数据将保留在页面缓存中，直到必须将其写出到磁盘为止（由于应用程序级fsync或操作系统自身的刷新策&amp;gt;略）。 数据刷新是通过一组称为pdflush的后台线程完成的（或在2.6.32版的内核“冲洗线程”中）。&lt;/p&gt;
+
+&lt;p&gt;Pdflush具有可配置的策略，该策略控制可以在缓存中维护多少脏数据以及必须将多脏数据写回到磁盘的时间.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://web.archive.org/web/20160518040713/http://www.westnet.com/~gsmith/content/linux-pdflush.htm&#34;&gt;pdflush刷新策略&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;当Pdflush无法跟上写入数据的速度时，它将最终导致写入过程阻塞写入中的延迟，从而减慢数据的累积。&lt;/p&gt;
+
+&lt;p&gt;与进程内缓存相比，使用pagecache存储将写入磁盘的数据有几个优点：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I/O调度将连续的小写批量写到更大的物理写中，从而提高吞吐量&lt;/li&gt;
+&lt;li&gt;I/O调度尝试重新排序写操作，以最小化磁盘头的移动，从而提高吞吐量&lt;/li&gt;
+&lt;li&gt;它会自动使用机器上所有的空闲内存&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;2-节点配置&#34;&gt;2.节点配置&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.避免使用太小的节点配置，因为这样整个集群的节点数可能会特别多，在这种机器上运行kafka将会有更多的开销&lt;/li&gt;
+&lt;li&gt;2.避免使用太高配计算机，因为它们经常导致资源使用不平衡，比如内存优先不够了，但cpu还剩余很多。如果在每个高配机器上运行多个broker节点，将会增加整体的复杂度&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;3-jvm配置&#34;&gt;3.JVM配置&lt;/h3&gt;
+
+&lt;p&gt;在当前大多数Java类应用下，基本都在使用JDK8(建议使用最新的jdk8)，在此环境下默认使用的是&lt;code&gt;G1&lt;/code&gt;的垃圾回收器，因此一般情况下仅需要修改如下参数即可:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;MaxGCPauseMillis&lt;/code&gt;: 指定每次垃圾回收默认的停顿时间，默认值200ms&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;InitiatingHeapOccupancyPercent&lt;/code&gt;: G1 启动新一轮垃圾回收之前可以使用的堆内存百分比，默认值是45&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;官方推荐的GC参数如下:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20
+       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M
+       -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;作为参考，LinkedIn最繁忙的集群当前是如下情况:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;60 brokers&lt;/li&gt;
+&lt;li&gt;50k partitions (replication factor 2)&lt;/li&gt;
+&lt;li&gt;800k messages/sec in&lt;/li&gt;
+&lt;li&gt;300 MBps inbound, 1 GBps + outbound&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上面的GC调优看起来比较激进，但集群中的所有broker都会有90%的gc中止时间，大概21ms，它们做不到每秒一个young GC&lt;/p&gt;
+
+&lt;h3 id=&#34;4-kafka核心配置&#34;&gt;4.kafka核心配置&lt;/h3&gt;
+
+&lt;p&gt;Kafka默认设置在大多数情况下都能工作，特别是与性能相关的设置和选项，但是考虑到集群的规划以及场景用途，有一些补充的配置参数可以对生产环境进行调优。&lt;/p&gt;
+
+&lt;p&gt;通常配置上来讲会分为&lt;code&gt;broker端配置&lt;/code&gt;、&lt;code&gt;produser端配置&lt;/code&gt;、&lt;code&gt;consumer端配置&lt;/code&gt;，由于各个业务方当前均使用开源客户端，因此对于客&amp;gt;户端的配置无法做到严格管控(如果有内部的sdk封装可能会比较好)。&lt;/p&gt;
+
+&lt;h4 id=&#34;4-1重要的客户端配置&#34;&gt;4.1重要的客户端配置&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;acks: 消息一致性保证(0:投递即成功,1:副本同步即成功,all/-1:全部ISR同步即成功)&lt;/li&gt;
+&lt;li&gt;compression: 压缩类型&lt;/li&gt;
+&lt;li&gt;batch size: 批处理大小&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 对于消费者来说，最重要的参数为&lt;code&gt;fetch size&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;鉴于集群的整体可用性可靠性其实很大一部分和客户端的使用方式有关，后面会列举一些常见的生产者和消费者端的核心参数&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#configuration&#34;&gt;kafka详细参数列表&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;4-2broker核心配置&#34;&gt;4.2broker核心配置&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;zookeeper.connect&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;zk连接串，建议写全部的zk节点地址。&lt;/p&gt;
+
+&lt;p&gt;brokers链接的zk集群地址，该值默认采用&lt;code&gt;host:ip/path&lt;/code&gt;来指定一个zk中的znode节点，通常情况下用来隔离环境. kafka的zk路径中使
+用了&lt;code&gt;chroot&lt;/code&gt;环境，如果不指定使用默认的&lt;code&gt;/&lt;/code&gt;来作为存储路径。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;broker.id&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker唯一标识，该值可以任意设定(int类型)。默认&lt;code&gt;reserved.broker.max&lt;/code&gt;开始，每次+1&lt;/p&gt;
+
+&lt;p&gt;在分布式集群中，可以手动指定每个broker的节点信息，同时也可以使用如下方式来自动生成每个broker的id&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;#broker.id
+broker.id.generation.enable=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;log.dirs&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;kafka存储的日志消息都是保存在该参数指定的日志路径下，该值可以指定多个磁盘路径，通常我们会绑定到多个磁盘上。比如&lt;code&gt;log.dirs=/exoprt/kafka1,/export/kafka2,/export/kafka3&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;对应的另外一个默认参数为&lt;code&gt;log.dir&lt;/code&gt;，默认值为&lt;code&gt;/tmp/kafka-logs&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;listeners&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker监听列表，默认将为&lt;code&gt;PLAINTEXT://myhost:9092&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;advertised.listeners&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;监听器发布到zk集群中的地址，供客户端使用，默认采用&lt;code&gt;listeners&lt;/code&gt;参数值&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;num.recovery.threads.per.data.dir&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;每个数据目录用于在启动时进行日志恢复和在关闭时进行刷新的线程数，默认值为: &lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;对于如下几种情况，kafka会使用&lt;code&gt;可配置的线程池&lt;/code&gt;来处理日志片段.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;服务器正常启动: 用于打开每个分区的日志片段&lt;/li&gt;
+&lt;li&gt;服务器崩溃后重启: 用于检查和截断每个分区的日志片段&lt;/li&gt;
+&lt;li&gt;服务器正常关闭: 用于关闭日志片段&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;默认情况下，每个日志目录采用一个线程，因为这些线程仅有在启动和关闭时才用到，所以可以适当设置大一点，并不会影响到整体服&amp;gt;务的性能，特别是对于包含大量分区的服务器来说，一旦发生崩愤，在进行恢复时使用井行操作可能会省下数小时的时间。&lt;/p&gt;
+
+&lt;p&gt;需要注意的是，该值是每个日志目录的线程数，因此总线程数需要考虑到&lt;code&gt;log.dirs&lt;/code&gt;的配置&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;delete.topic.enable&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;是否允许删除topic，默认为: &lt;code&gt;true&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;如果为flase，通过管理工具删除topic仅为标记删除，此时使用&lt;code&gt;describe&lt;/code&gt;命令可以查看到topic的详情信息，但是无法写入，可以通过删除&lt;code&gt;zk&lt;/code&gt;中的节点来删除&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;auto.create.topics.enable&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;默认情况下，kafka会使用如下三种方式创建topic:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;当一个生产者开始往主题写入消息时&lt;/li&gt;
+&lt;li&gt;当一个消费者开始从主题读取消息时&lt;/li&gt;
+&lt;li&gt;当任意一个客户端向主题发送元数据请求时&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;推荐是设置成&lt;code&gt;false&lt;/code&gt;，不允许客户端直接创建topic，否则topic会无法管理。默认值为&lt;code&gt;true&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;auto.leader.rebalance.enable&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;是否开启&lt;code&gt;leader&lt;/code&gt;自动平衡，默认值为&lt;code&gt;true&lt;/code&gt;。后台会有线程进行定期检查leader的分布情况&lt;/p&gt;
+
+&lt;p&gt;kafka中有一个被称为优先副本（preferred replicas）的概念(通常分区会有主分区和副本分区的概念，主分区先写入，然后push到其&amp;gt;他副本分区)。&lt;/p&gt;
+
+&lt;p&gt;如果一个分区有3个副本，且这3个副本的优先级别分别为0,1,2，根据优先副本的概念，0会作为leader 。&lt;/p&gt;
+
+&lt;p&gt;当0节点的broker挂掉时，会启动1这个节点broker当做leader。&lt;/p&gt;
+
+&lt;p&gt;当0节点的broker再次启动后，会自动恢复为此partition的leader。不会导致负载不均衡和资源浪费，这就是leader的均衡机制(前提是
+第一次partition在分配的时候，它本身就是一个相对平均的分配)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;auto.leader.rebalance.enable=true
+# 对应影响的其他两个参数
+# leader.imbalance.per.broker.percentage : 每个broker允许leader不平衡比例(如果每个broker上超过了这个值，controller将会&amp;gt;执行分区再平衡)，默认值10.
+# leader.imbalance.check.interval.seconds: 主分区再平衡的频率，默认值为300s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;num.partitions&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;自动创建topic的默认分区数，默认为1，通常生产集群不建议打开topic自动创建，一方面是不便于管理和追溯，另外一方面因为自动创建默认分区时1，且无法动态变更，造成的风险可能会比较大。&lt;/p&gt;
+
+&lt;p&gt;多分区的topic有这更好的数据平衡能力，并且可以帮助消费者进行并行化消费。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 对于有key的数据，避免改变分区的数量&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;default.replication.factor&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;适用于自动创建的主题的默认复制因子，推荐至少设置为2，默认为1&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;min.insync.replicas&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;当使用&lt;code&gt;required.acks=-1(all)&lt;/code&gt;提交到生产请求所需的ISR中的最小副本数，默认为1，建议在数据一致性要求较高的topic中设置至少为2&lt;/p&gt;
+
+&lt;p&gt;指定&lt;code&gt;ISR&lt;/code&gt;的最小数量。当producer设置&lt;code&gt;ack=all(-1)&lt;/code&gt;时，该值指定的副本必须全部写成功，才认为消息写入成功，否则生产者将抛异&amp;gt;常(&lt;code&gt;either NotEnoughReplicas or NotEnoughReplicasAfterAppend&lt;/code&gt;)&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;: &lt;code&gt;min.insync.replicas&lt;/code&gt;参数和生产者&lt;code&gt;ack&lt;/code&gt;参数一起使用，可以加强整个消息的持久性.示例:(3副本的topic,可以设置该值为2,同时生产者ack设置为all，这将确保大多数副本没有收到写操作时，生产者直接异常)&lt;/p&gt;
+
+&lt;p&gt;默认值为:&lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;unclean.leader.election.enable&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;是否启用不在ISR集中的副本以选作领导者，即使这样做可能会导致数据丢失。该参数可以提高整体Topic的可用性，但是可能会造成数据的整体不一致性(部分数据的丢失)。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#topicconfigs&#34;&gt;kafka可用性和可靠性保证&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;默认值为:&lt;code&gt;false&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;为false，就只从ISR中获取leader保证了数据的可靠性，但是partition就失效了，&lt;code&gt;true&lt;/code&gt;则从replica中获取，则可用性增强，但是数&amp;gt;据可能存在丢失情况&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;  该参数实际上在设置的时候也有一定的争议性，比如，我们知道副本是有&lt;code&gt;ISR&lt;/code&gt;的，即正在同步的副本，如果当前的broker宕&amp;gt;机导致需要选举leader partition，此时如果ISR内除了leader之外还有其他副本(但谁又能保证一定有呢)，那直接从ISR中选举leader&amp;gt;即可，如果没有的话，当&lt;code&gt;auto.leader.rebalance.enable=true&lt;/code&gt;时，就会去其他存活的副本中选举leader，此时可以增强整体的可用性
+，但是如果存活的副本不在ISR中，即意味着数据可能有一定的丢失了。但是如果该参数为false的话，ISR中没有，就直接异常了，为了
+保证数据的一致性&lt;/p&gt;
+
+&lt;p&gt;该参数的存在其实是在可用性和可靠性之间做了一个权衡，为true时保证了可用性AP，为false时保证了一致性CP&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;数据一致性保证&lt;/code&gt;: ISR就保存了kafka认为可靠的副本，它们具备这样的条件：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;落后leader的消息条数在一定阈值内&lt;/li&gt;
+&lt;li&gt;或者落后在一定时间内；&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;num.replica.fetchers&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数指定了fetch线程的数量(从源broker中复制消息的fetch线程)，默认值: &lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;其实可以适当的调整大一些，可以增强副本之前的同步效率&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;num.io.threads&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker处理请求的 IO 线程数，需要考虑到磁盘的IO状况。默认值为:&lt;code&gt;8&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;num.network.threads&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定broker用来接收来自网络的请求和发送网络的响应的线程数，默认值为: &lt;code&gt;3&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;background.threads&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;后台任务处理线程数(例如过期消息删除等)。默认值为:&lt;code&gt;10&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;socket相关&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;socket.send.buffer.bytes: (socket发送缓冲区:SO_SNDBUFF) 默认值:&lt;code&gt;102400&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;socket.receive.buffer.bytes: (socket接收缓冲区:SO_RCVBUFF) 默认值:&lt;code&gt;102400&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;socket.request.max.bytes: (请求最大值，message.max.bytes要小于该值较好) 默认值:&lt;code&gt;104857600&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;message.max.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该值表示kafka允许的最大的batch大小(不是单个message的大小)，默认值为&lt;code&gt;1000012&lt;/code&gt;，即1Mb.&lt;/p&gt;
+
+&lt;p&gt;在最新的消息格式版本中，为了提高效率，一般消息的提交都是采用batch的方式。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在以前的消息格式版本中，未压缩的记录不会分组成批，在这种情况下，此限制仅适用于单个记录。&lt;/p&gt;
+
+&lt;p&gt;在每个topic级别可以使用&lt;code&gt;max.message.bytes&lt;/code&gt;设置&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;log相关(具体到topic级别)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;log.segment.bytes: 单个日志段(segment)的大小，默认为&lt;code&gt;1073741824&lt;/code&gt;,即1GB&lt;/li&gt;
+&lt;li&gt;log.segment.delete.delay.ms: 日志段从文件系统中删除前等待的时间，默认为&lt;code&gt;60000&lt;/code&gt;，即1min&lt;/li&gt;
+&lt;li&gt;log.cleanup.policy: 保留窗口之外的日志清理策略可同时指定多个策略如: [&lt;code&gt;delete&lt;/code&gt;,compact]&lt;/li&gt;
+&lt;li&gt;log.cleaner.enable: 启用日志清除器进程，和&lt;code&gt;cleanup.policy = compact&lt;/code&gt;参数结合使用，默认为&lt;code&gt;true&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.cleaner.threads: 日志清理的后台线程数量，默认为&lt;code&gt;1&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.cleaner.delete.retention.ms: 删除的日志保留的时间，默认为&lt;code&gt;86400000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.retention.bytes: 删除日志前，日志最大的大小，超过该值即删除，默认&lt;code&gt;-1&lt;/code&gt;，作用在每个partition，会影响整个topic的容量&lt;/li&gt;
+&lt;li&gt;log.retention.minutes(hours|ms): 日志保留时间，如果没指定，默认使用hours参数&lt;/li&gt;
+&lt;li&gt;log.retention.check.interval.ms: 日志清理器检查日志是否符合删除条件的频率，默认为&lt;code&gt;300000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.flush.interval.messages: 将消息刷新到磁盘之前在日志分区上累积的消息数，默认为&lt;code&gt;9223372036854775807&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.flush.interval.ms: 主题中的消息在刷新到磁盘之前保存在内存中的最大时间，默认为&lt;code&gt;null&lt;/code&gt;(log.flush.scheduler.interval.ms参数的值)&lt;/li&gt;
+&lt;li&gt;log.flush.scheduler.interval.ms: 日志刷新器检查是否需要将日志刷新到磁盘的频率，默认&lt;code&gt;9223372036854775807&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.flush.offset.checkpoint.interval.ms: 更新最后一次刷新的持久记录(被作为恢复点)的频率，默认为&lt;code&gt;60000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.flush.start.offset.checkpoint.interval.ms: 更新日志起始偏移量的持久记录的频率，默认&lt;code&gt;60000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;log.roll.hours: 新日志段(segment)被创建前的最大时间，默认&lt;code&gt;168&lt;/code&gt;，如果没设置优先使用&lt;code&gt;log.roll.ms&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;offsets相关&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;offsets.commit.required.acks: offset提交之前是否需要ack确认,默认值:&lt;code&gt;-1&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;offsets.commit.timeout.ms: 当偏移量注意&lt;code&gt;_offset&lt;/code&gt;的所有副本接收到提交或超时达到该时间时，offset提交将延迟. 默认值:&lt;code&gt;5000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;offsets.load.buffer.size: 偏移量加载到缓存中时从偏移量段读取的批处理大小. 默认值:&lt;code&gt;5242880&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;offsets.retention.check.interval.ms: 历史offset检查的频率，默认值:&lt;code&gt;600000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;offsets.retention.minutes: 在消费者组的消费者全部异常之后，offset保留的时间，默认值:&lt;code&gt;10080&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;offsets.topic.compression.codec: 偏移量主题的压缩解码器，默认:&lt;code&gt;0&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;offsets.topic.num.partitions: offset提交主题的分区数量，默认:&lt;code&gt;50&lt;/code&gt;(&lt;code&gt;注意:&lt;/code&gt;集群部署后不要改变)&lt;/li&gt;
+&lt;li&gt;offsets.topic.replication.factor: offset提交主题的副本数，默认:&lt;code&gt;3&lt;/code&gt; (在集群大小满足此复制因子要求之前，内部主题创建将&amp;gt;失败,该主题非常重要，需要要求强一致性)&lt;/li&gt;
+&lt;li&gt;offsets.topic.segment.bytes: offset提交主题的段大小，设置相对较小，以便更快地实现日志压缩和缓存负载，默认值:&lt;code&gt;104857600&lt;/code&gt;，即1Mb&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;queue相关&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;queued.max.requests: 在网络阻塞线程前，数据平面允许的排队请求数，默认值:&lt;code&gt;500&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;replica相关&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;replica.fetch.min.bytes:每个fetch响应所需的最小字节数，默认值:&lt;code&gt;1&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;replica.fetch.wait.max.ms: 由follow副本发起的每个fetch请求的最大等待时间，该值应小于&lt;code&gt;replica.lag.time.max.ms&lt;/code&gt;，以避免
+为低吞吐量的主题频繁地收缩ISR，默认值:&lt;code&gt;500&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;replica.lag.time.max.ms: follow副本在该时间内没有和leader副本同步，或没有发送任何同步请求，将会被leader副本从ISR中删&amp;gt;除. 默认值:&lt;code&gt;10000&lt;/code&gt;，即10s&lt;/li&gt;
+&lt;li&gt;replica.socket.receive.buffer.bytes: 副本接收请求的网络缓冲区，默认值:&lt;code&gt;65535&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;replica.socket.timeout.ms: 网络请求的超时时间，默认值:&lt;code&gt;30000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;replica.fetch.backoff.ms: 发生获取分区错误时要休眠的时间，参数不是很重要，默认值:&lt;code&gt;1000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;replica.fetch.max.bytes: 尝试为每个分区获取的消息字节数，参数不是很重要，默认值:&lt;code&gt;1048576&lt;/code&gt;,即1M&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;broker.rack&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker所在的机架，用来感知机架的变化，通常多个分区不会放在同一个机架上&lt;/p&gt;
+
+&lt;p&gt;示例: &lt;code&gt;RACK1&lt;/code&gt;, &lt;code&gt;us-east-1d&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;controller控制器相关&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;controlled.shutdown.enable: 启用控制器关闭，默认:&lt;code&gt;true&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;controlled.shutdown.max.retries: 控制器会因为各种原因而宕机，该值表示控制器的重试次数，默认:&lt;code&gt;3&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;controlled.shutdown.retry.backoff.ms: 在每次重试之前，系统从前一次故障(控制器fail over或副本延迟)的状态中恢复过来的时
+间，默认:&lt;code&gt;5000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;controller.socket.timeout.ms: 控制器到broker角色转换的socket超时时间，默认:&lt;code&gt;30000&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;group相关(消费组)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;group.max.size: 消费组中最大消费者数量&lt;/li&gt;
+&lt;li&gt;group.initial.rebalance.delay.ms:注册消费者允许的最小会话超时，默认:&lt;code&gt;6000&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 很多参数是有不同级别的生效范围的，比如:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;read-only&lt;/code&gt;: 仅在broker重启后才能生效&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;per-broker&lt;/code&gt;: 可以为每个broker动态更新&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cluster-wide&lt;/code&gt;: 可作为集群范围内的值动态更新，也可以在每个broker上更新进行测试&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#brokerconfigs&#34;&gt;broker配置作用范围&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;示例配置&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# ZooKeeper地址
+zookeeper.connect=[list of ZooKeeper servers]
+
+# kafka log相关配置
+num.partitions=8
+default.replication.factor=3
+log.dirs=[List of directories. Kafka should have its own dedicated disk(s) or SSD(s).]
+
+# 其他配置核心配置
+broker.id=[An integer. Start with 0 and increment by 1 for each new broker.]
+listeners=[list of listeners]
+auto.create.topics.enable=false
+min.insync.replicas=2
+queued.max.requests=[number of concurrent requests]&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在kafka集群中，当broker集群参数确定后，还有一些针对topic的参数是可以进行动态调整的，以提高kafka服务的灵活性。&lt;/p&gt;
+
+&lt;h4 id=&#34;4-3topic级别的动态参数调整&#34;&gt;4.3Topic级别的动态参数调整&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#topicconfigs&#34;&gt;Topic级别的配置&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;cleanup.policy&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;一个字符串是“删除”或“压缩”或两者兼而有之. 默认值: &lt;code&gt;[compact, delete]&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;compression.type&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;日志压缩类型，默认值为&lt;code&gt;producer&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;delete.retention.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;用于日志压缩主题的删除保留时间。默认值:&lt;code&gt;86400000&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;max.message.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定每个topic可发送的最大消息(batch size)字节数.(区别于全局的&lt;code&gt;message.max.bytes&lt;/code&gt;参数)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;num.partitions&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定创建topic的默认分区数量，该值默认为1，建议根据具体的情况进行设定，越多的分区对于海量数据来说可以提高吞吐，但是对于&amp;gt;少量数据来说，也可能增加网络消耗&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;分区数一旦指定，只能增加，不能减少&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;default.replication.factor&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定kafka副本数，默认每个主题分区均有一个副本，当该副本所在主机异常，可能造成数据的丢失，建议在适当场景将副本至少设置成
+2个，以尽快保证数据的一致性。默认值:&lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;自动创建主题的副本因子&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;log.retention.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;kafka的log保留时间，也可以使用&lt;code&gt;log.retention.hours&lt;/code&gt;参数来配置保留时间，默认168小时，即一周&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;log.retention.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定log保留的大小，作用在每一个partition上，加入一个topic有3个partition，设置了&lt;code&gt;log.retention.bytes&lt;/code&gt;为1GB，则表示整个topic仅可以存储3GB的数据，超过该容量的数据会被进行自动删除。&lt;/p&gt;
+
+&lt;p&gt;此时，临时增加该topic的容量的方法就是调整该参数，或调整topic的partition个数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;log.segment.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定每个日志段的大小，通常在消息到达broker时，会被追加到分区的当前日志段上(segment)，当日志段大小超过该参数指定的值(默&amp;gt;认1GB)，当前日志段就会被关闭，一个新的日志段被打开。&lt;/p&gt;
+
+&lt;p&gt;如果一个日志片段被关闭，就开始等待过期，该值不建议设置太小。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;log.segment.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;上面会指定日志段的分割，该参数会指定历史的日志段的过期时间。该参数会和&lt;code&gt;log.retention.bytes&lt;/code&gt;一起校验，谁先满足就生效。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;message.max.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该值用来限制单个消息的大小，默认值为&lt;code&gt;1000 000&lt;/code&gt;即&lt;code&gt;1MB&lt;/code&gt;，如果超过该大小，broker不会接受，而且会抛出相关异常&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;该参数指的是消息被压缩后的大小，通常生产中的消息生产会使用gzip或snappy来进行压缩&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;消息的大小对于性能有比较显著的影响，越大负责处理网络连接和请求的线程就需要花越多的时间来处理这些请求，还会增加磁
+盘写入块的大小，从而影响 IO 吞吐量。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;retention.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;规定了该主题消息被保存的时常，默认是7天，即该主题只能保存7天的消息，该值可设定在topic级别，此时会覆盖broker端的全局参数&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;retention.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该值规定了要为该 Topic 预留多大的磁盘空间，默认为-1，该值通常情况用来设置topic的配额&lt;/p&gt;
+
+&lt;h4 id=&#34;4-3producer核心参数&#34;&gt;4.3Producer核心参数&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;bootstrap.servers&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定broker地址&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;key.serializer&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker 需要接收到序列化之后的&lt;code&gt;k/v&lt;/code&gt;值，所以生产者需要将序列化后的值发送过来。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;org.apache.kafka.common.serialization.Serializer&lt;/code&gt;该类表示把键对象序列化为字节数组&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ByteArraySerializer: 默认的序列化方式&lt;/li&gt;
+&lt;li&gt;StringSerializer:&lt;/li&gt;
+&lt;li&gt;IntegerSerializer:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;value.serializer&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定序列化后的value，需要实现&lt;code&gt;org.apache.kafka.common.serialization.Serializer&lt;/code&gt;接口&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;org.apache.kafka.common.serialization.StringSerializer&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;compression.type&lt;/strong&gt;
+指定消息压缩类型:gzip,snappy等，&lt;/p&gt;
+
+&lt;p&gt;broker端也有该参数，默认值为:&lt;code&gt;producer&lt;/code&gt;，表示遵循生产者的压缩方式&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;生产者使用何种压缩方式，消费者将必须使用该方式进行解压缩&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;acks&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数用来声明要有多少个分区副本接收消息后，生产者才认为消息写入成功，也就是数据一致性衡量，该参数对消息的丢失的影响较&amp;gt;大. 默认值为:&lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;acks=0&lt;/code&gt;: 表示生产者不知道消息是否被broker成功接收被处理，反正自己发出去了就认为是成功了，该种清理增加了吞吐，但是也&amp;gt;增加的数据丢失的风险，因为程序的稳定性，网络的稳定性都可能会影响到消息的生产&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;acks=1&lt;/code&gt;: 只要集群中leader接收到消息并成功处理，就返回给生产者写入成功的消息。该种情况，如果发送过程中网络出现问题或&amp;gt;者kafka集群异常导致leader没工作而导致消息写入失败，生产者会受到写入失败相关的异常，此时生产者可进行重试&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;acks=all/-1&lt;/code&gt;: 表示所有参与复制的节点都收到消息时，生产者才会接收到来自服务器端写入成功的消息，该种情况下，整体的消息
+确认延迟会更高一些，但是数据的一致性也更强一些&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 消息的发送其实也分&lt;code&gt;sync&lt;/code&gt;和&lt;code&gt;async&lt;/code&gt;，即同步和异步，kafka为了保证消息高效传输会决定是同步发送还是异步发送。如果让&amp;gt;客户端等待服务器的响应(通过调用get()方法)也会增加延迟，如果采用客户端回调方式，延迟问题可能会有好转。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;buffer.memory&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数用来设置生产者内存缓冲区的大小，生产者会用它来缓冲要发送到服务器的消息，以此来提供消息传递的效率。默认值:&lt;code&gt;33554432&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;如果应用程序发送消息的速度超过发送到服务器的速度，会导致生产者空间不足，此时&lt;code&gt;send()&lt;/code&gt;方法就会阻塞或者直接异常，取
+决于&lt;code&gt;block.on.buffer.null&lt;/code&gt;参数&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;retries&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;生产者从服务器收到的错误有可能是临时性的错误，比如暂时找不到&lt;code&gt;leader&lt;/code&gt;或者当前partition正在迁移无法找到相关的partition，&amp;gt;这种情况下，该参数可以决定生产者的行为，如果重试次数超过之后，生产者就会放弃重试，并返回错误。&lt;/p&gt;
+
+&lt;p&gt;默认情况下，生产者在每次重试之间等待100ms，这个等待参数可以通过&lt;code&gt;retry.backoff.ms&lt;/code&gt;来修改&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;batch.size&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定每次提交的batch大小，默认值:&lt;code&gt;16384&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;当有多个消息需要被发送&lt;code&gt;同一个分区&lt;/code&gt;(如何决定是发送到同一个分区?)时，生产者会把他们发送到同一个批次里.&lt;/p&gt;
+
+&lt;p&gt;该参数用来指定一个批次提交的大小，当达到该batch的大小，所有的消息会被统一发送至broker&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;client.id&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数用来指定客户端的id，不过可以不用指定，注册后为每个客户端生成64为的id&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;max.in.flight.requests.per.connection&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;此参数指定了生产者在收到服务器响应之前可以发送多少消息，它的值越高，就会占用越多的内存，不过也会提高吞吐量&lt;/p&gt;
+
+&lt;p&gt;把它设为1 可以保证消息是&lt;code&gt;按照发送的顺序&lt;/code&gt;写入服务器。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;timeout相关参数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;request.timeout.ms&lt;/code&gt;: 生产者在发送数据时等待服务器返回的响应时间，默认值:&lt;code&gt;30000&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;metadata.fetch.timeout.ms&lt;/code&gt;: 指定了生产者在获取元数据（比如目标分区的首领是谁）时等待服务器返回响应的时间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;timeout.ms&lt;/code&gt;: 指定了 broker 等待同步副本返回消息确认的时间，与 asks 的配置相匹配&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;max.block.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;此参数指定了在调用 send() 方法或使用 partitionFor() 方法获取元数据时生产者的阻塞时间.&lt;/p&gt;
+
+&lt;p&gt;当生产者的发送缓冲区已捕，或者没有可用的元数据时，这些方法就会阻塞，阻塞时间超过该参数值时，生产者抛出异常&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;max.request.size&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数用于控制生产者发送的&lt;code&gt;请求大小&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;它可以指能发送的单个消息的最大值，也可以指单个请求里所有消息的总大小&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;receive.buffer.bytes和send.buffer.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;为了保证可靠的消息传输，这两个参数分别指定了 TCP Socket &lt;code&gt;接收和发送数据包的缓冲区&lt;/code&gt;的大小，默认为-1，表示使用操作系统的&amp;gt;默认值。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 如果生产者或消费者与broker所处的数据中心不同，该值可以适当调大&lt;/p&gt;
+
+&lt;h4 id=&#34;4-4consumer核心参数&#34;&gt;4.4Consumer核心参数&lt;/h4&gt;
+
+&lt;p&gt;在消费者组中的消费者重平衡期间，消费者无法读取消息，造成整个消费者组在重平衡的期间都不可用&lt;/p&gt;
+
+&lt;p&gt;消费者通过向组织协调者（Kafka Broker）发送心跳来维护自己是消费者组的一员并确认其拥有的分区。&lt;/p&gt;
+
+&lt;p&gt;对于不同步的消费群体来说，其组织协调者可以是不同的。&lt;/p&gt;
+
+&lt;p&gt;只要消费者定期发送心跳，就会认为消费者是存活的并处理其分区中的消息。当消费者检索记录或者提交它所消费的记录时就会发送心&amp;gt;跳。&lt;/p&gt;
+
+&lt;p&gt;如果一段时间，消费者不发送心跳了，会话（Session）就会过期，组织协调者就会认为这个 Consumer 已经死亡，就会触发一次重平衡
+。&lt;/p&gt;
+
+&lt;p&gt;如果消费者宕机并且停止发送消息，组织协调者会等待几秒钟，确认它死亡了才会触发重平衡.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在这段时间里，组里的消费者将不处理消息(STW)&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;_consumer_offset&lt;/code&gt;主题就主要是用来记录相关消费者的偏移量以及消费者分区分配的&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;fetch.min.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定了消费者从服务器获取记录的最小字节数，默认:&lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;broker 在收到消费者的数据请求时，如果可用的数据量小于 fetch.min.bytes 指定的大小，那么它会等到有足够的可用数据时才把它&amp;gt;返回给消费者。&lt;/p&gt;
+
+&lt;p&gt;这样可以降低消费者和 broker 的工作负载，因为它们在主题使用频率不是很高的时候就不用来回处理消息。&lt;/p&gt;
+
+&lt;p&gt;如果没有很多可用数据，但消费者的 CPU 使用率很高，那么就需要把该属性的值设得比默认值大。&lt;/p&gt;
+
+&lt;p&gt;如果消费者的数量比较多，把该属性的值调大可以降低 broker 的工作负载。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;fetch.max.wait.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;上面参数用来控制每次fetch时的最小数据量，但也不能一直等待数据的容量满足要求，因此还有另外一个参数，即&lt;code&gt;fetch.max.wait.ms&lt;/code&gt;，指定多长时间还没满足数据容量就进行fetch数据，默认是&lt;code&gt;500ms&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;max.partition.fetch.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定了服务器从每个分区里返回给消费者的&lt;code&gt;最大字节数&lt;/code&gt;，默认值为&lt;code&gt;1MB&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;即&lt;code&gt;KafkaConsumer.poll()&lt;/code&gt;方法从每个分区返回的记录最多不超过该值指定的大小。&lt;/p&gt;
+
+&lt;p&gt;加入一个20分区的主题，拥有5个消费者，那么每个消费者必须至少&lt;code&gt;4MB&lt;/code&gt;的内存来接收消息(每个消费者消费4个分区，每个分区返回消&amp;gt;费者的最大字节数1MB)。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 该参数的设置要适当的设置大一些，防止单个消费者异常后，整体内存受限。&lt;/p&gt;
+
+&lt;p&gt;至少，该参数的值要大于&lt;code&gt;max.message.size&lt;/code&gt;(broker接收消息的最大字节数)，否则消费者无法读取这些消息，导致消费者一直重试并&amp;gt;挂起。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;session.timeout.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定了消费者在被认为死亡之前可以与服务器断开连接的时间，默认是 3s，在这个时间内没有发送心跳就会直接认为消费者死亡，此时
+协调器就会进行触发consumer rebalance.&lt;/p&gt;
+
+&lt;p&gt;此参数与&lt;code&gt;heartbeat.interval.ms&lt;/code&gt;(poll() 方法向群组协调器发送心跳的频率)强相关。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;auto.offset.reset&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定了消费者在读取一个没有偏移量的分区或者偏移量无效的情况下的该如何处理，默认值为&lt;code&gt;latest&lt;/code&gt;，意思是在偏移量无效的情况下&amp;gt;，默认从最新的记录下开始读取数据。可选值为&lt;code&gt;earliest&lt;/code&gt;，表示从最开始位置进行读取.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;enable.auto.commit&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定了消费者是否自动提交偏移量，默认值是 true，对应&lt;code&gt;auto.commit.interval.ms&lt;/code&gt;参数来保证每次提交偏移量的频率&lt;/p&gt;
+
+&lt;p&gt;为了避免数据重复和丢失，消费者可以设置为false，由自己决定自己的消费位置(客户端保证数据消费的一致性)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;partition.assignment.strategy&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;PartitionAssignor&lt;/code&gt;(分区分配器)会根据给定的消费者和主题，决定哪些分区应该被分配到哪个消费者，默认有两个策略:&lt;code&gt;Range&lt;/code&gt;和&lt;code&gt;RoundRobin&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;max.poll.records&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;用于控制&lt;code&gt;单次调用call()&lt;/code&gt; 方法能够返回的记录数量，可以帮你控制在轮询中需要处理的数据量.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;heartbeat.interval.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在消费组中，消费者心跳到消费者协调器的频率，默认值:&lt;code&gt;3000ms&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;三-集群管理&#34;&gt;三、集群管理&lt;/h2&gt;
+
+&lt;h2 id=&#34;四-集群监控&#34;&gt;四、集群监控&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#monitoring&#34;&gt;kafka-doc-monitor&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>你还记得你JVM的的初始堆大小吗</title>
@@ -8388,489 +9221,6 @@ dnsall-1577598300-hdl4z           0/1     Completed   0          3m29s&lt;/pre&g
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>Linux下快速构建Android编译环境</title>
-      <link>https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/</link>
-      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 在移动互联网时代，大多数的企业内部都有移动客户端，而移动客户端又因为OS的不同产生了两个派系，即&lt;code&gt;安卓(Android)&lt;/code&gt;和&lt;code&gt;苹果(IOS)&lt;/code&gt;，而对于互联网技术从业者来说，这两者最直接的区别就是&lt;code&gt;开源&lt;/code&gt;和&lt;code&gt;闭源&lt;/code&gt;，因而也导致了在构建移动客户端时，为了整体的稳定性和可靠性的考虑(甚至有成本的考虑)，需要进行分别编译，本篇文章记录下如何在Linux环境下构建&lt;code&gt;Android&lt;/code&gt;编译环境.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&#34;介绍&#34;&gt;介绍&lt;/h3&gt;
-
-&lt;p&gt;通常，开发&lt;code&gt;苹果&lt;/code&gt;系列的软件均需要使用一些专有开发工具，比如&lt;a href=&#34;https://developer.apple.com/xcode/&#34;&gt;xcode&lt;/a&gt;,而此工具必须运行在&lt;code&gt;Mac OS X&lt;/code&gt;设备上(当然你也可以尝试各种黑苹果的方式)，所以不论是对于个人开发者还是企业构建服务器来说，都需要购买更多的&lt;code&gt;Mac&lt;/code&gt;设备，通常，我知道的企业内部会使用&lt;code&gt;Mac Mini&lt;/code&gt;来作为苹果系列的构建环境。&lt;/p&gt;
-
-&lt;p&gt;而作为&lt;code&gt;安卓(Android)&lt;/code&gt;系列的软件，由于本身是谷歌开源的移动端操作系统，因此对于底层开发环境和构建环境没有太高的要求。一般而言，开发者会使用&lt;a href=&#34;https://developer.android.com/studio/&#34;&gt;Android Studio&lt;/a&gt;来开发安卓系列的软件，而内置的命令行工具&lt;a href=&#34;https://developer.android.com/studio/command-line/&#34;&gt;command-line&lt;/a&gt;则默认提供了安卓软件的编译工具和环境。值得一提的是，由于&lt;code&gt;Android Studio&lt;/code&gt;是开源的，因此该工具也提供了多个平台的支持(Windows,Mac,Linux,Chrome OS)。而这也极大的降低了企业的整体成本，通常开发环境可以在任意的OS环境中进行开发，而企业内部也可以使用&lt;code&gt;Linux&lt;/code&gt;环境进行安卓软件的持续集成和交付.&lt;/p&gt;
-
-&lt;p&gt;接下来主要讲解下如何在Linux环境下构建安卓的编译环境。&lt;/p&gt;
-
-&lt;h3 id=&#34;linux下安卓-android-编译环境的搭建&#34;&gt;Linux下安卓(Android)编译环境的搭建&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;前提条件&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;需要注意的是，对于&lt;code&gt;安卓(Android)&lt;/code&gt;应用来说，一些依赖包的管理主要依靠&lt;code&gt;sdkmanager&lt;/code&gt;这个命令行工具，该工具可以在&lt;a href=&#34;https://developer.android.com/studio/&#34;&gt;Android Studio&lt;/a&gt;页面找到，并且支持&lt;code&gt;Windows&lt;/code&gt;,&lt;code&gt;Mac&lt;/code&gt;,&lt;code&gt;Linux&lt;/code&gt;三个不同平台的版本。&lt;/p&gt;
-
-&lt;p&gt;同时，&lt;code&gt;安卓(Android)&lt;/code&gt;应用的开发工具&lt;code&gt;Android Studio&lt;/code&gt;使用&lt;code&gt;[Gradle](https://github.com/gradle/gradle)&lt;/code&gt;来进行编译和打包，因此对于&lt;code&gt;安卓(Android)&lt;/code&gt;应用而言，也将使用&lt;code&gt;gradle&lt;/code&gt;来进行编译和打包操作，该软件可以在&lt;a href=&#34;https://services.gradle.org/distributions/&#34;&gt;Gradle&lt;/a&gt;页面找到。&lt;/p&gt;
-
-&lt;p&gt;其次，&lt;code&gt;[NDK(原生开发套件)](https://developer.android.google.cn/ndk/guides/)&lt;/code&gt;是一套工具，可以使开发者能够在 Android 应用中使用 C 和 C++ 代码，并提供众多平台库，开发者可使用这些平台库管理原生 Activity 和访问物理设备组件，例如传感器和轻触输入。该开发套件可以在&lt;a href=&#34;https://developer.android.google.cn/ndk/downloads&#34;&gt;NDK&lt;/a&gt;页面找到.&lt;/p&gt;
-
-&lt;p&gt;最后，如上几个组件的底层语言均使用&lt;code&gt;java&lt;/code&gt;进行开发，因此需要安装&lt;code&gt;JDK&lt;/code&gt;相关环境。&lt;/p&gt;
-
-&lt;p&gt;综上所述，在Linux环境下编译安卓(Android)环境需要如下几个组件:
-- &lt;a href=&#34;https://www.oracle.com/technetwork/java/javase/downloads/index.html&#34;&gt;JDK&lt;/a&gt;: java语言的基础编译和运行环境
-- &lt;a href=&#34;https://developer.android.com/studio/&#34;&gt;sdkmanager&lt;/a&gt;: 安卓(Android)应用下的依赖包管理器
-- &lt;a href=&#34;https://developer.android.google.cn/ndk/downloads&#34;&gt;NDK&lt;/a&gt;: 安卓原生开发套件，可调用底层&lt;code&gt;C&lt;/code&gt;和&lt;code&gt;C++&lt;/code&gt;代码
-- &lt;a href=&#34;https://github.com/gradle/gradle&#34;&gt;Gradle&lt;/a&gt;: 安卓系列软件编译工具(类似&lt;code&gt;maven&lt;/code&gt;之类的工具)&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;快速安装基本环境&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 下载基础软件包
-$ mkdir -p /opt/servers/ &amp;amp;&amp;amp; cd /opt/servers/
-# JDK(可以选择openjdk)
-$ wget http://dl.bgbiao.top/dav/jdk1.8.0_191.tar.gz
-$ tar -zxf jdk1.8.0_191.tar.gz -C /opt/servers/
-
-
-# 下载并配置sdkmanager
-$ wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-$ unzip sdk-tools-linux-4333796.zip 
-$ mkdir -p /opt/sdk
-$ ln -s /opt/servers/tools /opt/sdk/tools
-
-# 配置环境变量
-$ cat /etc/profile
-export JAVA_HOME=/opt/servers/jdk1.8.0_191
-export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/jre/lib:$CLASSPATH
-export PATH=${JAVA_HOME}/bin:${PATH}
-export ANDROID_HOME=/opt/sdk
-export PATH=${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}:${PATH}
-
-# 测试sdkmanager使用
-$ source /etc/profile
-$ sdkmanager --list
-Warning: File /root/.android/repositories.cfg could not be loaded.
-Installed packages:
-  Path    | Version | Description              | Location
-  ------- | ------- | -------                  | -------
-  tools   | 26.0.1  | Android SDK Tools 26.0.1 | tools/
-
-
-# 安装指定版本的包
-$ sdkmanager --list | grep cmake
-Warning: File /root/.android/repositories.cfg could not be loaded.
-  cmake;3.10.2.4988404              | 3.10.2       | CMake 3.10.2.4988404
-  cmake;3.6.4111459                 | 3.6.4111459  | CMake 3.6.4111459
-
-$ sdkmanager &amp;#39;cmake;3.6.4111459&amp;#39; 
-....
-
-# 下载并安装ndk
-$ cd /opt/servers &amp;amp;&amp;amp; wget https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
-$ unzip android-ndk-r16b-linux-x86_64.zip
-$ ln -s /opt/servers/android-ndk-r16b /opt/ndk
-
-# 配置ndk配置环境(增加如下配置)
-$ cat /etc/profile
-export NDK_HOME=/opt/ndk
-export ANDROID_NDK_HOME=/opt/ndk
-export PATH=$NDK_HOME:${ANDROID_NDK_HOME}:$PATH
-
-
-# 下载并安装gradle
-$ cd /opt/servers &amp;amp;&amp;amp; wget https://services.gradle.org/distributions/gradle-4.10.1-all.zip
-$ unzip gradle-4.10.1-all.zip
-$ ln -s /opt/servers/gradle-4.10.1 /opt/gradle
-
-# 配置gradle环境(增加如下配置)
-$ cat /etc/profile
-export GRADLE_HOME=/opt/gradle
-export PATH=${GRADLE_HOME}/bin:${PATH}
-
-# 测试gradle
-$ gradle -v
-
-------------------------------------------------------------
-Gradle 4.10.1
-------------------------------------------------------------
-
-Build time:   2018-09-12 11:33:27 UTC
-Revision:     76c9179ea9bddc32810f9125ad97c3315c544919
-
-Kotlin DSL:   1.0-rc-6
-Kotlin:       1.2.61
-Groovy:       2.4.15
-Ant:          Apache Ant(TM) version 1.9.11 compiled on March 23 2018
-JVM:          1.8.0_191 (Oracle Corporation 25.191-b12)
-OS:           Linux 3.10.0-862.el7.x86_64 amd64&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;安装Android基础依赖&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 正式编译之前先生成license，并将&lt;code&gt;licenses&lt;/code&gt;目录移动到&lt;code&gt;/opt/sdk/&lt;/code&gt;下,和&lt;code&gt;sdkmanager&lt;/code&gt;的tools目录平级&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 安装android基础依赖包
-$ sdkmanager &amp;#39;build-tools;28.0.3&amp;#39; &amp;#39;platforms;android-28&amp;#39; &amp;#39;cmake;3.6.4111459&amp;#39;
-
-# 生成licences
-$ sdkmanager --licenses
-$ cp -rp licenses /opt/sdk/&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;编译Android包&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 加载下整体环境变量
-$ cat /etc/profile
-....
-....
-export JAVA_HOME=/opt/servers/jdk1.8.0_191
-export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/jre/lib:$CLASSPATH
-export PATH=${JAVA_HOME}/bin:${PATH}
-export ANDROID_HOME=/opt/sdk
-export PATH=${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}:${PATH}
-export GRADLE_HOME=/opt/gradle
-export PATH=${GRADLE_HOME}/bin:${PATH}
-export NDK_HOME=/opt/ndk
-export ANDROID_NDK_HOME=/opt/ndk
-export PATH=$NDK_HOME:${ANDROID_NDK_HOME}:$PATH
-
-$ source /etc/profile
-
-# 下载安卓(android)应用的源码文件
-$ git clone http://git.bgbiao.top/test-app.git
-
-$ cd test-app
-$ export ENV=&amp;#34;fNormal&amp;#34;
-$ gradle clean assemble${ENV}Release
-Starting a Gradle Daemon, 2 busy Daemons could not be reused, use --status for details
-Parallel execution with configuration on demand is an incubating feature.
-&amp;lt;-------------&amp;gt; 0% CONFIGURING [29s]
-&amp;gt; root project &amp;gt; Resolve dependencies of :classpath &amp;gt; guava-18.0.pom &amp;gt; 3 KB/5 KB downloaded
-&amp;gt; IDLE
-&amp;gt; root project &amp;gt; Resolve dependencies of :classpath &amp;gt; commons-lang-2.6.pom &amp;gt; 9 KB/17 KB downloaded
-&amp;gt; root project &amp;gt; Resolve dependencies of :classpath &amp;gt; osdetector-gradle-plugin-1.4.0.pom
-....
-....
-
-BUILD SUCCESSFUL in 7m 7s
-501 actionable tasks: 164 executed, 288 from cache, 49 up-to-date
-
-
-# 查看生成的apk包
-$ ls app/build/outputs/apk/fNormal/release/
-app-fNormal-release.apk  output.json
-
-
-# 安装二维码生成器
-$ yum install qrencode-3.4.1-3.el7.x86_64 -y
-
-# 将生成的apk包上传到指定的http服务中
-$ curl -T app/build/outputs/apk/fNormal/release/app-fNormal-release.apk http://dl.bgbiao.top/dav/
-
-# 给apk下载文件生成一个二维码
-$ qrencode -o test-android.png &amp;#34;http://dl.bgbiao.top/dav/app-fNormal-release.apk&amp;#34;
-
-# 上传二维码
-$ curl -T test-android.png http://dl.bgbiao.top/dav/&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;接下来，开发者用户即可以使用&lt;code&gt;http://dl.bgbiao.top/dav/test-android.png&lt;/code&gt;二维码地址进行扫描安装，对该版本的app功能进行测试验证了。&lt;/p&gt;
-
-&lt;p&gt;需要注意的是，通常情况下，开发者如果使用&lt;code&gt;Mac OSX&lt;/code&gt;来编写代码，可能会在代码里使用类似&lt;code&gt;#include &#39;MD5.h&#39;&lt;/code&gt;之类的代码，看起来好像没有什么问题，但是因为&lt;code&gt;Mac OSX&lt;/code&gt;或&lt;code&gt;Windows&lt;/code&gt;系统中对大小写不敏感，所以那样写不会有什么太大影响，因为编译器可以找到系统中的&lt;code&gt;md5.h&lt;/code&gt;，但是在&lt;code&gt;Linux&lt;/code&gt;环境下，系统对大小写很敏感，如果代码里写死了&lt;code&gt;MD5.h&lt;/code&gt;，而系统库中是&lt;code&gt;md5.h&lt;/code&gt;，那肯定会编译失败，而且一般人看到该异常情况不会想到是大小写的问题。&lt;/p&gt;
-
-&lt;p&gt;好了，趟坑算是趟完了，接下来提供一个福利，我自己基于以上构建历史环境打包了一个docker镜像，用以封装&lt;code&gt;Android&lt;/code&gt;编译的基本环境.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;docker镜像&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;$ cat Dockerfile
-FROM centos:7.5.1804
-MAINTAINER &amp;#34;BGBiao &amp;lt;https://bgbiao.top/&amp;gt;&amp;#34;
-ENV TZ &amp;#34;Asia/Shanghai&amp;#34;
-
-RUN yum clean all &amp;amp;&amp;amp; \
-    yum install unzip wget curl -y &amp;amp;&amp;amp; \
-    mkdir -p /opt/{servers,app} &amp;amp;&amp;amp; \
-    cd /opt/servers/ &amp;amp;&amp;amp; \
-    wget  http://dl.bgbiao.top/hadoop/jdk1.8.0_191.tar.gz &amp;amp;&amp;amp; \
-    wget http://dl.bgbiao.top/dav/android-build/android-ndk-r16b-linux-x86_64.zip &amp;amp;&amp;amp; \
-    wget http://dl.bgbiao.top/dav/android-build/gradle-4.10.1-all.zip &amp;amp;&amp;amp; \
-    wget http://dl.bgbiao.top/dav/android-build/sdk-tools-linux-4333796.zip
-
-RUN pushd /opt/servers &amp;amp;&amp;amp; \
-    tar -zxf jdk1.8.0_191.tar.gz &amp;amp;&amp;amp; \
-    unzip android-ndk-r16b-linux-x86_64.zip &amp;amp;&amp;amp; \
-    unzip gradle-4.10.1-all.zip &amp;amp;&amp;amp; \
-    unzip sdk-tools-linux-4333796.zip &amp;amp;&amp;amp; \
-    mkdir -p /opt/sdkmanager &amp;amp;&amp;amp; \
-    ln -s /opt/servers/tools /opt/sdkmanager/tools &amp;amp;&amp;amp; \
-    ln -s /opt/servers/gradle-4.10.1 /opt/gradle &amp;amp;&amp;amp; \
-    ln -s /opt/servers/android-ndk-r16b /opt/ndk
-
-COPY profile /opt/servers/setenv.sh
-$ cat profile
-export JAVA_HOME=/opt/servers/jdk1.8.0_191
-export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/jre/lib:$CLASSPATH
-export PATH=${JAVA_HOME}/bin:${PATH}
-export ANDROID_HOME=/opt/sdkmanager
-export PATH=${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}:${PATH}
-export GRADLE_HOME=/opt/gradle
-export PATH=${GRADLE_HOME}/bin:${PATH}
-export NDK_HOME=/opt/ndk
-export ANDROID_NDK_HOME=/opt/ndk
-export PATH=$NDK_HOME:${ANDROID_NDK_HOME}:$PATH
-
-# 用户可以根据上述Dockerfile构建镜像，同时也可以直接使用我构建好的一个镜像
-$ docker pull xxbandy123/android-build-env:19-12-12
-
-# 使用方式
-# 基于上述镜像，用户需要使用sdkmanager 安装依赖的安卓库，同时编排好自己的gradle打包命令，在自己的安卓项目中直接编译即可
-$ docker run -itd --name android-build-env:19-12-12 bash 
-[root@4c05d4ded28d /]# source /opt/servers/setenv.sh
-[root@4c05d4ded28d /]# git clone your-android-app.git
-[root@4c05d4ded28d /]# sdkmanager &amp;#39;build-tools;28.0.3&amp;#39; &amp;#39;platforms;android-28&amp;#39; &amp;#39;cmake;3.6.4111459&amp;#39;
-[root@4c05d4ded28d /]# sdkmanager --licenses
-[root@4c05d4ded28d /]# cp -rp licenses ${ANDROID_HOME}/
-[root@4c05d4ded28d /]# ls ${ANDROID_HOME}
-build-tools  cmake  licenses  platforms  platform-tools  tools
-# 开始执行编译(之后就是漫长的等待了)
-[root@4c05d4ded28d /]# cd your-android-app &amp;amp;&amp;amp; gradle clean assembleRelease&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;注意事项&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.通常持续集成会使用&lt;code&gt;Jenkins&lt;/code&gt;来进行编译打包，因此以上环境再接入Jenkins-salve之前需要安装&lt;code&gt;git&lt;/code&gt;客户端名&lt;/li&gt;
-&lt;li&gt;2.通常客户端在测试包时会通过二维码扫描来下载包，因此环境上需要安装&lt;code&gt;qrencode&lt;/code&gt;软件，用于生成二维码&lt;/li&gt;
-&lt;li&gt;3.需要注意&lt;code&gt;gradle&lt;/code&gt;在编译过程中会启动一个守护进程，如果编译异常结束，该守护进程可能不会立即释放，此时立即再次编译将有可能导致OOM&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;4.虽然使用该环境可以正常打包，但是在jenkins上打包后，可能遇到如下异常，通常是无法识别环境变量，在jenkins任务中显式声明&lt;code&gt;ANDROID_HOME=/opt/sdkmanager&lt;/code&gt;或者&lt;code&gt;ANDROID_SDK_ROOT=/opt/sdkmanager&lt;/code&gt;即可&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;SDK location not found. Define location with sdk.dir in the local.properties file or with an ANDROID_HOME environment variable.
-
-# or 
-* What went wrong:
-Could not determine the dependencies of task &amp;#39;:app:lintVitalFNormalRelease&amp;#39;.
-&amp;gt; Could not resolve all artifacts for configuration &amp;#39;:app:fNormalSamsungDebugCompileClasspath&amp;#39;.
-&amp;gt; SDK location not found. Define location with an ANDROID_SDK_ROOT environment variable or by setting the sdk.dir path in your project&amp;#39;s local properties file at &amp;#39;/opt/data/jenkins/workspace/test-andorid-build/local.properties&amp;#39;.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;/li&gt;
-&lt;/ul&gt;</description>
       
     </item>
     
