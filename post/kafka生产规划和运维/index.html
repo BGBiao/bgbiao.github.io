@@ -88,7 +88,7 @@
 
 <meta itemprop="datePublished" content="2020-04-25T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-04-25T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="15182">
+<meta itemprop="wordCount" content="16399">
 
 
 
@@ -488,8 +488,8 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 15182 words </span>
-          <span class="more-meta"> 31 min read </span>
+        <span class="more-meta"> 16399 words </span>
+          <span class="more-meta"> 33 min read </span>
 
         
         
@@ -513,12 +513,12 @@ if (!doNotTrack) {
 <ul>
 <li><a href="#1-硬件和os">1.硬件和OS</a>
 <ul>
-<li><a href="#1-0os">1.0OS</a></li>
-<li><a href="#1-1内存">1.1内存</a></li>
-<li><a href="#1-2cpu">1.2CPU</a></li>
-<li><a href="#1-3disk">1.3Disk</a></li>
-<li><a href="#1-4network">1.4Network</a></li>
-<li><a href="#1-5filesystem">1.5Filesystem</a></li>
+<li><a href="#1-0-os">1.0 OS</a></li>
+<li><a href="#1-1-内存">1.1 内存</a></li>
+<li><a href="#1-2-cpu">1.2 CPU</a></li>
+<li><a href="#1-3-disk">1.3 Disk</a></li>
+<li><a href="#1-4-network">1.4 Network</a></li>
+<li><a href="#1-5-filesystem">1.5 Filesystem</a></li>
 <li><a href="#1-6-application-vs-os-flush-management">1.6 Application vs. OS Flush Management</a></li>
 <li><a href="#1-7-理解linux操作系统的flush行为">1.7 理解Linux操作系统的Flush行为</a></li>
 </ul></li>
@@ -526,14 +526,18 @@ if (!doNotTrack) {
 <li><a href="#3-jvm配置">3.JVM配置</a></li>
 <li><a href="#4-kafka核心配置">4.kafka核心配置</a>
 <ul>
-<li><a href="#4-1重要的客户端配置">4.1重要的客户端配置</a></li>
-<li><a href="#4-2broker核心配置">4.2broker核心配置</a></li>
-<li><a href="#4-3topic级别的动态参数调整">4.3Topic级别的动态参数调整</a></li>
-<li><a href="#4-3producer核心参数">4.3Producer核心参数</a></li>
-<li><a href="#4-4consumer核心参数">4.4Consumer核心参数</a></li>
+<li><a href="#4-1-重要的客户端配置">4.1 重要的客户端配置</a></li>
+<li><a href="#4-2-broker核心配置">4.2 broker核心配置</a></li>
+<li><a href="#4-3-topic级别的动态参数调整">4.3 Topic级别的动态参数调整</a></li>
+<li><a href="#4-3-producer核心参数">4.3 Producer核心参数</a></li>
+<li><a href="#4-4-consumer核心参数">4.4 Consumer核心参数</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#三-集群管理">三、集群管理</a></li>
+<li><a href="#三-集群管理">三、集群管理</a>
+<ul>
+<li><a href="#1-官方工具">1. 官方工具</a></li>
+<li><a href="#2-kafka-manager">2. kafka-manager</a></li>
+</ul></li>
 <li><a href="#四-集群监控">四、集群监控</a></li>
 </ul></li>
 </ul>
@@ -569,7 +573,7 @@ if (!doNotTrack) {
 
 <p><code>注意:</code>通常对于分布式的开源服务来将对于硬件本身没有太高的要求，但当需要承载一定量级的业务时，我们需要考虑一些硬件是否能够支撑对应的业务场景，并且通常来讲针对不同的业务场景选择不同的硬件(如果可选择)，也许会适当降低资源成本。</p>
 
-<h4 id="1-0os">1.0OS</h4>
+<h4 id="1-0-os">1.0 OS</h4>
 
 <p>一般来说，对于运行Linux中的kafka集群不需要过多的OS以及kernel参数调整，但如下几种情况可以根据具体情况进行参考:</p>
 
@@ -613,7 +617,7 @@ $ echo &#39;vm.max_map_count=262144&#39; &gt;&gt; /etc/sysctl.conf
 $ sysctl -p</pre></td></tr></table>
 </div>
 </div>
-<h4 id="1-1内存">1.1内存</h4>
+<h4 id="1-1-内存">1.1 内存</h4>
 
 <p>Kafka严重依赖文件系统来存储和缓存消息。</p>
 
@@ -625,7 +629,7 @@ $ sysctl -p</pre></td></tr></table>
 
 <p>通常来讲<code>64G</code>内存配置的机器是一个不错的选择.</p>
 
-<h4 id="1-2cpu">1.2CPU</h4>
+<h4 id="1-2-cpu">1.2 CPU</h4>
 
 <p>大多数的kafka集群对于cpu的要求不是那么高，因此对于CPU的配置没有像其他资源那么重要(但是通常同等资源都是由一定比例配比的)。</p>
 
@@ -635,11 +639,11 @@ $ sysctl -p</pre></td></tr></table>
 
 <p>如果需要在更快的CPU或更多的内核之间进行选择，请选择更多的内核，因为多核提供的额外并发性将远远超过稍快的时钟速度。</p>
 
-<h4 id="1-3disk">1.3Disk</h4>
+<h4 id="1-3-disk">1.3 Disk</h4>
 
 <p>生产集群建议使用多块磁盘来最大化整体的吞吐，不要与应用程序日志或其他OS文件系统活动共享用于Kafka数据的相同驱动器，以确保良好的延迟。</p>
 
-<p>在官方的最佳实践中建议，可以将多块磁盘构建成RAID，或者直接将每块磁盘作为独立的目录进行挂载。</p>
+<p>在官方的最佳实践中建议，可以将<code>多块磁盘构建成RAID</code>，或者直接将独立的<code>多块磁盘</code>作为kafka的数据存储，也就是JBOD方案(Just Bunch Of Disks)。</p>
 
 <p><code>备注:</code>如果软RAID的话其实会在存储方面增加一层数据均衡，增加了集群的复杂度，因此一般可用选择后者，而且RAID主要用于提供冗余，对于开源分布式服务来讲，在软件层面上基本都会保证数据的冗余。</p>
 
@@ -647,7 +651,7 @@ $ sysctl -p</pre></td></tr></table>
 
 <p>如果配置多个数据目录，则Broker将在路径中放置一个新分区，该分区中当前存储的分区数最少。每个分区将完全位于数据目录之一中，如果<code>分区之间的数据不平衡，就会导致磁盘之间的负载不平衡</code>。</p>
 
-<p>RAID在平衡磁盘之间的负载方面做得更好，它能在较低的水平上平衡负载。RAID的主要缺点是减少了可用的磁盘空间(RAID0之外)h，好处是可以容忍磁盘故障(RAID1)</p>
+<p>RAID在平衡磁盘之间的负载方面做得更好，它能在较低的水平上平衡负载。RAID的主要缺点是减少了可用的磁盘空间(RAID0除外)，好处是可以容忍磁盘故障(RAID1，RAID5等)。</p>
 
 <p>在生产中强烈不建议使用RAID 5 or RAID 6 ,会严重影响到写吞吐的性能，并且在磁盘故障时会有重建阵列的I/O成本(<code>RAID0下也存在重建I/O的成本</code>)</p>
 
@@ -655,9 +659,17 @@ $ sysctl -p</pre></td></tr></table>
 
 <p>linked使用8x7200转的sata磁盘，一般来说，磁盘吞吐量是性能瓶颈，磁盘越多越好。</p>
 
-<p>kafka官方文档中其实建议使用多个驱动器以获得良好的吞吐量</p>
+<p>kafka官方文档中其实建议使用多个驱动器以获得良好的吞吐量，因为每个路径都独立挂载在不同的磁盘上，这使得多块物理磁盘磁头同时执行物理I/O写操作，可以极大地加速Kafka消息生产的速度。</p>
 
-<h4 id="1-4network">1.4Network</h4>
+<p><code>注意:</code> 通常在使用本地盘时，容量可能会比较大，当磁盘容量超过2T时，Linux下默认的MBR分区就不能满足容量的要求了，此时需要在分区时进行GPT分区，否则等线上业务真正上线后会发现超过2T的空间就被浪费了。</p>
+
+<p>另外一个问题就是，磁盘容量规划的问题，虽然kafka默认为全部的日志数据设置了7天保留时间，但是往往在海量的数据消费场景中，单天的数据量也可能达到好几个T，这就导致了需要提前对业务的场景和使用方式进行提前规划，并提前计算最少的存储量。</p>
+
+<p>但一般对于磁盘空间的规划可以根据消息量大概估算，比如一天7亿条消息，单条1kb，消息副本为3(可保证2节点同时挂)，那么大概的存储空间为<code>7亿*3*1KB/1000/1000=2100G</code>，也就是这种规模下的数据，一天产生2T的数据，实际使用数据为700G，1400G数据为冗余数据，此时我们在规划磁盘容量时就需要考虑到单天数据量的大小，以及数据的保留时间。</p>
+
+<p><code>注意:</code> 如果客户端开启了消息压缩，整体的数据能再相对小一些，可以根据具体情况来考虑</p>
+
+<h4 id="1-4-network">1.4 Network</h4>
 
 <p>在分布式系统中，快速可靠的网络是性能的一个重要组成部分(<code>因此通常分布式系统中建议在同机房</code>)。</p>
 
@@ -673,7 +685,7 @@ $ sysctl -p</pre></td></tr></table>
 
 <p><code>注意:</code> 如果业务上需要异地进行数据读写，推荐的方法是在每个数据中心中部署一个本地Kafka集群，每个数据中心中的应用程序实例只与它们的本地集群交互，并在集群之间进行镜像(kafka提供了mirror-maker工具)。</p>
 
-<h4 id="1-5filesystem">1.5Filesystem</h4>
+<h4 id="1-5-filesystem">1.5 Filesystem</h4>
 
 <p>现在操作系统中，大部分的系统应该都使用了<code>Ext4</code>或<code>XFS</code>系统，官方也推荐使用这两种文件系统，但是对于具体的文件系统的选择，官方提供了如下几种场景和需要注意的点。</p>
 
@@ -716,21 +728,31 @@ UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults
 
 <h4 id="1-6-application-vs-os-flush-management">1.6 Application vs. OS Flush Management</h4>
 
-<p>Kafka始终会立即将所有数据写入文件系统，并支持配置刷新策略的功能，该策略控制何时使用刷新将数据从OS缓存中强制出到磁盘上。
- 可以控制此刷新策略，以在一段时间后或在写入一定数量的消息之后将数据强制到磁盘。 在此配置中有几种选择。</p>
+<p>Kafka始终会立即将所有数据写入文件系统，并支持配置刷新策略的功能，该策略控制何时使用刷新将数据从OS缓存中强制出到磁盘上。</p>
 
-<p>Kafka必须最终调用fsync才能知道数据已刷新。 当从崩溃中恢复任何未知的日志段时，Kafka将通过检查其消息的CRC来检查每条消息的
-完整性，并在启动时执行的恢复过程中重建附带的偏移索引文件</p>
+<p>可以控制此刷新策略，以在一段时间后或在写入一定数量的消息之后将数据强制到磁盘。 在此配置中有几种选择。</p>
+
+<p>Kafka必须最终调用fsync才能知道数据已刷新。</p>
+
+<p><code>当从崩溃中恢复任何未知的日志段时，Kafka将通过检查其消息的CRC来检查每条消息的完整性，并在启动时执行的恢复过程中重建附带的偏移索引文件</code>。</p>
 
 <p>请注意，Kafka中的持久性不需要将数据同步到磁盘，因为发生故障的节点将始终从其副本中恢复。</p>
 
-<p>我们建议使用默认刷新设置，该设置将完全禁用应用程序fsync。 这意味着依靠操作系统和Kafka自己的后台刷新来完成后台刷新。 这 &gt;为所有用途提供了最佳的解决方案：无需调节旋钮，提高吞吐量和延迟，并提供完全恢复保证。 通常，我们认为复制提供的保证要强于同步到本地磁盘，但是偏执狂仍然更愿意同时拥有两者，并且仍然支持应用程序级fsync策略。</p>
+<p>我们建议使用默认刷新设置，该设置将完全禁用应用程序的fsync。</p>
+
+<p>这意味着依靠操作系统和Kafka自己的后台刷新来完成后台刷新。</p>
+
+<p>这为所有用途提供了最佳的解决方案：无需调节配置，提高吞吐量和延迟，并提供完全恢复保证。</p>
+
+<p>通常，我们认为<code>复制</code>提供的保证要强于<code>同步到本地磁盘</code>，但是偏执狂仍然更愿意同时拥有两者，并且仍然支持应用程序级fsync策略。</p>
 
 <p>使用应用程序级刷新设置的缺点是，其磁盘使用模式效率较低（它给操作系统减少了重新排序写操作的余地），并且由于大多数Linux文件系统中的fsync阻止了文件写入，因此它会引入延迟。 后台刷新进行更精细的页面级锁定。</p>
 
 <h4 id="1-7-理解linux操作系统的flush行为">1.7 理解Linux操作系统的Flush行为</h4>
 
-<p>在Linux中，写入文件系统的数据将保留在页面缓存中，直到必须将其写出到磁盘为止（由于应用程序级fsync或操作系统自身的刷新策&gt;略）。 数据刷新是通过一组称为pdflush的后台线程完成的（或在2.6.32版的内核“冲洗线程”中）。</p>
+<p>在Linux中，写入文件系统的数据将保留在页面缓存中，直到必须将其写出到磁盘为止（由于应用程序级fsync或操作系统自身的刷新策略）。</p>
+
+<p>数据刷新是通过一组称为pdflush的后台线程完成的（或在2.6.32版的内核“冲洗线程”中）。</p>
 
 <p>Pdflush具有可配置的策略，该策略控制可以在缓存中维护多少脏数据以及必须将多脏数据写回到磁盘的时间.</p>
 
@@ -790,14 +812,14 @@ UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults
 
 <p>Kafka默认设置在大多数情况下都能工作，特别是与性能相关的设置和选项，但是考虑到集群的规划以及场景用途，有一些补充的配置参数可以对生产环境进行调优。</p>
 
-<p>通常配置上来讲会分为<code>broker端配置</code>、<code>produser端配置</code>、<code>consumer端配置</code>，由于各个业务方当前均使用开源客户端，因此对于客&gt;户端的配置无法做到严格管控(如果有内部的sdk封装可能会比较好)。</p>
+<p>通常配置上来讲会分为<code>broker端配置</code>、<code>produser端配置</code>、<code>consumer端配置</code>，由于各个业务方当前均使用开源客户端，因此对于客户端的配置无法做到严格管控(如果有内部的sdk封装可能会比较好)。</p>
 
-<h4 id="4-1重要的客户端配置">4.1重要的客户端配置</h4>
+<h4 id="4-1-重要的客户端配置">4.1 重要的客户端配置</h4>
 
 <ul>
-<li>acks: 消息一致性保证(0:投递即成功,1:副本同步即成功,all/-1:全部ISR同步即成功)</li>
-<li>compression: 压缩类型</li>
-<li>batch size: 批处理大小</li>
+<li><code>acks</code>: 消息一致性保证(0:投递即成功,1:副本同步即成功,all/-1:全部ISR同步即成功)</li>
+<li><code>compression</code>: 压缩类型</li>
+<li><code>batch size</code>: 批处理大小</li>
 </ul>
 
 <p><code>注意:</code> 对于消费者来说，最重要的参数为<code>fetch size</code></p>
@@ -806,7 +828,7 @@ UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults
 
 <p><a href="http://kafka.apache.org/24/documentation.html#configuration">kafka详细参数列表</a></p>
 
-<h4 id="4-2broker核心配置">4.2broker核心配置</h4>
+<h4 id="4-2-broker核心配置">4.2 broker核心配置</h4>
 
 <p><strong>zookeeper.connect</strong></p>
 
@@ -856,15 +878,19 @@ broker.id.generation.enable=true</pre></td></tr></table>
 <li>服务器正常关闭: 用于关闭日志片段</li>
 </ul>
 
-<p>默认情况下，每个日志目录采用一个线程，因为这些线程仅有在启动和关闭时才用到，所以可以适当设置大一点，并不会影响到整体服&gt;务的性能，特别是对于包含大量分区的服务器来说，一旦发生崩愤，在进行恢复时使用井行操作可能会省下数小时的时间。</p>
+<p>默认情况下，每个日志目录采用一个线程，因为这些线程仅有在启动和关闭时才用到，所以可以适当设置大一点，并不会影响到整体服务的性能，特别是对于包含大量分区的服务器来说，一旦发生崩愤，在进行恢复时使用井行操作可能会省下数小时的时间。</p>
 
 <p>需要注意的是，该值是每个日志目录的线程数，因此总线程数需要考虑到<code>log.dirs</code>的配置</p>
+
+<p><code>备注</code>: 这也是在使用RAID和JBOD两种磁盘方案的另外一个考虑点</p>
 
 <p><strong>delete.topic.enable</strong></p>
 
 <p>是否允许删除topic，默认为: <code>true</code></p>
 
-<p>如果为flase，通过管理工具删除topic仅为标记删除，此时使用<code>describe</code>命令可以查看到topic的详情信息，但是无法写入，可以通过删除<code>zk</code>中的节点来删除</p>
+<p>如果为false，通过管理工具删除topic仅为标记删除，此时使用<code>describe</code>命令可以查看到topic的详情信息，但是无法写入，可以通过删除<code>zk</code>中的节点来删除</p>
+
+<p><code>备注</code>: 生产环境建议设置为<code>false</code>，由集群管理员定期统一的进行删除和管理</p>
 
 <p><strong>auto.create.topics.enable</strong></p>
 
@@ -882,14 +908,13 @@ broker.id.generation.enable=true</pre></td></tr></table>
 
 <p>是否开启<code>leader</code>自动平衡，默认值为<code>true</code>。后台会有线程进行定期检查leader的分布情况</p>
 
-<p>kafka中有一个被称为优先副本（preferred replicas）的概念(通常分区会有主分区和副本分区的概念，主分区先写入，然后push到其&gt;他副本分区)。</p>
+<p>kafka中有一个被称为优先副本（preferred replicas）的概念(通常分区会有主分区和副本分区的概念，主分区先写入，然后push到其他副本分区)。</p>
 
 <p>如果一个分区有3个副本，且这3个副本的优先级别分别为0,1,2，根据优先副本的概念，0会作为leader 。</p>
 
 <p>当0节点的broker挂掉时，会启动1这个节点broker当做leader。</p>
 
-<p>当0节点的broker再次启动后，会自动恢复为此partition的leader。不会导致负载不均衡和资源浪费，这就是leader的均衡机制(前提是
-第一次partition在分配的时候，它本身就是一个相对平均的分配)</p>
+<p>当0节点的broker再次启动后，会自动恢复为此partition的leader。不会导致负载不均衡和资源浪费，这就是leader的均衡机制(前提是第一次partition在分配的时候，它本身就是一个相对平均的分配)</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -920,9 +945,11 @@ broker.id.generation.enable=true</pre></td></tr></table>
 
 <p>当使用<code>required.acks=-1(all)</code>提交到生产请求所需的ISR中的最小副本数，默认为1，建议在数据一致性要求较高的topic中设置至少为2</p>
 
-<p>指定<code>ISR</code>的最小数量。当producer设置<code>ack=all(-1)</code>时，该值指定的副本必须全部写成功，才认为消息写入成功，否则生产者将抛异&gt;常(<code>either NotEnoughReplicas or NotEnoughReplicasAfterAppend</code>)</p>
+<p>指定<code>ISR</code>的最小数量。当producer设置<code>ack=all(-1)</code>时，该值指定的副本必须全部写成功，才认为消息写入成功，否则生产者将抛异常(<code>either NotEnoughReplicas or NotEnoughReplicasAfterAppend</code>)</p>
 
-<p><code>注意</code>: <code>min.insync.replicas</code>参数和生产者<code>ack</code>参数一起使用，可以加强整个消息的持久性.示例:(3副本的topic,可以设置该值为2,同时生产者ack设置为all，这将确保大多数副本没有收到写操作时，生产者直接异常)</p>
+<p><code>注意</code>: <code>min.insync.replicas</code>参数和生产者<code>ack</code>参数一起使用，可以加强整个消息的持久性</p>
+
+<p>示例:(3副本的topic,可以设置该值为2,同时生产者ack设置为all，这将确保大多数副本没有收到写操作时，生产者直接异常)</p>
 
 <p>默认值为:<code>1</code></p>
 
@@ -936,9 +963,7 @@ broker.id.generation.enable=true</pre></td></tr></table>
 
 <p>为false，就只从ISR中获取leader保证了数据的可靠性，但是partition就失效了，<code>true</code>则从replica中获取，则可用性增强，但是数&gt;据可能存在丢失情况</p>
 
-<p><code>注意:</code>  该参数实际上在设置的时候也有一定的争议性，比如，我们知道副本是有<code>ISR</code>的，即正在同步的副本，如果当前的broker宕&gt;机导致需要选举leader partition，此时如果ISR内除了leader之外还有其他副本(但谁又能保证一定有呢)，那直接从ISR中选举leader&gt;即可，如果没有的话，当<code>auto.leader.rebalance.enable=true</code>时，就会去其他存活的副本中选举leader，此时可以增强整体的可用性
-，但是如果存活的副本不在ISR中，即意味着数据可能有一定的丢失了。但是如果该参数为false的话，ISR中没有，就直接异常了，为了
-保证数据的一致性</p>
+<p><code>注意:</code>  该参数实际上在设置的时候也有一定的争议性，比如，我们知道副本是有<code>ISR</code>的，即正在同步的副本，如果当前的broker宕&gt;机导致需要选举leader partition，此时如果ISR内除了leader之外还有其他副本(但谁又能保证一定有呢)，那直接从ISR中选举leader&gt;即可，如果没有的话，当<code>auto.leader.rebalance.enable=true</code>时，就会去其他存活的副本中选举leader，此时可以增强整体的可用性，但是如果存活的副本不在ISR中，即意味着数据可能有一定的丢失了。但是如果该参数为false的话，ISR中没有，就直接异常了，为了保证数据的一致性。</p>
 
 <p>该参数的存在其实是在可用性和可靠性之间做了一个权衡，为true时保证了可用性AP，为false时保证了一致性CP</p>
 
@@ -1015,7 +1040,7 @@ broker.id.generation.enable=true</pre></td></tr></table>
 <li>offsets.retention.minutes: 在消费者组的消费者全部异常之后，offset保留的时间，默认值:<code>10080</code></li>
 <li>offsets.topic.compression.codec: 偏移量主题的压缩解码器，默认:<code>0</code></li>
 <li>offsets.topic.num.partitions: offset提交主题的分区数量，默认:<code>50</code>(<code>注意:</code>集群部署后不要改变)</li>
-<li>offsets.topic.replication.factor: offset提交主题的副本数，默认:<code>3</code> (在集群大小满足此复制因子要求之前，内部主题创建将&gt;失败,该主题非常重要，需要要求强一致性)</li>
+<li><code>offsets.topic.replication.factor</code>: offset提交主题的副本数，默认:<code>3</code> (在集群大小满足此复制因子要求之前，内部主题创建将&gt;失败,该主题非常重要，需要要求强一致性)</li>
 <li>offsets.topic.segment.bytes: offset提交主题的段大小，设置相对较小，以便更快地实现日志压缩和缓存负载，默认值:<code>104857600</code>，即1Mb</li>
 </ul>
 
@@ -1047,11 +1072,11 @@ broker.id.generation.enable=true</pre></td></tr></table>
 <p><strong>controller控制器相关</strong></p>
 
 <ul>
-<li>controlled.shutdown.enable: 启用控制器关闭，默认:<code>true</code></li>
+<li><code>controlled.shutdown.enable</code>: 启用控制器关闭，默认:<code>true</code></li>
 <li>controlled.shutdown.max.retries: 控制器会因为各种原因而宕机，该值表示控制器的重试次数，默认:<code>3</code></li>
 <li>controlled.shutdown.retry.backoff.ms: 在每次重试之前，系统从前一次故障(控制器fail over或副本延迟)的状态中恢复过来的时
 间，默认:<code>5000</code></li>
-<li>controller.socket.timeout.ms: 控制器到broker角色转换的socket超时时间，默认:<code>30000</code></li>
+<li><code>controller.socket.timeout.ms</code>: 控制器到broker角色转换的socket超时时间，默认:<code>30000</code></li>
 </ul>
 
 <p><strong>group相关(消费组)</strong></p>
@@ -1108,9 +1133,11 @@ queued.max.requests=[number of concurrent requests]</pre></td></tr></table>
 </div>
 <p><code>注意:</code> 在kafka集群中，当broker集群参数确定后，还有一些针对topic的参数是可以进行动态调整的，以提高kafka服务的灵活性。</p>
 
-<h4 id="4-3topic级别的动态参数调整">4.3Topic级别的动态参数调整</h4>
+<h4 id="4-3-topic级别的动态参数调整">4.3 Topic级别的动态参数调整</h4>
 
 <p><a href="http://kafka.apache.org/24/documentation.html#topicconfigs">Topic级别的配置</a></p>
+
+<p><code>注意</code>: 如下topic的参数可以在使用过程中进行动态调整，使用<code>kafka-topic.sh</code>工具中的<code>alter</code>参数来直接修改topic相关的参数。</p>
 
 <p><strong>cleanup.policy</strong></p>
 
@@ -1153,7 +1180,7 @@ queued.max.requests=[number of concurrent requests]</pre></td></tr></table>
 
 <p><strong>log.segment.bytes</strong></p>
 
-<p>指定每个日志段的大小，通常在消息到达broker时，会被追加到分区的当前日志段上(segment)，当日志段大小超过该参数指定的值(默&gt;认1GB)，当前日志段就会被关闭，一个新的日志段被打开。</p>
+<p>指定每个日志段的大小，通常在消息到达broker时，会被追加到分区的当前日志段上(segment)，当日志段大小超过该参数指定的值(默认1GB)，当前日志段就会被关闭，一个新的日志段被打开。</p>
 
 <p>如果一个日志片段被关闭，就开始等待过期，该值不建议设置太小。</p>
 
@@ -1178,7 +1205,7 @@ queued.max.requests=[number of concurrent requests]</pre></td></tr></table>
 
 <p>该值规定了要为该 Topic 预留多大的磁盘空间，默认为-1，该值通常情况用来设置topic的配额</p>
 
-<h4 id="4-3producer核心参数">4.3Producer核心参数</h4>
+<h4 id="4-3-producer核心参数">4.3 Producer核心参数</h4>
 
 <p><strong>bootstrap.servers</strong></p>
 
@@ -1279,7 +1306,7 @@ queued.max.requests=[number of concurrent requests]</pre></td></tr></table>
 
 <p><code>注意:</code> 如果生产者或消费者与broker所处的数据中心不同，该值可以适当调大</p>
 
-<h4 id="4-4consumer核心参数">4.4Consumer核心参数</h4>
+<h4 id="4-4-consumer核心参数">4.4 Consumer核心参数</h4>
 
 <p>在消费者组中的消费者重平衡期间，消费者无法读取消息，造成整个消费者组在重平衡的期间都不可用</p>
 
@@ -1356,6 +1383,72 @@ queued.max.requests=[number of concurrent requests]</pre></td></tr></table>
 <p>在消费组中，消费者心跳到消费者协调器的频率，默认值:<code>3000ms</code></p>
 
 <h2 id="三-集群管理">三、集群管理</h2>
+
+<p>任何一款优秀的开源软件，都会提供比较丰富的集群管理工具来帮助使用者(管理员和实际使用者)来对集群进行操作，记下来从三个角度来大概讲解集群管理相关的操作。</p>
+
+<ul>
+<li>官方提供的操作脚本</li>
+<li>kafka-manager</li>
+<li>kafkacat</li>
+</ul>
+
+<h3 id="1-官方工具">1. 官方工具</h3>
+
+<p>在kafka的发行包中，默认包含了如下管理工具脚本:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ ls
+connect-distributed.sh        kafka-delete-records.sh              kafka-server-stop.sh
+connect-mirror-maker.sh       kafka-dump-log.sh                    kafka-streams-application-reset.sh
+connect-standalone.sh         kafka-leader-election.sh             kafka-topics.sh
+kafka-acls.sh                 kafka-log-dirs.sh                    kafka-verifiable-consumer.sh
+kafka-broker-api-versions.sh  kafka-mirror-maker.sh                kafka-verifiable-producer.sh
+kafka-configs.sh              kafka-preferred-replica-election.sh  trogdor.sh
+kafka-console-consumer.sh     kafka-producer-perf-test.sh          windows
+kafka-console-producer.sh     kafka-reassign-partitions.sh         zookeeper-security-migration.sh
+kafka-consumer-groups.sh      kafka-replica-verification.sh        zookeeper-server-start.sh
+kafka-consumer-perf-test.sh   kafka-run-class.sh                   zookeeper-server-stop.sh
+kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-shell.sh</pre></td></tr></table>
+</div>
+</div>
+<p>这里主要介绍几个常用的工具脚本:</p>
+
+<ul>
+<li><code>kafka-configs.sh</code>: 用来操作和查看topic, client, user or broker的实体配置</li>
+<li><code>kafka-broker-api-versions.sh</code>: 用来查看指定broker当前支持的各个接口的版本(kafka高版本已经保证了向下兼容)</li>
+<li><code>kafka-console-consumer.sh</code>: 通过终端来启动消费者</li>
+<li><code>kafka-console-producer.sh</code>: 通过终端来启动生产者</li>
+<li><code>kafka-consumer-groups.sh</code>: 用来查看，删除或者重置消费者组offset</li>
+<li><code>kafka-consumer-perf-test.sh</code>: 用来进行消费者压力测试</li>
+<li><code>kafka-producer-perf-test.sh</code>: 用来进行生产者压力测试</li>
+<li><code>kafka-delete-records.sh</code>: 删除指定分区的记录，直到指定的offset</li>
+<li><code>kafka-leader-election.sh</code>: 用于一组Topic分区的leader重新分配，可以支持优先副本和非同步副本(不在ISR中)</li>
+<li><code>kafka-log-dirs.sh</code>: 用来查看指定broker下日志目录的使用空间</li>
+<li><code>kafka-mirror-maker.sh</code>: 用于多集群之间同步topic数据</li>
+<li><code>kafka-reassign-partitions.sh</code>: 用来对partition进行重新分配(管理员会较多使用)</li>
+<li><code>kafka-replica-verification.sh</code>: 该工具可以用来检查topic的一组副本的数据是否一致</li>
+<li><code>kafka-server-start.sh</code>: broker启动脚本</li>
+<li><code>kafka-server-stop.sh</code>: broker关闭脚本</li>
+<li><code>kafka-streams-application-reset.sh</code>: 流式应用工具</li>
+<li><code>kafka-topics.sh</code>: 用来创建，删除，查看，改变一个topic参数的工具</li>
+<li><code>zookeeper-shell.sh</code>: kafka工具中也默认提供了zookeeper管理工具(不太好用)</li>
+</ul>
+
+<h3 id="2-kafka-manager">2. kafka-manager</h3>
 
 <h2 id="四-集群监控">四、集群监控</h2>
 
