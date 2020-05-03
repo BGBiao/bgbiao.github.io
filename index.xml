@@ -639,23 +639,25 @@ queued.max.requests=[number of concurrent requests]&lt;/pre&gt;&lt;/td&gt;&lt;/t
 
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;自动创建主题的副本因子&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;log.retention.ms&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;retention.ms&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;kafka的log保留时间，也可以使用&lt;code&gt;log.retention.hours&lt;/code&gt;参数来配置保留时间，默认168小时，即一周&lt;/p&gt;
+&lt;p&gt;kafka的log保留时间，也可以使用&lt;code&gt;log.retention.hours&lt;/code&gt;参数来配置保留时间，默认168小时，即一周。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;log.retention.bytes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;retention.bytes&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;指定log保留的大小，作用在每一个partition上，加入一个topic有3个partition，设置了&lt;code&gt;log.retention.bytes&lt;/code&gt;为1GB，则表示整个topic仅可以存储3GB的数据，超过该容量的数据会被进行自动删除。&lt;/p&gt;
 
 &lt;p&gt;此时，临时增加该topic的容量的方法就是调整该参数，或调整topic的partition个数。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;log.segment.bytes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;-1表示不限制&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;segment.bytes&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;指定每个日志段的大小，通常在消息到达broker时，会被追加到分区的当前日志段上(segment)，当日志段大小超过该参数指定的值(默认1GB)，当前日志段就会被关闭，一个新的日志段被打开。&lt;/p&gt;
 
 &lt;p&gt;如果一个日志片段被关闭，就开始等待过期，该值不建议设置太小。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;log.segment.ms&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;segment.ms&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;上面会指定日志段的分割，该参数会指定历史的日志段的过期时间。该参数会和&lt;code&gt;log.retention.bytes&lt;/code&gt;一起校验，谁先满足就生效。&lt;/p&gt;
 
@@ -668,13 +670,77 @@ queued.max.requests=[number of concurrent requests]&lt;/pre&gt;&lt;/td&gt;&lt;/t
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;消息的大小对于性能有比较显著的影响，越大负责处理网络连接和请求的线程就需要花越多的时间来处理这些请求，还会增加磁
 盘写入块的大小，从而影响 IO 吞吐量。&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;retention.ms&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;file.delete.delay.ms&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;规定了该主题消息被保存的时常，默认是7天，即该主题只能保存7天的消息，该值可设定在topic级别，此时会覆盖broker端的全局参数&lt;/p&gt;
+&lt;p&gt;在从文件系统中删除一个文件前的等待时间&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;retention.bytes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;flush.messages&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;该值规定了要为该 Topic 预留多大的磁盘空间，默认为-1，该值通常情况用来设置topic的配额&lt;/p&gt;
+&lt;p&gt;该参数允许我们指定一个间隔来强制同步数据到本地磁盘，比如设置为1，表示每条消息后都会执行同步磁盘，如果设置为5表示，每5个消息同步一次。&lt;/p&gt;
+
+&lt;p&gt;一般情况下，管法定不建议修改该参数，可以使用副本机制来保证持久性和开启操作系统的后台flush功能，会更加有效率。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;flush.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;同上，但是指定的是时间间隔。比如设置1000，表示1000ms后执行一次同步操作.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;follower.replication.throttled.replicas&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;对日志复制的副本列表应该被在follow侧进行限流。&lt;/p&gt;
+
+&lt;p&gt;副本列表应该为&lt;code&gt;[PartitionId]:[BrokerId],[PartitionId]:[BrokerId]&lt;/code&gt;格式，或者使用通配符&lt;code&gt;*&lt;/code&gt;来表示给topic的所有副本进行限流。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;leader.replication.throttled.replicas&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;同上，在leader侧进行限流&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;index.interval.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数用来控制多久kafka会增加一个index实体数据到它的offset的index上。默认设置确保我们大约每4096字节索引一条消息。索引越多，读取越接近日志中的确切位置，但索引越大。通常不需要修改该参数。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;max.message.bytes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;被kafka允许的最大记录的batch size。&lt;/p&gt;
+
+&lt;p&gt;如果增加了该值，并且有消费者版本老于&lt;code&gt;0.10.2&lt;/code&gt;，消费者的&lt;code&gt;fetch size&lt;/code&gt;也必须增加，这样就能获取到该批次大小的数据。&lt;/p&gt;
+
+&lt;p&gt;在高版本的消息格式(message format)中，为了效率，记录总是会被分组成batch；而在之前的消息格式版本中，未被压缩的消息不会被分组成batch，在这种情况下，该参数仅在单条记录上生效。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;message.downconversion.enable&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;此配置用于控制是否启用消息格式的向下兼容以满足消费者请求。&lt;/p&gt;
+
+&lt;p&gt;当设置成&lt;code&gt;false&lt;/code&gt;，对于希望使用较旧消息格式的消费者来说，broker将不会执行向下转换。来自旧客户端的消费者请求，broker将会返回&lt;code&gt;UNSUPPORTED_VERSION&lt;/code&gt;错误码。&lt;/p&gt;
+
+&lt;p&gt;此配置不适用于可能需要复制到follower的消息格式转换。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;message.format.version&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定消息格式版本，broker将使用&lt;code&gt;append&lt;/code&gt;方式追加message到log里。该值必须是一个可用的ApiVersion，比如&lt;code&gt;0.8.2, 0.9.0.0, 0.10.0&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;通过设置特定的消息格式版本，用户可以验证已存在磁盘上的消息是否小于或者等于指定的版本。&lt;/p&gt;
+
+&lt;p&gt;错误地设置此值将导致使用较旧版本的使用者中断，因为他们将收到他们不理解的格式的消息。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;message.timestamp.difference.max.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker接收到消息的时间戳和在消息体内部的时间戳的最大时间差距。如果&lt;code&gt;message.timestamp.type=CreateTime&lt;/code&gt;，当时间戳的差值大于该值，一个message将被拒绝。如果&lt;code&gt;message.timestamp.type=LogAppendTime&lt;/code&gt;，该参数将被忽略。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;message.timestamp.type&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;指定message中时间戳的类型。&lt;code&gt;CreateTime&lt;/code&gt;或&lt;code&gt;LogAppendTime&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;min.cleanable.dirty.ratio&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;该参数用于控制，日志压缩器(log compactor)将尝试清除日志的频率。默认情况下，我们将避免清除已压缩超过50％的日志的日志。这个比率限制了最大空间浪费(日志中的重复,50%或50%以上的日志重复)。&lt;/p&gt;
+
+&lt;p&gt;比率越高，意味着越少，更有效的清理，但是也意味着更多的日志空间浪费。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;min.compaction.lag.ms&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;一条消息保持未压缩的最小时间。仅适用于正在压缩的日志。&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;h4 id=&#34;4-3-producer核心参数&#34;&gt;4.3 Producer核心参数&lt;/h4&gt;
 
