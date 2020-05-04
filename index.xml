@@ -22,6 +22,8 @@
 &lt;p&gt;前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。&lt;/p&gt;
 &lt;/blockquote&gt;
 
+&lt;p&gt;&lt;code&gt;要想kafka跑的好，如下几点要知晓。&lt;/code&gt;&lt;/p&gt;
+
 &lt;p&gt;&lt;strong&gt;Graceful shutdown&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;建议开启如下参数:&lt;/p&gt;
@@ -768,7 +770,7 @@ quota.consumer.default=10485760&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#operations&#34;&gt;kafka-operations&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
       
