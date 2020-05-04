@@ -6,10 +6,21 @@
     <description>Recent content in 运维 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 25 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka常用运维操作</title>
+      <link>https://bgbiao.top/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Mon, 04 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>kafka生产规划和运维</title>
