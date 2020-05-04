@@ -964,26 +964,384 @@ kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-she
 &lt;/div&gt;
 &lt;p&gt;这里主要介绍几个常用的工具脚本:&lt;/p&gt;
 
+&lt;p&gt;&lt;strong&gt;运维管理类&lt;/strong&gt;&lt;/p&gt;
+
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;kafka-configs.sh&lt;/code&gt;: 用来操作和查看topic, client, user or broker的实体配置&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;kafka-topics.sh&lt;/code&gt;: 用来创建，删除，查看，改变一个topic参数的工具&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;kafka-reassign-partitions.sh&lt;/code&gt;: 用来对partition进行重新分配(管理员会较多使用)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;kafka-log-dirs.sh&lt;/code&gt;: 用来查看指定broker下日志目录的使用空间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;kafka-leader-election.sh&lt;/code&gt;: 用于一组Topic分区的leader重新分配，可以支持优先副本和非同步副本(不在ISR中)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;kafka-replica-verification.sh&lt;/code&gt;: 该工具可以用来检查topic的一组副本的数据是否一致&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-broker-api-versions.sh&lt;/code&gt;: 用来查看指定broker当前支持的各个接口的版本(kafka高版本已经保证了向下兼容)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;kafka-configs.sh&lt;/code&gt;: 用来操作和查看topic, client, user or broker的实体配置&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;kafka操作类&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
 &lt;li&gt;&lt;code&gt;kafka-console-consumer.sh&lt;/code&gt;: 通过终端来启动消费者&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-console-producer.sh&lt;/code&gt;: 通过终端来启动生产者&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-consumer-groups.sh&lt;/code&gt;: 用来查看，删除或者重置消费者组offset&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-consumer-perf-test.sh&lt;/code&gt;: 用来进行消费者压力测试&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-producer-perf-test.sh&lt;/code&gt;: 用来进行生产者压力测试&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-delete-records.sh&lt;/code&gt;: 删除指定分区的记录，直到指定的offset&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;kafka-leader-election.sh&lt;/code&gt;: 用于一组Topic分区的leader重新分配，可以支持优先副本和非同步副本(不在ISR中)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;kafka-log-dirs.sh&lt;/code&gt;: 用来查看指定broker下日志目录的使用空间&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-mirror-maker.sh&lt;/code&gt;: 用于多集群之间同步topic数据&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;kafka-reassign-partitions.sh&lt;/code&gt;: 用来对partition进行重新分配(管理员会较多使用)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;kafka-replica-verification.sh&lt;/code&gt;: 该工具可以用来检查topic的一组副本的数据是否一致&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-server-start.sh&lt;/code&gt;: broker启动脚本&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-server-stop.sh&lt;/code&gt;: broker关闭脚本&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;kafka-streams-application-reset.sh&lt;/code&gt;: 流式应用工具&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;kafka-topics.sh&lt;/code&gt;: 用来创建，删除，查看，改变一个topic参数的工具&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;zookeeper-shell.sh&lt;/code&gt;: kafka工具中也默认提供了zookeeper管理工具(不太好用)&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h4 id=&#34;1-1-kafka-configs-sh&#34;&gt;1.1 kafka-configs.sh&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;topic创建&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--create&lt;/code&gt;: 创建topic&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--topic&lt;/code&gt;: 指定topic名称&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--partitions&lt;/code&gt;: 指定分区数量&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--replication-factor&lt;/code&gt;: 指定副本数量(仅在创建时可用)&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--config&lt;/code&gt;: 指定topic级别的参数(动态参数，可修改)&lt;/li&gt;
+
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;--replica-assignment&lt;/code&gt;: 手动指定partition到broker的分配&lt;part1_replica1:part1_replica2,part2_replica1:part2_replica2&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 创建topic
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --create --topic xxb
+Created topic xxb.
+
+# 查看默认创建topic的参数详情(由broker配置决定)
+# 默认3个分区，1个副本
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic xxb
+Topic: xxb	PartitionCount: 3	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
+	Topic: xxb	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: xxb	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
+	Topic: xxb	Partition: 2	Leader: 3	Replicas: 3	Isr: 3
+
+# 指定参数创建topic
+# 指定分区为5，副本为3，topic数据保留2分钟
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --create --topic xxb-1 --partitions 5 --replication-factor 3 --config retention.ms=120000
+
+# 分区，副本和指定参数都改变了
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic xxb-1
+Topic: xxb-1	PartitionCount: 5	ReplicationFactor: 3	Configs: min.insync.replicas=1,segment.bytes=1073741824,retention.ms=120000
+	Topic: xxb-1	Partition: 0	Leader: 2	Replicas: 2,3,1	Isr: 2,3,1
+	Topic: xxb-1	Partition: 1	Leader: 3	Replicas: 3,1,2	Isr: 3,1,2
+	Topic: xxb-1	Partition: 2	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3
+	Topic: xxb-1	Partition: 3	Leader: 2	Replicas: 2,1,3	Isr: 2,1,3
+	Topic: xxb-1	Partition: 4	Leader: 3	Replicas: 3,2,1	Isr: 3,2,1&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;topic更改&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; topic的分区(partitions)可以根据需要进行调整(只能调整大，不能调整小)，而且在调整分区的过程中，对于一个有&lt;code&gt;key&lt;/code&gt;的主题来说，一条消息的分区逻辑和顺序性可能会受到影响。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 副本数一旦topic创建之后，就不能再修改了，除非进行重分配(副本数不能超过broker数量哦)&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--alter&lt;/code&gt;: 修改分区数量，replica分配，或者topic的动态配置项(结合&amp;ndash;topic参数)&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--partitions&lt;/code&gt;: 修改指定Topic的分区数量&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--replica-assignment&lt;/code&gt;: 手动指定part到broker的分配&lt;a href=&#34;p1-r1:p1-r2,p2-r1:p2-r2&#34;&gt;p1-r1:p1-r2,p2-r1:p2-r2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--config&lt;/code&gt;: 修改topic的指定参数(动态参数调整:key=value)&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--delete-config&lt;/code&gt;: 删除topipc的指定参数()&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 通常情况下&lt;code&gt;--replica-assignment&lt;/code&gt;参数需要和&lt;code&gt;--partitions&lt;/code&gt;一同使用才可以指定分区下的副本到broker节点上的分配，相当于手动扩容迁移&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 上面我们刚开始创建的xxb的topic是1个分区1个副本，这里采用alter参数进行修改基本配置
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --alter  --topic xxb --replica-assignment 1,2,3,1,2 --partitions 5
+
+# 因为xxb 这个topic再创建时只有一个replication，因此--replica-assignment参数只能指定副本分配在那个broker上，无法指定多个副本的关系
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic xxb
+Topic: xxb	PartitionCount: 5	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
+	Topic: xxb	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: xxb	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
+	Topic: xxb	Partition: 2	Leader: 3	Replicas: 3	Isr: 3
+	Topic: xxb	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+	Topic: xxb	Partition: 4	Leader: 2	Replicas: 2	Isr: 2
+
+ &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;topic相关信息查看&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--list&lt;/code&gt;: 列出topic&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--describe&lt;/code&gt;: 查看topic详情信息&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--topic&lt;/code&gt;: 指定topic查看详情信息&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--exclude-internal&lt;/code&gt;: 排除内部topic(consumer_offset_topic)&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--unavailable-partitions&lt;/code&gt;: 仅显示leader不可用的分区(在集群异常时快速排查受影响的分区)&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--under-min-isr-partitions&lt;/code&gt;: 仅显示isr小于配置的min-isr-partitions的分区&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--under-replicated-partitions&lt;/code&gt;: 仅显示不同步的分区&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在低版本的kafka中使用&amp;ndash;zookeeper来链接集群，高版本中基本都通过&amp;ndash;bootstrap-server指定broker来连接集群&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 列出集群topic
+# --list参数列出可用的topic
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --list
+__consumer_offsets
+....
+....
+
+# 也可以使用--topic指定topic
+# 如果指定topic不存在，将返回空
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --list --topic __consumer_offsets
+__consumer_offsets
+
+# 列出topic详情信息
+# --describe参数(同时可以使用--topic指定topic查看)
+# --exclude-internal参数可以排除内部的topic(__consumer_offsets)
+# --unavailable-partitions参数可以列出leader不可用的topic，在集群故障时快速查看受影响的topic
+# 
+# 可以查看某个topic的分区和副本分布，以及topic级别的相关配置
+$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic __consumer_offsets
+Topic: __consumer_offsets	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,min.insync.replicas=1,cleanup.policy=compact,segment.bytes=104857600
+	Topic: __consumer_offsets	Partition: 0	Leader: 3	Replicas: 3	Isr: 3
+	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+....
+....
+
+# 查看集群leader不可用的分区
+# 可以发现leader都为-1，是因为副本和isr的id是4，而broker4其实已经光荣阵亡了
+$ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/log-kafka --describe --unavailable-partitions
+...
+	Topic: realtime_kafka.post_alg_real	Partition: 2	Leader: -1	Replicas: 4	Isr: 4
+	Topic: realtime_kafka.post_alg_real	Partition: 11	Leader: -1	Replicas: 4	Isr: 4
+	Topic: realtime_kafka.post_alg_real	Partition: 20	Leader: -1	Replicas: 4	Isr: 4
+	Topic: realtime_kafka.post_alg_real	Partition: 29	Leader: -1	Replicas: 4	Isr: 4
+	Topic: rm-bp1d3u2p9v3l4da7c632	Partition: 1	Leader: -1	Replicas: 4	Isr: 4
+	Topic: rm-bp1udb05091x11q5x	Partition: 1	Leader: -1	Replicas: 4	Isr: 4
+
+# 查看副本不同步的分区详情
+# 可以发现副本中有不同步的情况，是因为有副本所在的节点已经挂了，通常有一部分是因为资源或者网络原因未同步，还有就是如上述broker阵亡的情况
+# 如果说--unavailable-partitions可以直接查看到受影响的topic，那么--under-replicated-partitions就可以查看可用性受影响的topic，因为当副本为2时，此时broker4阵亡的前提下，topic下的分区是无法保证高可用的
+$ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/log-kafka --describe --under-replicated-partitions
+...
+...
+	Topic: androidregister	Partition: 1	Leader: 2	Replicas: 4,2	Isr: 2
+	Topic: eventjsonlog	Partition: 11	Leader: 2	Replicas: 4,2	Isr: 2
+	Topic: eventjsonlog	Partition: 27	Leader: 2	Replicas: 2,4	Isr: 2
+	Topic: eventjsonlog	Partition: 38	Leader: 13	Replicas: 13,4	Isr: 13
+	Topic: eventjsonlog	Partition: 44	Leader: 10	Replicas: 4,10	Isr: 10
+	Topic: eventjsonlog	Partition: 52	Leader: 12	Replicas: 12,4	Isr: 12
+	Topic: eventjsonlog	Partition: 59	Leader: 11	Replicas: 4,11	Isr: 11
+	Topic: eventlog	Partition: 8	Leader: 16	Replicas: 16,4	Isr: 16
+	Topic: eventlog	Partition: 23	Leader: 3	Replicas: 4,3	Isr: 3
+	Topic: eventlog	Partition: 38	Leader: 13	Replicas: 13,4	Isr: 13
+	Topic: eventlog	Partition: 44	Leader: 10	Replicas: 4,10	Isr: 10
+	Topic: eventlog	Partition: 52	Leader: 12	Replicas: 12,4	Isr: 12
+	Topic: eventlog	Partition: 59	Leader: 11	Replicas: 4,11	Isr: 11
+	Topic: pusheventlog	Partition: 9	Leader: 1	Replicas: 1,4	Isr: 1
+	Topic: pusheventlog	Partition: 12	Leader: 7	Replicas: 4,7	Isr: 7&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;删除&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--delete&lt;/code&gt;: 指定topic删除&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在删除Topic时会受&lt;code&gt;delete.topic.enable&lt;/code&gt;参数的影响，如果为true，则topic直接删除，如果为false，删除仅是标记删除，即在topic的config中增加一个删除标记，待broker重启后完全删除(也可通过zk中的数据删除)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --delete   --topic xxb&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;1-2-kafka-reassign-partitions-sh&#34;&gt;1.2 kafka-reassign-partitions.sh&lt;/h4&gt;
+
+&lt;p&gt;该脚本用于在副本之间移动topic的分区，也就是对副本进行重新分配，也是SRE在日常操作中会比较常用的脚本，需要注意的是，在做迁移时需要注意到当前集群的整体情况，毕竟在移动副本时，需要设计到新副本的数据同步，也会占用一定资源。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--broker-list&lt;/code&gt;: 指定分区需要重新分配到的broker节点，如果&lt;code&gt;--topics-to-move-json-file&lt;/code&gt;参数被指定用来生成重分配配置时，必须制定该参数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--topics-to-move-json-file&lt;/code&gt;: 生成一个移动指定topic的分区到指定broker(&lt;code&gt;--broker-list&lt;/code&gt;)的配置&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--generate&lt;/code&gt;: 生成候选分区分配的配置，该参数仅会生成候选的分配方案，不会进行执行&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--reassignment-json-file&lt;/code&gt;: 分区手动分配的配置参数，该参数可由&lt;code&gt;generate&lt;/code&gt;参数生成，通常一般会进行微调&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--replica-alter-log-dirs-throttle&lt;/code&gt;: 在相同的broker上日志目录之间的副本移动将被限流为该值bytes/sec，限流应该至少设置为1 KB/s，默认是-1表示不限制&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--throttle&lt;/code&gt;: broker之间的分区移动可以使用该值进行限流(bytes/sec)，同上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--execute&lt;/code&gt;: 通过指定&lt;code&gt;--reassignment-json-file&lt;/code&gt;参数来执行重新分配&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--verify&lt;/code&gt;: 如果一个重分配完成了，可以指定&lt;code&gt;--reassignment-json-file&lt;/code&gt;参数来查看重分配的进度&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;topics-to-move-json-file文件示例&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;{&amp;#34;topics&amp;#34;:
+[{&amp;#34;topic&amp;#34;: &amp;#34;foo&amp;#34;},{&amp;#34;topic&amp;#34;: &amp;#34;foo1&amp;#34;}],
+&amp;#34;version&amp;#34;:1
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;reassignment-json-file文件示例&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 注意:log_dirs是可选参数，需要指定绝对路径，也可以指定为any，当指定后需要和replicas的长度相等
+  {&amp;#34;partitions&amp;#34;:
+  	[{&amp;#34;topic&amp;#34;: &amp;#34;foo&amp;#34;,
+  	  &amp;#34;partition&amp;#34;: 1,
+  	  &amp;#34;replicas&amp;#34;: [1,2,3],
+  	  &amp;#34;log_dirs&amp;#34;: [&amp;#34;dir1&amp;#34;,&amp;#34;dir2&amp;#34;,&amp;#34;dir3&amp;#34;]
+    }],
+  &amp;#34;version&amp;#34;:1
+  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;1-3-kafka-log-dirs-sh&#34;&gt;1.3 kafka-log-dirs.sh&lt;/h4&gt;
+
+&lt;p&gt;该脚本参数用于查看kafka各个broker节点以及topic的磁盘使用率情况&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--describe&lt;/code&gt;: 查看topic和broker的磁盘使用情况&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--broker-list&lt;/code&gt;: 指定查看的broker列表&lt;/li&gt;
+
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;--topic-list&lt;/code&gt;: 指定需要查看的topic列表&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 当指定topic后会从全部的broker中进行查找
+$ sh /opt/app/kafka/bin/kafka-log-dirs.sh --bootstrap-server 172.29.203.62:9092 --describe --topic-list myapp-yum-log,myapp
+Querying brokers for log directories information
+Received log directory information from brokers 1,2,3
+{&amp;#34;version&amp;#34;:1,&amp;#34;brokers&amp;#34;:[{&amp;#34;broker&amp;#34;:1,&amp;#34;logDirs&amp;#34;:[{&amp;#34;logDir&amp;#34;:&amp;#34;/opt/data/kafka/kafka-logs&amp;#34;,&amp;#34;error&amp;#34;:null,&amp;#34;partitions&amp;#34;:[{&amp;#34;partition&amp;#34;:&amp;#34;myapp-yum-log-2&amp;#34;,&amp;#34;size&amp;#34;:13291235,&amp;#34;offsetLag&amp;#34;:0,&amp;#34;isFuture&amp;#34;:false},{&amp;#34;partition&amp;#34;:&amp;#34;myapp-0&amp;#34;,&amp;#34;size&amp;#34;:0,&amp;#34;offsetLag&amp;#34;:0,&amp;#34;isFuture&amp;#34;:false}]}]},{&amp;#34;broker&amp;#34;:2,&amp;#34;logDirs&amp;#34;:[{&amp;#34;logDir&amp;#34;:&amp;#34;/opt/data/kafka/kafka-logs&amp;#34;,&amp;#34;error&amp;#34;:null,&amp;#34;partitions&amp;#34;:[{&amp;#34;partition&amp;#34;:&amp;#34;myapp-1&amp;#34;,&amp;#34;size&amp;#34;:0,&amp;#34;offsetLag&amp;#34;:0,&amp;#34;isFuture&amp;#34;:false},{&amp;#34;partition&amp;#34;:&amp;#34;myapp-yum-log-0&amp;#34;,&amp;#34;size&amp;#34;:13258726,&amp;#34;offsetLag&amp;#34;:0,&amp;#34;isFuture&amp;#34;:false}]}]},{&amp;#34;broker&amp;#34;:3,&amp;#34;logDirs&amp;#34;:[{&amp;#34;logDir&amp;#34;:&amp;#34;/opt/data/kafka/kafka-logs&amp;#34;,&amp;#34;error&amp;#34;:null,&amp;#34;partitions&amp;#34;:[{&amp;#34;partition&amp;#34;:&amp;#34;myapp-2&amp;#34;,&amp;#34;size&amp;#34;:0,&amp;#34;offsetLag&amp;#34;:0,&amp;#34;isFuture&amp;#34;:false},{&amp;#34;partition&amp;#34;:&amp;#34;myapp-yum-log-1&amp;#34;,&amp;#34;size&amp;#34;:13264869,&amp;#34;offsetLag&amp;#34;:0,&amp;#34;isFuture&amp;#34;:false}]}]}]}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;结果是json串，可以看到&lt;code&gt;myapp-yum-log-2&lt;/code&gt;在broker-1上占用了&lt;code&gt;13291235&lt;/code&gt;字节，也就是&lt;code&gt;12M&lt;/code&gt;.&lt;/p&gt;
 
 &lt;h3 id=&#34;2-kafka-manager&#34;&gt;2. kafka-manager&lt;/h3&gt;
 
