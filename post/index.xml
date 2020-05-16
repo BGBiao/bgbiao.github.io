@@ -6,10 +6,25 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 16 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka如何合理规划分区数量</title>
+      <link>https://bgbiao.top/post/kafka%E5%A6%82%E4%BD%95%E5%90%88%E7%90%86%E8%A7%84%E5%88%92%E5%88%86%E5%8C%BA%E6%95%B0%E9%87%8F/</link>
+      <pubDate>Sat, 16 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E5%A6%82%E4%BD%95%E5%90%88%E7%90%86%E8%A7%84%E5%88%92%E5%88%86%E5%8C%BA%E6%95%B0%E9%87%8F/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。&lt;/p&gt;
+
+&lt;p&gt;以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>kafka常用运维操作</title>
@@ -217,15 +232,6 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;背景: 作为企业里唯一熟悉各种云产品的工种，通常需要和各种云产品打交道。当前，我们大部分的云基础设施和云服务都运行在阿里云上，而每个云产品都有独立的管理系统，这使得我们在运维过程中经常无法将相关产品和关联信息有效的组织在一起，来进行快速的问题诊断和信息查询，这对于运维和开发同学来说，在多个系统之间来回跳转查找关联信息是一个低效且极易出错的事务，因此通常来讲，不论是作为运维和开发，我们都希望将企业关联的云资源和服务进行整合关联，以实现效率的最大化。而在这过程中，我们采用Kubernetes集群的CronJob来定期获取阿里云的一些资源，在这过程中，遇到一些问题，根据问题重新细读CronJob官方文档，特记录于此。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>软件工程师们必须了解的画图工具</title>
-      <link>https://bgbiao.top/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</link>
-      <pubDate>Mon, 16 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</guid>
-      <description>作为一名在IT行业摸爬滚打多年的少年，选择一款适手的画图工具可以说是爽到不行。记得学生时代，鉴于条件的限制，都只能选择Visio进行绘制流程</description>
     </item>
     
   </channel>

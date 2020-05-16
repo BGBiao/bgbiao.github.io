@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>BGBiao的SRE人生</title>
+  <title>kafka如何合理规划分区数量 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="BGBiao的SRE人生." />
+  <meta name="description" content=" 背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。
+ 对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。
+以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。
+" />
+
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
@@ -34,8 +38,8 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.top/" />
-<link href="/index.xml" rel="alternate" type="application/rss+xml" title="BGBiao的SRE人生" />
+<link rel="canonical" href="https://bgbiao.top/post/kafka%E5%A6%82%E4%BD%95%E5%90%88%E7%90%86%E8%A7%84%E5%88%92%E5%88%86%E5%8C%BA%E6%95%B0%E9%87%8F/" />
+
 
 
 
@@ -60,18 +64,44 @@
 <link rel="stylesheet" href="/css/custom.css">
 
 
-<meta property="og:title" content="BGBiao的SRE人生" />
-<meta property="og:description" content="BGBiao的SRE人生." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://bgbiao.top/" />
+<meta property="og:title" content="kafka如何合理规划分区数量" />
+<meta property="og:description" content="
+背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。
 
-<meta property="og:updated_time" content="2020-05-16T00:00:00+00:00" />
-<meta itemprop="name" content="BGBiao的SRE人生">
-<meta itemprop="description" content="BGBiao的SRE人生.">
 
+对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。
+
+以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/kafka%E5%A6%82%E4%BD%95%E5%90%88%E7%90%86%E8%A7%84%E5%88%92%E5%88%86%E5%8C%BA%E6%95%B0%E9%87%8F/" />
+<meta property="article:published_time" content="2020-05-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-16T00:00:00+00:00" />
+<meta itemprop="name" content="kafka如何合理规划分区数量">
+<meta itemprop="description" content="
+背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。
+
+
+对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。
+
+以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。">
+
+
+<meta itemprop="datePublished" content="2020-05-16T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-05-16T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3397">
+
+
+
+<meta itemprop="keywords" content="kafka,运维," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="BGBiao的SRE人生"/>
-<meta name="twitter:description" content="BGBiao的SRE人生."/>
+<meta name="twitter:title" content="kafka如何合理规划分区数量"/>
+<meta name="twitter:description" content="
+背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。
+
+
+对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。
+
+以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -318,7 +348,7 @@ if (!doNotTrack) {
   <ul id="menu" class="menu">
     
     
-        <li class="menu-item active">
+        <li class="menu-item">
         
           
           
@@ -445,48 +475,57 @@ if (!doNotTrack) {
     <main id="main" class="main bg-llight">
       <div class="content-wrapper">
         <div id="content" class="content container">
-          
-<section id="posts" class="posts">
-  
-  
+          <article class="post bg-white">
     
-  
-  
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
+    <header class="post-header">
+      <h1 class="post-title">kafka如何合理规划分区数量</h1>
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+      <div class="post-meta">
+        <time datetime="2020-05-16" class="post-time">
+          2020-05-16
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 3397 words </span>
+          <span class="more-meta"> 7 min read </span>
 
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E5%A6%82%E4%BD%95%E5%90%88%E7%90%86%E8%A7%84%E5%88%92%E5%88%86%E5%8C%BA%E6%95%B0%E9%87%8F/">kafka如何合理规划分区数量</a>
-    </h1>
+        
+        
+
+        
+        
+      </div>
+    </header>
+
     
-    <div class="post-meta">
-      <time datetime="2020-05-16" class="post-time">
-        2020-05-16
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 3397 words </span>
-      <span class="more-meta"> 7 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
     
-    <div class="post-summary">
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#目录">目录</a></li>
+<li><a href="#多分区可以提高吞吐-higher-throughput">多分区可以提高吞吐(Higher Throughput)</a></li>
+<li><a href="#需要更多的open-file-handles">需要更多的Open File Handles</a></li>
+<li><a href="#多分区可能增加整体不可用性">多分区可能增加整体不可用性</a></li>
+<li><a href="#可能增加端到端的延迟-end-to-end-latency">可能增加端到端的延迟(End-to-end Latency)</a></li>
+<li><a href="#更多的分区可能在客户端需要更多的内存">更多的分区可能在客户端需要更多的内存</a></li>
+<li><a href="#总结">总结</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
       <blockquote>
 <p>背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。</p>
 </blockquote>
@@ -494,771 +533,219 @@ if (!doNotTrack) {
 <p>对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。</p>
 
 <p>以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E5%A6%82%E4%BD%95%E5%90%88%E7%90%86%E8%A7%84%E5%88%92%E5%88%86%E5%8C%BA%E6%95%B0%E9%87%8F/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
+<h3 id="目录">目录</h3>
+
+<p>[TOC]</p>
+
+<h3 id="多分区可以提高吞吐-higher-throughput">多分区可以提高吞吐(Higher Throughput)</h3>
+
+<p>首先，我们需要理解的是，在kafka集群中，topic分区<code>partition</code>是一个并行单位。</p>
+
+<p>在生产者和broker端，可以完全并行完成对不同分区的写入操作。一些昂贵的操作，比如压缩(compression)，需要消耗更多的硬件资源。</p>
+
+<p>在消费者端，kafka总是会给每个消费者线程一个单分区的数据，因此当分区的数量其实也就限制了消费者线程的最大数据量，如果消费者不足以在最短时间消费数据，可以通过优化客户端程序或增加partition数量的方式(同时增加消费者线程)来缓解，但后者需要topic级别的调整，同时需要确认生产者是否有分区绑定相关操作。</p>
+
+<p>因此，一般而言，kafka集群的拥有越多的分区也意味着可以获取更高的吞吐。</p>
+
+<p>选择分区的数量一般可用基于吞吐来进行简单计算。</p>
+
+<p>您可以在单个分区上对生产(称为p)和消费(称为c)所能实现的所有性能进行度量。假如我们的目标吞吐是<code>t</code>，然后我们可以设置分区数量为<code>max(t/p, t/c)</code>。</p>
+
+<p>在生产者端，可以通过设置<code>batch size</code>,<code>compression</code>,<code>ack</code>,<code>replication factor</code>等参数来计算单个分区的吞吐。
+不过如<a href="https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines">LinkedIn-Benchmarking</a>中显示，通常单个分区可以承载每秒10 Million调数据的写入。</p>
+
+<p>在消费者端吞吐量通常依赖于应用程序，因为它对应于使用者逻辑处理每个消息的速度，因此得实际进行测量。</p>
+
+<p>尽管在topic创建后期，可以根据需求进行扩容分区，但是对于有<code>keys</code>的消息需要注意。</p>
+
+<p>因为当生产者写入一个带<code>key</code>的消息后，kafka将依据该<code>key</code>的hash来决定数据映射到具体的分区，这样就可以保证具有相同<code>key</code>的消息会被路由到同一个分区，从而保证了一类消息的有序性。</p>
+
+<p>如果此时分区数量突然增加，将可能导致数据的无序性，为了避免未来这种问题的出现，一般而言会在业务接入初期进行分区的过度分配<code>over-partition</code>，即在topic创建时尽量多创建一些，但基本上在接入之前需要预估未来的吞吐量以确定一个合理的分区数量，这样即使当前集群规模较小，可以对topic进行提前规划，待后期集群规模大之后进行迁移即可，否则刚开始因为集群规模小，而对分区数量没有合理规划，后期会比较麻烦，而且这样当生产者使用带<code>key</code>的消息时，您可以跟上吞吐量的增长，而不会破坏应用程序中的语义。</p>
+
+<p>除了吞吐量之外，在规划分区数时还需要考虑一些其他的因素，因为在吞吐增加的同时可能会增加一些其他影响。</p>
+
+<h3 id="需要更多的open-file-handles">需要更多的Open File Handles</h3>
+
+<p>每个分区会映射到broker机器的其中一个目录，在每个日志目录每个日志段(segment)包含四个文件:</p>
+
+<ul>
+<li>00000000000029487197.index: 索引文件</li>
+<li>00000000000029487197.log: 真正的日志文件</li>
+<li>00000000000029487197.snapshot: 快照</li>
+<li>00000000000029487197.timeindex: 时间索引</li>
+</ul>
+
+<p>在kafka中，broker会为每个segment打开一个file handle ，不过这仅是一个配置问题，通常在生产集群可以配置OS层面的打开文件数为<code>30 thousand</code></p>
+
+<h3 id="多分区可能增加整体不可用性">多分区可能增加整体不可用性</h3>
+
+<p>整体可用性的降低是因为在异常时有更多的分区需要进行恢复数据，此时多分区之间的数据同步可能在网络上需要消耗。</p>
+
+<p>kafka集群内部的副本机制，可以提供比较高的可用性和持久性。一个分区如果有多个副本，每个副本将会存储到不同的broker上，副本被设计为leader和follow副本。</p>
+
+<p>在内部，Kafka自动管理所有这些副本，并确保它们保持同步，生产者和消费者对分区的请求都将由leader副本来响应，当broker宕机后，该节点上的leader副本将暂时不可用，kafka内部的controller角色将自动将分区的leader副本切换到其他满足条件的副本上，以尽快提供读写请求(是否能尽快切换到其他副本上取决于数据的一致性和可靠性要求)。</p>
+
+<p><code>注意:</code>leader副本的切换动作会涉及到controller从zookeeper中去获取对应分区的相关副本元数据，在controller内部，操作zookeeper是串行的。</p>
+
+<p>在通常情况下，当一个Broker被优雅地关闭时，控制器会主动地将leader从关闭的代理中移开，每次只关闭一个，一个leader的切换通常仅会需要消耗几毫秒，因此，对于客户端而言，当使用优雅重启时，仅有一个很小的不可用窗口。</p>
+
+<p>然而，当broker被异常关闭时(<code>kill -9</code>)，观测到的不可用性可能与分区的数量成正比。假设每个broker共2000个分区，每个分区共2个副本，基本每个broker将负责1000个分区，当该broker异常关闭时，所有1000个分区将在同一时间不可用。假设为单个分区选主的时间需要消耗5ms，选举1000个分区将消耗5s。</p>
+
+<p>因此，对于某些分区，其观察到的不可用性可能是5秒加上检测故障所需的时间。</p>
+
+<p>如果不行的是，异常关闭的broker节点刚好是controller角色，在这种情况下，分区选leader的操作将不会立即进行，知道controller本身转移到正常的broker节点上。</p>
+
+<p>controller控制器自动发生故障转移，但需要新控制器在初始化期间从ZooKeeper读取每个分区的一些元数据。</p>
+
+<p>例如，如果Kafka集群中有10,000个分区，并且每个分区初始化来自ZooKeeper的元数据需要2 ms时间，这可能会给不可用窗口增加20秒。</p>
+
+<p>一般来说，异常的关闭是罕见的。但是，如果关心在这些罕见情况下的可用性，那么最好将每个Broker的分区数量限制在<code>2到4000</code>个，集群中的分区总数限制在数万个以内。</p>
+
+<h3 id="可能增加端到端的延迟-end-to-end-latency">可能增加端到端的延迟(End-to-end Latency)</h3>
+
+<p>Kafka中的端到端延迟是由<code>生产者发布消息到消费者读取消息</code>的时间定义的。</p>
+
+<p>Kafka只在<code>提交消息之后</code>才向使用者公开消息(commited log)，即当消息被复制到所有同步副本时。因此，提交消息的时间可能是端到端延迟的重要部分。</p>
+
+<p>默认情况下，Kafka的broker节点仅使用一个线程来复制来自另一个Broker的数据，用于在两个Broker之间共享副本的所有分区。(可以设置适当大参数来调整同步线程数)</p>
+
+<p>实验表明，将1000个分区从一个Broker复制到另一个Broker可以增加大约20 ms延迟，这意味着端到端延迟至少是20 ms，这对于某些实时计算类的应用来说，整体的延迟其实有点高，当然如果整个集群比较大时，分区分布在不同的broker上，该问题可以适当缓解(其余的broker可以从这一个broker上平均fetch消息)</p>
+
+<p>因此，由于提交消息而增加的延迟将只有几ms，而不是几十ms。</p>
+
+<p>如果关系延迟指标，可以参照如下方式来计算分区:</p>
+
+<p>将每个Broker的分区数量限制在<code>100 * b * r</code>可能是一个好主意，其中b是Kafka集群中的Broker数量，r是复制因子。</p>
+
+<h3 id="更多的分区可能在客户端需要更多的内存">更多的分区可能在客户端需要更多的内存</h3>
+
+<p>在客户端在内部，生产者缓冲每个分区的消息。在积累了足够的数据或经过了足够的时间之后，将从缓冲区中删除累积的消息并将其发送给Broker。</p>
+
+<p>如果增加分区的数量，消息将在客户端区域中的更多分区中累积。所使用的内存总量现在可能超过了配置的内存限制。</p>
+
+<p>当发生这种情况时，生产者必须阻止或删除任何新消息，这两种方法都不理想。为了防止这种情况发生，需要重新配置生成器，使其具有更大的内存大小。</p>
+
+<p>根据经验，要获得良好的吞吐量，应该为生产者中生成的每个分区分配至少几十KB的内存，如果分区数量显著增加，还应该调整内存总量。</p>
+
+<p>消费者也存在类似的问题。消费者为每个分区获取一批消息。消费者使用的分区越多，所需的内存就越多。然而，这通常只是一个针对非实时用户的问题。</p>
+
+<h3 id="总结">总结</h3>
+
+<p>通常，Kafka集群中的分区越多，吞吐量就越高。但是，必须意识到总分区或每个Broker拥有太多分区对可用性和延迟等方面的潜在影响，通常这部分需要业务方和基础服务方进行合理规划和调整。</p>
+
+<p><strong>相关文档</strong></p>
+
+<ul>
+<li><a href="https://www.confluent.io/blog/apache-kafka-supports-200k-partitions-per-cluster/">kafka-supports-200k-partitions-per-cluster</a></li>
+<li><a href="https://www.confluent.io/blog/how-choose-number-topics-partitions-kafka-cluster/">kafka-topic-partition-numbers</a></li>
+</ul>
+
+<hr />
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-05-16
+      
+    </span>
+  </p>
   
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
 
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/">kafka常用运维操作</a>
-    </h1>
+
     
-    <div class="post-meta">
-      <time datetime="2020-05-04" class="post-time">
-        2020-05-04
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/kafka/">kafka</a>
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
           
         </div>
-      <span class="more-meta"> 5203 words </span>
-      <span class="more-meta"> 11 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/">
+            <span class="next-text nav-default">kafka常用运维操作</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
 </svg>
 
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/">kafka生产规划和运维</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-04-25" class="post-time">
-        2020-04-25
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 21823 words </span>
-      <span class="more-meta"> 44 min read </span>
-      
-      
-      
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
     </div>
-  </header>
   
-  <div class="post-content">
+
+  
+
+  
+
+  
+
     
-    <div class="post-summary">
-      <blockquote>
-<p>前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有<code>Redis集群</code>，<code>ElasticSearch</code>集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。</p>
-</blockquote>
-
-<p>笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为<code>日志收集</code>、<code>数据管道</code>、<code>流式计算</code>、<code>业务事件存储</code>几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的<code>可用性</code>，<code>可靠性</code>，<code>数据一致性</code>要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。</p>
-
-<p>鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
   
-</section>
-
-
-
-
-
-
-  
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-    <nav class="pagination">
-      <ul>
-
-      
-      
-
-      
-      
-
-      
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="active">
-            <a href="/">
-              1
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/2/">
-              2
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/3/">
-              3
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/4/">
-              4
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/5/">
-              5
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/6/">
-              6
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/7/">
-              7
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/8/">
-              8
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/9/">
-              9
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/10/">
-              10
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/11/">
-              11
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/12/">
-              12
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/13/">
-              13
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-      
-      
-      <li><a href="/page/2/">»</a></li>
-      
-
-      
-      
-      <li><a href="/page/21/">»»</a></li>
-      
-
-      </ul>
-    </nav>
-  
-
-
-
-
 
         </div>
       </div>
