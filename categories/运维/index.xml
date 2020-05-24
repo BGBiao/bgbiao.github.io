@@ -17,7 +17,11 @@
       <pubDate>Sat, 23 May 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/kafka%E7%AB%AF%E5%88%B0%E7%AB%AF%E7%9A%84%E5%BB%B6%E8%BF%9F/</guid>
-      <description>前言: 在大规模的使用kafka过程中，我们通常会遇到各种各样的问题，比如说，通常会有一些大数据集群中的Job发现总有几个task会比较慢，导</description>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 在大规模的使用kafka过程中，我们通常会遇到各种各样的问题，比如说，通常会有一些大数据集群中的Job发现总有几个task会比较慢，导致整体的任务迟迟不能完成运行，这种情况通常问题会比较复杂，想要知道具体延迟在哪里，我们需要知道在Kafka集群中哪些点可能会增加端到端的延迟。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;接下来的内容翻译自&lt;code&gt;confluent&lt;/code&gt;官网博客中的一篇文章，希望能够帮助大家理解kafka使用过程中端到端的延迟。&lt;a href=&#34;https://www.confluent.io/blog/configure-kafka-to-minimize-latency/&#34;&gt;99th Percentile Latency at Scale with Apache Kafka&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
     <item>

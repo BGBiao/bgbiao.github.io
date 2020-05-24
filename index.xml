@@ -18,9 +18,7 @@
       
       <guid>https://bgbiao.top/post/kafka%E7%AB%AF%E5%88%B0%E7%AB%AF%E7%9A%84%E5%BB%B6%E8%BF%9F/</guid>
       
-        <description>
-
-&lt;blockquote&gt;
+        <description>&lt;blockquote&gt;
 &lt;p&gt;前言: 在大规模的使用kafka过程中，我们通常会遇到各种各样的问题，比如说，通常会有一些大数据集群中的Job发现总有几个task会比较慢，导致整体的任务迟迟不能完成运行，这种情况通常问题会比较复杂，想要知道具体延迟在哪里，我们需要知道在Kafka集群中哪些点可能会增加端到端的延迟。&lt;/p&gt;
 &lt;/blockquote&gt;
 
@@ -373,8 +371,7 @@
 
 &lt;hr /&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
-</description>
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
       
     </item>
     
