@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-05-23T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-05-27T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,53 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/">CronJob控制器中的一些绕坑指南</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2019-12-29" class="post-time">
+        2019-12-29
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+          
+        </div>
+      <span class="more-meta"> 2722 words </span>
+      <span class="more-meta"> 6 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <blockquote>
+<p>背景: 作为企业里唯一熟悉各种云产品的工种，通常需要和各种云产品打交道。当前，我们大部分的云基础设施和云服务都运行在阿里云上，而每个云产品都有独立的管理系统，这使得我们在运维过程中经常无法将相关产品和关联信息有效的组织在一起，来进行快速的问题诊断和信息查询，这对于运维和开发同学来说，在多个系统之间来回跳转查找关联信息是一个低效且极易出错的事务，因此通常来讲，不论是作为运维和开发，我们都希望将企业关联的云资源和服务进行整合关联，以实现效率的最大化。而在这过程中，我们采用Kubernetes集群的CronJob来定期获取阿里云的一些资源，在这过程中，遇到一些问题，根据问题重新细读CronJob官方文档，特记录于此。</p>
+</blockquote>
+    </div>
+    <div class="read-more">
+      <a href="/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/">软件工程师们必须了解的画图工具</a>
     </h1>
     
@@ -540,52 +587,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/">Linux下快速构建Android编译环境</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-12-11" class="post-time">
-        2019-12-11
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 3226 words </span>
-      <span class="more-meta"> 7 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>背景: 在移动互联网时代，大多数的企业内部都有移动客户端，而移动客户端又因为OS的不同产生了两个派系，即<code>安卓(Android)</code>和<code>苹果(IOS)</code>，而对于互联网技术从业者来说，这两者最直接的区别就是<code>开源</code>和<code>闭源</code>，因而也导致了在构建移动客户端时，为了整体的稳定性和可靠性的考虑(甚至有成本的考虑)，需要进行分别编译，本篇文章记录下如何在Linux环境下构建<code>Android</code>编译环境.</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/" class="read-more-link">Read more</a>
     </div>
     
   </div>

@@ -6,10 +6,19 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 23 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 27 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ElasticSearch架构解析与最佳实践</title>
+      <link>https://bgbiao.top/post/elasticsearch%E6%9E%B6%E6%9E%84%E8%A7%A3%E6%9E%90%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Wed, 27 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/elasticsearch%E6%9E%B6%E6%9E%84%E8%A7%A3%E6%9E%90%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>kafka端到端的延迟</title>
@@ -225,15 +234,6 @@
       
       <guid>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/</guid>
       <description>大胡子是我特别佩服的一位老师，第一次知道他是17年偶尔一次线上讲座，具体题目忘记了，内容大概是关于&amp;rdquo;技术人如何赚钱&amp;rdquo;</description>
-    </item>
-    
-    <item>
-      <title>2019年总结之财务投资</title>
-      <link>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E8%B4%A2%E5%8A%A1%E6%8A%95%E8%B5%84/</link>
-      <pubDate>Mon, 30 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E8%B4%A2%E5%8A%A1%E6%8A%95%E8%B5%84/</guid>
-      <description>18年的时候，我在个人公众号BGBiao上写了一篇关于如何&amp;rdquo;选鸡&amp;rdquo;的文章，大概介绍下了作为一名不了解投资和没有投资经</description>
     </item>
     
   </channel>

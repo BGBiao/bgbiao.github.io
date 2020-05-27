@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-05-23T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-05-27T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,52 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/k8s-dashboard-http/">k8s dashboard的http接口改造</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2019-09-18" class="post-time">
+        2019-09-18
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+          
+        </div>
+      <span class="more-meta"> 1733 words </span>
+      <span class="more-meta"> 4 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <blockquote>
+<p>背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件<a href="https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/">dashboard</a>,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了<code>https</code>并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).</p>
+</blockquote>
+    </div>
+    <div class="read-more">
+      <a href="/post/k8s-dashboard-http/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/">Golang的ElasticSearch6的SDK问题处理</a>
     </h1>
     
@@ -552,67 +598,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/golang-expect/">Golang中的异常处理</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-03-06" class="post-time">
-        2019-03-06
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
-          
-        </div>
-      <span class="more-meta"> 1870 words </span>
-      <span class="more-meta"> 4 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <h2 id="golang的异常处理和单元测试">Golang的异常处理和单元测试</h2>
-
-<ul>
-<li>1.Golang语言中没有其他语言中的<code>try...catch...</code>语句来捕获异常和异常恢复</li>
-<li>2.在Golang中我们通常会使用<code>panic</code>关键字来抛出异常，在<code>defer</code>中使用<code>recover</code>来捕获异常进行具体逻辑处理</li>
-<li>3.Golang中我们通常会在函数或方法中返回<code>error</code>结构对象来判断是否有异常出现</li>
-</ul>
-
-<p><code>注意事项</code></p>
-
-<ul>
-<li>1.利用<code>recover</code>和<code>panic</code>指令，<code>defer</code>必须放在panic之前定义(<code>panic会终止其后要执行的代码</code>).</li>
-<li>2.<code>recover</code>只有在<code>defer</code>调用的函数中才有效，否则<code>recover</code>无法捕获到<code>panic</code>.</li>
-<li>3.<code>recover</code>处理异常后，业务逻辑会跑到<code>defer</code>之后的处理片段中</li>
-<li>4.多个<code>defer</code>会形成<code>defer栈</code></li>
-<li>5.panic会等到整个<code>goroutine</code>退出才会报告错误</li>
-</ul>
-    </div>
-    <div class="read-more">
-      <a href="/post/golang-expect/" class="read-more-link">Read more</a>
     </div>
     
   </div>

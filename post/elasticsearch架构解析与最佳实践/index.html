@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>BGBiao的SRE人生</title>
+  <title>ElasticSearch架构解析与最佳实践 - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="BGBiao的SRE人生." />
+  <meta name="description" content="" />
+
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
 
@@ -34,8 +35,8 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.top/" />
-<link href="/index.xml" rel="alternate" type="application/rss+xml" title="BGBiao的SRE人生" />
+<link rel="canonical" href="https://bgbiao.top/post/elasticsearch%E6%9E%B6%E6%9E%84%E8%A7%A3%E6%9E%90%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" />
+
 
 
 
@@ -60,18 +61,26 @@
 <link rel="stylesheet" href="/css/custom.css">
 
 
-<meta property="og:title" content="BGBiao的SRE人生" />
-<meta property="og:description" content="BGBiao的SRE人生." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://bgbiao.top/" />
+<meta property="og:title" content="ElasticSearch架构解析与最佳实践" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/elasticsearch%E6%9E%B6%E6%9E%84%E8%A7%A3%E6%9E%90%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" />
+<meta property="article:published_time" content="2020-05-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-27T00:00:00+00:00" />
+<meta itemprop="name" content="ElasticSearch架构解析与最佳实践">
+<meta itemprop="description" content="">
 
-<meta property="og:updated_time" content="2020-05-27T00:00:00+00:00" />
-<meta itemprop="name" content="BGBiao的SRE人生">
-<meta itemprop="description" content="BGBiao的SRE人生.">
 
+<meta itemprop="datePublished" content="2020-05-27T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-05-27T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="0">
+
+
+
+<meta itemprop="keywords" content="运维,ElasticSearch,Kibana," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="BGBiao的SRE人生"/>
-<meta name="twitter:description" content="BGBiao的SRE人生."/>
+<meta name="twitter:title" content="ElasticSearch架构解析与最佳实践"/>
+<meta name="twitter:description" content=""/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -318,7 +327,7 @@ if (!doNotTrack) {
   <ul id="menu" class="menu">
     
     
-        <li class="menu-item active">
+        <li class="menu-item">
         
           
           
@@ -445,818 +454,222 @@ if (!doNotTrack) {
     <main id="main" class="main bg-llight">
       <div class="content-wrapper">
         <div id="content" class="content container">
-          
-<section id="posts" class="posts">
-  
-  
+          <article class="post bg-white">
     
-  
-  
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
+    <header class="post-header">
+      <h1 class="post-title">ElasticSearch架构解析与最佳实践</h1>
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+      <div class="post-meta">
+        <time datetime="2020-05-27" class="post-time">
+          2020-05-27
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 0 words </span>
+          <span class="more-meta"> 0 min read </span>
 
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/">kafka常用运维操作</a>
-    </h1>
+        
+        
+
+        
+        
+      </div>
+    </header>
+
     
-    <div class="post-meta">
-      <time datetime="2020-05-04" class="post-time">
-        2020-05-04
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 5203 words </span>
-      <span class="more-meta"> 11 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
     
-    <div class="post-summary">
-      <blockquote>
-<p>前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/" class="read-more-link">Read more</a>
-    </div>
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
     
   </div>
-</article>
+</div>
 
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/">kafka生产规划和运维</a>
-    </h1>
     
-    <div class="post-meta">
-      <time datetime="2020-04-25" class="post-time">
-        2020-04-25
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+    <div class="post-content">
+      <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6talv0b0j30u00gwgmv.jpg" alt="目录" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6taz9e6mj30u00gwgn1.jpg" alt="应用概述-1" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tbcoytlj30u00gw0v2.jpg" alt="应用概述-2" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tc1k3flj30u00gwdih.jpg" alt="应用概述-3" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tcd3b6zj30u00gw416.jpg" alt="应用概述-4" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tcptmk3j30u00gwju7.jpg" alt="Lucene内核原理-1" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tdh8oo9j30u00gwq5d.jpg" alt="Lucene内核原理-2" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tdtnjioj30u00gwq67.jpg" alt="Lucene内核原理-3" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6te64te2j30u00gw76q.jpg" alt="Lucene内核原理-4" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tegzbfej30u00gwgnr.jpg" alt="Lucene内核原理-5" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tesbdjrj30u00gwq4l.jpg" alt="Lucene内核原理-6" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tf62pxfj30u00gwmzk.jpg" alt="Lucene内核原理-7" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tfo8dnyj30u00gwdit.jpg" alt="ElasticSearch架构解析" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tg98nsrj30u00gwwgz.jpg" alt="ElasticSearch架构解析-1" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tgl8k6aj30u00gw41m.jpg" alt="ElasticSearch架构解析-2" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tgy5lhqj30u00gwtbh.jpg" alt="ElasticSearch架构解析-3" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6th9bynxj30u00gwgoi.jpg" alt="ElasticSearch架构解析-4" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6thjuhgtj30u00gwwgb.jpg" alt="ElasticSearch架构解析-5" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6thyvb72j30u00gwwgy.jpg" alt="ElasticSearch架构解析-6" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tiaoksoj30u00gwq57.jpg" alt="最佳实践-1" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tinieeyj30u00gwq51.jpg" alt="最佳实践-2" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tiy8yc4j30u00gw40r.jpg" alt="最佳实践-3" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tj6kki5j30u00gwmz3.jpg" alt="最佳实践-4" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tjflhouj30u00gwmzs.jpg" alt="最佳实践-5" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tjrhom9j30u00gw414.jpg" alt="最佳实践-6" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tk30ujjj30u00gwwgd.jpg" alt="最佳实践-7" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tkez1t6j30u00gwacw.jpg" alt="最佳实践-8" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tksdke2j30u00gwgmw.jpg" alt="性能调优-1" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tl2qkemj30u00gw76f.jpg" alt="性能调优-2" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tlejqftj30u00gwjtk.jpg" alt="性能调优-3" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tlpduy6j30u00gw0ut.jpg" alt="性能调优-4" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tlz6ifvj30u00gwmzi.jpg" alt="性能调优-5" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tm9ln5dj30u00gw410.jpg" alt="性能调优-6" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tmjx424j30u00gwmyd.jpg" alt="性能调优-7" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tmta1rxj30u00gwacb.jpg" alt="性能调优-8" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tn4mub6j30u00gw76f.jpg" alt="性能调优-9" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tni8rnxj30u00gw410.jpg" alt="性能调优-10" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6tnset4mj30u00gwacc.jpg" alt="性能调优-11" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gf6to3orh5j30u00gwmxu.jpg" alt="性能调优-12" /></p>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-05-27
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/elasticsearch/">ElasticSearch</a>
+          <a href="https://bgbiao.top/tags/kibana/">Kibana</a>
           
         </div>
-      <span class="more-meta"> 21823 words </span>
-      <span class="more-meta"> 44 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有<code>Redis集群</code>，<code>ElasticSearch</code>集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。</p>
-</blockquote>
 
-<p>笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为<code>日志收集</code>、<code>数据管道</code>、<code>流式计算</code>、<code>业务事件存储</code>几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的<code>可用性</code>，<code>可靠性</code>，<code>数据一致性</code>要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。</p>
-
-<p>鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/kafka%E7%AB%AF%E5%88%B0%E7%AB%AF%E7%9A%84%E5%BB%B6%E8%BF%9F/">
+            <span class="next-text nav-default">kafka端到端的延迟</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
 </svg>
 
-        </span>
-      
-      <a class="post-link" href="/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/">你还记得你JVM的的初始堆大小吗</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-04-21" class="post-time">
-        2020-04-21
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 525 words </span>
-      <span class="more-meta"> 2 min read </span>
-      
-      
-      
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
     </div>
-  </header>
   
-  <div class="post-content">
+
+  
+
+  
+
+  
+
     
-    <div class="post-summary">
-      通常对于很多java应用来说，当打成jar包后会下意识的使用java -jar xxx.jar来运行应用，而不是根据自己业务或实际debug的一些需求
-    </div>
-    <div class="read-more">
-      <a href="/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
   
-</section>
-
-
-
-
-
-
-  
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-    <nav class="pagination">
-      <ul>
-
-      
-      
-      <li><a href="/">««</a></li>
-      
-
-      
-      
-      <li><a href="/">«</a></li>
-      
-
-      
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/">
-              1
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="active">
-            <a href="/page/2/">
-              2
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/3/">
-              3
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/4/">
-              4
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/5/">
-              5
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/6/">
-              6
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/7/">
-              7
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/8/">
-              8
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/9/">
-              9
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/10/">
-              10
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/11/">
-              11
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/12/">
-              12
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-              
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/13/">
-              13
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-            
-
-          
-          
-          
-
-        
-        
-
-        
-        
-
-      
-
-      
-      
-      <li><a href="/page/3/">»</a></li>
-      
-
-      
-      
-      <li><a href="/page/21/">»»</a></li>
-      
-
-      </ul>
-    </nav>
-  
-
-
-
-
 
         </div>
       </div>
