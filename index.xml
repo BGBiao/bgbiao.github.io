@@ -1626,6 +1626,36 @@ UUID=&amp;#34;4231b126-7e67-45c4-b8bf-554006291d35&amp;#34;  /export1    xfs    
 
 &lt;p&gt;上面的GC调优看起来比较激进，但集群中的所有broker都会有90%的gc中止时间，大概21ms，它们做不到每秒一个young GC&lt;/p&gt;
 
+&lt;p&gt;作为同样是图片社交的&lt;code&gt;Pinterest&lt;/code&gt;来讲，他们采用如下的JVM参数:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://medium.com/pinterest-engineering/how-pinterest-runs-kafka-at-scale-ff9c6f735be&#34;&gt;Pinterest的大规模kafka实践&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 61G的内存
+-Xms8g -Xmx8g -XX:NewSize=512m -XX:MaxNewSize=512m -XX:MetaspaceSize=128m -XX:+UseG1GC -XX:MaxGCPauseMillis=25
+       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=25 
+       -XX:MaxMetaspaceFreeRatio=75
+       -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:PrintTenuringDistribution 
+       -Xloggc:/var/log/kafka/gc.log -XX:UseGCLogFileRotation -XX:NumberOfGCLogFiles=40
+       -XX:GCLogFileSize=50M&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;-Xmx10G -Xms10G -server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -XX:MaxInlineLevel=15 -Djava.awt.headless=true -Xloggc:/opt/app/kafka/bin/../logs/kafkaServer-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9999&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;h3 id=&#34;4-kafka核心配置&#34;&gt;4.kafka核心配置&lt;/h3&gt;
 
 &lt;p&gt;Kafka默认设置在大多数情况下都能工作，特别是与性能相关的设置和选项，但是考虑到集群的规划以及场景用途，有一些补充的配置参数可以对生产环境进行调优。&lt;/p&gt;
@@ -1688,6 +1718,8 @@ broker.id.generation.enable=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 &lt;p&gt;每个数据目录用于在启动时进行日志恢复和在关闭时进行刷新的线程数，默认值为: &lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
 
+&lt;p&gt;生产环境下，该值可以适当的调整大一些，用来增加正常关闭时数据flush的速度，以及启动时日志恢复的速度，可以提高broker节点的整体可用性。&lt;/p&gt;
+
 &lt;p&gt;对于如下几种情况，kafka会使用&lt;code&gt;可配置的线程池&lt;/code&gt;来处理日志片段.&lt;/p&gt;
 
 &lt;ul&gt;
@@ -1747,6 +1779,8 @@ broker.id.generation.enable=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 # leader.imbalance.check.interval.seconds: 主分区再平衡的频率，默认值为300s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;p&gt;其实，在重要业务的场景中，需要将&lt;code&gt;leader.imbalance.per.broker.percentage&lt;/code&gt;参数适当调整小一些，以避免broker中leader不平衡率导致节点的吞吐不均匀&lt;/p&gt;
+
 &lt;p&gt;&lt;strong&gt;num.partitions&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;自动创建topic的默认分区数，默认为1，通常生产集群不建议打开topic自动创建，一方面是不便于管理和追溯，另外一方面因为自动创建默认分区时1，且无法动态变更，造成的风险可能会比较大。&lt;/p&gt;
@@ -1796,15 +1830,19 @@ broker.id.generation.enable=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 &lt;p&gt;该参数指定了fetch线程的数量(从源broker中复制消息的fetch线程)，默认值: &lt;code&gt;1&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;其实可以适当的调整大一些，可以增强副本之前的同步效率&lt;/p&gt;
+&lt;p&gt;其实可以适当的调整大一些，可以增强副本之前的同步效率，设置为2可以满足大多数的场景&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;num.io.threads&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;broker处理请求的 IO 线程数，需要考虑到磁盘的IO状况。默认值为:&lt;code&gt;8&lt;/code&gt;&lt;/p&gt;
 
+&lt;p&gt;该值通常情况下在生产环境也可以适当的调整大一些，但是通常情况下需要考虑到所使用的的磁盘的整体情况，可以尝试设置为&lt;code&gt;num.network.threads&lt;/code&gt;的两倍，比如&lt;code&gt;d1ne.4xlarge&lt;/code&gt;的规格其实可以设置为20&lt;/p&gt;
+
 &lt;p&gt;&lt;strong&gt;num.network.threads&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;指定broker用来接收来自网络的请求和发送网络的响应的线程数，默认值为: &lt;code&gt;3&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;在生产环境中，可以根据网络的情况以及cpu和内存的使用情况将该值默认调大一些，基本上可以为逻辑cpu核心的2/3都是可以的，比如我们生产环境采用&lt;code&gt;d1ne.4xlarge&lt;/code&gt;规格的实例，可以设置该值为10&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;background.threads&lt;/strong&gt;&lt;/p&gt;
 
@@ -1818,15 +1856,19 @@ broker.id.generation.enable=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;li&gt;socket.request.max.bytes: (请求最大值，message.max.bytes要小于该值较好) 默认值:&lt;code&gt;104857600&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;p&gt;在生产环境中如果涉及到多可用区，或多机房环境时，socket缓冲区的默认值也是有点小的，因此尝试可以尝试将该值设置为&lt;code&gt;1M&lt;/code&gt;或者&lt;code&gt;2M&lt;/code&gt;，即&lt;code&gt;socket.send.buffer.bytes=2097152/1048576&lt;/code&gt;，生产环境推荐优化该参数&lt;/p&gt;
+
 &lt;p&gt;&lt;strong&gt;message.max.bytes&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;该值表示kafka允许的最大的batch大小(不是单个message的大小)，默认值为&lt;code&gt;1000012&lt;/code&gt;，即1Mb.&lt;/p&gt;
+&lt;p&gt;该值表示kafka允许的最大的batch大小(不是单个message的大小)，默认值为&lt;code&gt;1000012&lt;/code&gt;，即1MB.&lt;/p&gt;
 
 &lt;p&gt;在最新的消息格式版本中，为了提高效率，一般消息的提交都是采用batch的方式。&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在以前的消息格式版本中，未压缩的记录不会分组成批，在这种情况下，此限制仅适用于单个记录。&lt;/p&gt;
 
 &lt;p&gt;在每个topic级别可以使用&lt;code&gt;max.message.bytes&lt;/code&gt;设置&lt;/p&gt;
+
+&lt;p&gt;通常情况下，如果是一个集群承担多种业务场景，通常需要将该值设置为可以满足大多数场景的配置，比如&lt;code&gt;4194304&lt;/code&gt;即&lt;code&gt;4MB&lt;/code&gt;，&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;log相关(具体到topic级别)&lt;/strong&gt;&lt;/p&gt;
 
@@ -1931,6 +1973,7 @@ broker.id.generation.enable=true&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;# ZooKeeper地址
@@ -1945,6 +1988,7 @@ log.dirs=[List of directories. Kafka should have its own dedicated disk(s) or SS
 broker.id=[An integer. Start with 0 and increment by 1 for each new broker.]
 listeners=[list of listeners]
 auto.create.topics.enable=false
+# 最小的isr数量，可以在topic级别设置
 min.insync.replicas=2
 queued.max.requests=[number of concurrent requests]&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
@@ -1975,7 +2019,9 @@ queued.max.requests=[number of concurrent requests]&lt;/pre&gt;&lt;/td&gt;&lt;/t
 
 &lt;p&gt;&lt;strong&gt;num.partitions&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;指定创建topic的默认分区数量，该值默认为1，建议根据具体的情况进行设定，越多的分区对于海量数据来说可以提高吞吐，但是对于&amp;gt;少量数据来说，也可能增加网络消耗&lt;/p&gt;
+&lt;p&gt;指定创建topic的默认分区数量，该值默认为1，建议根据具体的情况进行设定，越多的分区对于海量数据来说可以提高吞吐，但是对于少量数据来说，也可能增加网络消耗.&lt;/p&gt;
+
+&lt;p&gt;一般情况下，我们会对默认的topic的分区进行过度分配，以防止后期带key的message扩容分区导致的问题，一般建议初始值设置为5-10&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;分区数一旦指定，只能增加，不能减少&lt;/p&gt;
 
