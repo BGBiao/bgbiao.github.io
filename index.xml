@@ -2385,7 +2385,7 @@ kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-she
 &lt;li&gt;&lt;code&gt;zookeeper-shell.sh&lt;/code&gt;: kafka工具中也默认提供了zookeeper管理工具(不太好用)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h4 id=&#34;1-1-kafka-configs-sh&#34;&gt;1.1 kafka-configs.sh&lt;/h4&gt;
+&lt;h4 id=&#34;1-1-kafka-topics-sh&#34;&gt;1.1 kafka-topics.sh&lt;/h4&gt;
 
 &lt;p&gt;&lt;strong&gt;topic创建&lt;/strong&gt;&lt;/p&gt;
 
@@ -2879,6 +2879,454 @@ Received log directory information from brokers 1,2,3
 &lt;/ul&gt;
 
 &lt;p&gt;结果是json串，可以看到&lt;code&gt;myapp-yum-log-2&lt;/code&gt;在broker-1上占用了&lt;code&gt;13291235&lt;/code&gt;字节，也就是&lt;code&gt;12M&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h4 id=&#34;1-4-kafka-leader-election-sh&#34;&gt;1.4 kafka-leader-election.sh&lt;/h4&gt;
+
+&lt;p&gt;用于一组 Topic 分区的 leader 重新分配，可以支持优先副本和非同步副本。一般用于指定topic的分区存在非预选副本或非同步副本的情况，对整个leader进行适当调整&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--admin.config&lt;/code&gt;: 传给admin客户端的配置文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--all-topic-partitions&lt;/code&gt;: 基于选举类型&lt;code&gt;--election-type&lt;/code&gt;来对符合条件的topic进行选举&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--bootstrap-server&lt;/code&gt;: 指定broker地址&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--election-type&lt;/code&gt;: 指定选举类型&lt;code&gt;[preferred,unclean]&lt;/code&gt;，对优先副本进行选举或非同步副本进行选举&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--partition&lt;/code&gt;: 指定需要选举的指定topic分区的id(和&amp;ndash;topic一起使用)&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;--path-to-json-file&lt;/code&gt;: 使用json配置文件来保存重分配信息&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 比如我们发现topic的partition-1当前的leader不是优先副本(broker相对倾斜),可以使用如下配置进行leader重新选举
+$ sh kafka-leader-election.sh --bootstrap-server 172.29.203.62:9092 --topic test-bgbiao-1 --partition 0 --election-type preferred
+Valid replica already elected for partitions
+
+
+{&amp;#34;partitions&amp;#34;:
+[{&amp;#34;topic&amp;#34;: &amp;#34;foo&amp;#34;, &amp;#34;partition&amp;#34;: 1},
+{&amp;#34;topic&amp;#34;: &amp;#34;foobar&amp;#34;, &amp;#34;partition&amp;#34;: 2}]
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;1-5-kafka-configs-sh&#34;&gt;1.5 kafka-configs.sh&lt;/h4&gt;
+
+&lt;p&gt;用来查看和修改kafka相关的配置信息，包含集群的动态配置，topic级别的动态配置等等&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--all&lt;/code&gt;: 列出给定实体的全部配置文件(默认已经生效的全部参数，如果没有all仅对动态参数生效)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--entity-type&lt;/code&gt;: 实体类型[topics/clients/users/brokers/broker-loggers]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--entity-name&lt;/code&gt;: 实体名称[topic名称/client-id/user-name/broker-id]&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--describe&lt;/code&gt;: 列出给定实体的配置文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--force&lt;/code&gt;: 强制生效&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--topic&lt;/code&gt;: 指定topic名称&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--alter&lt;/code&gt;: 修改指定实体的配置文件 &lt;code&gt;注意:当使用delete-config和add-config时必须使用--alter&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--delete-config&lt;/code&gt;: 删除指定的配置&amp;rdquo;k1,k2&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--add-config&lt;/code&gt;: 给指定的实体增加配置(k=v,k2=[v1,v2,v3],k3=v3)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;topic级别的动态参数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;cleanup.policy&lt;/code&gt;: 清理策略&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;compression.type&lt;/code&gt;: 压缩类型(通常建议在produce端控制)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;delete.retention.ms&lt;/code&gt;: 压缩日志的保留时间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;flush.messages&lt;/code&gt;: 持久化message限制&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;flush.ms&lt;/code&gt;: 持久化频率&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;follower.replication.throttled.replicas&lt;/code&gt;: follower副本限流&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;leader.replication.throttled.replicas&lt;/code&gt;: leader副本限流&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max.message.bytes&lt;/code&gt;: 最大的batch的message大小&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;message.downconversion.enable&lt;/code&gt;: message向下兼容&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;message.format.version&lt;/code&gt;: message格式版本&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;min.insync.replicas&lt;/code&gt;: 最小的ISR&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;retention.ms&lt;/code&gt;: 日志保留时间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;retention.bytes&lt;/code&gt;: 日志保留大小(通常按照时间限制)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;segment.bytes&lt;/code&gt;: segment的大小限制&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;segment.ms&lt;/code&gt;: segment的切割时间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;unclean.leader.election.enable&lt;/code&gt;: 是否允许非同步副本选主(针对可用性设置的一个参数)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;broker级别的动态参数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;broker级别的动态参数比较多，这里只列举常用的几个&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;log.retention.ms&lt;/code&gt;: 日志保留时间&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max.connections&lt;/code&gt;: 最大连接数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max.connections.per.ip&lt;/code&gt;: 每个ip的最大连接数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;message.max.bytes&lt;/code&gt;: batch的message的最大限制&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;min.insync.replicas&lt;/code&gt;: 最小的ISR&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;num.io.threads&lt;/code&gt;: IO线程数(网络线程数的两倍)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;num.network.threads&lt;/code&gt;: 网络线程数(cpu的2/3较好)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;num.recovery.threads.per.data.dir&lt;/code&gt;: 每个数据目录的恢复线程&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;num.replica.fetchers&lt;/code&gt;: 副本的fetchers数量(默认为1,可适当调大)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;user级别的参数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;SCRAM-SHA-256&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SCRAM-SHA-512&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;consumer_byte_rate&lt;/code&gt;: 针对消费者user进行限流&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;producer_byte_rate&lt;/code&gt;: 针对生产者进行限流&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;request_percentage&lt;/code&gt;: 请求百分比&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;clients级别参数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;consumer_byte_rate&lt;/code&gt;: 针对消费者user进行限流&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;producer_byte_rate&lt;/code&gt;: 针对生产者进行限流&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;request_percentage&lt;/code&gt;: 请求百分比&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 修改topic的数据保留时间
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --add-config retention.ms=10000000 --alter
+
+# 查看topic的动态参数配置
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --describe
+Dynamic configs for topic push-test are:
+retention.ms=10000000 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:retention.ms=10000000}
+
+# 删除topic动态参数
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --alter --delete-config retention.ms
+Completed updating config for topic push-test.
+
+# 查看broker全部的参数(--all会获取全部的参数)
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --all --broker-defaults  --describe
+Default configs for brokers in the cluster are:
+
+# 也可以使用如下参数查看broker的全部参数(动态的和默认的参数)
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --entity-type brokers --entity-name  1  --describe
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --broker 1  --describe
+
+# broker的动态参数(去除了--all之后，会发现列出的是动态的配置，默认broker是没有动态参数调整的)
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --broker 1  --describe
+Dynamic configs for broker 1 are:
+
+# user和client也是类似的&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;1-6-kafka-broker-api-versions-sh&#34;&gt;1.6 kafka-broker-api-versions.sh&lt;/h4&gt;
+
+&lt;p&gt;查看kafka对外的各个api版本.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 查看当前kafka版本
+$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092 --version
+2.5.0 (Commit:66563e712b0b9f84)
+
+# 查看集群所有节点的api版本
+$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092
+172.29.203.106:9092 (id: 2 rack: null) -&amp;gt; (
+	Produce(0): 0 to 8 [usable: 8],
+	Fetch(1): 0 to 11 [usable: 11],
+	ListOffsets(2): 0 to 5 [usable: 5],
+	Metadata(3): 0 to 9 [usable: 9],
+	LeaderAndIsr(4): 0 to 4 [usable: 4],
+	StopReplica(5): 0 to 2 [usable: 2],
+	UpdateMetadata(6): 0 to 6 [usable: 6],
+	ControlledShutdown(7): 0 to 3 [usable: 3],
+	OffsetCommit(8): 0 to 8 [usable: 8],
+	OffsetFetch(9): 0 to 7 [usable: 7],
+	FindCoordinator(10): 0 to 3 [usable: 3],
+	JoinGroup(11): 0 to 7 [usable: 7],
+	Heartbeat(12): 0 to 4 [usable: 4],
+	LeaveGroup(13): 0 to 4 [usable: 4],
+	SyncGroup(14): 0 to 5 [usable: 5],
+	DescribeGroups(15): 0 to 5 [usable: 5],
+	ListGroups(16): 0 to 3 [usable: 3],
+	SaslHandshake(17): 0 to 1 [usable: 1],
+	ApiVersions(18): 0 to 3 [usable: 3],
+	CreateTopics(19): 0 to 5 [usable: 5],
+	DeleteTopics(20): 0 to 4 [usable: 4],
+	DeleteRecords(21): 0 to 1 [usable: 1],
+	InitProducerId(22): 0 to 3 [usable: 3],
+	OffsetForLeaderEpoch(23): 0 to 3 [usable: 3],
+	AddPartitionsToTxn(24): 0 to 1 [usable: 1],
+	AddOffsetsToTxn(25): 0 to 1 [usable: 1],
+	EndTxn(26): 0 to 1 [usable: 1],
+	WriteTxnMarkers(27): 0 [usable: 0],
+	TxnOffsetCommit(28): 0 to 3 [usable: 3],
+	DescribeAcls(29): 0 to 2 [usable: 2],
+	CreateAcls(30): 0 to 2 [usable: 2],
+	DeleteAcls(31): 0 to 2 [usable: 2],
+	DescribeConfigs(32): 0 to 2 [usable: 2],
+	AlterConfigs(33): 0 to 1 [usable: 1],
+	AlterReplicaLogDirs(34): 0 to 1 [usable: 1],
+	DescribeLogDirs(35): 0 to 1 [usable: 1],
+	SaslAuthenticate(36): 0 to 2 [usable: 2],
+	CreatePartitions(37): 0 to 2 [usable: 2],
+	CreateDelegationToken(38): 0 to 2 [usable: 2],
+	RenewDelegationToken(39): 0 to 2 [usable: 2],
+	ExpireDelegationToken(40): 0 to 2 [usable: 2],
+	DescribeDelegationToken(41): 0 to 2 [usable: 2],
+	DeleteGroups(42): 0 to 2 [usable: 2],
+	ElectLeaders(43): 0 to 2 [usable: 2],
+	IncrementalAlterConfigs(44): 0 to 1 [usable: 1],
+	AlterPartitionReassignments(45): 0 [usable: 0],
+	ListPartitionReassignments(46): 0 [usable: 0],
+	OffsetDelete(47): 0 [usable: 0]
+)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4 id=&#34;1-7-生产者和消费者工具&#34;&gt;1.7 生产者和消费者工具&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;kafka-console-consumer.sh&lt;/code&gt;: 终端消费者工具&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;kafka-console-producer.sh&lt;/code&gt;: 终端生产者工具&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 指定topic从终端写入数据
+$ sh /opt/app/kafka/bin/kafka-console-producer.sh --bootstrap-server 172.29.203.62:9092 --topic test-push
+&amp;gt;hello xxb
+&amp;gt;BGBiao
+&amp;gt;My website is https://bgbiao.top.
+&amp;gt;And
+&amp;gt;公众号: BGBiao
+
+
+# 指定消费者组对topic进行消费
+# --from-beginning表示从头开始消费
+# 因为开始生产者刚开始生产并生产topic，导致topic无leader会有警告信息
+# 可以看到client-id就是consumer-test-bgbiao-1,即consumer的前缀加消费组加数字后缀
+$ sh kafka-console-consumer.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --group test-bgbiao
+[2020-05-31 19:52:13,472] WARN [Consumer clientId=consumer-test-bgbiao-1, groupId=test-bgbiao] Error while fetching metadata with correlation id 2 : {test-push=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
+hello xxb
+BGBiao
+My website is https://bgbiao.top.
+
+公众号: BGBiao&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;1-8-kafka-consumer-groups-sh&#34;&gt;1.8 kafka-consumer-groups.sh&lt;/h4&gt;
+
+&lt;p&gt;消费组管理工具，可以列出所有的消费组，查看消费组详情，删除消费组信息以及重置消费组的offset&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--all-groups&lt;/code&gt;: 应用到所有的消费组&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--all-topics&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--delete&lt;/code&gt;: 删除topic分区的offset,以及拥有者和消费组信息(&amp;ndash;group g1 &amp;ndash;group g2)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--delete-offsets&lt;/code&gt;: 删除消费组的offset&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--describe&lt;/code&gt;: 查看消费组信息以及消费者的offset lag&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--execute&lt;/code&gt;: 指定操作，支持&lt;code&gt;reset-offsets&lt;/code&gt;操作&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--export&lt;/code&gt;: 导出操作执行到csv，支持&lt;code&gt;reset-offsets&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--from-file&lt;/code&gt;: 指定文件中指定的值重置offset (csv文件)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--group&lt;/code&gt;: 指定消费组&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--list&lt;/code&gt;: 列出所有的消费组&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--members&lt;/code&gt;: 查看消费组中的成员&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--state&lt;/code&gt;: 查看消费组的状态&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--offsets&lt;/code&gt;: 查看消费组并且列出每个消费组所有topic的分区以及消息的offset lag&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--reset-offsets&lt;/code&gt;: 重置消费组的offset (需要指定如下一个参数)&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--to-datetime&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--by-period&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--to-earliest&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--to-latest&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--shift-by&lt;/code&gt;:&lt;/li&gt;
+&lt;li&gt;- &lt;code&gt;--from-file&lt;/code&gt;:&lt;/li&gt;
+
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;--to-current&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 查看全部的消费者组
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --all-grou  --list
+KMOffsetCache-daf27df49ede
+test-bgbiao
+
+# 查看消费者详情
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --describe
+
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
+test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+
+# 查看消费组的成员
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --members --describe
+
+GROUP           CONSUMER-ID                                                 HOST            CLIENT-ID              #PARTITIONS
+test-bgbiao     consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1 3
+
+# 查看消费组状态
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --state --describe
+
+GROUP                     COORDINATOR (ID)          ASSIGNMENT-STRATEGY  STATE           #MEMBERS
+test-bgbiao               172.29.203.62:9092 (1)    range                Stable          1
+
+
+# 查看消费组的offset信息
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --offsets --describe
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
+test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-full-push    2          61392           61430           38              -                                                           -               -
+test-bgbiao     test-full-push    1          61056           61088           32              -                                                           -               -
+test-bgbiao     test-full-push    0          61299           61337           38              -&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h3 id=&#34;2-kafka-manager&#34;&gt;2. kafka-manager&lt;/h3&gt;
 

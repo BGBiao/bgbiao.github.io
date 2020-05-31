@@ -88,7 +88,7 @@
 
 <meta itemprop="datePublished" content="2020-04-25T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-04-25T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="22582">
+<meta itemprop="wordCount" content="25263">
 
 
 
@@ -488,8 +488,8 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 22582 words </span>
-          <span class="more-meta"> 46 min read </span>
+        <span class="more-meta"> 25263 words </span>
+          <span class="more-meta"> 51 min read </span>
 
         
         
@@ -537,9 +537,14 @@ if (!doNotTrack) {
 <ul>
 <li><a href="#1-官方工具">1. 官方工具</a>
 <ul>
-<li><a href="#1-1-kafka-configs-sh">1.1 kafka-configs.sh</a></li>
+<li><a href="#1-1-kafka-topics-sh">1.1 kafka-topics.sh</a></li>
 <li><a href="#1-2-kafka-reassign-partitions-sh">1.2 kafka-reassign-partitions.sh</a></li>
 <li><a href="#1-3-kafka-log-dirs-sh">1.3 kafka-log-dirs.sh</a></li>
+<li><a href="#1-4-kafka-leader-election-sh">1.4 kafka-leader-election.sh</a></li>
+<li><a href="#1-5-kafka-configs-sh">1.5 kafka-configs.sh</a></li>
+<li><a href="#1-6-kafka-broker-api-versions-sh">1.6 kafka-broker-api-versions.sh</a></li>
+<li><a href="#1-7-生产者和消费者工具">1.7 生产者和消费者工具</a></li>
+<li><a href="#1-8-kafka-consumer-groups-sh">1.8 kafka-consumer-groups.sh</a></li>
 </ul></li>
 <li><a href="#2-kafka-manager">2. kafka-manager</a></li>
 </ul></li>
@@ -1572,7 +1577,7 @@ kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-she
 <li><code>zookeeper-shell.sh</code>: kafka工具中也默认提供了zookeeper管理工具(不太好用)</li>
 </ul>
 
-<h4 id="1-1-kafka-configs-sh">1.1 kafka-configs.sh</h4>
+<h4 id="1-1-kafka-topics-sh">1.1 kafka-topics.sh</h4>
 
 <p><strong>topic创建</strong></p>
 
@@ -2066,6 +2071,454 @@ Received log directory information from brokers 1,2,3
 </ul>
 
 <p>结果是json串，可以看到<code>myapp-yum-log-2</code>在broker-1上占用了<code>13291235</code>字节，也就是<code>12M</code>.</p>
+
+<h4 id="1-4-kafka-leader-election-sh">1.4 kafka-leader-election.sh</h4>
+
+<p>用于一组 Topic 分区的 leader 重新分配，可以支持优先副本和非同步副本。一般用于指定topic的分区存在非预选副本或非同步副本的情况，对整个leader进行适当调整</p>
+
+<ul>
+<li><code>--admin.config</code>: 传给admin客户端的配置文件</li>
+<li><code>--all-topic-partitions</code>: 基于选举类型<code>--election-type</code>来对符合条件的topic进行选举</li>
+<li><code>--bootstrap-server</code>: 指定broker地址</li>
+<li><code>--election-type</code>: 指定选举类型<code>[preferred,unclean]</code>，对优先副本进行选举或非同步副本进行选举</li>
+<li><code>--partition</code>: 指定需要选举的指定topic分区的id(和&ndash;topic一起使用)</li>
+
+<li><p><code>--path-to-json-file</code>: 使用json配置文件来保存重分配信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 比如我们发现topic的partition-1当前的leader不是优先副本(broker相对倾斜),可以使用如下配置进行leader重新选举
+$ sh kafka-leader-election.sh --bootstrap-server 172.29.203.62:9092 --topic test-bgbiao-1 --partition 0 --election-type preferred
+Valid replica already elected for partitions
+
+
+{&#34;partitions&#34;:
+[{&#34;topic&#34;: &#34;foo&#34;, &#34;partition&#34;: 1},
+{&#34;topic&#34;: &#34;foobar&#34;, &#34;partition&#34;: 2}]
+}</pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<h4 id="1-5-kafka-configs-sh">1.5 kafka-configs.sh</h4>
+
+<p>用来查看和修改kafka相关的配置信息，包含集群的动态配置，topic级别的动态配置等等</p>
+
+<ul>
+<li><code>--all</code>: 列出给定实体的全部配置文件(默认已经生效的全部参数，如果没有all仅对动态参数生效)</li>
+<li><code>--entity-type</code>: 实体类型[topics/clients/users/brokers/broker-loggers]</li>
+<li><code>--entity-name</code>: 实体名称[topic名称/client-id/user-name/broker-id]</li>
+<li><code>--describe</code>: 列出给定实体的配置文件</li>
+<li><code>--force</code>: 强制生效</li>
+<li><code>--topic</code>: 指定topic名称</li>
+<li><code>--alter</code>: 修改指定实体的配置文件 <code>注意:当使用delete-config和add-config时必须使用--alter</code></li>
+<li><code>--delete-config</code>: 删除指定的配置&rdquo;k1,k2&rdquo;</li>
+<li><code>--add-config</code>: 给指定的实体增加配置(k=v,k2=[v1,v2,v3],k3=v3)</li>
+</ul>
+
+<p><strong>topic级别的动态参数</strong></p>
+
+<ul>
+<li><code>cleanup.policy</code>: 清理策略</li>
+<li><code>compression.type</code>: 压缩类型(通常建议在produce端控制)</li>
+<li><code>delete.retention.ms</code>: 压缩日志的保留时间</li>
+<li><code>flush.messages</code>: 持久化message限制</li>
+<li><code>flush.ms</code>: 持久化频率</li>
+<li><code>follower.replication.throttled.replicas</code>: follower副本限流</li>
+<li><code>leader.replication.throttled.replicas</code>: leader副本限流</li>
+<li><code>max.message.bytes</code>: 最大的batch的message大小</li>
+<li><code>message.downconversion.enable</code>: message向下兼容</li>
+<li><code>message.format.version</code>: message格式版本</li>
+<li><code>min.insync.replicas</code>: 最小的ISR</li>
+<li><code>retention.ms</code>: 日志保留时间</li>
+<li><code>retention.bytes</code>: 日志保留大小(通常按照时间限制)</li>
+<li><code>segment.bytes</code>: segment的大小限制</li>
+<li><code>segment.ms</code>: segment的切割时间</li>
+<li><code>unclean.leader.election.enable</code>: 是否允许非同步副本选主(针对可用性设置的一个参数)</li>
+</ul>
+
+<p><strong>broker级别的动态参数</strong></p>
+
+<p>broker级别的动态参数比较多，这里只列举常用的几个</p>
+
+<ul>
+<li><code>log.retention.ms</code>: 日志保留时间</li>
+<li><code>max.connections</code>: 最大连接数</li>
+<li><code>max.connections.per.ip</code>: 每个ip的最大连接数</li>
+<li><code>message.max.bytes</code>: batch的message的最大限制</li>
+<li><code>min.insync.replicas</code>: 最小的ISR</li>
+<li><code>num.io.threads</code>: IO线程数(网络线程数的两倍)</li>
+<li><code>num.network.threads</code>: 网络线程数(cpu的2/3较好)</li>
+<li><code>num.recovery.threads.per.data.dir</code>: 每个数据目录的恢复线程</li>
+<li><code>num.replica.fetchers</code>: 副本的fetchers数量(默认为1,可适当调大)</li>
+</ul>
+
+<p><strong>user级别的参数</strong></p>
+
+<ul>
+<li><code>SCRAM-SHA-256</code>:</li>
+<li><code>SCRAM-SHA-512</code>:</li>
+<li><code>consumer_byte_rate</code>: 针对消费者user进行限流</li>
+<li><code>producer_byte_rate</code>: 针对生产者进行限流</li>
+<li><code>request_percentage</code>: 请求百分比</li>
+</ul>
+
+<p><strong>clients级别参数</strong></p>
+
+<ul>
+<li><code>consumer_byte_rate</code>: 针对消费者user进行限流</li>
+<li><code>producer_byte_rate</code>: 针对生产者进行限流</li>
+
+<li><p><code>request_percentage</code>: 请求百分比</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 修改topic的数据保留时间
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --add-config retention.ms=10000000 --alter
+
+# 查看topic的动态参数配置
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --describe
+Dynamic configs for topic push-test are:
+retention.ms=10000000 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:retention.ms=10000000}
+
+# 删除topic动态参数
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --alter --delete-config retention.ms
+Completed updating config for topic push-test.
+
+# 查看broker全部的参数(--all会获取全部的参数)
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --all --broker-defaults  --describe
+Default configs for brokers in the cluster are:
+
+# 也可以使用如下参数查看broker的全部参数(动态的和默认的参数)
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --entity-type brokers --entity-name  1  --describe
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --broker 1  --describe
+
+# broker的动态参数(去除了--all之后，会发现列出的是动态的配置，默认broker是没有动态参数调整的)
+$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --broker 1  --describe
+Dynamic configs for broker 1 are:
+
+# user和client也是类似的</pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<h4 id="1-6-kafka-broker-api-versions-sh">1.6 kafka-broker-api-versions.sh</h4>
+
+<p>查看kafka对外的各个api版本.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 查看当前kafka版本
+$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092 --version
+2.5.0 (Commit:66563e712b0b9f84)
+
+# 查看集群所有节点的api版本
+$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092
+172.29.203.106:9092 (id: 2 rack: null) -&gt; (
+	Produce(0): 0 to 8 [usable: 8],
+	Fetch(1): 0 to 11 [usable: 11],
+	ListOffsets(2): 0 to 5 [usable: 5],
+	Metadata(3): 0 to 9 [usable: 9],
+	LeaderAndIsr(4): 0 to 4 [usable: 4],
+	StopReplica(5): 0 to 2 [usable: 2],
+	UpdateMetadata(6): 0 to 6 [usable: 6],
+	ControlledShutdown(7): 0 to 3 [usable: 3],
+	OffsetCommit(8): 0 to 8 [usable: 8],
+	OffsetFetch(9): 0 to 7 [usable: 7],
+	FindCoordinator(10): 0 to 3 [usable: 3],
+	JoinGroup(11): 0 to 7 [usable: 7],
+	Heartbeat(12): 0 to 4 [usable: 4],
+	LeaveGroup(13): 0 to 4 [usable: 4],
+	SyncGroup(14): 0 to 5 [usable: 5],
+	DescribeGroups(15): 0 to 5 [usable: 5],
+	ListGroups(16): 0 to 3 [usable: 3],
+	SaslHandshake(17): 0 to 1 [usable: 1],
+	ApiVersions(18): 0 to 3 [usable: 3],
+	CreateTopics(19): 0 to 5 [usable: 5],
+	DeleteTopics(20): 0 to 4 [usable: 4],
+	DeleteRecords(21): 0 to 1 [usable: 1],
+	InitProducerId(22): 0 to 3 [usable: 3],
+	OffsetForLeaderEpoch(23): 0 to 3 [usable: 3],
+	AddPartitionsToTxn(24): 0 to 1 [usable: 1],
+	AddOffsetsToTxn(25): 0 to 1 [usable: 1],
+	EndTxn(26): 0 to 1 [usable: 1],
+	WriteTxnMarkers(27): 0 [usable: 0],
+	TxnOffsetCommit(28): 0 to 3 [usable: 3],
+	DescribeAcls(29): 0 to 2 [usable: 2],
+	CreateAcls(30): 0 to 2 [usable: 2],
+	DeleteAcls(31): 0 to 2 [usable: 2],
+	DescribeConfigs(32): 0 to 2 [usable: 2],
+	AlterConfigs(33): 0 to 1 [usable: 1],
+	AlterReplicaLogDirs(34): 0 to 1 [usable: 1],
+	DescribeLogDirs(35): 0 to 1 [usable: 1],
+	SaslAuthenticate(36): 0 to 2 [usable: 2],
+	CreatePartitions(37): 0 to 2 [usable: 2],
+	CreateDelegationToken(38): 0 to 2 [usable: 2],
+	RenewDelegationToken(39): 0 to 2 [usable: 2],
+	ExpireDelegationToken(40): 0 to 2 [usable: 2],
+	DescribeDelegationToken(41): 0 to 2 [usable: 2],
+	DeleteGroups(42): 0 to 2 [usable: 2],
+	ElectLeaders(43): 0 to 2 [usable: 2],
+	IncrementalAlterConfigs(44): 0 to 1 [usable: 1],
+	AlterPartitionReassignments(45): 0 [usable: 0],
+	ListPartitionReassignments(46): 0 [usable: 0],
+	OffsetDelete(47): 0 [usable: 0]
+)</pre></td></tr></table>
+</div>
+</div>
+<h4 id="1-7-生产者和消费者工具">1.7 生产者和消费者工具</h4>
+
+<ul>
+<li><code>kafka-console-consumer.sh</code>: 终端消费者工具</li>
+
+<li><p><code>kafka-console-producer.sh</code>: 终端生产者工具</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 指定topic从终端写入数据
+$ sh /opt/app/kafka/bin/kafka-console-producer.sh --bootstrap-server 172.29.203.62:9092 --topic test-push
+&gt;hello xxb
+&gt;BGBiao
+&gt;My website is https://bgbiao.top.
+&gt;And
+&gt;公众号: BGBiao
+
+
+# 指定消费者组对topic进行消费
+# --from-beginning表示从头开始消费
+# 因为开始生产者刚开始生产并生产topic，导致topic无leader会有警告信息
+# 可以看到client-id就是consumer-test-bgbiao-1,即consumer的前缀加消费组加数字后缀
+$ sh kafka-console-consumer.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --group test-bgbiao
+[2020-05-31 19:52:13,472] WARN [Consumer clientId=consumer-test-bgbiao-1, groupId=test-bgbiao] Error while fetching metadata with correlation id 2 : {test-push=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
+hello xxb
+BGBiao
+My website is https://bgbiao.top.
+
+公众号: BGBiao</pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<h4 id="1-8-kafka-consumer-groups-sh">1.8 kafka-consumer-groups.sh</h4>
+
+<p>消费组管理工具，可以列出所有的消费组，查看消费组详情，删除消费组信息以及重置消费组的offset</p>
+
+<ul>
+<li><code>--all-groups</code>: 应用到所有的消费组</li>
+<li><code>--all-topics</code>:</li>
+<li><code>--delete</code>: 删除topic分区的offset,以及拥有者和消费组信息(&ndash;group g1 &ndash;group g2)</li>
+<li><code>--delete-offsets</code>: 删除消费组的offset</li>
+<li><code>--describe</code>: 查看消费组信息以及消费者的offset lag</li>
+<li><code>--execute</code>: 指定操作，支持<code>reset-offsets</code>操作</li>
+<li><code>--export</code>: 导出操作执行到csv，支持<code>reset-offsets</code></li>
+<li><code>--from-file</code>: 指定文件中指定的值重置offset (csv文件)</li>
+<li><code>--group</code>: 指定消费组</li>
+<li><code>--list</code>: 列出所有的消费组</li>
+<li><code>--members</code>: 查看消费组中的成员</li>
+<li><code>--state</code>: 查看消费组的状态</li>
+<li><code>--offsets</code>: 查看消费组并且列出每个消费组所有topic的分区以及消息的offset lag</li>
+<li><code>--reset-offsets</code>: 重置消费组的offset (需要指定如下一个参数)</li>
+<li>- <code>--to-datetime</code>:</li>
+<li>- <code>--by-period</code>:</li>
+<li>- <code>--to-earliest</code>:</li>
+<li>- <code>--to-latest</code>:</li>
+<li>- <code>--shift-by</code>:</li>
+<li>- <code>--from-file</code>:</li>
+
+<li><ul>
+<li><p><code>--to-current</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 查看全部的消费者组
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --all-grou  --list
+KMOffsetCache-daf27df49ede
+test-bgbiao
+
+# 查看消费者详情
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --describe
+
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
+test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+
+# 查看消费组的成员
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --members --describe
+
+GROUP           CONSUMER-ID                                                 HOST            CLIENT-ID              #PARTITIONS
+test-bgbiao     consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1 3
+
+# 查看消费组状态
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --state --describe
+
+GROUP                     COORDINATOR (ID)          ASSIGNMENT-STRATEGY  STATE           #MEMBERS
+test-bgbiao               172.29.203.62:9092 (1)    range                Stable          1
+
+
+# 查看消费组的offset信息
+$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --offsets --describe
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
+test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+test-bgbiao     test-full-push    2          61392           61430           38              -                                                           -               -
+test-bgbiao     test-full-push    1          61056           61088           32              -                                                           -               -
+test-bgbiao     test-full-push    0          61299           61337           38              -</pre></td></tr></table>
+</div>
+</div></li>
+</ul></li>
+</ul>
 
 <h3 id="2-kafka-manager">2. kafka-manager</h3>
 
