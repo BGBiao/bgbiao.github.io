@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-05-27T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-06-14T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,19 +465,18 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/golang-expect/">Golang中的异常处理</a>
+      <a class="post-link" href="/post/k8s-dashboard-http/">k8s dashboard的http接口改造</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2019-03-06" class="post-time">
-        2019-03-06
+      <time datetime="2019-09-18" class="post-time">
+        2019-09-18
       </time>
       <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
           
         </div>
-      <span class="more-meta"> 1870 words </span>
+      <span class="more-meta"> 1733 words </span>
       <span class="more-meta"> 4 min read </span>
       
       
@@ -488,26 +487,12 @@ if (!doNotTrack) {
   <div class="post-content">
     
     <div class="post-summary">
-      <h2 id="golang的异常处理和单元测试">Golang的异常处理和单元测试</h2>
-
-<ul>
-<li>1.Golang语言中没有其他语言中的<code>try...catch...</code>语句来捕获异常和异常恢复</li>
-<li>2.在Golang中我们通常会使用<code>panic</code>关键字来抛出异常，在<code>defer</code>中使用<code>recover</code>来捕获异常进行具体逻辑处理</li>
-<li>3.Golang中我们通常会在函数或方法中返回<code>error</code>结构对象来判断是否有异常出现</li>
-</ul>
-
-<p><code>注意事项</code></p>
-
-<ul>
-<li>1.利用<code>recover</code>和<code>panic</code>指令，<code>defer</code>必须放在panic之前定义(<code>panic会终止其后要执行的代码</code>).</li>
-<li>2.<code>recover</code>只有在<code>defer</code>调用的函数中才有效，否则<code>recover</code>无法捕获到<code>panic</code>.</li>
-<li>3.<code>recover</code>处理异常后，业务逻辑会跑到<code>defer</code>之后的处理片段中</li>
-<li>4.多个<code>defer</code>会形成<code>defer栈</code></li>
-<li>5.panic会等到整个<code>goroutine</code>退出才会报告错误</li>
-</ul>
+      <blockquote>
+<p>背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件<a href="https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/">dashboard</a>,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了<code>https</code>并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).</p>
+</blockquote>
     </div>
     <div class="read-more">
-      <a href="/post/golang-expect/" class="read-more-link">Read more</a>
+      <a href="/post/k8s-dashboard-http/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -526,19 +511,20 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/operatehivewithpython/">使用Python来操作Hive中的数据</a>
+      <a class="post-link" href="/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/">Golang的ElasticSearch6的SDK问题处理</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2018-10-28" class="post-time">
-        2018-10-28
+      <time datetime="2019-08-12" class="post-time">
+        2019-08-12
       </time>
       <div class="post-category">
+          <a href="https://bgbiao.top/categories/golang/"> golang </a>
           <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
           
         </div>
-      <span class="more-meta"> 3114 words </span>
-      <span class="more-meta"> 7 min read </span>
+      <span class="more-meta"> 1162 words </span>
+      <span class="more-meta"> 3 min read </span>
       
       
       
@@ -548,14 +534,22 @@ if (!doNotTrack) {
   <div class="post-content">
     
     <div class="post-summary">
-      <blockquote>
-<p>背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了<a href="http://hive.apache.org/">Hive</a>作为数据仓库工具，同时使用<a href="https://github.com/cloudera/hue">Hue</a>来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.</p>
+      <h2 id="es6-版本的golang-sdk问题处理">es6 版本的golang-sdk问题处理</h2>
+
+<blockquote>
+<p>ElasticSearch6版本的Golang SDK问题处理.</p>
 </blockquote>
 
-<p>本篇简单记录下使用Python操作Hive。</p>
+<p><a href="https://olivere.github.io/elastic/">golang-sdk</a></p>
+
+<p>es_version: 6.4.3</p>
+
+<p>官方建议的sdk版本:     <a href="https://github.com/olivere/elastic">https://github.com/olivere/elastic</a></p>
+
+<p><code>注意:很好奇,作者其他版本都采用vN来标记版本，但是在v6的时候直接采用github版本</code></p>
     </div>
     <div class="read-more">
-      <a href="/post/operatehivewithpython/" class="read-more-link">Read more</a>
+      <a href="/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -574,19 +568,19 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/operatemysqlwithpython/">使用Python操作MySQL</a>
+      <a class="post-link" href="/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/">Prometheus入门实践</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2018-10-27" class="post-time">
-        2018-10-27
+      <time datetime="2019-06-20" class="post-time">
+        2019-06-20
       </time>
       <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
           
         </div>
-      <span class="more-meta"> 4479 words </span>
-      <span class="more-meta"> 9 min read </span>
+      <span class="more-meta"> 6177 words </span>
+      <span class="more-meta"> 13 min read </span>
       
       
       
@@ -596,12 +590,14 @@ if (!doNotTrack) {
   <div class="post-content">
     
     <div class="post-summary">
-      <blockquote>
-<p>前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。</p>
-</blockquote>
+      <h2 id="prometheus入门实践">Prometheus入门实践</h2>
+
+<p><a href="https://prometheus.io/download/">Prometheus下载地址</a>
+<a href="https://www.kubernetes.org.cn/tags/prometheus">Prometheus相关文档</a>
+<a href="https://prometheus.io/docs/introduction/overview/">Prometheus官方文档</a></p>
     </div>
     <div class="read-more">
-      <a href="/post/operatemysqlwithpython/" class="read-more-link">Read more</a>
+      <a href="/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -1192,6 +1188,27 @@ if (!doNotTrack) {
 
       
 
+        
+
+        
+        
+
+          
+          
+          
+
+            
+
+          
+
+        
+        
+
+        
+        
+
+      
+
       
       
       <li><a href="/page/14/">»</a></li>
@@ -1199,7 +1216,7 @@ if (!doNotTrack) {
 
       
       
-      <li><a href="/page/21/">»»</a></li>
+      <li><a href="/page/22/">»»</a></li>
       
 
       </ul>

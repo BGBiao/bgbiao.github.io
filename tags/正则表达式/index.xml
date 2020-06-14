@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>正则表达式 on BGBiao的SRE人生</title>
+    <link>https://bgbiao.top/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/</link>
+    <description>Recent content in 正则表达式 on BGBiao的SRE人生</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 06 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://bgbiao.top/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>一文帮你快速回顾正则表达式知识</title>
+      <link>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</link>
+      <pubDate>Sat, 06 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 在日常工作中，我们经常会使用正则表达式来快速匹配和过滤一些我们期望的字符串来处理一些简单又繁琐的文字统计和过滤操作；而作为一名技术从业者，我们也经常会在程序中或者配置文件中使用正则表达式来处理字符或进行批量配置项的查询和更改，但通常情况下，我们需要对编写的正则表达式进行不断测试才能满足我们的需求，本篇文章带你重新回顾正则表达式，并分享一个在线的正则表达式工具(&lt;a href=&#34;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&#34;&gt;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

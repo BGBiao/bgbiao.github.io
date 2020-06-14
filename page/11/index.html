@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-05-27T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-06-14T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,19 +465,19 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/k8s-nvidia-gpu/">Kubernetes-1.15管理NVIDIA GPU容器</a>
+      <a class="post-link" href="/post/k8s-ali-terway/">基于阿里云Terway网络的Kubernetes集群实践</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2019-10-08" class="post-time">
-        2019-10-08
+      <time datetime="2019-10-27" class="post-time">
+        2019-10-27
       </time>
       <div class="post-category">
           <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
           
         </div>
-      <span class="more-meta"> 1340 words </span>
-      <span class="more-meta"> 3 min read </span>
+      <span class="more-meta"> 4938 words </span>
+      <span class="more-meta"> 10 min read </span>
       
       
       
@@ -488,11 +488,11 @@ if (!doNotTrack) {
     
     <div class="post-summary">
       <blockquote>
-<p>使用kubernetes来调度和管理nvidia gpu资源。</p>
+<p>背景: 众所周知的是在构建一个Kubernetes集群时，容器网络通常会使用一个独立的私有子网来构建Kubernetes集群内部的pod网络和service网络，但在实际的业务场景中，没有企业会在一段时间内将内部全部的服务都迁移到Kubernetes集群中(因为涉及到业务架构以及整体业务的可靠性)，因而会产生一些Kubernetes集群内部服务和集群外部服务互相调用的场景，当然如果是HTTP服务，我们可以采用LVS、Nginx、HAProxy之类的代理工具工具进行集群内外的流量转发，但如果是TCP服务，比如使用Dubbo框架时，生产者和消费者需要直连，当生产者和消费者不在一个可以互联互通的网络下会比较麻烦，这也就是为什么大厂在规模化使用Kubernetes时首先需要解决的就是网络问题的原因了。比如我们在数科的时候就采用的是<a href="https://github.com/contiv/install">Contiv</a>+BGP的模式来实现容器网络和容器外网络的互联互通的，而这通常需要一个比较专业的SDN团队来构建和维护。而作为创业公司通常会使用公有云来承载自己的业务，这种轻资产模式的好处就是底层会有专业的团队来提供保障，因此考虑到业务需求我们采用了阿里云的terway网络插件来实现内部的Kubernetes集群网络.</p>
 </blockquote>
     </div>
     <div class="read-more">
-      <a href="/post/k8s-nvidia-gpu/" class="read-more-link">Read more</a>
+      <a href="/post/k8s-ali-terway/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -511,19 +511,19 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/k8s-traefik-v2/">Traefik-v2.0快速入门</a>
+      <a class="post-link" href="/post/k8s-delete-namespace/">k8s删除Terminating状态的命名空间</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2019-09-27" class="post-time">
-        2019-09-27
+      <time datetime="2019-10-21" class="post-time">
+        2019-10-21
       </time>
       <div class="post-category">
           <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
           
         </div>
-      <span class="more-meta"> 1445 words </span>
-      <span class="more-meta"> 3 min read </span>
+      <span class="more-meta"> 799 words </span>
+      <span class="more-meta"> 2 min read </span>
       
       
       
@@ -533,12 +533,12 @@ if (!doNotTrack) {
   <div class="post-content">
     
     <div class="post-summary">
-      <p><a href="https://docs.traefik.io/">traefik官方文档</a></p>
-
-<p><code>注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面</code></p>
+      <blockquote>
+<p>背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.</p>
+</blockquote>
     </div>
     <div class="read-more">
-      <a href="/post/k8s-traefik-v2/" class="read-more-link">Read more</a>
+      <a href="/post/k8s-delete-namespace/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -557,19 +557,19 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/golang-module/">Golang module的使用</a>
+      <a class="post-link" href="/post/golang-unit-test/">Golang中的单元测试、基准测试、覆盖测试</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2019-09-18" class="post-time">
-        2019-09-18
+      <time datetime="2019-10-20" class="post-time">
+        2019-10-20
       </time>
       <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
+          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
           
         </div>
-      <span class="more-meta"> 2312 words </span>
-      <span class="more-meta"> 5 min read </span>
+      <span class="more-meta"> 4591 words </span>
+      <span class="more-meta"> 10 min read </span>
       
       
       
@@ -579,16 +579,14 @@ if (!doNotTrack) {
   <div class="post-content">
     
     <div class="post-summary">
-      <blockquote>
-<p>前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用<code>vendor</code>或者<code>glide</code>的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为<code>go modules</code>的版本管理机制。</p>
-</blockquote>
+      <h2 id="单元测试-基准测试-覆盖测试">单元测试、基准测试、覆盖测试</h2>
 
-<p><code>注意:</code>
-- 在Golang1.11版本中需要使用<code>export GO111MODULE=on</code>来显式开启go module
-- 在Golang1.12之后默认开启了module</p>
+<blockquote>
+<p>背景: 之前很长一段时间再写Golang程序时，不会有意识去写单元测试，直到后来写了独立项目后，慢慢才发现给一个功能编写对应的单元测试是多么高效和方便，接下来就再一起复习下Golang中的测试.</p>
+</blockquote>
     </div>
     <div class="read-more">
-      <a href="/post/golang-module/" class="read-more-link">Read more</a>
+      <a href="/post/golang-unit-test/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -1179,6 +1177,27 @@ if (!doNotTrack) {
 
       
 
+        
+
+        
+        
+
+          
+          
+          
+
+            
+
+          
+
+        
+        
+
+        
+        
+
+      
+
       
       
       <li><a href="/page/12/">»</a></li>
@@ -1186,7 +1205,7 @@ if (!doNotTrack) {
 
       
       
-      <li><a href="/page/21/">»»</a></li>
+      <li><a href="/page/22/">»»</a></li>
       
 
       </ul>

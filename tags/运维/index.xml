@@ -6,10 +6,41 @@
     <description>Recent content in 运维 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 27 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 14 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka经典面试题详解</title>
+      <link>https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+    <item>
+      <title>Git常用命令</title>
+      <link>https://bgbiao.top/post/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
+      <description>在日常工作中，可能经常会遇到一些一致性需求，需要将本地代码和Git远端代码保持一致，因此这里就主要来记录一些Git的日常操作。 强制覆盖本地代</description>
+    </item>
+    
+    <item>
+      <title>一文帮你快速回顾正则表达式知识</title>
+      <link>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</link>
+      <pubDate>Sat, 06 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 在日常工作中，我们经常会使用正则表达式来快速匹配和过滤一些我们期望的字符串来处理一些简单又繁琐的文字统计和过滤操作；而作为一名技术从业者，我们也经常会在程序中或者配置文件中使用正则表达式来处理字符或进行批量配置项的查询和更改，但通常情况下，我们需要对编写的正则表达式进行不断测试才能满足我们的需求，本篇文章带你重新回顾正则表达式，并分享一个在线的正则表达式工具(&lt;a href=&#34;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&#34;&gt;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>ElasticSearch架构解析与最佳实践</title>

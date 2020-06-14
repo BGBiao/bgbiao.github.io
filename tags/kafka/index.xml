@@ -6,10 +6,21 @@
     <description>Recent content in kafka on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 23 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 14 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/kafka/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka经典面试题详解</title>
+      <link>https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>kafka端到端的延迟</title>

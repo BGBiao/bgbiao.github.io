@@ -6,10 +6,980 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 27 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 14 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka经典面试题详解</title>
+      <link>https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/</link>
+      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;以下面试题，参考胡大的&lt;code&gt;Kafka 核心源码解读&lt;/code&gt;，对相关的知识进行了补充和思考。&lt;/p&gt;
+
+&lt;h3 id=&#34;基础题目&#34;&gt;基础题目&lt;/h3&gt;
+
+&lt;h4 id=&#34;1-apache-kafka-是什么&#34;&gt;1.Apache Kafka 是什么？&lt;/h4&gt;
+
+&lt;p&gt;能问这道题，主要是想看候选人对于kafka的使用场景以及定位认知理解有多深，同时候可以知道候选人对于这项技术的关注度。&lt;/p&gt;
+
+&lt;p&gt;我们都知道，在开源软件中，大部分软件随着用户量的增加，整个软件的功能和定位也有了新的变化，而Apache Kafka 一路发展到现在，已经由最初的分布式提交日志系统逐渐演变成了实时流处理框架。&lt;/p&gt;
+
+&lt;p&gt;因此，这道题你最好这么回答：&lt;strong&gt;Apach Kafka 是一款分布式流处理平台，用于实时构建流处理应用。它有一个核心的功能广为人知，即作为企业级的消息引擎被广泛使用(通常也会称之为消息总线message bus)。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;关于&lt;code&gt;分布式流处理平台&lt;/code&gt;，其实从它官方的logo以及slogan我们就很容易看出来。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://kafka.apache.org/images/logo.png&#34; alt=&#34;kafka-logo&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;2-什么是消费者组&#34;&gt;2.什么是消费者组?&lt;/h4&gt;
+
+&lt;p&gt;消费者组是 Kafka 独有的概念，如果面试官问这个，就说明他对此是有一定了解的。&lt;/p&gt;
+
+&lt;p&gt;胡大给的标准答案是: &lt;strong&gt;官网上的介绍言简意赅，即消费者组是 Kafka 提供的可扩展且具有容错性的消费者机制&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;但实际上，消费者组(Consumer Group)其实包含两个概念，作为&lt;code&gt;队列&lt;/code&gt;，消费者组允许你分割数据处理到一组进程集合上(即一个消费者组中可以包含多个消费者进程，他们共同消费该topic的数据)，这有助于你的消费能力的动态调整；作为&lt;code&gt;发布-订阅模型(publish-subscribe)&lt;/code&gt;，kafka允许你将同一份消息广播到多个消费者组里，以此来丰富多种数据使用场景。&lt;/p&gt;
+
+&lt;p&gt;需要注意的是: &lt;strong&gt;在消费者组中，多个实例共同订阅若干个主题，实现共同消费。同一个组下的每个实例都配置有相同的组 ID，被分配不同的订阅分区。当某个实例挂掉的时候，其他实例会自动地承担起它负责消费的分区。&lt;/strong&gt; 因此，消费者组在一定程度上也保证了消费者程序的高可用性。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfs6dbcw1yj30d6070aar.jpg&#34; alt=&#34;kafka-consumer-group&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 消费者组的题目，能够帮你在某种程度上掌控下面的面试方向。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果你擅长&lt;code&gt;位移值原理(Offset)&lt;/code&gt;，就不妨再提一下消费者组的位移提交机制；&lt;/li&gt;
+&lt;li&gt;如果你擅长&lt;code&gt;Kafka Broker&lt;/code&gt;，可以提一下消费者组与 Broker 之间的交互；&lt;/li&gt;
+&lt;li&gt;如果你擅长与消费者组完全不相关的 &lt;code&gt;Producer&lt;/code&gt;，那么就可以这么说：“消费者组要消费的数据完全来自于 Producer 端生产的消息，我对 Producer 还是比较熟悉的。”&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;总之，你总得对&lt;code&gt;consumer group&lt;/code&gt;相关的方向有一定理解，然后才能像面试官表名你对某一块很理解。&lt;/p&gt;
+
+&lt;h4 id=&#34;3-在-kafka-中-zookeeper-的作用是什么&#34;&gt;3.在 Kafka 中，ZooKeeper 的作用是什么？&lt;/h4&gt;
+
+&lt;p&gt;这道题，也是我经常会问候选人的题，因为任何分布式系统中虽然都通过一些列的算法去除了传统的关系型数据存储，但是毕竟还是有些数据要存储的，同时分布式系统的特性往往是需要有一些中间人角色来统筹集群。比如我们在整个微服务框架中的&lt;code&gt;Dubbo&lt;/code&gt;，它也是需要依赖一些注册中心或配置中心类的中间件的，以及云原生的Kubernetes使用&lt;code&gt;Etcd&lt;/code&gt;作为整个集群的枢纽。&lt;/p&gt;
+
+&lt;p&gt;标准答案: &lt;strong&gt;目前，Kafka 使用 ZooKeeper 存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。之后，等 KIP-500 提案完成后，Kafka 将完全不再依赖于 ZooKeeper。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;“存放元数据” 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他 “人” 都要与它保持对齐。&lt;/li&gt;
+&lt;li&gt;“成员管理” 是指 Broker 节点的注册、注销以及属性变更，等等。&lt;/li&gt;
+&lt;li&gt;“Controller 选举” 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置等&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;KIP-500 思想，是使用社区自研的基于 Raft 的共识算法，替代 ZooKeeper，实现 Controller 自选举。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;4-解释下-kafka-中位移-offset-的作用&#34;&gt;4.解释下 Kafka 中位移（offset）的作用&lt;/h4&gt;
+
+&lt;p&gt;标准答案: &lt;strong&gt;在 Kafka 中，每个主题分区下的每条消息都被赋予了一个唯一的 ID 数值，用于标识它在分区中的位置。这个 ID 数值，就被称为位移，或者叫偏移量。一旦消息被写入到分区日志，它的位移值将不能被修改。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答完这些之后，你还可以把整个面试方向转移到你希望的地方:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;如果你深谙 Broker 底层日志写入的逻辑，可以强调下消息在日志中的存放格式&lt;/li&gt;
+&lt;li&gt;如果你明白位移值一旦被确定不能修改，可以强调下 “Log Cleaner 组件都不能影响位移值” 这件事情&lt;/li&gt;
+&lt;li&gt;如果你对消费者的概念还算熟悉，可以再详细说说&lt;code&gt;位移值&lt;/code&gt;和&lt;code&gt;消费者位移值&lt;/code&gt;之间的区别&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;5-阐述下-kafka-中的领导者副本-leader-replica-和追随者副本-follower-replica-的区别&#34;&gt;5.阐述下 Kafka 中的领导者副本（Leader Replica）和追随者副本（Follower Replica）的区别&lt;/h4&gt;
+
+&lt;p&gt;推荐的答案: &lt;strong&gt;Kafka 副本当前分为领导者副本和追随者副本。只有 Leader 副本才能对外提供读写服务，响应 Clients 端的请求。Follower 副本只是采用拉（PULL）的方式，被动地同步 Leader 副本中的数据，并且在 Leader 副本所在的 Broker 宕机后，随时准备应聘 Leader 副本。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;加分点:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;强调 Follower 副本也能对外提供读服务&lt;/strong&gt;。自 Kafka 2.4 版本开始，社区通过引入新的 Broker 端参数，允许 Follower 副本有限度地提供读服务。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;强调 Leader 和 Follower 的消息序列在实际场景中不一致&lt;/strong&gt;。通常情况下，很多因素可能造成leader和follower之间的不同步，比如程序问题，网络问题，broker问题等，短暂的不同步我们可以关注(秒级别)，但长时间的不同步可能就需要深入排查了，因为一旦leader所在节点异常，可能直接影响可用性。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 之前确保一致性的主要手段是高水位机制(HW)，但高水位值无法保证 Leader 连续变更场景下的数据一致性，因此，社区引入了&lt;code&gt;Leader Epoch&lt;/code&gt; 机制，来修复高水位值的弊端。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://time.geekbang.org/column/article/112118?utm_source=pinpaizhuanqu&amp;amp;utm_medium=geektime&amp;amp;utm_campaign=guanwang&amp;amp;utm_term=guanwang&amp;amp;utm_content=0511&#34;&gt;关于高水位和 Leader Epoch 的讨论&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;实操题目&#34;&gt;实操题目&lt;/h3&gt;
+
+&lt;h4 id=&#34;6-如何设置-kafka-能接收的最大消息的大小&#34;&gt;6.如何设置 Kafka 能接收的最大消息的大小?&lt;/h4&gt;
+
+&lt;p&gt;对于SRE来讲，该题简直是送分题啊，但是，最大消息的设置通常情况下有生产者端，消费者端，broker端和topic级别的参数，我们需要正确设置，以保证可以正常的生产和消费。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Broker端参数: &lt;code&gt;message.max.bytes&lt;/code&gt;,&lt;code&gt;max.message.bytes(topic级别)&lt;/code&gt;,&lt;code&gt;replica.fetch.max.bytes(否则follow会同步失败)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Consumer端参数: &lt;code&gt;fetch.message.max.bytes&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;7-监控-kafka-的框架都有哪些&#34;&gt;7.监控 Kafka 的框架都有哪些？&lt;/h4&gt;
+
+&lt;p&gt;对于SRE来讲，依然是送分题。但基础的我们要知道，kafka本身是提供了&lt;code&gt;jmx(Java Management Extensions)&lt;/code&gt;的，我们可以通过它来获取到kafka内部的一些基本数据。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Kafka Manager&lt;/strong&gt;: 更多是kafka的管理，对于SRE非常友好，也提供了简单的瞬时指标监控&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kafka Monitor&lt;/strong&gt;: LinkedIn 开源的免费框架，支持对集群进行系统测试，并实时监控测试结果。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;CruiseControl&lt;/strong&gt;: 也是 LinkedIn 公司开源的监控框架，用于实时监测资源使用率，以及提供常用运维操作等。无 UI 界面，只提供 REST API，可以进行多集群管理。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;JMX 监控&lt;/strong&gt;: 由于 Kafka 提供的监控指标都是基于 JMX 的，因此，市面上任何能够集成 JMX 的框架都可以使用，比如 Zabbix 和 Prometheus。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;已有大数据平台自己的监控体系&lt;/strong&gt;: 像 Cloudera 提供的 CDH 这类大数据平台，天然就提供 Kafka 监控方案。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;JMXTool&lt;/strong&gt;: 社区提供的命令行工具，能够实时监控 JMX 指标。可以使用&lt;code&gt;kafka-run-class.sh kafka.tools.JmxTool&lt;/code&gt;来查看具体的用法。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;8-broker-的-heap-size-如何设置&#34;&gt;8.Broker 的 Heap Size 如何设置？&lt;/h4&gt;
+
+&lt;p&gt;其实对于SRE还是送分题，因为目前来讲大部分公司的业务系统都是使用Java开发，因此SRE对于基本的JVM相关的参数应该至少都是非常了解的，核心就在于JVM的配置以及GC相关的知识。&lt;/p&gt;
+
+&lt;p&gt;标准答案: &lt;strong&gt;任何 Java 进程 JVM 堆大小的设置都需要仔细地进行考量和测试。一个常见的做法是，以默认的初始 JVM 堆大小运行程序，当系统达到稳定状态后，手动触发一次 Full GC，然后通过 JVM 工具查看 GC 后的存活对象大小。之后，将堆大小设置成存活对象总大小的 1.5~2 倍。对于 Kafka 而言，这个方法也是适用的。不过，业界有个最佳实践，那就是将 Broker 的 Heap Size 固定为 6GB。经过很多公司的验证，这个大小是足够且良好的。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;9-如何估算-kafka-集群的机器数量&#34;&gt;9.如何估算 Kafka 集群的机器数量?&lt;/h4&gt;
+
+&lt;p&gt;该题也算是SRE的送分题吧，对于SRE来讲，任何生产的系统第一步需要做的就是容量预估以及集群的架构规划，实际上也就是&lt;strong&gt;机器数量和所用资源之间的关联关系&lt;/strong&gt;，资源通常来讲就是cpu，内存，磁盘容量，带宽。但需要注意的是，kafka因为独有的设计，对于磁盘的要求并不是特别高，普通机械硬盘足够，而通常的瓶颈会出现在带宽上。&lt;/p&gt;
+
+&lt;p&gt;在预估磁盘的占用时，你一定不要忘记计算副本同步的开销。如果一条消息占用 1KB 的磁盘空间，那么，在有 3 个副本的主题中，你就需要 3KB 的总空间来保存这条消息。同时，需要考虑到整个业务Topic数据保存的最大时间，以上几个因素，基本可以预估出来磁盘的容量需求。&lt;/p&gt;
+
+&lt;p&gt;需要注意的是: 对于磁盘来讲，一定要提前和业务沟通好场景，而不是等待真正有磁盘容量瓶颈了才去扩容磁盘或者找业务方沟通方案。&lt;/p&gt;
+
+&lt;p&gt;对于带宽来说，常见的带宽有 1Gbps 和 10Gbps，通常我们需要知道，当带宽占用接近总带宽的 90% 时，丢包情形就会发生。&lt;/p&gt;
+
+&lt;h4 id=&#34;10-leader-总是-1-怎么破&#34;&gt;10.Leader 总是 -1，怎么破？&lt;/h4&gt;
+
+&lt;p&gt;对于有经验的SRE来讲，早期的kafka版本应该多多少少都遇到过该种情况，通常情况下就是&lt;code&gt;controller&lt;/code&gt;不工作了，导致无法分配leader，那既然知道问题后，解决方案也就很简单了。重启controller节点上的kafka进程，让其他节点重新注册controller角色，但是如上面&lt;code&gt;zookeeper&lt;/code&gt;的作用，你要知道为什么&lt;code&gt;controller&lt;/code&gt;可以自动注册。&lt;/p&gt;
+
+&lt;p&gt;当然了，当你知道&lt;code&gt;controller&lt;/code&gt;的注册机制后，你也可以说: &lt;strong&gt;删除 ZooKeeper 节点 /controller，触发 Controller 重选举。Controller 重选举能够为所有主题分区重刷分区状态，可以有效解决因不一致导致的 Leader 不可用问题&lt;/strong&gt;。但是，需要注意的是，直接操作&lt;code&gt;zookeeper&lt;/code&gt;是一件风险很大的操作，就好比在Linux中执行了&lt;strong&gt;rm -rf /xxx&lt;/strong&gt;一样，如果在&lt;code&gt;/&lt;/code&gt;和&lt;code&gt;xxx&lt;/code&gt;之间不小心多了几个空格，那&amp;rdquo;恭喜你&amp;rdquo;，今年白干了。&lt;/p&gt;
+
+&lt;h3 id=&#34;炫技式题目&#34;&gt;炫技式题目&lt;/h3&gt;
+
+&lt;h4 id=&#34;11-leo-lso-ar-isr-hw-都表示什么含义&#34;&gt;11.LEO、LSO、AR、ISR、HW 都表示什么含义？&lt;/h4&gt;
+
+&lt;p&gt;讲真，我不认为这是炫技的题目，特别是作为SRE来讲，对于一个开源软件的原理以及概念的理解，是非常重要的。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;LEO(Log End Offset)&lt;/strong&gt;: 日志末端位移值或末端偏移量，表示日志下一条待插入消息的位移值。举个例子，如果日志有 10 条消息，位移值从 0 开始，那么，第 10 条消息的位移值就是 9。此时，LEO = 10。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LSO(Log Stable Offset)&lt;/strong&gt;: 这是 Kafka 事务的概念。如果你没有使用到事务，那么这个值不存在（其实也不是不存在，只是设置成一个无意义的值）。该值控制了事务型消费者能够看到的消息范围。它经常与 Log Start Offset，即日志起始位移值相混淆，因为有些人将后者缩写成 LSO，这是不对的。在 Kafka 中，LSO 就是指代 Log Stable Offset。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AR(Assigned Replicas)&lt;/strong&gt;: AR 是主题被创建后，分区创建时被分配的副本集合，副本个数由副本因子决定。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ISR(In-Sync Replicas)&lt;/strong&gt;: Kafka 中特别重要的概念，指代的是 AR 中那些与 Leader 保持同步的副本集合。在 AR 中的副本可能不在 ISR 中，但 Leader 副本天然就包含在 ISR 中。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;HW(High watermark)&lt;/strong&gt;: 高水位值，这是控制消费者可读取消息范围的重要字段。一个普通消费者只能 “看到” Leader 副本上介于 Log Start Offset 和 HW（不含）之间的所有消息。水位以上的消息是对消费者不可见的。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;需要注意的是，通常在&lt;code&gt;ISR&lt;/code&gt;中，可能会有人问到为什么有时候副本不在ISR中，这其实也就是上面说的Leader和Follower不同步的情况，为什么我们前面说，短暂的不同步我们可以关注，但是长时间的不同步，我们需要介入排查了，因为ISR里的副本后面都是通过&lt;code&gt;replica.lag.time.max.ms&lt;/code&gt;，即Follower 副本的 LEO 落后 Leader LEO 的时间是否超过阈值来决定副本是否在ISR内部的。&lt;/p&gt;
+
+&lt;h4 id=&#34;12-kafka-能手动删除消息吗&#34;&gt;12.Kafka 能手动删除消息吗？&lt;/h4&gt;
+
+&lt;p&gt;Kafka 不需要用户手动删除消息。它本身提供了留存策略，能够自动删除过期消息。当然，它是支持手动删除消息的。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;对于设置了 Key 且参数 &lt;code&gt;cleanup.policy=compact&lt;/code&gt; 的主题而言，我们可以构造一条 的消息发送给 Broker，依靠 Log Cleaner 组件提供的功能删除掉该 Key 的消息。&lt;/li&gt;
+&lt;li&gt;对于普通主题而言，我们可以使用 kafka-delete-records 命令，或编写程序调用 Admin.deleteRecords 方法来删除消息。这两种方法殊途同归，底层都是调用 Admin 的 deleteRecords 方法，通过将分区 Log Start Offset 值抬高的方式间接删除消息。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;13-consumer-offsets-是做什么用的&#34;&gt;13.__consumer_offsets 是做什么用的？&lt;/h4&gt;
+
+&lt;p&gt;这是一个内部主题，主要用于存储消费者的偏移量，以及消费者的元数据信息(&lt;code&gt;消费者实例，消费者id&lt;/code&gt;等等)&lt;/p&gt;
+
+&lt;p&gt;需要注意的是: Kafka 的 &lt;code&gt;GroupCoordinator&lt;/code&gt; 组件提供对该主题完整的管理功能，包括该主题的创建、写入、读取和 Leader 维护等。&lt;/p&gt;
+
+&lt;h4 id=&#34;14-分区-leader-选举策略有几种&#34;&gt;14.分区 Leader 选举策略有几种？&lt;/h4&gt;
+
+&lt;p&gt;分区的 Leader 副本选举对用户是完全透明的，它是由 &lt;code&gt;Controller&lt;/code&gt; 独立完成的。你需要回答的是，在哪些场景下，需要执行分区 Leader 选举。每一种场景对应于一种选举策略。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;OfflinePartition Leader 选举&lt;/strong&gt;: 每当有分区上线时，就需要执行 Leader 选举。所谓的分区上线，可能是创建了新分区，也可能是之前的下线分区重新上线。这是最常见的分区 Leader 选举场景。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ReassignPartition Leader 选举&lt;/strong&gt;: 当你手动运行 kafka-reassign-partitions 命令，或者是调用 Admin 的 alterPartitionReassignments 方法执行分区副本重分配时，可能触发此类选举。假设原来的 AR 是 [1，2，3]，Leader 是 1，当执行副本重分配后，副本集合 AR 被设置成 [4，5，6]，显然，Leader 必须要变更，此时会发生 Reassign Partition Leader 选举。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;PreferredReplicaPartition Leader 选举&lt;/strong&gt;: 当你手动运行 kafka-preferred-replica-election 命令，或自动触发了 Preferred Leader 选举时，该类策略被激活。所谓的 Preferred Leader，指的是 AR 中的第一个副本。比如 AR 是 [3，2，1]，那么，Preferred Leader 就是 3。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ControlledShutdownPartition Leader 选举&lt;/strong&gt;: 当 Broker 正常关闭时，该 Broker 上的所有 Leader 副本都会下线，因此，需要为受影响的分区执行相应的 Leader 选举。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这 4 类选举策略的大致思想是类似的，即从 AR 中挑选首个在 ISR 中的副本，作为新 Leader。&lt;/p&gt;
+
+&lt;h4 id=&#34;15-kafka-的哪些场景中使用了零拷贝-zero-copy&#34;&gt;15.Kafka 的哪些场景中使用了零拷贝（Zero Copy）&lt;/h4&gt;
+
+&lt;p&gt;其实这道题对于SRE来讲，有点超纲了，不过既然&lt;code&gt;Zero Copy&lt;/code&gt;是kafka高性能的保证，我们需要了解它。&lt;/p&gt;
+
+&lt;p&gt;Zero Copy 是特别容易被问到的高阶题目。在 Kafka 中，体现 Zero Copy 使用场景的地方有两处：&lt;strong&gt;基于 mmap 的索引和日志文件读写所用的 TransportLayer&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;先说第一个。索引都是基于 MappedByteBuffer 的，也就是让用户态和内核态共享内核态的数据缓冲区，此时，数据不需要复制到用户态空间。不过，mmap 虽然避免了不必要的拷贝，但不一定就能保证很高的性能。在不同的操作系统下，mmap 的创建和销毁成本可能是不一样的。很高的创建和销毁开销会抵消 Zero Copy 带来的性能优势。由于这种不确定性，在 Kafka 中，只有索引应用了 mmap，最核心的日志并未使用 mmap 机制。&lt;/p&gt;
+
+&lt;p&gt;再说第二个。TransportLayer 是 Kafka 传输层的接口。它的某个实现类使用了 FileChannel 的 transferTo 方法。该方法底层使用 sendfile 实现了 Zero Copy。对 Kafka 而言，如果 I/O 通道使用普通的 PLAINTEXT，那么，Kafka 就可以利用 Zero Copy 特性，直接将页缓存中的数据发送到网卡的 Buffer 中，避免中间的多次拷贝。相反，如果 I/O 通道启用了 SSL，那么，Kafka 便无法利用 Zero Copy 特性了。&lt;/p&gt;
+
+&lt;h3 id=&#34;深度思考题&#34;&gt;深度思考题&lt;/h3&gt;
+
+&lt;h4 id=&#34;16-kafka-为什么不支持读写分离&#34;&gt;16.Kafka 为什么不支持读写分离？&lt;/h4&gt;
+
+&lt;p&gt;这其实是分布式场景下的通用问题，因为我们知道CAP理论下，我们只能保证C(可用性)和A(一致性)取其一，如果支持读写分离，那其实对于一致性的要求可能就会有一定折扣，因为通常的场景下，副本之间都是通过同步来实现副本数据一致的，那同步过程中肯定会有时间的消耗，如果支持了读写分离，就意味着可能的数据不一致，或数据滞后。&lt;/p&gt;
+
+&lt;p&gt;Leader/Follower 模型并没有规定 Follower 副本不可以对外提供读服务。很多框架都是允许这么做的，只是 Kafka 最初为了避免不一致性的问题，而采用了让 Leader 统一提供服务的方式。&lt;/p&gt;
+
+&lt;p&gt;不过，&lt;strong&gt;自 Kafka 2.4 之后，Kafka 提供了有限度的读写分离，也就是说，Follower 副本能够对外提供读服务&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h4 id=&#34;17-如何调优-kafka&#34;&gt;17.如何调优 Kafka？&lt;/h4&gt;
+
+&lt;p&gt;作为SRE来讲，任何生产环境的调优，首先需要&lt;strong&gt;识别问题和瓶颈点&lt;/strong&gt;，而不是随意的进行臆想调优。随后，需要&lt;strong&gt;确定优化目标，并且定量给出目标&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;对于kafka来讲，常见的调优方向基本为: 吞吐量、延时、持久性和可用性，每种目标之前都是由冲突点，这也就要求了，我们在对业务接入使用时，要进行业务场景的了解，以对业务进行相对的集群隔离，因为每一个方向的优化思路都是不同的，甚至是相反的。&lt;/p&gt;
+
+&lt;p&gt;确定了目标之后，还要明确优化的维度。有些调优属于通用的优化思路，比如对操作系统、JVM 等的优化；有些则是有针对性的，比如要优化 Kafka 的 TPS。我们需要从 3 个方向去考虑：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Producer 端&lt;/strong&gt;: 增加&lt;code&gt;batch.size&lt;/code&gt;和&lt;code&gt;linger.ms&lt;/code&gt;，启用压缩，关闭重试&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Broker 端&lt;/strong&gt;: 增加&lt;code&gt;num.replica.fetchers&lt;/code&gt;提升 Follower 同步 TPS，避免 Broker Full GC 等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Consumer&lt;/strong&gt;: 增加&lt;code&gt;fetch.min.bytes&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;18-controller-发生网络分区-network-partitioning-时-kafka-会怎么样&#34;&gt;18.Controller 发生网络分区（Network Partitioning）时，Kafka 会怎么样&lt;/h4&gt;
+
+&lt;p&gt;这道题目能够诱发我们对分布式系统设计、CAP 理论、一致性等多方面的思考。&lt;/p&gt;
+
+&lt;p&gt;一旦发生 Controller 网络分区，那么，第一要务就是查看集群是否出现 “脑裂”，即同时出现两个甚至是多个 Controller 组件。这可以根据 Broker 端监控指标 ActiveControllerCount 来判断。&lt;/p&gt;
+
+&lt;p&gt;不过，通常而言，我们在设计整个部署架构时，为了避免这种网络分区的发生，一般会将broker节点尽可能的防止在一个机房或者可用区。&lt;/p&gt;
+
+&lt;p&gt;由于 Controller 会给 Broker 发送 3 类请求，&lt;code&gt;LeaderAndIsrRequest&lt;/code&gt;，&lt;code&gt;StopReplicaRequest&lt;/code&gt;，&lt;code&gt;UpdateMetadataRequest&lt;/code&gt;，因此，一旦出现网络分区，这些请求将不能顺利到达 Broker 端。&lt;/p&gt;
+
+&lt;p&gt;这将影响主题的创建、修改、删除操作的信息同步，表现为集群仿佛僵住了一样，无法感知到后面的所有操作。因此，网络分区通常都是非常严重的问题，要赶快修复。&lt;/p&gt;
+
+&lt;h4 id=&#34;19-java-consumer-为什么采用单线程来获取消息&#34;&gt;19.Java Consumer 为什么采用单线程来获取消息？&lt;/h4&gt;
+
+&lt;p&gt;在回答之前，如果先把这句话说出来，一定会加分：&lt;strong&gt;Java Consumer 是双线程的设计。一个线程是用户主线程，负责获取消息；另一个线程是心跳线程，负责向 Kafka 汇报消费者存活情况。将心跳单独放入专属的线程，能够有效地规避因消息处理速度慢而被视为下线的 “假死” 情况。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;单线程获取消息的设计能够避免阻塞式的消息获取方式。单线程轮询方式容易实现异步非阻塞式，这样便于将消费者扩展成支持实时流处理的操作算子。因为很多实时流处理操作算子都不能是阻塞式的。另外一个可能的好处是，可以简化代码的开发。多线程交互的代码是非常容易出错的。&lt;/p&gt;
+
+&lt;h4 id=&#34;20-简述-follower-副本消息同步的完整流程&#34;&gt;20.简述 Follower 副本消息同步的完整流程&lt;/h4&gt;
+
+&lt;p&gt;首先，Follower 发送 FETCH 请求给 Leader。&lt;/p&gt;
+
+&lt;p&gt;接着，Leader 会读取底层日志文件中的消息数据，再更新它内存中的 Follower 副本的 LEO 值，更新为 FETCH 请求中的 fetchOffset 值。&lt;/p&gt;
+
+&lt;p&gt;最后，尝试更新分区高水位值。Follower 接收到 FETCH 响应之后，会把消息写入到底层日志，接着更新 LEO 和 HW 值。&lt;/p&gt;
+
+&lt;p&gt;Leader 和 Follower 的 HW 值更新时机是不同的，Follower 的 HW 更新永远落后于 Leader 的 HW。这种时间上的错配是造成各种不一致的原因。&lt;/p&gt;
+
+&lt;p&gt;因此，对于消费者而言，消费到的消息永远是所有副本中最小的那个HW。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Git常用命令</title>
+      <link>https://bgbiao.top/post/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;在日常工作中，可能经常会遇到一些一致性需求，需要将本地代码和Git远端代码保持一致，因此这里就主要来记录一些Git的日常操作。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;强制覆盖本地代码&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;有时候，我们不小心修改错了代码或者之前构思的业务逻辑被推翻了，但是这个迭代中我们增加了很多代码，想要尽快回滚到上一个稳定版本的分支，我们就可以采用强制覆盖本地代码的方式来实现，此时距离上一次commit修改的代码将会被强制覆盖，可以很好的将我们本次的错误需求代码清理掉。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 首先将远端代码全部fetch下来
+➜  kafka git:(master) ✗ git fetch --all
+Fetching origin
+Fetching bgbiao
+From https://github.com/goops-top/utils
+ * [new branch]      master     -&amp;gt; bgbiao/master
+
+# 将本地代码设置到远端的稳定版本
+➜  kafka git:(master) ✗ git reset --hard origin/master
+HEAD is now at 1223981 update the go.mod fix the &amp;#39;module declares its path as:&amp;#39;
+
+# 重新pull
+➜  kafka git:(master) git pull
+Already up to date.&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>一文帮你快速回顾正则表达式知识</title>
+      <link>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</link>
+      <pubDate>Sat, 06 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;背景: 在日常工作中，我们经常会使用正则表达式来快速匹配和过滤一些我们期望的字符串来处理一些简单又繁琐的文字统计和过滤操作；而作为一名技术从业者，我们也经常会在程序中或者配置文件中使用正则表达式来处理字符或进行批量配置项的查询和更改，但通常情况下，我们需要对编写的正则表达式进行不断测试才能满足我们的需求，本篇文章带你重新回顾正则表达式，并分享一个在线的正则表达式工具(&lt;a href=&#34;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&#34;&gt;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;什么是正则表达式&#34;&gt;什么是正则表达式？&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;正则表达式是一组由字母和符号组成的特殊文本，它可以用来从文本中找出满足你想要的格式的句子。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;一个正则表达式是一种从左到右匹配主体字符串的模式。
+“Regular expression”这个词比较拗口，我们常使用缩写的术语“regex”或“regexp”。
+正则表达式可以从一个基础字符串中根据一定的匹配模式替换文本中的字符串、验证表单、提取字符串等等。&lt;/p&gt;
+
+&lt;p&gt;想象你正在写一个应用，然后你想设定一个用户命名的规则，让用户名包含字符、数字、下划线和连字符，以及限制字符的个数，好让名字看起来没那么丑。
+我们使用以下正则表达式来验证一个用户名：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gficxu10luj30hl0bsq3e.jpg&#34; alt=&#34;用户名匹配&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上的正则表达式可以接受 &lt;code&gt;john_doe&lt;/code&gt;、&lt;code&gt;jo-hn_doe&lt;/code&gt;、&lt;code&gt;john12_as&lt;/code&gt;。
+但不匹配&lt;code&gt;Jo&lt;/code&gt;，因为它包含了大写的字母而且太短了。&lt;/p&gt;
+
+&lt;h1 id=&#34;目录&#34;&gt;目录&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#1-基本匹配&#34;&gt;1. 基本匹配&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#2-元字符&#34;&gt;2. 元字符&lt;/a&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#21-点运算符-&#34;&gt;2.1 点运算符 .&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#22-字符集&#34;&gt;2.2 字符集&lt;/a&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#221-否定字符集&#34;&gt;2.2.1 否定字符集&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#23-重复次数&#34;&gt;2.3 重复次数&lt;/a&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#231--号&#34;&gt;2.3.1 * 号&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#232--号&#34;&gt;2.3.2 + 号&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#233--号&#34;&gt;2.3.3 ? 号&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#24--号&#34;&gt;2.4 {} 号&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#25--特征标群&#34;&gt;2.5 (&amp;hellip;) 特征标群&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#26--或运算符&#34;&gt;2.6 | 或运算符&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#27-转码特殊字符&#34;&gt;2.7 转码特殊字符&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#28-锚点&#34;&gt;2.8 锚点&lt;/a&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#281--号&#34;&gt;2.8.1 ^ 号&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#282--号&#34;&gt;2.8.2 $ 号&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#3-简写字符集&#34;&gt;3. 简写字符集&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#4-零宽度断言前后预查&#34;&gt;4. 零宽度断言(前后预查)&lt;/a&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#41--正先行断言&#34;&gt;4.1 ?=&amp;hellip; 正先行断言&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#42--负先行断言&#34;&gt;4.2 ?!&amp;hellip; 负先行断言&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#43---正后发断言&#34;&gt;4.3 ?&amp;lt;= &amp;hellip; 正后发断言&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#44--负后发断言&#34;&gt;4.4 ?&amp;lt;!&amp;hellip; 负后发断言&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#5-标志&#34;&gt;5. 标志&lt;/a&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#51-忽略大小写-case-insensitive&#34;&gt;5.1 忽略大小写（Case Insensitive）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#52-全局搜索-global-search&#34;&gt;5.2 全局搜索（Global search）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#53-多行修饰符-multiline&#34;&gt;5.3 多行修饰符（Multiline）&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#额外补充&#34;&gt;额外补充&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#贡献&#34;&gt;贡献&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#许可证&#34;&gt;许可证&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;1-基本匹配&#34;&gt;1. 基本匹配&lt;/h2&gt;
+
+&lt;p&gt;正则表达式其实就是在执行搜索时的格式，它由一些字母和数字组合而成。
+例如：一个正则表达式 &lt;code&gt;the&lt;/code&gt;，它表示一个规则：由字母&lt;code&gt;t&lt;/code&gt;开始，接着是&lt;code&gt;h&lt;/code&gt;，再接着是&lt;code&gt;e&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;the&#34; =&gt; The fat cat sat on &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/dmRygT/1&#34;&gt;https://regex101.com/r/dmRygT/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;正则表达式&lt;code&gt;123&lt;/code&gt;匹配字符串&lt;code&gt;123&lt;/code&gt;。它逐个字符的与输入的正则表达式做比较。&lt;/p&gt;
+
+&lt;p&gt;正则表达式是大小写敏感的，所以&lt;code&gt;The&lt;/code&gt;不会匹配&lt;code&gt;the&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;The&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; fat cat sat on the mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/1paXsy/1&#34;&gt;https://regex101.com/r/1paXsy/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-元字符&#34;&gt;2. 元字符&lt;/h2&gt;
+
+&lt;p&gt;正则表达式主要依赖于元字符。
+元字符不代表他们本身的字面意思，他们都有特殊的含义。一些元字符写在方括号中的时候有一些特殊的意思。以下是一些元字符的介绍：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;center&#34;&gt;元字符&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;.&lt;/td&gt;
+&lt;td&gt;句号匹配任意单个字符除了换行符。&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;[ ]&lt;/td&gt;
+&lt;td&gt;字符种类。匹配方括号内的任意字符。&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;[^ ]&lt;/td&gt;
+&lt;td&gt;否定的字符种类。匹配除了方括号里的任意字符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;*&lt;/td&gt;
+&lt;td&gt;匹配&amp;gt;=0个重复的在*号之前的字符。&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;+&lt;/td&gt;
+&lt;td&gt;匹配&amp;gt;=1个重复的+号前的字符。&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;?&lt;/td&gt;
+&lt;td&gt;标记?之前的字符为可选.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;{n,m}&lt;/td&gt;
+&lt;td&gt;匹配num个大括号之前的字符或字符集 (n &amp;lt;= num &amp;lt;= m).&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;(xyz)&lt;/td&gt;
+&lt;td&gt;字符集，匹配与 xyz 完全相等的字符串.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;&amp;#124;&lt;/td&gt;
+&lt;td&gt;或运算符，匹配符号前或后的字符.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;&amp;#92;&lt;/td&gt;
+&lt;td&gt;转义字符,用于匹配一些保留的字符 &lt;code&gt;[ ] ( ) { } . * + ? ^ $ \ &amp;#124;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;^&lt;/td&gt;
+&lt;td&gt;从开始行开始匹配.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;$&lt;/td&gt;
+&lt;td&gt;从末端开始匹配.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;2-1-点运算符&#34;&gt;2.1 点运算符 &lt;code&gt;.&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;.&lt;/code&gt;是元字符中最简单的例子。
+&lt;code&gt;.&lt;/code&gt;匹配任意单个字符，但不匹配换行符。
+例如，表达式&lt;code&gt;.ar&lt;/code&gt;匹配一个任意字符后面跟着是&lt;code&gt;a&lt;/code&gt;和&lt;code&gt;r&lt;/code&gt;的字符串。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;.ar&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;car&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;par&lt;/strong&gt;&lt;/a&gt;ked in the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;gar&lt;/strong&gt;&lt;/a&gt;age.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/xc9GkU/1&#34;&gt;https://regex101.com/r/xc9GkU/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-2-字符集&#34;&gt;2.2 字符集&lt;/h2&gt;
+
+&lt;p&gt;字符集也叫做字符类。
+方括号用来指定一个字符集。
+在方括号中使用连字符来指定字符集的范围。
+在方括号中的字符集不关心顺序。
+例如，表达式&lt;code&gt;[Tt]he&lt;/code&gt; 匹配 &lt;code&gt;the&lt;/code&gt; 和 &lt;code&gt;The&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[Tt]he&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; car parked in &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; garage.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/2ITLQ4/1&#34;&gt;https://regex101.com/r/2ITLQ4/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;方括号的句号就表示句号。
+表达式 &lt;code&gt;ar[.]&lt;/code&gt; 匹配 &lt;code&gt;ar.&lt;/code&gt;字符串&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;ar[.]&#34; =&gt; A garage is a good place to park a c&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;ar.&lt;/strong&gt;&lt;/a&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/wL3xtE/1&#34;&gt;https://regex101.com/r/wL3xtE/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;2-2-1-否定字符集&#34;&gt;2.2.1 否定字符集&lt;/h3&gt;
+
+&lt;p&gt;一般来说 &lt;code&gt;^&lt;/code&gt; 表示一个字符串的开头，但它用在一个方括号的开头的时候，它表示这个字符集是否定的。
+例如，表达式&lt;code&gt;[^c]ar&lt;/code&gt; 匹配一个后面跟着&lt;code&gt;ar&lt;/code&gt;的除了&lt;code&gt;c&lt;/code&gt;的任意字符。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[^c]ar&#34; =&gt; The car &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;par&lt;/strong&gt;&lt;/a&gt;ked in the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;gar&lt;/strong&gt;&lt;/a&gt;age.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/nNNlq3/1&#34;&gt;https://regex101.com/r/nNNlq3/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-3-重复次数&#34;&gt;2.3 重复次数&lt;/h2&gt;
+
+&lt;p&gt;后面跟着元字符 &lt;code&gt;+&lt;/code&gt;，&lt;code&gt;*&lt;/code&gt; or &lt;code&gt;?&lt;/code&gt; 的，用来指定匹配子模式的次数。
+这些元字符在不同的情况下有着不同的意思。&lt;/p&gt;
+
+&lt;h3 id=&#34;2-3-1-号&#34;&gt;2.3.1 &lt;code&gt;*&lt;/code&gt; 号&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;*&lt;/code&gt;号匹配 在&lt;code&gt;*&lt;/code&gt;之前的字符出现&lt;code&gt;大于等于0&lt;/code&gt;次。
+例如，表达式 &lt;code&gt;a*&lt;/code&gt; 匹配0或更多个以a开头的字符。表达式&lt;code&gt;[a-z]*&lt;/code&gt; 匹配一个行中所有以小写字母开头的字符串。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[a-z]*&#34; =&gt; T&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;he&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;car&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;parked&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;in&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;garage&lt;/strong&gt;&lt;/a&gt; #21.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/7m8me5/1&#34;&gt;https://regex101.com/r/7m8me5/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;*&lt;/code&gt;字符和&lt;code&gt;.&lt;/code&gt;字符搭配可以匹配所有的字符&lt;code&gt;.*&lt;/code&gt;。
+&lt;code&gt;*&lt;/code&gt;和表示匹配空格的符号&lt;code&gt;\s&lt;/code&gt;连起来用，如表达式&lt;code&gt;\s*cat\s*&lt;/code&gt;匹配0或更多个空格开头和0或更多个空格结尾的cat字符串。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;\s*cat\s*&#34; =&gt; The fat&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt; cat &lt;/strong&gt;&lt;/a&gt;sat on the con&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;cat&lt;/strong&gt;&lt;/a&gt;enation.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/gGrwuz/1&#34;&gt;https://regex101.com/r/gGrwuz/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;2-3-2-号&#34;&gt;2.3.2 &lt;code&gt;+&lt;/code&gt; 号&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;+&lt;/code&gt;号匹配&lt;code&gt;+&lt;/code&gt;号之前的字符出现 &amp;gt;=1 次。
+例如表达式&lt;code&gt;c.+t&lt;/code&gt; 匹配以首字母&lt;code&gt;c&lt;/code&gt;开头以&lt;code&gt;t&lt;/code&gt;结尾，中间跟着至少一个字符的字符串。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;c.+t&#34; =&gt; The fat &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;cat sat on the mat&lt;/strong&gt;&lt;/a&gt;.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/Dzf9Aa/1&#34;&gt;https://regex101.com/r/Dzf9Aa/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;2-3-3-号&#34;&gt;2.3.3 &lt;code&gt;?&lt;/code&gt; 号&lt;/h3&gt;
+
+&lt;p&gt;在正则表达式中元字符 &lt;code&gt;?&lt;/code&gt; 标记在符号前面的字符为可选，即出现 0 或 1 次。
+例如，表达式 &lt;code&gt;[T]?he&lt;/code&gt; 匹配字符串 &lt;code&gt;he&lt;/code&gt; 和 &lt;code&gt;The&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[T]he&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; car is parked in the garage.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/cIg9zm/1&#34;&gt;https://regex101.com/r/cIg9zm/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[T]?he&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; car is parked in t&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;he&lt;/strong&gt;&lt;/a&gt; garage.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/kPpO2x/1&#34;&gt;https://regex101.com/r/kPpO2x/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-4-号&#34;&gt;2.4 &lt;code&gt;{}&lt;/code&gt; 号&lt;/h2&gt;
+
+&lt;p&gt;在正则表达式中 &lt;code&gt;{}&lt;/code&gt; 是一个量词，常用来限定一个或一组字符可以重复出现的次数。
+例如， 表达式 &lt;code&gt;[0-9]{2,3}&lt;/code&gt; 匹配最少 2 位最多 3 位 0~9 的数字。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[0-9]{2,3}&#34; =&gt; The number was 9.&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;999&lt;/strong&gt;&lt;/a&gt;7 but we rounded it off to &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;10&lt;/strong&gt;&lt;/a&gt;.0.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/juM86s/1&#34;&gt;https://regex101.com/r/juM86s/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;我们可以省略第二个参数。
+例如，&lt;code&gt;[0-9]{2,}&lt;/code&gt; 匹配至少两位 0~9 的数字。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[0-9]{2,}&#34; =&gt; The number was 9.&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;9997&lt;/strong&gt;&lt;/a&gt; but we rounded it off to &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;10&lt;/strong&gt;&lt;/a&gt;.0.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/Gdy4w5/1&#34;&gt;https://regex101.com/r/Gdy4w5/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;如果逗号也省略掉则表示重复固定的次数。
+例如，&lt;code&gt;[0-9]{3}&lt;/code&gt; 匹配3位数字&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;[0-9]{3}&#34; =&gt; The number was 9.&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;999&lt;/strong&gt;&lt;/a&gt;7 but we rounded it off to 10.0.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/Sivu30/1&#34;&gt;https://regex101.com/r/Sivu30/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-5-特征标群&#34;&gt;2.5 &lt;code&gt;(...)&lt;/code&gt; 特征标群&lt;/h2&gt;
+
+&lt;p&gt;特征标群是一组写在 &lt;code&gt;(...)&lt;/code&gt; 中的子模式。&lt;code&gt;(...)&lt;/code&gt; 中包含的内容将会被看成一个整体，和数学中小括号（ ）的作用相同。例如, 表达式 &lt;code&gt;(ab)*&lt;/code&gt; 匹配连续出现 0 或更多个 &lt;code&gt;ab&lt;/code&gt;。如果没有使用 &lt;code&gt;(...)&lt;/code&gt; ，那么表达式 &lt;code&gt;ab*&lt;/code&gt; 将匹配连续出现 0 或更多个 &lt;code&gt;b&lt;/code&gt; 。再比如之前说的 &lt;code&gt;{}&lt;/code&gt; 是用来表示前面一个字符出现指定次数。但如果在 &lt;code&gt;{}&lt;/code&gt; 前加上特征标群 &lt;code&gt;(...)&lt;/code&gt; 则表示整个标群内的字符重复 N 次。&lt;/p&gt;
+
+&lt;p&gt;我们还可以在 &lt;code&gt;()&lt;/code&gt; 中用或字符 &lt;code&gt;|&lt;/code&gt; 表示或。例如，&lt;code&gt;(c|g|p)ar&lt;/code&gt; 匹配 &lt;code&gt;car&lt;/code&gt; 或 &lt;code&gt;gar&lt;/code&gt; 或 &lt;code&gt;par&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(c|g|p)ar&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;car&lt;/strong&gt;&lt;/a&gt; is &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;par&lt;/strong&gt;&lt;/a&gt;ked in the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;gar&lt;/strong&gt;&lt;/a&gt;age.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/tUxrBG/1&#34;&gt;https://regex101.com/r/tUxrBG/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-6-或运算符&#34;&gt;2.6 &lt;code&gt;|&lt;/code&gt; 或运算符&lt;/h2&gt;
+
+&lt;p&gt;或运算符就表示或，用作判断条件。&lt;/p&gt;
+
+&lt;p&gt;例如 &lt;code&gt;(T|t)he|car&lt;/code&gt; 匹配 &lt;code&gt;(T|t)he&lt;/code&gt; 或 &lt;code&gt;car&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(T|t)he|car&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;car&lt;/strong&gt;&lt;/a&gt; is parked in &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; garage.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/fBXyX0/1&#34;&gt;https://regex101.com/r/fBXyX0/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-7-转码特殊字符&#34;&gt;2.7 转码特殊字符&lt;/h2&gt;
+
+&lt;p&gt;反斜线 &lt;code&gt;\&lt;/code&gt; 在表达式中用于转码紧跟其后的字符。用于指定 &lt;code&gt;{ } [ ] / \ + * . $ ^ | ?&lt;/code&gt; 这些特殊字符。如果想要匹配这些特殊字符则要在其前面加上反斜线 &lt;code&gt;\&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;例如 &lt;code&gt;.&lt;/code&gt; 是用来匹配除换行符外的所有字符的。如果想要匹配句子中的 &lt;code&gt;.&lt;/code&gt; 则要写成 &lt;code&gt;\.&lt;/code&gt; 以下这个例子 &lt;code&gt;\.?&lt;/code&gt;是选择性匹配&lt;code&gt;.&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(f|c|m)at\.?&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;fat&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;cat&lt;/strong&gt;&lt;/a&gt; sat on the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;mat.&lt;/strong&gt;&lt;/a&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/DOc5Nu/1&#34;&gt;https://regex101.com/r/DOc5Nu/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;2-8-锚点&#34;&gt;2.8 锚点&lt;/h2&gt;
+
+&lt;p&gt;在正则表达式中，想要匹配指定开头或结尾的字符串就要使用到锚点。&lt;code&gt;^&lt;/code&gt; 指定开头，&lt;code&gt;$&lt;/code&gt; 指定结尾。&lt;/p&gt;
+
+&lt;h3 id=&#34;2-8-1-号&#34;&gt;2.8.1 &lt;code&gt;^&lt;/code&gt; 号&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;^&lt;/code&gt; 用来检查匹配的字符串是否在所匹配字符串的开头。&lt;/p&gt;
+
+&lt;p&gt;例如，在 &lt;code&gt;abc&lt;/code&gt; 中使用表达式 &lt;code&gt;^a&lt;/code&gt; 会得到结果 &lt;code&gt;a&lt;/code&gt;。但如果使用 &lt;code&gt;^b&lt;/code&gt; 将匹配不到任何结果。因为在字符串 &lt;code&gt;abc&lt;/code&gt; 中并不是以 &lt;code&gt;b&lt;/code&gt; 开头。&lt;/p&gt;
+
+&lt;p&gt;例如，&lt;code&gt;^(T|t)he&lt;/code&gt; 匹配以 &lt;code&gt;The&lt;/code&gt; 或 &lt;code&gt;the&lt;/code&gt; 开头的字符串。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(T|t)he&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; car is parked in &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; garage.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/5ljjgB/1&#34;&gt;https://regex101.com/r/5ljjgB/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;^(T|t)he&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; car is parked in the garage.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/jXrKne/1&#34;&gt;https://regex101.com/r/jXrKne/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;2-8-2-号&#34;&gt;2.8.2 &lt;code&gt;$&lt;/code&gt; 号&lt;/h3&gt;
+
+&lt;p&gt;同理于 &lt;code&gt;^&lt;/code&gt; 号，&lt;code&gt;$&lt;/code&gt; 号用来匹配字符是否是最后一个。&lt;/p&gt;
+
+&lt;p&gt;例如，&lt;code&gt;(at\.)$&lt;/code&gt; 匹配以 &lt;code&gt;at.&lt;/code&gt; 结尾的字符串。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(at\.)&#34; =&gt; The fat c&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;at.&lt;/strong&gt;&lt;/a&gt; s&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;at.&lt;/strong&gt;&lt;/a&gt; on the m&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;at.&lt;/strong&gt;&lt;/a&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/y4Au4D/1&#34;&gt;https://regex101.com/r/y4Au4D/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(at\.)$&#34; =&gt; The fat cat. sat. on the m&lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;at.&lt;/strong&gt;&lt;/a&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/t0AkOd/1&#34;&gt;https://regex101.com/r/t0AkOd/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;3-简写字符集&#34;&gt;3. 简写字符集&lt;/h2&gt;
+
+&lt;p&gt;正则表达式提供一些常用的字符集简写。如下:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;center&#34;&gt;简写&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;.&lt;/td&gt;
+&lt;td&gt;除换行符外的所有字符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\w&lt;/td&gt;
+&lt;td&gt;匹配所有字母数字，等同于 &lt;code&gt;[a-zA-Z0-9_]&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\W&lt;/td&gt;
+&lt;td&gt;匹配所有非字母数字，即符号，等同于： &lt;code&gt;[^\w]&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\d&lt;/td&gt;
+&lt;td&gt;匹配数字： &lt;code&gt;[0-9]&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\D&lt;/td&gt;
+&lt;td&gt;匹配非数字： &lt;code&gt;[^\d]&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\s&lt;/td&gt;
+&lt;td&gt;匹配所有空格字符，等同于： &lt;code&gt;[\t\n\f\r\p{Z}]&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\S&lt;/td&gt;
+&lt;td&gt;匹配所有非空格字符： &lt;code&gt;[^\s]&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\f&lt;/td&gt;
+&lt;td&gt;匹配一个换页符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\n&lt;/td&gt;
+&lt;td&gt;匹配一个换行符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\r&lt;/td&gt;
+&lt;td&gt;匹配一个回车符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\t&lt;/td&gt;
+&lt;td&gt;匹配一个制表符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\v&lt;/td&gt;
+&lt;td&gt;匹配一个垂直制表符&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;\p&lt;/td&gt;
+&lt;td&gt;匹配 CR/LF（等同于 &lt;code&gt;\r\n&lt;/code&gt;），用来匹配 DOS 行终止符&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;4-零宽度断言-前后预查&#34;&gt;4. 零宽度断言（前后预查）&lt;/h2&gt;
+
+&lt;p&gt;先行断言和后发断言都属于&lt;strong&gt;非捕获簇&lt;/strong&gt;（不捕获文本 ，也不针对组合计进行计数）。
+先行断言用于判断所匹配的格式是否在另一个确定的格式之前，匹配结果不包含该确定格式（仅作为约束）。&lt;/p&gt;
+
+&lt;p&gt;例如，我们想要获得所有跟在 &lt;code&gt;$&lt;/code&gt; 符号后的数字，我们可以使用正后发断言 &lt;code&gt;(?&amp;lt;=\$)[0-9\.]*&lt;/code&gt;。
+这个表达式匹配 &lt;code&gt;$&lt;/code&gt; 开头，之后跟着 &lt;code&gt;0,1,2,3,4,5,6,7,8,9,.&lt;/code&gt; 这些字符可以出现大于等于 0 次。&lt;/p&gt;
+
+&lt;p&gt;零宽度断言如下：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;center&#34;&gt;符号&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;?=&lt;/td&gt;
+&lt;td&gt;正先行断言-存在&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;?!&lt;/td&gt;
+&lt;td&gt;负先行断言-排除&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;?&amp;lt;=&lt;/td&gt;
+&lt;td&gt;正后发断言-存在&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;?&amp;lt;!&lt;/td&gt;
+&lt;td&gt;负后发断言-排除&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;4-1-正先行断言&#34;&gt;4.1 &lt;code&gt;?=...&lt;/code&gt; 正先行断言&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;?=...&lt;/code&gt; 正先行断言，表示第一部分表达式之后必须跟着 &lt;code&gt;?=...&lt;/code&gt;定义的表达式。&lt;/p&gt;
+
+&lt;p&gt;返回结果只包含满足匹配条件的第一部分表达式。
+定义一个正先行断言要使用 &lt;code&gt;()&lt;/code&gt;。在括号内部使用一个问号和等号： &lt;code&gt;(?=...)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;正先行断言的内容写在括号中的等号后面。
+例如，表达式 &lt;code&gt;(T|t)he(?=\sfat)&lt;/code&gt; 匹配 &lt;code&gt;The&lt;/code&gt; 和 &lt;code&gt;the&lt;/code&gt;，在括号中我们又定义了正先行断言 &lt;code&gt;(?=\sfat)&lt;/code&gt; ，即 &lt;code&gt;The&lt;/code&gt; 和 &lt;code&gt;the&lt;/code&gt; 后面紧跟着 &lt;code&gt;(空格)fat&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(T|t)he(?=\sfat)&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; fat cat sat on the mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/IDDARt/1&#34;&gt;https://regex101.com/r/IDDARt/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;4-2-负先行断言&#34;&gt;4.2 &lt;code&gt;?!...&lt;/code&gt; 负先行断言&lt;/h3&gt;
+
+&lt;p&gt;负先行断言 &lt;code&gt;?!&lt;/code&gt; 用于筛选所有匹配结果，筛选条件为 其后不跟随着断言中定义的格式。
+&lt;code&gt;正先行断言&lt;/code&gt;  定义和 &lt;code&gt;负先行断言&lt;/code&gt; 一样，区别就是 &lt;code&gt;=&lt;/code&gt; 替换成 &lt;code&gt;!&lt;/code&gt; 也就是 &lt;code&gt;(?!...)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;表达式 &lt;code&gt;(T|t)he(?!\sfat)&lt;/code&gt; 匹配 &lt;code&gt;The&lt;/code&gt; 和 &lt;code&gt;the&lt;/code&gt;，且其后不跟着 &lt;code&gt;(空格)fat&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(T|t)he(?!\sfat)&#34; =&gt; The fat cat sat on &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/V32Npg/1&#34;&gt;https://regex101.com/r/V32Npg/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;4-3-正后发断言&#34;&gt;4.3 &lt;code&gt;?&amp;lt;= ...&lt;/code&gt; 正后发断言&lt;/h3&gt;
+
+&lt;p&gt;正后发断言 记作&lt;code&gt;(?&amp;lt;=...)&lt;/code&gt; 用于筛选所有匹配结果，筛选条件为 其前跟随着断言中定义的格式。
+例如，表达式 &lt;code&gt;(?&amp;lt;=(T|t)he\s)(fat|mat)&lt;/code&gt; 匹配 &lt;code&gt;fat&lt;/code&gt; 和 &lt;code&gt;mat&lt;/code&gt;，且其前跟着 &lt;code&gt;The&lt;/code&gt; 或 &lt;code&gt;the&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(?&lt;=(T|t)he\s)(fat|mat)&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;fat&lt;/strong&gt;&lt;/a&gt; cat sat on the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;mat&lt;/strong&gt;&lt;/a&gt;.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/avH165/1&#34;&gt;https://regex101.com/r/avH165/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;4-4-负后发断言&#34;&gt;4.4 &lt;code&gt;?&amp;lt;!...&lt;/code&gt; 负后发断言&lt;/h3&gt;
+
+&lt;p&gt;负后发断言 记作 &lt;code&gt;(?&amp;lt;!...)&lt;/code&gt; 用于筛选所有匹配结果，筛选条件为 其前不跟随着断言中定义的格式。
+例如，表达式 &lt;code&gt;(?&amp;lt;!(T|t)he\s)(cat)&lt;/code&gt; 匹配 &lt;code&gt;cat&lt;/code&gt;，且其前不跟着 &lt;code&gt;The&lt;/code&gt; 或 &lt;code&gt;the&lt;/code&gt;。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;(?&amp;lt;!(T|t)he\s)(cat)&#34; =&gt; The cat sat on &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;cat&lt;/strong&gt;&lt;/a&gt;.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/8Efx5G/1&#34;&gt;https://regex101.com/r/8Efx5G/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;5-标志&#34;&gt;5. 标志&lt;/h2&gt;
+
+&lt;p&gt;标志也叫模式修正符，因为它可以用来修改表达式的搜索结果。
+这些标志可以任意的组合使用，它也是整个正则表达式的一部分。&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;center&#34;&gt;标志&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;i&lt;/td&gt;
+&lt;td&gt;忽略大小写。&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;g&lt;/td&gt;
+&lt;td&gt;全局搜索。&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;center&#34;&gt;m&lt;/td&gt;
+&lt;td&gt;多行修饰符：锚点元字符 &lt;code&gt;^&lt;/code&gt; &lt;code&gt;$&lt;/code&gt; 工作范围在每行的起始。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;5-1-忽略大小写-case-insensitive&#34;&gt;5.1 忽略大小写（Case Insensitive）&lt;/h3&gt;
+
+&lt;p&gt;修饰语 &lt;code&gt;i&lt;/code&gt; 用于忽略大小写。
+例如，表达式 &lt;code&gt;/The/gi&lt;/code&gt; 表示在全局搜索 &lt;code&gt;The&lt;/code&gt;，在后面的 &lt;code&gt;i&lt;/code&gt; 将其条件修改为忽略大小写，则变成搜索 &lt;code&gt;the&lt;/code&gt; 和 &lt;code&gt;The&lt;/code&gt;，&lt;code&gt;g&lt;/code&gt; 表示全局搜索。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;The&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; fat cat sat on the mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/dpQyf9/1&#34;&gt;https://regex101.com/r/dpQyf9/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/The/gi&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The&lt;/strong&gt;&lt;/a&gt; fat cat sat on &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;the&lt;/strong&gt;&lt;/a&gt; mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/ahfiuh/1&#34;&gt;https://regex101.com/r/ahfiuh/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;5-2-全局搜索-global-search&#34;&gt;5.2 全局搜索（Global search）&lt;/h3&gt;
+
+&lt;p&gt;修饰符 &lt;code&gt;g&lt;/code&gt; 常用于执行一个全局搜索匹配，即（不仅仅返回第一个匹配的，而是返回全部）。
+例如，表达式 &lt;code&gt;/.(at)/g&lt;/code&gt; 表示搜索 任意字符（除了换行）+ &lt;code&gt;at&lt;/code&gt;，并返回全部结果。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/.(at)/&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;fat&lt;/strong&gt;&lt;/a&gt; cat sat on the mat.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/jnk6gM/1&#34;&gt;https://regex101.com/r/jnk6gM/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/.(at)/g&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;fat&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;cat&lt;/strong&gt;&lt;/a&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;sat&lt;/strong&gt;&lt;/a&gt; on the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;mat&lt;/strong&gt;&lt;/a&gt;.
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/dO1nef/1&#34;&gt;https://regex101.com/r/dO1nef/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;5-3-多行修饰符-multiline&#34;&gt;5.3 多行修饰符（Multiline）&lt;/h3&gt;
+
+&lt;p&gt;多行修饰符 &lt;code&gt;m&lt;/code&gt; 常用于执行一个多行匹配。&lt;/p&gt;
+
+&lt;p&gt;像之前介绍的 &lt;code&gt;(^,$)&lt;/code&gt; 用于检查格式是否是在待检测字符串的开头或结尾。但我们如果想要它在每行的开头和结尾生效，我们需要用到多行修饰符 &lt;code&gt;m&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;例如，表达式 &lt;code&gt;/at(.)?$/gm&lt;/code&gt; 表示小写字符 &lt;code&gt;a&lt;/code&gt; 后跟小写字符 &lt;code&gt;t&lt;/code&gt; ，末尾可选除换行符外任意字符。根据 &lt;code&gt;m&lt;/code&gt; 修饰符，现在表达式匹配每行的结尾。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/.at(.)?$/&#34; =&gt; The fat
+                cat sat
+                on the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;mat.&lt;/strong&gt;&lt;/a&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/hoGMkP/1&#34;&gt;https://regex101.com/r/hoGMkP/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/.at(.)?$/gm&#34; =&gt; The &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;fat&lt;/strong&gt;&lt;/a&gt;
+                  cat &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;sat&lt;/strong&gt;&lt;/a&gt;
+                  on the &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;mat.&lt;/strong&gt;&lt;/a&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/E88WE2/1&#34;&gt;https://regex101.com/r/E88WE2/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h3 id=&#34;6-贪婪匹配与惰性匹配-greedy-vs-lazy-matching&#34;&gt;6. 贪婪匹配与惰性匹配（Greedy vs lazy matching）&lt;/h3&gt;
+
+&lt;p&gt;正则表达式默认采用贪婪匹配模式，在该模式下意味着会匹配尽可能长的子串。我们可以使用 &lt;code&gt;?&lt;/code&gt; 将贪婪匹配模式转化为惰性匹配模式。&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/(.*at)/&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The fat cat sat on the mat&lt;/strong&gt;&lt;/a&gt;. &lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/AyAdgJ/1&#34;&gt;https://regex101.com/r/AyAdgJ/1&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;
+&#34;/(.*?at)/&#34; =&gt; &lt;a href=&#34;#learn-regex&#34;&gt;&lt;strong&gt;The fat&lt;/strong&gt;&lt;/a&gt; cat sat on the mat. &lt;/pre&gt;
+
+&lt;p&gt;(在线练习)(&lt;a href=&#34;https://regex101.com/r/AyAdgJ/2&#34;&gt;https://regex101.com/r/AyAdgJ/2&lt;/a&gt;)&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>ElasticSearch架构解析与最佳实践</title>
@@ -9695,1300 +10665,6 @@ $ curl &amp;#34;localhost:8080/api/testdata/Java&amp;#34;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>深入Gin框架内幕1</title>
-      <link>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/</link>
-      <pubDate>Sat, 11 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/</guid>
-      
-        <description>&lt;h3 id=&#34;gin框架介绍&#34;&gt;Gin框架介绍&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/gin-gonic/gin&#34;&gt;Gin&lt;/a&gt;是一个用 Go (Golang) 编写的 web 框架。它是一个类似于&lt;a href=&#34;https://github.com/go-martini/martini&#34;&gt;martini&lt;/a&gt;但性能更好的API框架，不同于谢大主导的&lt;a href=&#34;https://beego.me/&#34;&gt;Beego&lt;/a&gt;web框架，后者更像是Python语言中的&lt;code&gt;Django&lt;/code&gt;框架，内部包含了开发一个web程序所需的各种组件。&lt;/p&gt;
-
-&lt;p&gt;如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。&lt;/p&gt;
-
-&lt;p&gt;同时，不同于其他Golang语言的API框架，该框架社区十分活跃，并且主程仍然在不断更新和改进，我们知道通常情况下在选择一个开源的软件或者相关库时，社区的活跃度以及项目的更新情况会非常重要(考虑到后期的维护和性能和特性问题)。&lt;/p&gt;
-
-&lt;p&gt;另外一方面，该框架官方提供了很多简单的示例来供我们快速运行一个期望的http服务，这对于一个刚转入Golang进行业务开发的同学来说是一个非常好的开始。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/gin-gonic/gin#api-examples&#34;&gt;Gin官方提供的各种HTTP服务示例&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;当然我在很长一段时间也仅是去看官方示例来快速熟悉并实现自己的业务需求，但当有一些特殊的需求时通常去查看官方的具体实现来满足需求，长期如此，不仅耗时且效率极低，因此我产生了将核心源码探究一番的兴趣，希望能通过源码方式来对Gin框架有个深入的学习。&lt;/p&gt;
-
-&lt;h3 id=&#34;gin框架中的几个核心结构&#34;&gt;Gin框架中的几个核心结构&lt;/h3&gt;
-
-&lt;p&gt;我们都知道开发一个HTTP服务，首先需要启动一个TCP监听，然后需要有一些列的handler来处理具体的业务逻辑，最后在再将具体的业务逻辑通过HTTP协议约定和相关的Method和URL进行绑定，以此来对外提供具体功能的HTTP服务。那么在Gin框架对应的就是如下几个模型，我们将一起学习Gin的实现。&lt;/p&gt;
-
-&lt;p&gt;Gin框架中的几个重要的模型:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Engine: 用来初始化一个&lt;code&gt;gin&lt;/code&gt;对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L54&#34;&gt;源码文件&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Router: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中&lt;/li&gt;
-&lt;li&gt;Context: &lt;code&gt;Context&lt;/code&gt;是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.&lt;/li&gt;
-&lt;li&gt;Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化数据来处理底层的业务逻辑，就需要使用&lt;code&gt;Bind&lt;/code&gt;相关的结构方法来解析context中的HTTP数据&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;1-gin框架中的engine结构体&#34;&gt;1.Gin框架中的Engine结构体&lt;/h4&gt;
-
-&lt;p&gt;当我们在使用框架&lt;code&gt;[Gin](https://github.com/gin-gonic/gin)&lt;/code&gt;来创建一个HTTP服务时，首先我们需要初始化一个实例，在&lt;code&gt;Engine&lt;/code&gt;结构体中就包含了实例的一些基本属性和实例化的一些方法。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;Engine结构体&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;type Engine struct {
-    // 路由组，在实际开发过程中我们通常会使用路由组来组织和管理一些列的路由. 比如: /apis/,/v1/等分组路由
-    RouterGroup
-    // 开启自动重定向。如果当前路由没有匹配到，但是存在不带/开头的handler就会重定向. 比如: 用户输入/foo/但是存在一个/foo 就会自动重定向到该handler，并且会向客户端返回301或者307状态码(区别在于GET方法和其他方法)
-    RedirectTrailingSlash bool
-    // 如果开启该参数，没有handler注册时，路由会尝试自己去修复当前的请求地址. 
-    // 修复流程:
-    // 1.首位多余元素会被删除(../ or //); 2.然后路由会对新的路径进行不区分大小写的查找;3.如果能正常找到对应的handler，路由就会重定向到正确的handler上并返回301或者307.(比如: 用户访问/FOO 和 /..//Foo可能会被重定向到/foo这个路由上)
-    RedirectFixedPath bool
-    // 如果开启该参数，当当前请求不能被路由时，路由会自己去检查其他方法是否被允许.在这种情况下会响应&amp;#34;Method Not Allowed&amp;#34;，并返回状态码405; 如果没有其他方法被允许，将会委托给NotFound的handler
-    HandleMethodNotAllowed bool
-    // 是否转发客户端ip
-    ForwardedByClientIP    bool
-    // 如果开启将会在请求中增加一个以&amp;#34;X-AppEngine...&amp;#34;开头的header
-    AppEngine bool
-    // 如果开启将会使用url.RawPath去查找参数(默认:false)
-    UseRawPath bool
-    // 如果开启，请求路径将不会被转义. 如果UseRawPath为false，该参数实际上就为true(因为使用的是url.Path)
-    UnescapePathValues bool
-    // maxMemory参数的值(http.Request的ParseMultipartForm调用时的参数)
-    MaxMultipartMemory int64
-    // 是否删除额外的反斜线(开始时可解析有额外斜线的请求)
-    RemoveExtraSlash bool
-    // 分隔符(render.Delims表示使用HTML渲染的一组左右分隔符,具体可见html/template库)
-    delims           render.Delims
-    // 设置在Context.SecureJSON中国的json前缀
-    secureJsonPrefix string
-    // 返回一个HTMLRender接口(用于渲染HTMLProduction和HTMLDebug两个结构体类型的模板)
-    HTMLRender       render.HTMLRender
-    // html/template包中的FuncMap map[string]interface{} ,用来定义从名称到函数的映射
-    FuncMap          template.FuncMap
-    // 以下是gin框架内部定义的一些属性 
-    // HandlersChain 是一个HandlerFunc 的数组(HandlerFunc其实就是一个Context的指针,Context会在下一节讲解)
-    allNoRoute       HandlersChain
-    allNoMethod      HandlersChain
-    noRoute          HandlersChain
-    noMethod         HandlersChain
-    // 这里定义了一个可以临时存取对象的集合(sync.Pool是线程安全的，主要用来缓存为使用的item以减少GC压力，使得创建高效且线程安全的空闲队列)
-    pool             sync.Pool
-    // methodTrees是methodTree的切片(methodTree是一个包含请求方法和node指针的结构体,node是一个管理path的节点树)
-    trees            methodTrees
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;code&gt;HandlerFunc定义&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// 定义了一个可以被中间件使用的handler
-type HandlerFunc func(*Context)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;code&gt;初始化Engine的方式&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;New()&lt;/code&gt;: 该函数返回一个默认的Engine引用实例(开启了自动重定向,转发客户端ip和禁止请求路径转义)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Default()&lt;/code&gt;: 内部调用&lt;code&gt;New()&lt;/code&gt;函数，但是增加了Logger和Recovery两个中间件&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;Engine对外常用的方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;Delims(left, right string) *Engine&lt;/code&gt;: 给创建好的gin实例指定模板引擎的左右分割符&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;SecureJsonPrefix(prefix string) *Engine&lt;/code&gt;: 给创建好的gin实例设置secureJsonPrefixi&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;SetHTMLTemplate(templ *template.Template)&lt;/code&gt;: 该方法会gin实实例绑定一个模板引擎(内部其实是设置了engine的HTMLRender属性)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;LoadHTMLGlob(pattern string)&lt;/code&gt;: 该方法用来加载glob模式(类似于shell中的正则)的html模板文件，然后将结果和HTML模板引擎关联(内部调用&lt;code&gt;SetHTMLTemplate&lt;/code&gt;方法将全部匹配到模板注册进去)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;LoadHTMLFiles(files ...string)&lt;/code&gt;: 该方法用上，需要指定一组模板文件名&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;SetFuncMap(funcMap template.FuncMap)&lt;/code&gt;: 该方法会设置一个FuncMap给template.FuncMap使用(内部其实设置了engine的FuncMap)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;NoRoute(handlers ...HandlerFunc)&lt;/code&gt;: 该方法为NoRoute增加一些handler，它默认会返回404(通常在企业里，404我们会处理的比较优雅一些，比如给一些企业的静态页啥的)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;NoMethod(handlers ...HandlerFunc)&lt;/code&gt;: 同上，该方法用于给NoMethod增加handler，默认返回405&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Use(middleware ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法用于绑定一个全局的中间件给router. 通过该方法注册的中间件将包含在每个请求的handler chain中(比如可以在这里使用一些logger或者error相关的中间件). 在上面初始化实例的&lt;code&gt;Default()&lt;/code&gt;函数中其实内部使用了&lt;code&gt;engine.Use(Logger(), Recovery())&lt;/code&gt;来加载logger和recovery中间件&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Routes() (routes RoutesInfo)&lt;/code&gt;: 该方法用来返回一个路由列表信息&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L50&#34;&gt;RoutesInfo&lt;/a&gt;(一个路由信息RouteInfo中包含Method,Path,Handler,HandlerFunc)，该方法底层调用engine的trees来获取一些router必要的信息.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Run(addr ...string) (err error)&lt;/code&gt;: 该方法会绑定router到http.Server中并开启一个http监听来接收http请求. 该方法其实是&lt;code&gt;http.ListenAndServe(addr, engine)&lt;/code&gt;的简单实现. 注意:该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求(engine内部只要实现了http.ServeHTTP方法即可)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;RunTLS(addr, certFile, keyFile string) (err error)&lt;/code&gt;: 同上，以https方式运行服务&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;RunUnix(file string) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;方法，通过指定的unix socket文件运行服务&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;RunFd(fd int) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;方法，通过指定的文件描述符(fd)来运行服务&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;RunListener(listener net.Listener) (err error)&lt;/code&gt;: 同&lt;code&gt;Run(addr)&lt;/code&gt;，通过制定的&lt;code&gt;net.Listener&lt;/code&gt;来运行服务&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;ServeHTTP(w http.ResponseWriter, req *http.Request)&lt;/code&gt;: 该方法遵循了&lt;code&gt;http.Handler&lt;/code&gt;的接口规范，可使gin内部调用&lt;code&gt;http.ListenAndServe&lt;/code&gt;来启动一个http服务&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;HandleContext(c *Context)&lt;/code&gt;: 该方法会重新确认一个被重写的context(可以通过c.Request.URL.Path来实现). 需要注意的是该方法可能造成context的循环使用(会绕死你,谨慎使用)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;2-gin框架中的router&#34;&gt;2.Gin框架中的Router&lt;/h4&gt;
-
-&lt;p&gt;使用&lt;code&gt;Engine&lt;/code&gt;结构体中提供的相关方法，我们就可以快速的启动一个HTTP服务了，但是如何对外暴露一个URL来简单实现一个HTTP的数据传输呢，这个时候就需要使用Router中的方法了。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;Gin框架中Router相关的结构体&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;RouterGroup&lt;/code&gt;: 该结构体被用来在Gin内部配置一个路由，一个RouterGroup被用来关联URL前缀和一组具体的handler业务逻辑&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;IRoutes&lt;/code&gt;: IRoutes是一个定了了所有路由处理的接口(包含一些常用的HTTP方法)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;IRouter&lt;/code&gt;: IRouter则是一个包含单个路由和路由组的所有路由处理的接口&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;RouterGroup相关结构定义&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// RouterGroup 结构体
-type RouterGroup struct {
-	Handlers HandlersChain
-	basePath string
-	engine   *Engine
-	root     bool
-}
-
-// IRoutes 接口
-type IRoutes interface {
-	Use(...HandlerFunc) IRoutes
-
-	Handle(string, string, ...HandlerFunc) IRoutes
-	Any(string, ...HandlerFunc) IRoutes
-	GET(string, ...HandlerFunc) IRoutes
-	POST(string, ...HandlerFunc) IRoutes
-	DELETE(string, ...HandlerFunc) IRoutes
-	PATCH(string, ...HandlerFunc) IRoutes
-	PUT(string, ...HandlerFunc) IRoutes
-	OPTIONS(string, ...HandlerFunc) IRoutes
-	HEAD(string, ...HandlerFunc) IRoutes
-
-	StaticFile(string, string) IRoutes
-	Static(string, string) IRoutes
-	StaticFS(string, http.FileSystem) IRoutes
-}
-
-// IRouter接口
-type IRouter interface {
-	IRoutes
-	Group(string, ...HandlerFunc) *RouterGroup
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;还记得在上一节中我们的&lt;code&gt;Engine&lt;/code&gt;结构体中有一个&lt;code&gt;RouterGroup&lt;/code&gt;字段吗，该字段会在我们创建一个&lt;code&gt;Engine&lt;/code&gt;的gin实例后帮助我们初始化一个默认的&lt;code&gt;RouterGroup&lt;/code&gt;实例。&lt;/p&gt;
-
-&lt;p&gt;比如在&lt;code&gt;Engine&lt;/code&gt;结构体的中的&lt;code&gt;New()&lt;/code&gt;函数，会初始化一个带有如下&lt;code&gt;RouterGroup&lt;/code&gt;的gin实例，并将gin实例注册到RouterGroup的&lt;code&gt;engine&lt;/code&gt;字段.&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L126&#34;&gt;源码文件&lt;/a&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// https://github.com/gin-gonic/gin/blob/master/gin.go#L129
-		RouterGroup: RouterGroup{
-			Handlers: nil,
-			basePath: &amp;#34;/&amp;#34;,
-			root:     true,
-		},&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;code&gt;RouterGroup结构体对外暴露的常用方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;Use(middleware ...HandlerFunc) IRoutes&lt;/code&gt;: 注册一个中间件并返回Iroutes接口&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Group(relativePath string, handlers ...HandlerFunc) *RouterGroup&lt;/code&gt;: Group方法会创建一个新的路由组。通常我们会创建一个公共的中间件或者是具有相同前缀的路由，来归并到一个路由组&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;BasePath() string&lt;/code&gt;: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&amp;ldquo;/rest/n/v1/api&amp;rdquo;)，则v.BasePath()就是&amp;rdquo;/rest/n/v1/api&amp;rdquo;)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法会使用给定的HTTP方法和URL来注册一个新的handler。(最后一个handler应该是真正的处理程序，其他的应该是在不同的路由之间共享的中间件)。&lt;code&gt;注意:内部调用了一个handle(httpMethod, relativePath string, handlers HandlersChain)的私有方法来处理核心逻辑&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;POST(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 该方法是&lt;code&gt;router.Handle(&amp;quot;POST&amp;quot;, path, handle)&lt;/code&gt;的快速实现，&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;GET(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;DELETE(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;PATCH(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;PUT(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;HEAD(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Any(relativePath string, handlers ...HandlerFunc) IRoutes&lt;/code&gt;: 同上，会将HTTP的所有方法都注册上去&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;StaticFile(relativePath, filepath string) IRoutes&lt;/code&gt;: 该方法用来注册一台路由来服务本地文件系统的单个文件，比如:&lt;code&gt;router.StaticFile(&amp;quot;favicon.ico&amp;quot;, &amp;quot;./resources/favicon.ico&amp;quot;)&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Static(relativePath, root string) IRoutes&lt;/code&gt;: 该方法用来提供一个指定文件系统根路径的的路由，内部调用&lt;code&gt;group.StaticFS(path,Dir(root,false))&lt;/code&gt;来提供服务&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;StaticFS(relativePath string, fs http.FileSystem) IRoutes&lt;/code&gt;: 指定文件系统(http.FileSystem)来创建一个服务&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;3-gin实例示例&#34;&gt;3.Gin实例示例&lt;/h4&gt;
-
-&lt;p&gt;有了上面两个核心模型&lt;code&gt;Engine&lt;/code&gt;和&lt;code&gt;RouteGroup&lt;/code&gt;的了解，此时我们就可以通过Gin框架快速来创建一个简单HTTP服务了。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;1.默认路由&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;测试示例&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;cat&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;case1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
-&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;
-
-&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
-    &lt;span class=&#34;s&#34;&gt;&amp;#34;net/http&amp;#34;&lt;/span&gt;
-
-    &lt;span class=&#34;s&#34;&gt;&amp;#34;github.com/gin-gonic/gin&amp;#34;&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// 使用Default()函数来初始化一个gin实例(engine结构体的引用对象)
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// Default函数内部调用New()函数来初始化一个gin实例，
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// 同时使用Use(middleware ...HandlerFunc) IRoutes 方法注册了Logger和Recovery两个中间件
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// 在New()初始化gin实例的过程中还默认初始化了一个bathPath为&amp;#34;/&amp;#34;的RouterGroup，其实就是一个router实例
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;nx&#34;&gt;ginObj&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Default&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// 由于RouterGroup在engine结构体中是一个匿名对象，因此实例化的engine引用对象就可以直接操作RouterGroup结构体里对外暴露的所有方法
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// 这里我们尝试注册一个包含所有HTTP方法的路由
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// https://github.com/gin-gonic/gin/blob/master/routergroup.go#L133
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// 而在RouterGroup的各种对外暴露的方法中，底层调用了 Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes方法，后面可以传入多个handler来处理具体的业务逻辑，当handler有多个时最后一个处理实际的业务请求，前面的handler来处理中间件和共享的组件
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
-    &lt;span class=&#34;c1&#34;&gt;// 而HandlerFunc 其实就是一个func(*Context)的匿名函数.Context会在下一节具体分析
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;nx&#34;&gt;ginObj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Any&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Context&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
-        &lt;span class=&#34;c1&#34;&gt;// context结构体相关的方法下一节会具体分析，这里是一个简单的示例
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;nx&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;http&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;StatusOK&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Hello BGBiao.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;})&lt;/span&gt;
-
-
-    &lt;span class=&#34;c1&#34;&gt;// 当所有的路由注册之后，我们可以使用gin的结构体方法(engine结构体的引用对象)来实际运行HTTP服务，以接收用户的http请求
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// 我们前面说过该方法除非出现错误，否则会无期限阻塞调用goroutine来接收请求
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;nx&#34;&gt;ginObj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;localhost:8080&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-
-
-
-&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;运行实例&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;go&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;run&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;case1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;go&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;WARNING&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Creating&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;an&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Engine&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;instance&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;the&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Logger&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Recovery&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;middleware&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;already&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;attached&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;WARNING&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Running&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;debug&amp;#34;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;mode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Switch&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;release&amp;#34;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;mode&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;production&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;
- &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;using&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;env&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GIN_MODE&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;release&lt;/span&gt;
- &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;using&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;code&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;SetMode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;gin&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ReleaseMode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GET&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;POST&lt;/span&gt;   &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;PUT&lt;/span&gt;    &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;PATCH&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;HEAD&lt;/span&gt;   &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;OPTIONS&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;DELETE&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;CONNECT&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;TRACE&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;                    &lt;span class=&#34;o&#34;&gt;--&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;func1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;handlers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GIN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Listening&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;serving&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;HTTP&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;on&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;localhost&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8080&lt;/span&gt;
-
-&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;模拟请求&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;因为我们注册了全部的HTTP方法的路由&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;curl&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;localhost&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8080&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;
-&lt;span class=&#34;nx&#34;&gt;Hello&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;BGBiao&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;                                                                                        
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;curl&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;X&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;POST&lt;/span&gt;  &lt;span class=&#34;nx&#34;&gt;localhost&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8080&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;
-&lt;span class=&#34;nx&#34;&gt;Hello&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;BGBiao&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;                                                                                        
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;curl&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;X&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;DELETE&lt;/span&gt;   &lt;span class=&#34;nx&#34;&gt;localhost&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8080&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;
-&lt;span class=&#34;nx&#34;&gt;Hello&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;BGBiao&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;                                                                                        
-&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;curl&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;X&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;TRACE&lt;/span&gt;   &lt;span class=&#34;nx&#34;&gt;localhost&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8080&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;hello&lt;/span&gt;
-&lt;span class=&#34;nx&#34;&gt;Hello&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;BGBiao&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>关于如何挣钱的35条建议</title>
-      <link>https://bgbiao.top/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/</link>
-      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E6%8C%A3%E9%92%B1%E7%9A%8435%E6%9D%A1%E5%BB%BA%E8%AE%AE/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;这篇《关于如何挣钱的35条建议》，是波波从《How to Get Rich : Every Episode》[附录1]这篇长文(超过3.6万英文单词)翻译整理而来。波波非常认同原文作者Naval关于挣钱和财富的理念，有种强烈的得道恨晚的感觉～要是早十年就懂这些道理就好了，所以专门花时间翻译整理，并且放在自己的公众号里头。期望以后可以经常回顾，加深理解，并最终深入自己的mindset.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;code&gt;注:&lt;/code&gt;本篇文章转自公众号&amp;rdquo;程序新视界&amp;rdquo;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;1.追寻财富，而不是金钱和地位(Seek Wealth, Not Money or Status)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Wealth is assets that earn while you sleep.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;财富是你睡觉时都能挣钱的资产。诸如工厂，机器人，计算机软件，作家的著作，被租赁的房产，被投资进入其它领域的钱等等&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Wealth buys your freedom&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;财富的目标就是换取自由，你不必在不喜欢的地方呆着，不必在不喜欢的工作上消磨人生，仅此而已。它并不是让你能够买高级外套，或者开法拉利，或者开游艇，或者周游世界。这些物质享受会让你很快产生厌倦和愚蠢感。财富只是让你成为你自己的主宰。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Money is how we transfer wealth&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;金钱是可以转换成资产财富的媒介。金钱是一种社会信用，它代表可以使用他人时间的一种能力。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Status is your rank in the social hierarchy&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;社会中有两大游戏，几乎每个人都参与其中。一个是金钱游戏，另外一个是身份地位游戏。在地位和财富之间始终上演着一种微妙的竞争，玩身份地位的人，经常会攻击或利用创造财富的人。
-创造财富是一种正和游戏(positive-sum)，你拥有一个房子，不会妨碍我也拥有一个房子。身份地位则是一种零和游戏(zero-sum)，老三要爬到老二的位置，那么老二的位子就必须让出来。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2.挣钱和运气无关(Making Money Isn&amp;rsquo;t About Luck)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Making money isn&amp;rsquo;t about luck. It&amp;rsquo;s about becoming the kind of person who makes moeny.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;挣钱和运气无关，它是关于如何让自己变成注定挣钱的人。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Four kinds of luck: 1). Blind Luck, 2). Luck from hustling, 3). Luck from preparation, 4). Luck from your unique character&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;运气的四种分类：
-- &lt;code&gt;撞大运&lt;/code&gt;，纯运气
-- &lt;code&gt;奋力争取带来的好运&lt;/code&gt;，俗语：幸运眷顾勇敢的人，也就是积极行动大量做事后获得好运，经常折腾的人也会有好运。
-- &lt;code&gt;积极准备带来的好运&lt;/code&gt;，俗语：机会永远只给有准备的人。当你在某个领域积累很深，当大多数对这个领域不熟的人还没有觉察到的时候，你可以提前洞察这个领域的机会。
-- &lt;code&gt;独特个性带来的好运&lt;/code&gt;，你塑造了一个独特的个性，独特的品牌，独特的思维模式，然后运气就盯上了你(运气变成确定的事)。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;In 1,000 parallel universes, you want to be wealthy in 999 of them&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;在1000个平行宇宙中，你应该期望在其中的999个都是富有的，而不是只在其中的50个，靠运气才富有。通过追寻第四种运气，你可以消除运气因素。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;3.让运气变成你的命运(Make Luck Your Destiny)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Build your character in a way so luck becomes deterministic.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;以特定方式塑造你的个性，让运气成为注定的事&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Build your character so opportunity finds you&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;塑造你的独特个性(专业，可信赖，正直诚实，勇于担责，具有长线思维)，让机会自己来找你&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You have to be a little eccentric to be out on the frontier by yourself.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;第四种运气大都源于古怪的行事方式。想要非常收获，你必须要有非常表现。世界是一个高效场所，所有明显的地方都已经被挖掘过，为了找到新奇的尚未发现的事物，你必须要以非常规方式行事，你要有强烈意愿和兴趣，要比别人挖得更深，深到让人感觉非理性的地步。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Extreme people get extreme results ~ Sam Altman&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;极端的人获得极端的结果&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You can&amp;rsquo;t be normal and expect abnormal returns ~ Jeffrey Pfeffer&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;你不可能表现平凡，但却期望不平凡的回报&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Play stupid games win stupid prizes&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;玩愚蠢的游戏，只会赢得愚蠢的奖励。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;4.通过出租时间的方式，你不太可能致富(You Won&amp;rsquo;t Get Rich Renting Out Your Time)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You won&amp;rsquo;t get rich renting out your time, because you can&amp;rsquo;t earn non-linearly.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;通过出租时间(比如打工)的方式，你不太可能致富，因为你的输入(时薪)和输出(工作产出)高度相关，你无法以非线性方式挣钱。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Renting out your time means you&amp;rsquo;re essentially replacable.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;出租你的时间意味着你根本上是可以被替代的。大部分输入和输出高度相关的工作，会逐步被机器人或AI所取代。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You must own equity to gain your financial freedom.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;你必须拥有资产(生意的一部分，如产品，生意，知识产权，股票期权等)，才可能以非线性方式挣钱，并赢得财务自由。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You want a career where your inputs don&amp;rsquo;t match your outputs.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;你需要选择输入和输出不严格相关的，能以非线性方式挣钱的行业。要找高度创新，能够利用工具和杠杆的行业。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;5.通过量入为出获得自由(Live Below Your Means for Freedom)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;People living far below their means enjoy a freedom that people busy upgrading their lifestyles just can&amp;rsquo;t fathom&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;量入为出的人能够体会到的自由，是那些忙于升级生活方式的人所无法理解的。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The most dangerous things are heroin and a monthly salary&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;最危险的东西是海洛因和月光族。真正的致富之道是甘于朴素的生活+持续不断的努力积累。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Ideally, you&amp;rsquo;ll make your money in discret lumps&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;以逐步增量的方式挣钱(而非暴发户)是最理想的。财富来得太快去得也快。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;6.为社会创造它想要但是还不知道如何获取的东西(Give Society What It Doesn&amp;rsquo;t Know How to Get)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Society will pay you for creating what it wants, but doen&amp;rsquo;t know how to get, and delivering it at scale.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果你能够规模化创造和交付社会想要，但是还不知道如何获得的东西，那么社会就会回报你。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Figure out what product you can provide and then figure out how to scale it.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;基于你的特质/能力，思考你能够提供什么产品，然后思考如何能够规模化地交付这种产品。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Entrepreneur&amp;rsquo;s job is to try to bring the high end to the mass market&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;企业家的工作就将高端产品普及大众化。创造新事物 -&amp;gt; 预测社会需要这个新事物 -&amp;gt; 规模化生产 -&amp;gt; 普及到大众 -&amp;gt; 可盈利可持续&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;7.互联网极大扩展了职业的可能性(The Internet Has Massively Broadened Career Possibilities)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The Internet has massively broadened the possible space of careers, by allowing you to scale any niche obsession.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;互联网极大的扩展了可能的职业空间，它让你可以规模化任何你擅长和痴迷的细分市场。每个人都独一无二，互联网连接每一个人，通过它，你可以为你的产品/天赋/技能，找到足够听众，不管距离多么遥远。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Escape competition through authenticity. No one can compete with you on being you.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;通过真诚避开竞争。不要模仿，不要复制，每个人都不同，每个人都各有所长，做你自己擅长的事，没有人可以和做自己的人竞争。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;8.和具有长线思维的人玩长线游戏(Play Long-term Games With Long-term People)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Pick an industry where you can play long-term games with long-term people. All returns in life come from compound interest over many turns of the game.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;选择一个你能够和具有长线思维的人玩长线游戏的行业。生命中所有的回报(关系/挣钱/学习)都来自于反复游戏后产生的复利效应。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;When you switch industries, you&amp;rsquo;re starting over from scratch&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果你频繁换行业，那们你就要每次从零开始。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Long-term players make each other rich. In short-term game, it seems like everybody is making themselves rich.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;长期玩家让彼此都致富，短期玩家只顾自己挣钱。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;9.选择聪明，精力充沛和正直的合伙人(Pick Partners With Intelligence, Energy and Integrity)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Picking partners with high intelligence, energy and integrity is the three-part checklist that you can&amp;rsquo;t compromise on.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;选择合伙人如下三点是你不能将就的:
-- &lt;code&gt;聪明&lt;/code&gt;: 保证做事的方向正确，勤奋的蠢人很多
-- &lt;code&gt;精力充沛&lt;/code&gt;: 聪明的懒人也非常多
-- &lt;code&gt;正直&lt;/code&gt;: 这点最重要，没有这点上面两点归零&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Motivation has to come intrinsically. If you&amp;rsquo;re trying to keep someone motivated for the long-term, that motivation has to come intrinsically.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;必须是自激励和自驱动的人。如果你想让某人对某事长期处于激励状态，那么这种激励必须是发自内在的。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Integrity is what someone does, despite what they say they do.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;考察一个人是否正直，主要看他真正做了什么，而不是他说了什么。注意细微的细节(subtle signals)，当他认为周围没人在看的时候，他的所言所行。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;People are oddly consistent.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;虽然可以短期隐瞒，但人的本性极具有一致性。如果一个人在餐厅对服务员不礼貌，那么他对你不礼貌只是时间问题。如果一个人有报复敌人倾向，那么他把你从朋友重新定义为敌人只是时间问题，你早晚会感受到&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Status Signalling: If you overtly bid for status, if you overtly talk about being high status, that is a low status move.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果你过度看重和强调身份地位，你越可能内心自卑。你越讲自己诚实/可靠/正直，情况越可能相反。已有的实在的东西没必要强调，缺乏的虚的东西才需要强调。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;10.和理性乐观者为伍(Partner With Rational Optimists)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Don&amp;rsquo;t partner with cynics and pessimists. Their beliefs are self-fulfilling.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;不要和愤世嫉俗和悲观者为伍，他们的信条是自证预言。自证预言者：如果别人失败了，他会说我早就预言会失败，如果别人成功了，他会说这是撞大运。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Either lead, follow, or get out of the way.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;要么领导大家，要么跟随领导，要么让开。愤世嫉俗和悲观者，他们不想领导，不想跟随，也不想让开，他们只是无休止散布悲观言论。所有的成功人士都是行动导向的，判断某事是否可行的最简单方式就是行动。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Partner with rational optimists.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;乐观但是要理性，要清楚知道事物的艰难和不利面，但是依然乐观前行&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;11.用特长知识武装自己(Arm Yourself With Specific Knowledge)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Arm yourself with specific knowledge. It can&amp;rsquo;t be trained but it can be found by pursuing your genuine curiosity.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;用特长知识武装自己。特长知识无法通过培训获得，它只能通过追寻你的单纯的好奇而获得。对特长领域的好奇可能源于先天基因，也可能在儿童时期养成，它构成你后续职业的核心竞争。特长知识几乎无法后天培养，大致20岁以后，个人的特长领域已经初步显现，你需要意识到自己的特长领域，并基于它构建你的职业。很多时候，个人其实并不能清楚认识到自己的特长领域，周围亲近的人反而更清楚。特长知识无法通过培训简单获得，如果社会能够培训你，那么它也能培训其他人，然后取代你&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;12.特长知识具有高度创新和技术性(Specific Knowledge Is Highly Creative or Technical)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Specific knowledge tends to be creative or technical. It&amp;rsquo;s on the bleeding edge of technology, art and communication.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;特长知识具有高度创新和技术性。它存在于技术/艺术/沟通的前沿。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Specific knowledge can be taught through apprenticeships.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;通过学徒关系可以获得特长知识。巴菲特(Warren Buffett)和格雷厄姆(Benjamin Graham)是一个典型例子。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Specific knowledge is highly specific to the situation, it’s specific to the individual, it’s specific to the problem, and it can only be built as part of a larger obsession, interest, and time spent in that domain.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;特长知识和情景/个体/问题领域高度相关。它只能通过对某个领域的痴迷/兴趣和大量时间的投入才能获得。简单读一本书，上一门课无法获取特长知识，特长知识也无法被编程为一个算法(无法自动化)。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You can&amp;rsquo;t be too deliberate about assembling specific knowledge. Build specific knowledge where you are a natural。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;不要刻意追求特长知识(过于目标导向)，找到你内在真正擅长和喜欢的事(你天生就是干这个的料)，然后基于此构建特长知识。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;13.学习销售，学习制造(Learn to Sell, Learn to Build)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Learn to sell. Learn to build. If you can do both, you will be unstoppable.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;学习销售，学习制造。如果你两样都会，你将不可阻挡。制造范畴：开发，制造，物流，采购，设计和运营服务。销售范畴：售卖，市场，沟通，招聘，筹钱，激励员工，公关&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The Silicon Valley model is a builder and seller&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;硅谷模式=世界级销售+世界级制造。例子，苹果创始人Steve Jobs + Steve Wozniak，微软创始人Gates + Allen，谷歌创始人Larry + Sergey。CEO + CTO组合。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;If you can do both you will be unstoppable&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;两者兼备可创造整个行业。例子埃隆·马斯克(Elon Musk)，史蒂夫·乔布斯(Steve Jobs), 拉里·埃里森(Larry Ellison/Oracle)&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;I&amp;rsquo;d rather teach an engineer marketing than a marketer engineering&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;制造者容易转行为销售者(前提沟通能力好)，销售者不易转成制造者。职业早期建议从制造者开始(打下基础)，后期可转行为销售者。制造者需要大量聚焦时间的投入，而且新人新产品始终会推陈出新，所以制造技能难以规模化和保持前沿，销售技能则长期更易于规模化。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;14.从读你喜欢的书开始，一直到你喜欢上阅读(Read What You Love Until You Love to Read)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;培养大量阅读和终身学习习惯。早期要读原创经典(基础+第一性原理)，以后各类学科都要广泛涉猎&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;15.基础是数学和逻辑(The Foundations Are Math and Logic)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;现代最重要五项基础技能：&lt;code&gt;阅读&lt;/code&gt;，&lt;code&gt;写作&lt;/code&gt;，&lt;code&gt;算术&lt;/code&gt;，&lt;code&gt;沟通(说服力)&lt;/code&gt;，&lt;code&gt;计算机编程&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;16.没有所谓“商业&amp;rdquo;技能(There&amp;rsquo;s No Actual Skill Called &amp;ldquo;Business&amp;rdquo;)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;通过实践锻炼你的做生意能力，而非纯理论学习。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The number of &amp;ldquo;doing&amp;rdquo; iterations drives the learning curve.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;试错迭代才能快速驱动学习曲线，迭代是不断尝试新的方法，而非重复劳动。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;If you&amp;rsquo;are willing to bleed a little every day, you may win big later&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;普通大众期望每天能挣一点，企业家则相反，他们愿意承受每天出一点血(比如损失金钱)，但最终可能会赢得更多。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;17.通过勇于承担风险来获得杠杆(Embrace Accountability to Get Leverage)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Embrace accountability. Society will reward you with leverage.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;致富需要杠杆(人力/资金等)。只有建立勇于承担责任和风险的信誉，社会才会回报杠杆予你。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;People who can fail in public have a lot of power.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;敢于公开承担失败的人其实非常强大。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;18.通过勇于承担风险来赢得资产(Take Accountability to Earn Equity)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;If you have high accountability, you&amp;rsquo;re less replaceable and you can get a piece of the business.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果你具有勇于承担风险的信誉，别人才会觉得你不可替代，才会把生意/资产交给你。位置越高，承担风险越大，同样受益也可能越大。船要沉没的时候，船长必须最后一个离开。公司破产的时候，员工最先得到工资补偿，然后是银行，最后才是资产投资人(风险最大，收益也可能越大)。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Accountability is reputational skin in the game&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;skin in the game是风险共担意思，来自黑天鹅的作者塔勒布的新书《非对称风险》。回报要和风险承担成正比，敢于压上你的声誉。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;19.劳动力和资本是老式杠杆(Labor and Capital Are Old Leverage)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Wealth requires leverage. Labor and capital are older forms of leverage that everyone is fighting for.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;获得财富需要利用杠杆。劳动力和资本是几乎每个人都在竞争的老式杠杆。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Society overvalues labor leverage&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;当前社会过度看重劳动力杠杆。看职位高低，就看带多少人，看公司实力，就看公司有多少人，实际上看的是能用多大的人力杠杆。
-&amp;gt; You want the minimum amount of labor that allows you to use the other forms of leverage.&lt;/p&gt;
-
-&lt;p&gt;劳动力杠杆的劣势：管人并不容易，需要很强领导管理技能；劳动力杠杆竞争非常激烈，一不小心会成为政治斗争或政变中的牺牲品(历史上资本和劳动力之间的斗争从未停止)。所以应该尽量减少劳动力杠杆的使用，你只需少量劳动力，能够支持你使用其它形式的杠杆即可。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Capital has been the dominant form of leverage in the last century.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;资本是上个世纪以来的一种主要的杠杆形式，少数人靠它获得巨量财富，大部分甚至还不懂如何利用它。资本是一种很强大的杠杆，可以转换成其它形式的杠杆(比如劳动力)，资本也易于规模化。运用好资本需要好的资本管理能力和分析技能&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You need specific knowledge and accountability to obtain capital&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;你需要有特长知识和良好的信誉记录，社会才会放心把资本交到你手，以此作为杠杆，让你帮忙挣取更多资本。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;20.产品和媒体是新杠杆(Product and Media are New Leverage)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Product and media are the leverage of new wealth. Create software and media that work for you while you sleep.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;产品和媒体几乎没有边际复制成本，是新财富的杠杆。从印刷出版开始 -&amp;gt; 到广播电视媒体开始加速 -&amp;gt; 互联网+代码大爆发。现在，你甚至可以不靠(或只是少量依靠)人力和资本杠杆，就可以放大你的努力。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Product leverage is where the new fortunes are made&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;上一代财富主要靠资本杠杆，典型例子是巴菲特。新一代的财富主要靠代码和媒体杠杆，典型例子杰夫·贝佐斯(亚马逊创始人)，马克·艾略特·扎克伯格(Facebook创始人)，拉里·佩奇(谷歌创始人)，比尔·盖茨(微软创始人)，斯蒂夫·乔布斯(苹果创始人)。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Combining all three forms of leverage is a magic combination&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.劳动力杠杆：工程师+设计师+产品开发。&lt;/li&gt;
-&lt;li&gt;2.资本杠杆: 市场，广告，规模化&lt;/li&gt;
-&lt;li&gt;3.代码+媒体杠杆&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;三者结合可以产生巨大杠杆效应&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Product and media leverage are permissionless&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;对于劳动力杠杆，别人要愿意跟你才行。对于资本杠杆，要有人愿意投资给你才行。编程/写书/录制播客视频/写博客，所有这些都是不需要许可的，所以说它们是最公平的杠杆。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;21.产品杠杆人人平等(Product Leverage is Egalitarian)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Labor and capital are limited to the people who control those resources. But products reach global markets.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;劳动力和资本仅限于控制这些资源的人，但是产品可以触达全球市场。产品杠杆是一种正和游戏，如果你在乎要以道德的方式获取财富，你最好使用代码和媒体来创造财富，因为这类产品任何人都可以使用(具有平等属性)，而劳动力和资本则只有少数人能够使用(不平等)。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;22.寻找一个能够利用杠杆的生意(Pick a Business Model With Leverage)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Ideally, you should pick a business model with network effects, low marginal costs and scale economies.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;你最好选择一个具有&lt;code&gt;网络效应&lt;/code&gt;的业务，&lt;code&gt;低边际成本&lt;/code&gt;，并且是&lt;code&gt;经济地规模化&lt;/code&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Scale economies: the more you produce, the cheaper it gets&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;code&gt;规模经济&lt;/code&gt;: 生产越多，越便宜。造第12个产品比造第5个产品便宜，造第10000个产品比造前一个要便宜很多，这种方式易于商品化，并且能够自动给竞争者制造障碍&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Zero marginal cost of reproduction: producing more is free&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;code&gt;零边际复制成本&lt;/code&gt;: 生产更多是免费的，典型例子是媒体产品。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Network effects: value grows as the square of the customers. Network effect business are natual monopolies.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;code&gt;网络效益&lt;/code&gt;: 价值以客户的平方增长。典型例子: Facebook/Uber/Google/Twitter/YouTube。具有网络效应的业务具有天然垄断(natual monopolies)和赢者通吃(winner-take-all)特性。语言具有网络效应，未来世界可能只有英语和中文两种语言。货币也具有网络效应，未来世界可能只有一种储备货币(目前是美元)。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Zero marginal cost business can pivot into network effect business.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;零边际成本的产品-&amp;gt;易于规模化-&amp;gt;易于产生网络效益-&amp;gt;每增加一个用户都会增加整个网络的价值。网络效应是终极杠杆，你选择业务模式的时候一定要思考每增加一个客户，客户之间如何彼此增加价值，然后你躺在海滩上旅游的时候，客户都会自动增加价值。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;23.从劳工到企业家的案例(Example: From Laborer to Entrepreneur)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The continuum from laborer to real estate tech company goes from low to high specific knowledge, accountability and leverage.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;从建筑工人到房地产技术公司的案例，展示特长知识、职责风险承担和杠杆，从低到高的发展历程。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Laborers get paid hourly and have low accountability&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;底层是建筑工人/水电工等，他们按小时计薪，但承担职责风险最小，社会地位低。他们需要掌握的特长知识很少，除了手头工具没有多少杠杆可用。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;General contractors get equity, but they&amp;rsquo;re also taking risk.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;第二层是总承包商，他们拥有资产，可以利用人力杠杆(承包工队)，可以获得项目收入的大头，但同时承担职责和风险也更多，如果项目失败，他们也要承担大头。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Property developers pocket the profit by applying capital leverage.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;第三层是房地产开发商，他们利用资本杠杆获取利润。经验丰富的承包商可能转型为房地产开发商，他们发展出了地产领域的商业敏锐性（知道哪块地皮会增值，政策经济层面因素等)，然后他们有能力找到资本投资(自己也可投资)。这层需要更多特长知识，风险承担和利用资本杠杆的能力。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Architects, large developers and REITs are even higher in the stack.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;建筑师，大开发商由于之前的成功带来的声誉，会让他们更加增值。也有部分转做房地产投资信托，他们同时熟悉房地产和金融/资本市场，他们不用去真正开发房地产，也不用管理很多人，他们可以充分利用资本杠杆。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Real estate tech companies apply the maximum leverage.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;最上层是房地产技术公司(类似美国Trulia/RedFin/Zillow这样的公司)，他们可以最大程度利用杠杆。需要同时具备房地产、技术、投资领域的特长知识(一般需要互补团队)，承担职责和风险很高，可以利用的杠杆最大，同时潜在收益也可能最高。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;24.判断就是决断技能(Judgment Is the Decisive Skill)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;In an age of infinite leverage, judgment becomes the most important skill。Leverage is a force multipler for your judgment.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;在杠杆几乎无限的时代，判断力成为最重要的技能。判断力是基础，杠杆则是判断力的倍增器。职业早期你忙于追逐杠杆，一旦获得杠杆，你需要歇一歇，因为这个时候判断力就更加重要了(因为风险也更大了)。巴菲特如此富有主要是因为他的判断力，即便你把他的钱全部拿走，明天投资者仍然会給他1千亿，因为他的判断力还在&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Without experience, judgment is often less than useless.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;光有高智商还不够，判断力源于快速迭代+实战体验。需要切身投入和切肤之痛(skin in the game)才会产生真正的判断力。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The people with the best judgment are among the least emotional&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;具有最好判断力的人是最不情绪化的。很多最好的投资人/企业家是近乎毫无情绪的机器人。情绪是真正阻碍你看清事物真相的东西。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The more outraged someone is, the worse their judgment.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;一个人越愤怒，他们的判断就越糟糕。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;25.给自己设定一个超高时薪(Set an Aspirational Hourly Rate)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;If outsourcing a task will cost less than your hourly rate, outsource it.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果外包某项工作所需费用比你的时薪少，那么就外包。对于大部分要花时间的事情，都要和你的时薪比较，再决定是否自己去做。如果致富你是的首要目标，那么你的主要时间都应该投在这件事情上。花费时间和别人争吵，买错小东西自己亲自去退货，都是浪费时间的蠢事。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You can&amp;rsquo;t penny pinch your way to wealth&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;对于基本的生活所需，你可以节俭，你也可以始终保持低开销，但是对于致富这件事情，你无法通过吝啬来实现。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;My aspirational rate was $5,000/hr&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;我(原文作者)给自己设定的超高时薪是每小时5000美金。如果你给自己设定的超高时薪，看起来还没有到荒谬的程度，那么你设得还不够高。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You should be working on your product and getting product-market fit. And you should be exercising and eating healthy. That&amp;rsquo;s all you have time for while you&amp;rsquo;re on wealth creation mission. ~ Paul Graham(保罗·格雷厄姆)，美国著名程序员、风险投资家、博客和技术作家。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;创业者只应该关注和花费时间在：产品，产品和市场契合，锻炼，健康饮食。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;26.奋力工作(Work As hard As You Can)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Work as hard as you can. Even Though what you work on and who you work with are more important.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果致富是你的目标(如果只是朝九晚五的上班则另当别论)，那么你必须奋力工作，同时要清楚意识到，做什么工作，和谁一起工作，比努力本身更重要&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;正确的工作领域&lt;/code&gt;: 最重要，选择职业或者做生意，先要弄清楚做什么，有没有市场，我能够开发出什么产品，能否发挥我的特长知识，我有没有兴趣能否持续投入&lt;/li&gt;
-&lt;li&gt;其次是和&lt;code&gt;正确的人(聪明/精力充沛/正直)&lt;/code&gt;, 和优秀的人一起工作，优秀的标准也要超高(now matter how high your bar is, raise your bar)。&lt;/li&gt;
-&lt;li&gt;最后才是&lt;code&gt;努力工作&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Nobody really works 80 hours a week&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;没有人能真正工作80甚至120小时，这样说的人无非是在身份炫耀。没有人能持续工作80甚至120小时，同时还保持高产出和头脑清醒，你的脑袋会迟钝，灵感缺失。&lt;/p&gt;
-
-&lt;p&gt;在知识领域的高效工作方式是：在灵感和兴趣来的时候，像冲刺一样奋力工作一段时间，然后休息一段更长的时间。这种方式更像猎捕狮子，而不是像马拉松，但长期看，致富的过程是一系列冲刺组成的一个马拉松。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Inspiration is perishable&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;灵感容易腐烂。灵感稍纵即逝，灵感点子来的时候要及时抓住，及时动手去做。比如脑中突然来了写博文的灵感，马上动手去写，如果延迟或迟疑，它可能很快消失。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Impatience with actions, patience with results.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;对行动可以没有耐性(积极行动)，但是对结果要有耐心。灵感来的时候，抓住行动，问题来的时候，不睡觉也要解决。但是产品被市场接受需要很长时间，与人合作磨合也需要很长时间，伟大的产品诞生需要不断的打磨，打磨，再打磨。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;27.你应该足够忙，没有多少时间去社交(Be Too Busy to &amp;ldquo;Do Coffee&amp;rdquo;)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;You should be too busy to &amp;ldquo;do coffee&amp;rdquo;, while still keeping an uncluttered calendar&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;你应该足够忙，没有多少时间去社交，同时日程表最好空白，换句话说，你应该专注自己的要事，没有时间社交和开会。&lt;/p&gt;
-
-&lt;p&gt;在职业早期的探索(exploring)阶段，你可以参与一些社交和建立一些关系。在职业的中后期利用(exploiting)阶段，你有更重要的事情要做，你必须无情地将会议从你的生活中剔除。&lt;/p&gt;
-
-&lt;p&gt;如果某人要和你开会，你就问能否用电话代替。如果某人要和你电话沟通，你就问能否用电子邮件代替。如果某人想要发电子邮件给你，你就问能否用短信代替，实际上到这一步，大部分短信都是可以忽略的，除非是真正紧急的事情&lt;/p&gt;
-
-&lt;p&gt;你应该无情地拒绝会议。如果真的要开会，就边走边谈，或站着谈。让会谈保持简短，保持行动导向(actionable)。大部分超过8个人的圆桌会议，不会有任何产出，你基本上浪费至少一个小时。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;People will meet with you when you have proof of work&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果你手头真有重要和有价值的产品，可以考虑找合适的人会谈合作。找重量级投资人谈，你必须先有工作证明(proof of work，区块链术语)，也就是你实际开发的产品或者项目进度，而不是ppt，更不是脑袋里的想法&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Networking is overrated even early in your career&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;即便在职业早期，社交的作用也被夸大了。通过社交手段建立人脉获得机会，表面上看如此，实际这种机会顶多是第一(撞大运)和第二类(奋力争取带来的好运)。你应该把重点放在第三(积极准备带来的好运)和第四类(独特个性带来的好运)，专注建立声誉，开发产品，建立独特视角，善于发掘机会(在别人还没看到时)。&lt;/p&gt;
-
-&lt;p&gt;忙碌的日程表和忙碌的脑瓜，做不了伟大的事情。自由的时间和思考，&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;28.不断重新定义你的工作(Keep Redefing What You Do)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Become the best in the world at what you do. Keep redefining what you do until this is true.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;在你专注的工作上做到世界最佳，不断重新定义和打磨你的工作，直到世界最佳成真。这个工作必须和你的特长知识/技能/职位/能力/位置/兴趣相匹配(遵循自己的内心，being authentic to yourself)，探索之旅会很漫长，但你始终要意识这点。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Find founder-product-market fit&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;企业家最重要的事：找到有&lt;code&gt;市场&lt;/code&gt;的&lt;code&gt;产品&lt;/code&gt;，而且你天生&lt;code&gt;擅长&lt;/code&gt;干这事，三者缺一不可&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;29.通过做自己避开竞争(Escape Competition Through Authenticity)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Competition will trap you in a lesser game&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;受到社会上身份地位游戏的影响，我们容易追逐模仿而迷失自我。如果周围的人都是成功的商务人士，我也要成为商务人士。如果我周围的人都是成功的社会活动家，我也要成为社会活动家。如果我周围的人都是成功的架构师，我也要成为架构师。实际上这种追逐模仿更多是一种零和竞争游戏。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;No one can complete with you on being you&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;没有人能够和做自己的人竞争，做你最擅长的事，基于你的特长知识打造你的核心竞争。同时也要注意产品和市场匹配问题(product-market fit)，如果真实做自己，但是市场不大，你也要注意调整。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;In entrepreneurship, the masses are never right&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;从企业视角看，大众判断往往不正确。如果大众判断正确，那么大家早就发财致富了。如果大众都在谈论某个领域或产品，那么恰恰说明这个领域的竞争趋于饱和，已经没有多少机会了。相反，如果没人谈论某个领域，则可能这个领域的机会也不大。企业家需要在两者之间找到平衡。大部分人倾向模仿追逐热点，伟大的企业家倾向真实做自己。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Combine your vocation and avocation&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;最好将自己的事业和爱好结合起来，这样的人更容易做自己。经过不断尝试，很多人最终会找到自己最擅长的事业。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;30.玩愚蠢的游戏，赢愚蠢的奖励(Play Stupid Games, Win Stupid Prizes)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Competition will blind you to greater games. You&amp;rsquo;re one step away from a better market.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;热衷模仿竞争会蒙蔽你的双眼，陷入零和游戏，让你迷失自我。真实面对自己和客户才能找到更好市场。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;31.最终你会获得你应得的（Eventually You Will Get What You Deserve）&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Apply specific knowledge with leverge and eventually you will get what you deserve.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果满足特长知识，责任心，利用杠杆和真实做自己这些先决条件，那么从足够长的时间范围来看，你最终会获得回报。这个通常需要十年甚至二十年，也有快的三五年的，但是这种是例外。期间你会经历很多失败，但在企业界，有时往往做对一次就够了。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;What are you really good at that the market values?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;致富要素：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.特长知识的稀缺性&lt;/li&gt;
-&lt;li&gt;2.能够利用多大的杠杆&lt;/li&gt;
-&lt;li&gt;3.判断力的准确度&lt;/li&gt;
-&lt;li&gt;4.责任心强度&lt;/li&gt;
-&lt;li&gt;5.所做事情的社会价值多大(product market fit)&lt;/li&gt;
-&lt;li&gt;6.持续投入时间+持续学习改进&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;核心:&lt;/code&gt; 你擅长(特长知识)+社会需要(product market fit)，其它自然会来。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;32.拒绝大部分建议(Reject Most Advice)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Most advice is people giving you their winning lottery ticket numbers. The best founders listen to everyone but make up their own mind.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;如果你问那些速成人士是如何获得成功的，他们可能只是告诉你他们中奖的彩票号码(也就是说，你得到的建议往往只适用于特定的人和特定上下文环境)，可能完全不适用于你和你的环境。你应该关注系统，而非单一目标，也就是什么的系统或者说环境，才促成了某些人的成功。盲目生搬硬套只会适得其反。&lt;/p&gt;
-
-&lt;p&gt;真正的创始人会聆听所有人的视角和建议，但是在最后做决策时，他会忽略所有人，而是根据自己的系统和上下文做决定。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Advice is maxims you can recall later, when you get your own experience.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;所谓建议可以认为是一种格言，也就是你有了自己体验之后，你能回忆起来并能对上号的格言。本文的35条建议也是35条格言，我(原文作者)碰到问题时也时常会回顾这些格言，作为我的处事指导，比如是否要和某人一起共事，如果我不能和他一起共事10年(长线游戏)，那么我何必要和他共事一天？如果你看过建议以后有体验共鸣，那么对你就要价值；如果你无感，那么请忽略，继续做自己的事就好了。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;33.平和的内心，健康的身体和充满爱的家庭(A Calm Mind, a Fit Body, a House Full of Love)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;When you&amp;rsquo;re finally wealthy, you&amp;rsquo;ll realize it wasn&amp;rsquo;t what you were seeking in the first place.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;当你某天最终变得富有，你会意识到这其实并不是你最初的追求。钱只能解决你钱的问题(获得一定的物质世界的自由度)，但是内心的平静，健康的身体，和谐有爱的家庭，这些靠钱买不来，这些也要靠你去挣取，不可偏废。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;34.致富没有捷径(There Are No Get Rich Quick Schemes)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Get rich quick schemes are just someone else getting rich off you.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;所谓的致富速成，往往是别人想从你身上挣钱的把戏。世界是一个高效之地，如果有容易挣钱的地方，那么这个地方早就被探索和利用过了。&lt;/p&gt;
-
-&lt;p&gt;另一方面，作为专家或成功人士，可以给其他人一些(高质量和可执行的)致富建议，同时要坦承过程漫长且艰难，否则会毁掉自己的声誉。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;35. 将自己产品化(Productize Yourself)&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Figure out what you&amp;rsquo;re uniquely good at and apply as much leverage as possible.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;找到你擅长的事业，并尽可能利用杠杆。Productize Yourself，把独特的你和你的特长知识进行产品化，勇于承担风险，真实面对自己，充分利用杠杆规模化你的产品。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Making money isn&amp;rsquo;t even something you do, it&amp;rsquo;s not a skill. It&amp;rsquo;s who you are.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;做最真实的自己，&lt;code&gt;挣钱并不是关于你做的事情，也不是一种技能，而是你到底是谁的问题。&lt;/code&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Find hobbies that make you rich, fit and creative&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;挣钱是一个函数，输入是你的身份和你的爱好。找到你的三个爱好，一个让你挣钱，一个让你健康，一个让你富有创造力。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
-</description>
-      
-    </item>
-    
-    <item>
-      <title>2019年总结之瞎扯淡</title>
-      <link>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/</link>
-      <pubDate>Thu, 02 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E7%9E%8E%E6%89%AF%E6%B7%A1/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;大胡子&lt;/code&gt;是我特别佩服的一位老师，第一次知道他是17年偶尔一次线上讲座，具体题目忘记了，内容大概是关于&amp;rdquo;技术人如何赚钱&amp;rdquo;，很real，告诉一些晚辈如何赚钱，以及拥有一些赚钱思维，我觉得这个真的很酷。后来才了解到他的&lt;code&gt;疯人院&lt;/code&gt;和星球，所以立马入会，所幸会费不是很高(这要是再高个几百的，当时的我是肯定不会去&amp;rdquo;割韭菜&amp;rdquo;社群)。不过，在这两年里，虽然不曾在社群发表自己的观点，但是通过群里各种大牛、前辈们的探讨，在加上自己的思考，也的确让自己再技术之外成长了很多，所以，在这里我向大家极力推荐大胡子老师，他的公众号是&lt;code&gt;姜胡说&lt;/code&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;年初了，总该总结总结过去一年的成长和收获，也该去梳理梳理新一年的征程如何走下去，这里有一篇胡子老师的文章，觉得很有意思，感兴趣的可以去仔细读读&lt;a href=&#34;https://mp.weixin.qq.com/s?__biz=MzIxMjE4NzM5MA==&amp;amp;mid=2651785933&amp;amp;idx=1&amp;amp;sn=867e1c2e54dc124d60d9ad3c7a759a49&amp;amp;chksm=8cb24b5cbbc5c24a7a3f51f882e2a8c13f05312bdf33d5a5e03e52ea89eb818b32dfad65a43b#rd&#34;&gt;早知道这个，我至少可以少奋斗3年&lt;/a&gt;，虽然有点标题档了，但不妨碍这依然是一篇值得看和值得思考的文章.&lt;/p&gt;
-
-&lt;p&gt;以下摘录几个观点，用于鞭策自己:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;1.Stay hungry,Stay foolish&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;Stay hungry,Stay foolish!&lt;/code&gt;是乔布斯老爷子在斯坦福大学大学演讲时结尾的一句话，翻译过来即为&amp;rdquo;求知若饥，虚心若愚&amp;rdquo;。&lt;/p&gt;
-
-&lt;p&gt;记得那个时候我还在上大学，乔老爷子的自传以及演讲都那么激动人心，我还曾经将&lt;code&gt;Stay hungry,Stay foolish!&lt;/code&gt;作为我的微信签名，直到后来我懂得了做的重要性，才将微信签名换成如今的&lt;code&gt;Never try,Never known!&lt;/code&gt;。要说&amp;rdquo;Stay hungry,Stay foolish&amp;rdquo;是内在修养的话，那么&amp;rdquo;Never try,Never known&amp;rdquo;就是外在表现，我们要一直对外保持不断的好奇心，不断尝试，只有不断尝试，我们才会发现我们是多么的无知，而当你长时间处于无知状态时，往往会被别人远远的甩在最后。&lt;/p&gt;
-
-&lt;p&gt;所以，&lt;code&gt;当你对这个世界失去了敬畏和好奇心时，你就一定会落后&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;落后就肯定会挨打，我相信从小到大大家都不愿成为挨打的那个人。&lt;/p&gt;
-
-&lt;p&gt;那该怎么办呢？我在&amp;rdquo;Stay hungry,Stay foolish&amp;rdquo;的后面再加一个&amp;rdquo;Never try,Never known!&amp;ldquo;.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Stay hungry: &lt;code&gt;保持对知识的敬畏，保持对这个世界的好奇心&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Stay foolish: &lt;code&gt;接触到新事物时，不要让固有的观念影响自己。真正强大的人，允许自己的大脑里同时存在两种或者两种以上完全相反的声音。&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Never try,Never known: &lt;code&gt;不去尝试，永远不知道这个世界本身的运行机制，当你知道再多也不去尝试仍然是不知道&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;2.技不压身&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;像我们搞运维的，最早之前可能会比较熟悉使用Linux，然后擅长Linux环境下一些常用服务的规划和实施，并且能够尽快排查故障和问题。在我刚开始从业的一段时间，我一度有点茫然，纠其原因是因为运维这个行业，起码像我上面提到的这个定义，其实任何一个有相关技术背景，并且本身还算是一个靠谱的人，及时对运维一点儿也不懂，如果有运维的活儿，那他也一定可以完成，不过就是多花点时间多花点儿精力而已。&lt;/p&gt;
-
-&lt;p&gt;所以，我那个时候在想，作为一个运维从业者，未来将如何破局。这就跟一两年前同行相遇都会问&amp;rdquo;我们搞运维的，要不要去学点开发啊&amp;rdquo;，到目前为止，我想市面上应该再没有不懂开发的运维了吧。至少你写个Python、Shell、Perl脚本是最基本的吧,再有甚者可能还会对运维有Golang或者Java开发的能力的要求。&lt;/p&gt;
-
-&lt;p&gt;那我想说的也是:&lt;code&gt;多了解一些其他技术，对运维，甚至是其他事情都会有莫大的好处&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;这两年我也因此去多学习了一些其他技术，比如&lt;code&gt;Golang、Vue、基于Hadoop体系的大数据处理&lt;/code&gt;，虽然在这几个方面都不是很深入，也不是很资深，但此时作为一个运维从业者来说，或者想要成为一个更加优秀的运维从业者来说，这些技能都是非常有帮助的。&lt;/p&gt;
-
-&lt;p&gt;2020年，我会在巩固常用技术的基础上再去多拓展一些技术，比如&lt;code&gt;Rust&lt;/code&gt;或者&lt;code&gt;JavaScript&lt;/code&gt;之类的，毕竟2020年都要实现全面建设小康社会了，我们自身的技能也应该再全面一些不是么？&lt;/p&gt;
-
-&lt;p&gt;有些人可能就会说了，学那么多技术，也不一定用的上，其实古人有句话就是&amp;rdquo;书到用时，方恨少&amp;rdquo;，很多时候我们在不断学习和了解的过程中并不一定是在未来一定要用它，而是&lt;code&gt;用整个经历来还原他人决策的依据&lt;/code&gt;，让你能够以更贴近他人的角度去理解一件事，更何况万一在未来用上了，不是也不用去求他人了不是。&lt;/p&gt;
-
-&lt;p&gt;这个时候，可能还会有人说了，我想去学习一些先进的技术，但是在国内网站上都无法找到，而且信息杂乱。其实，只要你确定了要去学习一些新技术，那怎么学就不是那么重要了，毕竟&lt;code&gt;做什么比怎么做更重要&lt;/code&gt;，是吧，只要目标明确，就一定能找到对应的途径。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;3.知识获取&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;接着上面说到的，我想学习一门新技术，我该如何去学习呢？&lt;/p&gt;
-
-&lt;p&gt;我的建议其实如同大胡子老师的观点，一定要吸收&lt;code&gt;最原始的知识&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;一定要&lt;code&gt;拒绝二手知识。更何况是三手、四手。&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;前两天，偶然在群里看到有小伙伴说&amp;rdquo;现在就是照着网上的配置抄，然后埋大bug&amp;rdquo;。现实可能的确是这样的，因为大家时间都很宝贵，遇到问题也都着眼于解决眼下&amp;rdquo;问题&amp;rdquo;，所以对于本质问题也少有人会追根溯源了。这就是典型的多手知识，目前网络上充斥着各种良莠不齐的文章，我们可能不了解别人的场景，也不了解问题的上下文，照抄别人的配置，可能是暂时解决问题了，也许也埋下了一个祸根，但终究对于我们个人而言，没有任何成长。&lt;/p&gt;
-
-&lt;p&gt;胡子老师在那篇文章说:
-&amp;gt; 读书这种事很美妙。
-&amp;gt; 思考也是。
-&amp;gt; 不要让他人剥夺走。
-&amp;gt; 获取一些有养料的知识。
-&amp;gt; 不仅仅是读书。&lt;/p&gt;
-
-&lt;p&gt;我们搞技术的人，大多数场景都在使用开源技术构建产品，所以在成长的路上我们完全可以阅读那些&lt;code&gt;官方文档&lt;/code&gt;，及时那些英文官方文档不那么容易理解，我也依然建议去阅读官方文档，起码在核心问题上，要比那些多手翻译的官方文档要好很多。再者，我们如果有时间和经历，其实是可以针对核心逻辑去阅读源代码来追溯源头。&lt;/p&gt;
-
-&lt;p&gt;到现在为止，我在工作上遇到的任何技术问题，如果是开源组件，我都会第一时间去&lt;code&gt;GitHub&lt;/code&gt;或&lt;code&gt;Google&lt;/code&gt;上查找官方文档，当然我也会借鉴一些多手翻译的官方文档(毕竟英语水平不咋地)。&lt;/p&gt;
-
-&lt;p&gt;当然这里并不是想说是怎么去获取知识的，而是一种思维模式，即&amp;rdquo;对于知识，我们一定要思考要不要去学习，然后找到一手渠道去学习最原始、最纯的知识&amp;rdquo;。知识其实是无处不在的，我们需要的是有鉴别知识的能力.&lt;/p&gt;
-
-&lt;p&gt;然后，&lt;code&gt;基于需求或者人类的社会动机将那些想法进行分类整理&lt;/code&gt;。 这句话也是胡子老师文章中的，很有感触。将我们学到知识进行分门别类，仔细想想，&lt;code&gt;一个不能和人类需求和社会动机联系在一起的知识，它可以用在什么地方呢？&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;可以尝试思考一下:
-&amp;gt; 这条信息主要覆盖哪个团体和人群？
-&amp;gt; 这个想法代表了哪些深层的人类需求和行为？
-&amp;gt; 这件事有趣的地方在哪里？
-&amp;gt; 别人是怎么做的？
-&amp;gt; 不同团体之间他们互相是如何做的？&lt;/p&gt;
-
-&lt;p&gt;最后，依然以大胡子老师的话结尾。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;观察生活中既有的生活方式,
-和那些新鲜事物做对比。看看发生了什么。
-最后&lt;code&gt;把所有的问题全部回归到人类的需求和社会动机上来。&lt;/code&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;人活着都有什么需求，你考虑了，别人没考虑，那，这就是你和别人的差距。&lt;/p&gt;
-
-&lt;p&gt;劳心者制人，劳力者制于人，这才是自然规律。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
-</description>
       
     </item>
     

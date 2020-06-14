@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>kafka经典面试题详解 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
+" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="kafka经典面试题详解" />
+<meta property="og:description" content="
+无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/" />
+<meta property="article:published_time" content="2020-06-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-14T00:00:00+00:00" />
+<meta itemprop="name" content="kafka经典面试题详解">
+<meta itemprop="description" content="
+无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
+">
+
+
+<meta itemprop="datePublished" content="2020-06-14T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-14T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="7474">
+
+
+
+<meta itemprop="keywords" content="kafka,运维,面试," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="kafka经典面试题详解"/>
+<meta name="twitter:description" content="
+无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">kafka经典面试题详解</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-06-14" class="post-time">
+          2020-06-14
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 7474 words </span>
+          <span class="more-meta"> 15 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#基础题目">基础题目</a>
+<ul>
+<li><a href="#1-apache-kafka-是什么">1.Apache Kafka 是什么？</a></li>
+<li><a href="#2-什么是消费者组">2.什么是消费者组?</a></li>
+<li><a href="#3-在-kafka-中-zookeeper-的作用是什么">3.在 Kafka 中，ZooKeeper 的作用是什么？</a></li>
+<li><a href="#4-解释下-kafka-中位移-offset-的作用">4.解释下 Kafka 中位移（offset）的作用</a></li>
+<li><a href="#5-阐述下-kafka-中的领导者副本-leader-replica-和追随者副本-follower-replica-的区别">5.阐述下 Kafka 中的领导者副本（Leader Replica）和追随者副本（Follower Replica）的区别</a></li>
+</ul></li>
+<li><a href="#实操题目">实操题目</a>
+<ul>
+<li><a href="#6-如何设置-kafka-能接收的最大消息的大小">6.如何设置 Kafka 能接收的最大消息的大小?</a></li>
+<li><a href="#7-监控-kafka-的框架都有哪些">7.监控 Kafka 的框架都有哪些？</a></li>
+<li><a href="#8-broker-的-heap-size-如何设置">8.Broker 的 Heap Size 如何设置？</a></li>
+<li><a href="#9-如何估算-kafka-集群的机器数量">9.如何估算 Kafka 集群的机器数量?</a></li>
+<li><a href="#10-leader-总是-1-怎么破">10.Leader 总是 -1，怎么破？</a></li>
+</ul></li>
+<li><a href="#炫技式题目">炫技式题目</a>
+<ul>
+<li><a href="#11-leo-lso-ar-isr-hw-都表示什么含义">11.LEO、LSO、AR、ISR、HW 都表示什么含义？</a></li>
+<li><a href="#12-kafka-能手动删除消息吗">12.Kafka 能手动删除消息吗？</a></li>
+<li><a href="#13-consumer-offsets-是做什么用的">13.__consumer_offsets 是做什么用的？</a></li>
+<li><a href="#14-分区-leader-选举策略有几种">14.分区 Leader 选举策略有几种？</a></li>
+<li><a href="#15-kafka-的哪些场景中使用了零拷贝-zero-copy">15.Kafka 的哪些场景中使用了零拷贝（Zero Copy）</a></li>
+</ul></li>
+<li><a href="#深度思考题">深度思考题</a>
+<ul>
+<li><a href="#16-kafka-为什么不支持读写分离">16.Kafka 为什么不支持读写分离？</a></li>
+<li><a href="#17-如何调优-kafka">17.如何调优 Kafka？</a></li>
+<li><a href="#18-controller-发生网络分区-network-partitioning-时-kafka-会怎么样">18.Controller 发生网络分区（Network Partitioning）时，Kafka 会怎么样</a></li>
+<li><a href="#19-java-consumer-为什么采用单线程来获取消息">19.Java Consumer 为什么采用单线程来获取消息？</a></li>
+<li><a href="#20-简述-follower-副本消息同步的完整流程">20.简述 Follower 副本消息同步的完整流程</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。</p>
+</blockquote>
+
+<p>以下面试题，参考胡大的<code>Kafka 核心源码解读</code>，对相关的知识进行了补充和思考。</p>
+
+<h3 id="基础题目">基础题目</h3>
+
+<h4 id="1-apache-kafka-是什么">1.Apache Kafka 是什么？</h4>
+
+<p>能问这道题，主要是想看候选人对于kafka的使用场景以及定位认知理解有多深，同时候可以知道候选人对于这项技术的关注度。</p>
+
+<p>我们都知道，在开源软件中，大部分软件随着用户量的增加，整个软件的功能和定位也有了新的变化，而Apache Kafka 一路发展到现在，已经由最初的分布式提交日志系统逐渐演变成了实时流处理框架。</p>
+
+<p>因此，这道题你最好这么回答：<strong>Apach Kafka 是一款分布式流处理平台，用于实时构建流处理应用。它有一个核心的功能广为人知，即作为企业级的消息引擎被广泛使用(通常也会称之为消息总线message bus)。</strong></p>
+
+<p>关于<code>分布式流处理平台</code>，其实从它官方的logo以及slogan我们就很容易看出来。</p>
+
+<p><img src="http://kafka.apache.org/images/logo.png" alt="kafka-logo" /></p>
+
+<h4 id="2-什么是消费者组">2.什么是消费者组?</h4>
+
+<p>消费者组是 Kafka 独有的概念，如果面试官问这个，就说明他对此是有一定了解的。</p>
+
+<p>胡大给的标准答案是: <strong>官网上的介绍言简意赅，即消费者组是 Kafka 提供的可扩展且具有容错性的消费者机制</strong>。</p>
+
+<p>但实际上，消费者组(Consumer Group)其实包含两个概念，作为<code>队列</code>，消费者组允许你分割数据处理到一组进程集合上(即一个消费者组中可以包含多个消费者进程，他们共同消费该topic的数据)，这有助于你的消费能力的动态调整；作为<code>发布-订阅模型(publish-subscribe)</code>，kafka允许你将同一份消息广播到多个消费者组里，以此来丰富多种数据使用场景。</p>
+
+<p>需要注意的是: <strong>在消费者组中，多个实例共同订阅若干个主题，实现共同消费。同一个组下的每个实例都配置有相同的组 ID，被分配不同的订阅分区。当某个实例挂掉的时候，其他实例会自动地承担起它负责消费的分区。</strong> 因此，消费者组在一定程度上也保证了消费者程序的高可用性。</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfs6dbcw1yj30d6070aar.jpg" alt="kafka-consumer-group" /></p>
+
+<p><code>注意:</code> 消费者组的题目，能够帮你在某种程度上掌控下面的面试方向。</p>
+
+<ul>
+<li>如果你擅长<code>位移值原理(Offset)</code>，就不妨再提一下消费者组的位移提交机制；</li>
+<li>如果你擅长<code>Kafka Broker</code>，可以提一下消费者组与 Broker 之间的交互；</li>
+<li>如果你擅长与消费者组完全不相关的 <code>Producer</code>，那么就可以这么说：“消费者组要消费的数据完全来自于 Producer 端生产的消息，我对 Producer 还是比较熟悉的。”</li>
+</ul>
+
+<p>总之，你总得对<code>consumer group</code>相关的方向有一定理解，然后才能像面试官表名你对某一块很理解。</p>
+
+<h4 id="3-在-kafka-中-zookeeper-的作用是什么">3.在 Kafka 中，ZooKeeper 的作用是什么？</h4>
+
+<p>这道题，也是我经常会问候选人的题，因为任何分布式系统中虽然都通过一些列的算法去除了传统的关系型数据存储，但是毕竟还是有些数据要存储的，同时分布式系统的特性往往是需要有一些中间人角色来统筹集群。比如我们在整个微服务框架中的<code>Dubbo</code>，它也是需要依赖一些注册中心或配置中心类的中间件的，以及云原生的Kubernetes使用<code>Etcd</code>作为整个集群的枢纽。</p>
+
+<p>标准答案: <strong>目前，Kafka 使用 ZooKeeper 存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。之后，等 KIP-500 提案完成后，Kafka 将完全不再依赖于 ZooKeeper。</strong></p>
+
+<ul>
+<li>“存放元数据” 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他 “人” 都要与它保持对齐。</li>
+<li>“成员管理” 是指 Broker 节点的注册、注销以及属性变更，等等。</li>
+<li>“Controller 选举” 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置等</li>
+</ul>
+
+<p><strong>KIP-500 思想，是使用社区自研的基于 Raft 的共识算法，替代 ZooKeeper，实现 Controller 自选举。</strong></p>
+
+<h4 id="4-解释下-kafka-中位移-offset-的作用">4.解释下 Kafka 中位移（offset）的作用</h4>
+
+<p>标准答案: <strong>在 Kafka 中，每个主题分区下的每条消息都被赋予了一个唯一的 ID 数值，用于标识它在分区中的位置。这个 ID 数值，就被称为位移，或者叫偏移量。一旦消息被写入到分区日志，它的位移值将不能被修改。</strong></p>
+
+<p>答完这些之后，你还可以把整个面试方向转移到你希望的地方:</p>
+
+<ul>
+<li>如果你深谙 Broker 底层日志写入的逻辑，可以强调下消息在日志中的存放格式</li>
+<li>如果你明白位移值一旦被确定不能修改，可以强调下 “Log Cleaner 组件都不能影响位移值” 这件事情</li>
+<li>如果你对消费者的概念还算熟悉，可以再详细说说<code>位移值</code>和<code>消费者位移值</code>之间的区别</li>
+</ul>
+
+<h4 id="5-阐述下-kafka-中的领导者副本-leader-replica-和追随者副本-follower-replica-的区别">5.阐述下 Kafka 中的领导者副本（Leader Replica）和追随者副本（Follower Replica）的区别</h4>
+
+<p>推荐的答案: <strong>Kafka 副本当前分为领导者副本和追随者副本。只有 Leader 副本才能对外提供读写服务，响应 Clients 端的请求。Follower 副本只是采用拉（PULL）的方式，被动地同步 Leader 副本中的数据，并且在 Leader 副本所在的 Broker 宕机后，随时准备应聘 Leader 副本。</strong></p>
+
+<p>加分点:</p>
+
+<ul>
+<li><strong>强调 Follower 副本也能对外提供读服务</strong>。自 Kafka 2.4 版本开始，社区通过引入新的 Broker 端参数，允许 Follower 副本有限度地提供读服务。</li>
+<li><strong>强调 Leader 和 Follower 的消息序列在实际场景中不一致</strong>。通常情况下，很多因素可能造成leader和follower之间的不同步，比如程序问题，网络问题，broker问题等，短暂的不同步我们可以关注(秒级别)，但长时间的不同步可能就需要深入排查了，因为一旦leader所在节点异常，可能直接影响可用性。</li>
+</ul>
+
+<p><code>注意:</code> 之前确保一致性的主要手段是高水位机制(HW)，但高水位值无法保证 Leader 连续变更场景下的数据一致性，因此，社区引入了<code>Leader Epoch</code> 机制，来修复高水位值的弊端。</p>
+
+<p><a href="https://time.geekbang.org/column/article/112118?utm_source=pinpaizhuanqu&amp;utm_medium=geektime&amp;utm_campaign=guanwang&amp;utm_term=guanwang&amp;utm_content=0511">关于高水位和 Leader Epoch 的讨论</a></p>
+
+<h3 id="实操题目">实操题目</h3>
+
+<h4 id="6-如何设置-kafka-能接收的最大消息的大小">6.如何设置 Kafka 能接收的最大消息的大小?</h4>
+
+<p>对于SRE来讲，该题简直是送分题啊，但是，最大消息的设置通常情况下有生产者端，消费者端，broker端和topic级别的参数，我们需要正确设置，以保证可以正常的生产和消费。</p>
+
+<ul>
+<li>Broker端参数: <code>message.max.bytes</code>,<code>max.message.bytes(topic级别)</code>,<code>replica.fetch.max.bytes(否则follow会同步失败)</code></li>
+<li>Consumer端参数: <code>fetch.message.max.bytes</code></li>
+</ul>
+
+<h4 id="7-监控-kafka-的框架都有哪些">7.监控 Kafka 的框架都有哪些？</h4>
+
+<p>对于SRE来讲，依然是送分题。但基础的我们要知道，kafka本身是提供了<code>jmx(Java Management Extensions)</code>的，我们可以通过它来获取到kafka内部的一些基本数据。</p>
+
+<ul>
+<li><strong>Kafka Manager</strong>: 更多是kafka的管理，对于SRE非常友好，也提供了简单的瞬时指标监控</li>
+<li><strong>Kafka Monitor</strong>: LinkedIn 开源的免费框架，支持对集群进行系统测试，并实时监控测试结果。</li>
+<li><strong>CruiseControl</strong>: 也是 LinkedIn 公司开源的监控框架，用于实时监测资源使用率，以及提供常用运维操作等。无 UI 界面，只提供 REST API，可以进行多集群管理。</li>
+<li><strong>JMX 监控</strong>: 由于 Kafka 提供的监控指标都是基于 JMX 的，因此，市面上任何能够集成 JMX 的框架都可以使用，比如 Zabbix 和 Prometheus。</li>
+<li><strong>已有大数据平台自己的监控体系</strong>: 像 Cloudera 提供的 CDH 这类大数据平台，天然就提供 Kafka 监控方案。</li>
+<li><strong>JMXTool</strong>: 社区提供的命令行工具，能够实时监控 JMX 指标。可以使用<code>kafka-run-class.sh kafka.tools.JmxTool</code>来查看具体的用法。</li>
+</ul>
+
+<h4 id="8-broker-的-heap-size-如何设置">8.Broker 的 Heap Size 如何设置？</h4>
+
+<p>其实对于SRE还是送分题，因为目前来讲大部分公司的业务系统都是使用Java开发，因此SRE对于基本的JVM相关的参数应该至少都是非常了解的，核心就在于JVM的配置以及GC相关的知识。</p>
+
+<p>标准答案: <strong>任何 Java 进程 JVM 堆大小的设置都需要仔细地进行考量和测试。一个常见的做法是，以默认的初始 JVM 堆大小运行程序，当系统达到稳定状态后，手动触发一次 Full GC，然后通过 JVM 工具查看 GC 后的存活对象大小。之后，将堆大小设置成存活对象总大小的 1.5~2 倍。对于 Kafka 而言，这个方法也是适用的。不过，业界有个最佳实践，那就是将 Broker 的 Heap Size 固定为 6GB。经过很多公司的验证，这个大小是足够且良好的。</strong></p>
+
+<h4 id="9-如何估算-kafka-集群的机器数量">9.如何估算 Kafka 集群的机器数量?</h4>
+
+<p>该题也算是SRE的送分题吧，对于SRE来讲，任何生产的系统第一步需要做的就是容量预估以及集群的架构规划，实际上也就是<strong>机器数量和所用资源之间的关联关系</strong>，资源通常来讲就是cpu，内存，磁盘容量，带宽。但需要注意的是，kafka因为独有的设计，对于磁盘的要求并不是特别高，普通机械硬盘足够，而通常的瓶颈会出现在带宽上。</p>
+
+<p>在预估磁盘的占用时，你一定不要忘记计算副本同步的开销。如果一条消息占用 1KB 的磁盘空间，那么，在有 3 个副本的主题中，你就需要 3KB 的总空间来保存这条消息。同时，需要考虑到整个业务Topic数据保存的最大时间，以上几个因素，基本可以预估出来磁盘的容量需求。</p>
+
+<p>需要注意的是: 对于磁盘来讲，一定要提前和业务沟通好场景，而不是等待真正有磁盘容量瓶颈了才去扩容磁盘或者找业务方沟通方案。</p>
+
+<p>对于带宽来说，常见的带宽有 1Gbps 和 10Gbps，通常我们需要知道，当带宽占用接近总带宽的 90% 时，丢包情形就会发生。</p>
+
+<h4 id="10-leader-总是-1-怎么破">10.Leader 总是 -1，怎么破？</h4>
+
+<p>对于有经验的SRE来讲，早期的kafka版本应该多多少少都遇到过该种情况，通常情况下就是<code>controller</code>不工作了，导致无法分配leader，那既然知道问题后，解决方案也就很简单了。重启controller节点上的kafka进程，让其他节点重新注册controller角色，但是如上面<code>zookeeper</code>的作用，你要知道为什么<code>controller</code>可以自动注册。</p>
+
+<p>当然了，当你知道<code>controller</code>的注册机制后，你也可以说: <strong>删除 ZooKeeper 节点 /controller，触发 Controller 重选举。Controller 重选举能够为所有主题分区重刷分区状态，可以有效解决因不一致导致的 Leader 不可用问题</strong>。但是，需要注意的是，直接操作<code>zookeeper</code>是一件风险很大的操作，就好比在Linux中执行了<strong>rm -rf /xxx</strong>一样，如果在<code>/</code>和<code>xxx</code>之间不小心多了几个空格，那&rdquo;恭喜你&rdquo;，今年白干了。</p>
+
+<h3 id="炫技式题目">炫技式题目</h3>
+
+<h4 id="11-leo-lso-ar-isr-hw-都表示什么含义">11.LEO、LSO、AR、ISR、HW 都表示什么含义？</h4>
+
+<p>讲真，我不认为这是炫技的题目，特别是作为SRE来讲，对于一个开源软件的原理以及概念的理解，是非常重要的。</p>
+
+<ul>
+<li><strong>LEO(Log End Offset)</strong>: 日志末端位移值或末端偏移量，表示日志下一条待插入消息的位移值。举个例子，如果日志有 10 条消息，位移值从 0 开始，那么，第 10 条消息的位移值就是 9。此时，LEO = 10。</li>
+<li><strong>LSO(Log Stable Offset)</strong>: 这是 Kafka 事务的概念。如果你没有使用到事务，那么这个值不存在（其实也不是不存在，只是设置成一个无意义的值）。该值控制了事务型消费者能够看到的消息范围。它经常与 Log Start Offset，即日志起始位移值相混淆，因为有些人将后者缩写成 LSO，这是不对的。在 Kafka 中，LSO 就是指代 Log Stable Offset。</li>
+<li><strong>AR(Assigned Replicas)</strong>: AR 是主题被创建后，分区创建时被分配的副本集合，副本个数由副本因子决定。</li>
+<li><strong>ISR(In-Sync Replicas)</strong>: Kafka 中特别重要的概念，指代的是 AR 中那些与 Leader 保持同步的副本集合。在 AR 中的副本可能不在 ISR 中，但 Leader 副本天然就包含在 ISR 中。</li>
+<li><strong>HW(High watermark)</strong>: 高水位值，这是控制消费者可读取消息范围的重要字段。一个普通消费者只能 “看到” Leader 副本上介于 Log Start Offset 和 HW（不含）之间的所有消息。水位以上的消息是对消费者不可见的。</li>
+</ul>
+
+<p>需要注意的是，通常在<code>ISR</code>中，可能会有人问到为什么有时候副本不在ISR中，这其实也就是上面说的Leader和Follower不同步的情况，为什么我们前面说，短暂的不同步我们可以关注，但是长时间的不同步，我们需要介入排查了，因为ISR里的副本后面都是通过<code>replica.lag.time.max.ms</code>，即Follower 副本的 LEO 落后 Leader LEO 的时间是否超过阈值来决定副本是否在ISR内部的。</p>
+
+<h4 id="12-kafka-能手动删除消息吗">12.Kafka 能手动删除消息吗？</h4>
+
+<p>Kafka 不需要用户手动删除消息。它本身提供了留存策略，能够自动删除过期消息。当然，它是支持手动删除消息的。</p>
+
+<ul>
+<li>对于设置了 Key 且参数 <code>cleanup.policy=compact</code> 的主题而言，我们可以构造一条 的消息发送给 Broker，依靠 Log Cleaner 组件提供的功能删除掉该 Key 的消息。</li>
+<li>对于普通主题而言，我们可以使用 kafka-delete-records 命令，或编写程序调用 Admin.deleteRecords 方法来删除消息。这两种方法殊途同归，底层都是调用 Admin 的 deleteRecords 方法，通过将分区 Log Start Offset 值抬高的方式间接删除消息。</li>
+</ul>
+
+<h4 id="13-consumer-offsets-是做什么用的">13.__consumer_offsets 是做什么用的？</h4>
+
+<p>这是一个内部主题，主要用于存储消费者的偏移量，以及消费者的元数据信息(<code>消费者实例，消费者id</code>等等)</p>
+
+<p>需要注意的是: Kafka 的 <code>GroupCoordinator</code> 组件提供对该主题完整的管理功能，包括该主题的创建、写入、读取和 Leader 维护等。</p>
+
+<h4 id="14-分区-leader-选举策略有几种">14.分区 Leader 选举策略有几种？</h4>
+
+<p>分区的 Leader 副本选举对用户是完全透明的，它是由 <code>Controller</code> 独立完成的。你需要回答的是，在哪些场景下，需要执行分区 Leader 选举。每一种场景对应于一种选举策略。</p>
+
+<ul>
+<li><strong>OfflinePartition Leader 选举</strong>: 每当有分区上线时，就需要执行 Leader 选举。所谓的分区上线，可能是创建了新分区，也可能是之前的下线分区重新上线。这是最常见的分区 Leader 选举场景。</li>
+<li><strong>ReassignPartition Leader 选举</strong>: 当你手动运行 kafka-reassign-partitions 命令，或者是调用 Admin 的 alterPartitionReassignments 方法执行分区副本重分配时，可能触发此类选举。假设原来的 AR 是 [1，2，3]，Leader 是 1，当执行副本重分配后，副本集合 AR 被设置成 [4，5，6]，显然，Leader 必须要变更，此时会发生 Reassign Partition Leader 选举。</li>
+<li><strong>PreferredReplicaPartition Leader 选举</strong>: 当你手动运行 kafka-preferred-replica-election 命令，或自动触发了 Preferred Leader 选举时，该类策略被激活。所谓的 Preferred Leader，指的是 AR 中的第一个副本。比如 AR 是 [3，2，1]，那么，Preferred Leader 就是 3。</li>
+<li><strong>ControlledShutdownPartition Leader 选举</strong>: 当 Broker 正常关闭时，该 Broker 上的所有 Leader 副本都会下线，因此，需要为受影响的分区执行相应的 Leader 选举。</li>
+</ul>
+
+<p>这 4 类选举策略的大致思想是类似的，即从 AR 中挑选首个在 ISR 中的副本，作为新 Leader。</p>
+
+<h4 id="15-kafka-的哪些场景中使用了零拷贝-zero-copy">15.Kafka 的哪些场景中使用了零拷贝（Zero Copy）</h4>
+
+<p>其实这道题对于SRE来讲，有点超纲了，不过既然<code>Zero Copy</code>是kafka高性能的保证，我们需要了解它。</p>
+
+<p>Zero Copy 是特别容易被问到的高阶题目。在 Kafka 中，体现 Zero Copy 使用场景的地方有两处：<strong>基于 mmap 的索引和日志文件读写所用的 TransportLayer</strong></p>
+
+<p>先说第一个。索引都是基于 MappedByteBuffer 的，也就是让用户态和内核态共享内核态的数据缓冲区，此时，数据不需要复制到用户态空间。不过，mmap 虽然避免了不必要的拷贝，但不一定就能保证很高的性能。在不同的操作系统下，mmap 的创建和销毁成本可能是不一样的。很高的创建和销毁开销会抵消 Zero Copy 带来的性能优势。由于这种不确定性，在 Kafka 中，只有索引应用了 mmap，最核心的日志并未使用 mmap 机制。</p>
+
+<p>再说第二个。TransportLayer 是 Kafka 传输层的接口。它的某个实现类使用了 FileChannel 的 transferTo 方法。该方法底层使用 sendfile 实现了 Zero Copy。对 Kafka 而言，如果 I/O 通道使用普通的 PLAINTEXT，那么，Kafka 就可以利用 Zero Copy 特性，直接将页缓存中的数据发送到网卡的 Buffer 中，避免中间的多次拷贝。相反，如果 I/O 通道启用了 SSL，那么，Kafka 便无法利用 Zero Copy 特性了。</p>
+
+<h3 id="深度思考题">深度思考题</h3>
+
+<h4 id="16-kafka-为什么不支持读写分离">16.Kafka 为什么不支持读写分离？</h4>
+
+<p>这其实是分布式场景下的通用问题，因为我们知道CAP理论下，我们只能保证C(可用性)和A(一致性)取其一，如果支持读写分离，那其实对于一致性的要求可能就会有一定折扣，因为通常的场景下，副本之间都是通过同步来实现副本数据一致的，那同步过程中肯定会有时间的消耗，如果支持了读写分离，就意味着可能的数据不一致，或数据滞后。</p>
+
+<p>Leader/Follower 模型并没有规定 Follower 副本不可以对外提供读服务。很多框架都是允许这么做的，只是 Kafka 最初为了避免不一致性的问题，而采用了让 Leader 统一提供服务的方式。</p>
+
+<p>不过，<strong>自 Kafka 2.4 之后，Kafka 提供了有限度的读写分离，也就是说，Follower 副本能够对外提供读服务</strong>。</p>
+
+<h4 id="17-如何调优-kafka">17.如何调优 Kafka？</h4>
+
+<p>作为SRE来讲，任何生产环境的调优，首先需要<strong>识别问题和瓶颈点</strong>，而不是随意的进行臆想调优。随后，需要<strong>确定优化目标，并且定量给出目标</strong></p>
+
+<p>对于kafka来讲，常见的调优方向基本为: 吞吐量、延时、持久性和可用性，每种目标之前都是由冲突点，这也就要求了，我们在对业务接入使用时，要进行业务场景的了解，以对业务进行相对的集群隔离，因为每一个方向的优化思路都是不同的，甚至是相反的。</p>
+
+<p>确定了目标之后，还要明确优化的维度。有些调优属于通用的优化思路，比如对操作系统、JVM 等的优化；有些则是有针对性的，比如要优化 Kafka 的 TPS。我们需要从 3 个方向去考虑：</p>
+
+<ul>
+<li><strong>Producer 端</strong>: 增加<code>batch.size</code>和<code>linger.ms</code>，启用压缩，关闭重试</li>
+<li><strong>Broker 端</strong>: 增加<code>num.replica.fetchers</code>提升 Follower 同步 TPS，避免 Broker Full GC 等。</li>
+<li><strong>Consumer</strong>: 增加<code>fetch.min.bytes</code></li>
+</ul>
+
+<h4 id="18-controller-发生网络分区-network-partitioning-时-kafka-会怎么样">18.Controller 发生网络分区（Network Partitioning）时，Kafka 会怎么样</h4>
+
+<p>这道题目能够诱发我们对分布式系统设计、CAP 理论、一致性等多方面的思考。</p>
+
+<p>一旦发生 Controller 网络分区，那么，第一要务就是查看集群是否出现 “脑裂”，即同时出现两个甚至是多个 Controller 组件。这可以根据 Broker 端监控指标 ActiveControllerCount 来判断。</p>
+
+<p>不过，通常而言，我们在设计整个部署架构时，为了避免这种网络分区的发生，一般会将broker节点尽可能的防止在一个机房或者可用区。</p>
+
+<p>由于 Controller 会给 Broker 发送 3 类请求，<code>LeaderAndIsrRequest</code>，<code>StopReplicaRequest</code>，<code>UpdateMetadataRequest</code>，因此，一旦出现网络分区，这些请求将不能顺利到达 Broker 端。</p>
+
+<p>这将影响主题的创建、修改、删除操作的信息同步，表现为集群仿佛僵住了一样，无法感知到后面的所有操作。因此，网络分区通常都是非常严重的问题，要赶快修复。</p>
+
+<h4 id="19-java-consumer-为什么采用单线程来获取消息">19.Java Consumer 为什么采用单线程来获取消息？</h4>
+
+<p>在回答之前，如果先把这句话说出来，一定会加分：<strong>Java Consumer 是双线程的设计。一个线程是用户主线程，负责获取消息；另一个线程是心跳线程，负责向 Kafka 汇报消费者存活情况。将心跳单独放入专属的线程，能够有效地规避因消息处理速度慢而被视为下线的 “假死” 情况。</strong></p>
+
+<p>单线程获取消息的设计能够避免阻塞式的消息获取方式。单线程轮询方式容易实现异步非阻塞式，这样便于将消费者扩展成支持实时流处理的操作算子。因为很多实时流处理操作算子都不能是阻塞式的。另外一个可能的好处是，可以简化代码的开发。多线程交互的代码是非常容易出错的。</p>
+
+<h4 id="20-简述-follower-副本消息同步的完整流程">20.简述 Follower 副本消息同步的完整流程</h4>
+
+<p>首先，Follower 发送 FETCH 请求给 Leader。</p>
+
+<p>接着，Leader 会读取底层日志文件中的消息数据，再更新它内存中的 Follower 副本的 LEO 值，更新为 FETCH 请求中的 fetchOffset 值。</p>
+
+<p>最后，尝试更新分区高水位值。Follower 接收到 FETCH 响应之后，会把消息写入到底层日志，接着更新 LEO 和 HW 值。</p>
+
+<p>Leader 和 Follower 的 HW 值更新时机是不同的，Follower 的 HW 更新永远落后于 Leader 的 HW。这种时间上的错配是造成各种不一致的原因。</p>
+
+<p>因此，对于消费者而言，消费到的消息永远是所有副本中最小的那个HW。</p>
+
+<hr />
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-06-14
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/kafka/">kafka</a>
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
+            <span class="next-text nav-default">Git常用命令</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>
