@@ -255,6 +255,8 @@
 
 &lt;p&gt;因此，对于消费者而言，消费到的消息永远是所有副本中最小的那个HW。&lt;/p&gt;
 
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfs986oapjj30u01hdaj9.jpg&#34; alt=&#34;胡大的kafka源码课程&#34; /&gt;&lt;/p&gt;
+
 &lt;hr /&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
