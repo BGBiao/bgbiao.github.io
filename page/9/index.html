@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-06-14T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-06-15T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,50 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E8%B4%A2%E5%8A%A1%E6%8A%95%E8%B5%84/">2019年总结之财务投资</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2019-12-30" class="post-time">
+        2019-12-30
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/%E6%8A%95%E8%B5%84/"> 投资 </a>
+          
+        </div>
+      <span class="more-meta"> 1453 words </span>
+      <span class="more-meta"> 3 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      18年的时候，我在个人公众号BGBiao上写了一篇关于如何&rdquo;选鸡&rdquo;的文章，大概介绍下了作为一名不了解投资和没有投资经
+    </div>
+    <div class="read-more">
+      <a href="/post/2019%E5%B9%B4%E6%80%BB%E7%BB%93%E4%B9%8B%E8%B4%A2%E5%8A%A1%E6%8A%95%E8%B5%84/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/cronjob%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%95%E5%9D%91%E6%8C%87%E5%8D%97/">CronJob控制器中的一些绕坑指南</a>
     </h1>
     
@@ -538,55 +582,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E4%BB%AC%E5%BF%85%E9%A1%BB%E4%BA%86%E8%A7%A3%E7%9A%84%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/">Goroutine与主进程的通信</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-12-13" class="post-time">
-        2019-12-13
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
-          
-        </div>
-      <span class="more-meta"> 1398 words </span>
-      <span class="more-meta"> 3 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <p>还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过<code>context</code>这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。</p>
-
-<p>子goroutine与主线程同步的集中方式:
-- <code>channel</code>: 每个goroutine往主进程的<code>chan</code>写数据，然后由主进程去读取，直到读取完了全部goroutine的<code>chan</code>就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
-- <code>context</code>: 使用<code>context</code>中的<code>cancel</code>，这种模式是主线程通知子线程结束
-- <code>sync.WaitGroup</code>: 通过<code>Add</code>方法设置等待子goroutine的数量，使用<code>Done</code>方法设置等待子goroutine的数量减1，当等待数量为0时，<code>Wait</code>函数退出.</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -1198,6 +1193,27 @@ if (!doNotTrack) {
 
       
 
+        
+
+        
+        
+
+          
+          
+          
+
+            
+
+          
+
+        
+        
+
+        
+        
+
+      
+
       
       
       <li><a href="/page/10/">»</a></li>
@@ -1205,7 +1221,7 @@ if (!doNotTrack) {
 
       
       
-      <li><a href="/page/22/">»»</a></li>
+      <li><a href="/page/23/">»»</a></li>
       
 
       </ul>

@@ -6,10 +6,122 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 14 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 15 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>kafka中关于HW(High Watermark)和Leader Epoch的讨论</title>
+      <link>https://bgbiao.top/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/</link>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;我们知道在kafka中有一个名词叫做HW(High Watermark)，但是具体这个高水位是用来做什么的呢？我们一起来学习下&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;kafka中的高水位的作用:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;定义消息可见性，即用来标识分区下的哪些消息是可以被消费者消费的。&lt;/li&gt;
+&lt;li&gt;帮助 Kafka 完成副本同步&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfva86hzzrj31bc0h6go3.jpg&#34; alt=&#34;kafka高水位以及消息提交图&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;值得注意的是，在kafka的某个topic中，分区和副本都有HW的概念，而分区的HW是所有副本HW的最小值，也是消费者能够消费到最大消息。(即: 消费者只能消费已经提交的消息)&lt;/p&gt;
+
+&lt;p&gt;另外，位移值等于高水位的消息也属于未提交消息。也就是说，&lt;code&gt;高水位上的消息是不能被消费者消费&lt;/code&gt;的。&lt;/p&gt;
+
+&lt;p&gt;图中还有一个日志末端位移的概念，即 Log End Offset，简写是 LEO。它表示副本写入下一条消息的位移值。注意，数字 15 所在的方框是虚线，这就说明，这个副本当前只有 15 条消息，位移值是从 0 到 14，下一条新消息的位移是 15。显然，介于高水位和 LEO 之间的消息就属于未提交消息。这也从侧面告诉了我们一个重要的事实，那就是：&lt;code&gt;同一个副本对象，其高水位值不会大于 LEO 值&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h3 id=&#34;高水位更新机制&#34;&gt;高水位更新机制&lt;/h3&gt;
+
+&lt;p&gt;现在，我们知道了每个副本对象都保存了一组高水位值和 LEO 值，但实际上，在 Leader 副本所在的 Broker 上，还保存了其他 Follower 副本的 LEO 值。我们一起来看看下面这张图。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvb7on0vpj316f0u0dju.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在这张图中，我们可以看到，Broker 0 上保存了某分区的 Leader 副本和所有 Follower 副本的 LEO 值，而 Broker 1 上仅仅保存了该分区的某个 Follower 副本。Kafka 把 Broker 0 上保存的这些 Follower 副本又称为&lt;code&gt;远程副本&lt;/code&gt; Remote Replica）。Kafka 副本机制在运行过程中，会更新 Broker 1 上 Follower 副本的高水位和 LEO 值，同时也会更新 Broker 0 上 Leader 副本的高水位和 LEO 以及所有远程副本的 LEO，但它不会更新远程副本的高水位值，也就是我在图中标记为灰色的部分。&lt;/p&gt;
+
+&lt;p&gt;为什么要在 Broker 0 上保存这些远程副本呢？其实，它们的主要作用是，&lt;code&gt;帮助 Leader 副本确定其高水位，也就是分区高水位&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;为了帮助你更好地记忆这些值被更新的时机，我做了一张表格。只有搞清楚了更新机制，我们才能开始讨论 Kafka 副本机制的原理，以及它是如何使用高水位来执行副本消息同步的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvb9nilwvj30h60fogo4.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;判断Leader 副本保持同步的条件：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;远程 Follower 副本在 ISR 中&lt;/li&gt;
+&lt;li&gt;Follower 副本 LEO 值落后于 Leader 副本 LEO 值的时间，不超过 Broker 端参数 replica.lag.time.max.ms 的值。如果使用默认值的话，就是不超过 10 秒&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;乍一看，这两个条件好像是一回事，因为目前某个副本能否进入 ISR 就是靠第 2 个条件判断的。但有些时候，会发生这样的情况：即 Follower 副本已经 “追上” 了 Leader 的进度，却不在 ISR 中，比如某个刚刚重启回来的副本。如果 Kafka 只判断第 1 个条件的话，就可能出现某些副本具备了 “进入 ISR” 的资格，但却尚未进入到 ISR 中的情况。此时，分区高水位值就可能超过 ISR 中副本 LEO，而高水位 &amp;gt; LEO 的情形是不被允许的。&lt;/p&gt;
+
+&lt;h3 id=&#34;副本同步机制解析&#34;&gt;副本同步机制解析&lt;/h3&gt;
+
+&lt;p&gt;副本同步的全过程:&lt;/p&gt;
+
+&lt;p&gt;首先是初始状态。下面这张图中的 remote LEO 就是刚才的远程副本的 LEO 值。在初始状态时，所有值都是 0。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvbgu2idsj30nd03awet.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当生产者给主题分区发送一条消息后，状态变更为：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvbh4glr3j30nd07wwf7.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;此时，Leader 副本成功将消息写入了本地磁盘，故 LEO 值被更新为 1。&lt;/p&gt;
+
+&lt;p&gt;Follower 再次尝试从 Leader 拉取消息。和之前不同的是，这次有消息可以拉取了，因此状态进一步变更为：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvbhh5e15j30nc08a3z8.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这时，Follower 副本也成功地更新 LEO 为 1。此时，Leader 和 Follower 副本的 LEO 都是 1，但各自的高水位依然是 0，还没有被更新。&lt;code&gt;它们需要在下一轮的fetch request中被更新&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvbi5gvykj30nu0cft9w.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在新一轮的拉取请求中，由于位移值是 0 的消息已经拉取成功，因此 Follower 副本这次请求拉取的是位移值 =1 的消息。Leader 副本接收到此请求后，更新远程副本 LEO 为 1，然后更新 Leader 高水位为 1。做完这些之后，它会将当前已更新过的高水位值 1 发送给 Follower 副本。Follower 副本接收到以后，也将自己的高水位值更新成 1。至此，一次完整的消息同步周期就结束了。事实上，Kafka 就是利用这样的机制，实现了 Leader 和 Follower 副本之间的同步。&lt;/p&gt;
+
+&lt;h3 id=&#34;leader-epoch-登场&#34;&gt;Leader Epoch 登场&lt;/h3&gt;
+
+&lt;p&gt;从刚才的分析中，我们知道，Follower 副本的高水位更新需要一轮额外的拉取请求才能实现。如果把上面那个例子扩展到多个 Follower 副本，情况可能更糟，也许需要多轮拉取请求。也就是说，Leader 副本高水位更新和 Follower 副本高水位更新在时间上是存在错配的。这种错配是很多 “数据丢失” 或 “数据不一致” 问题的根源。基于此，社区在 0.11 版本正式引入了 Leader Epoch 概念，来规避因高水位更新错配导致的各种不一致问题。&lt;/p&gt;
+
+&lt;p&gt;所谓 Leader Epoch，我们大致可以认为是 &lt;code&gt;Leader 版本&lt;/code&gt;。它由两部分数据组成。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Epoch。一个单调增加的版本号。每当副本领导权发生变更时，都会增加该版本号。小版本号的 Leader 被认为是过期 Leader，不能再行使 Leader 权力&lt;/li&gt;
+&lt;li&gt;起始位移（Start Offset）。Leader 副本在该 Epoch 值上写入的首条消息的位移&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我举个例子来说明一下 Leader Epoch。假设现在有两个 Leader Epoch&lt;0, 0&gt; 和 &lt;1, 120&gt;，那么，第一个 Leader Epoch 表示版本号是 0，这个版本的 Leader 从位移 0 开始保存消息，一共保存了 120 条消息。之后，Leader 发生了变更，版本号增加到 1，新版本的起始位移是 120。&lt;/p&gt;
+
+&lt;p&gt;Kafka Broker 会在内存中为每个分区都缓存 Leader Epoch 数据，同时它还会定期地将这些信息持久化到一个 checkpoint 文件中。当 Leader 副本写入消息到磁盘时，Broker 会尝试更新这部分缓存。如果该 Leader 是首次写入消息，那么 Broker 会向缓存中增加一个 Leader Epoch 条目，否则就不做更新。这样，每次有 Leader 变更时，新的 Leader 副本会查询这部分缓存，取出对应的 Leader Epoch 的起始位移，以避免数据丢失和不一致的情况。&lt;/p&gt;
+
+&lt;p&gt;接下来，我们来看一个实际的例子，它展示的是 Leader Epoch 是如何防止数据丢失的。请先看下图。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvbnxpmjcj30x30u0q75.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我稍微解释一下，单纯依赖高水位是怎么造成数据丢失的。开始时，副本 A 和副本 B 都处于正常状态，A 是 Leader 副本。某个使用了默认 acks 设置的生产者程序向 A 发送了两条消息，A 全部写入成功，此时 Kafka 会通知生产者说两条消息全部发送成功。现在我们假设 Leader 和 Follower 都写入了这两条消息，而且 Leader 副本的高水位也已经更新了，但 Follower 副本高水位还未更新 —— 这是可能出现的。还记得吧，Follower 端高水位的更新与 Leader 端有时间错配。倘若此时副本 B 所在的 Broker 宕机，当它重启回来后，副本 B 会执行日志截断操作，将 LEO 值调整为之前的高水位值，也就是 1。这就是说，位移值为 1 的那条消息被副本 B 从磁盘中删除，此时副本 B 的底层磁盘文件中只保存有 1 条消息，即位移值为 0 的那条消息。&lt;/p&gt;
+
+&lt;p&gt;当执行完截断操作后，副本 B 开始从 A 拉取消息，执行正常的消息同步。如果就在这个节骨眼上，副本 A 所在的 Broker 宕机了，那么 Kafka 就别无选择，只能让副本 B 成为新的 Leader，此时，当 A 回来后，需要执行相同的日志截断操作，即将高水位调整为与 B 相同的值，也就是 1。这样操作之后，位移值为 1 的那条消息就从这两个副本中被永远地抹掉了。这就是这张图要展示的数据丢失场景。&lt;/p&gt;
+
+&lt;p&gt;严格来说，这个场景发生的前提是 Broker 端参数 &lt;code&gt;min.insync.replicas 设置为 1&lt;/code&gt;。此时一旦消息被写入到 Leader 副本的磁盘，就会被认为是 “已提交状态”，但现有的时间错配问题导致 Follower 端的高水位更新是有滞后的。如果在这个短暂的滞后时间窗口内，接连发生 Broker 宕机，那么这类数据的丢失就是不可避免的。&lt;/p&gt;
+
+&lt;p&gt;现在，我们来看下如何利用 Leader Epoch 机制来规避这种数据丢失。我依然用图的方式来说明。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gfvbp51hefj319g0u0wj2.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;场景和之前大致是类似的，只不过引用 Leader Epoch 机制后，Follower 副本 B 重启回来后，需要向 A 发送一个特殊的请求去获取 Leader 的 LEO 值。在这个例子中，该值为 2。当获知到 Leader LEO=2 后，B 发现该 LEO 值不比它自己的 LEO 值小，而且缓存中也没有保存任何起始位移值 &amp;gt; 2 的 Epoch 条目，因此 B 无需执行任何日志截断操作。这是对高水位机制的一个明显改进，即副本是否执行日志截断不再依赖于高水位进行判断。&lt;/p&gt;
+
+&lt;p&gt;现在，副本 A 宕机了，B 成为 Leader。同样地，当 A 重启回来后，执行与 B 相同的逻辑判断，发现也不用执行日志截断，至此位移值为 1 的那条消息在两个副本中均得到保留。后面当生产者程序向 B 写入新消息时，副本 B 所在的 Broker 缓存中，会生成新的 Leader Epoch 条目：[Epoch=1, Offset=2]。之后，副本 B 会使用这个条目帮助判断后续是否执行日志截断操作。这样，通过 Leader Epoch 机制，Kafka 完美地规避了这种数据丢失场景。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>kafka经典面试题详解</title>
@@ -9970,703 +10082,6 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
 </description>
-      
-    </item>
-    
-    <item>
-      <title>深入Gin框架内幕2</title>
-      <link>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/</link>
-      <pubDate>Sun, 12 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;在上一篇文章&lt;a href=&#34;https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/&#34;&gt;深入gin框架内幕(一)&lt;/a&gt;中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个&lt;code&gt;Context&lt;/code&gt;引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;在开始分析之前，我们先简单回顾一下上一个章节中讲到的Gin框架中的几个核心的结构.&lt;/p&gt;
-
-&lt;h3 id=&#34;gin框架中的几个核心结构&#34;&gt;Gin框架中的几个核心结构&lt;/h3&gt;
-
-&lt;p&gt;Gin框架中的几个重要的模型:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;Engine&lt;/code&gt;: 用来初始化一个&lt;code&gt;gin&lt;/code&gt;对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.&lt;a href=&#34;https://github.com/gin-gonic/gin/blob/master/gin.go#L54&#34;&gt;源码文件&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Router&lt;/code&gt;: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中&lt;/li&gt;
-&lt;li&gt;Context: &lt;code&gt;Context&lt;/code&gt;是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.&lt;/li&gt;
-&lt;li&gt;Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化
-数据来处理底层的业务逻辑，就需要使用&lt;code&gt;Bind&lt;/code&gt;相关的结构方法来解析context中的HTTP数据&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;1-gin框架对http响应数据的处理&#34;&gt;1.Gin框架对HTTP响应数据的处理&lt;/h4&gt;
-
-&lt;p&gt;我们在&lt;a href=&#34;https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/&#34;&gt;深入Gin框架内幕(一)&lt;/a&gt;中，以一个简单的Gin实例来具体讲解它内部是如何创建一个Http服务，并且注册一个路由来接收用户的请求，在示例程序中我们使用了&lt;code&gt;Context&lt;/code&gt;引用对象的&lt;code&gt;String&lt;/code&gt;方法来处理HTTP服务的数据响应，所以在整个Gin框架中紧跟&lt;code&gt;Router&lt;/code&gt;模型结构的就要属&lt;code&gt;Context&lt;/code&gt;结构了，该结构体主要用来处理整个HTTP请求的上下文数据，也是我们在开发HTTP服务中相对比较重要的一个结构体了。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;gh&#34;&gt;# 深入Gin框架内幕(一)中的示例
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ cat case1.go
-package main
-import (
-    &amp;#34;net/http&amp;#34;
-
-    &amp;#34;github.com/gin-gonic/gin&amp;#34;
-)
-func main() {
-    ginObj := gin.Default()
-    ginObj.Any(&amp;#34;/hello&amp;#34;,func(c *gin.Context){
-        c.String(http.StatusOK,&amp;#34;Hello BGBiao.&amp;#34;)
-    })
-    ginObj.Run(&amp;#34;localhost:8080&amp;#34;)
-}&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;我们可以看到，在使用Gin框架后，我们只需要很简单的代码，即可以快速运行一个返回&lt;code&gt;Hello BGBiao.&lt;/code&gt;的HTTP服务，而在&lt;code&gt;ginObj.Any&lt;/code&gt;方法中，我们传入了一个参数为&lt;code&gt;Context&lt;/code&gt;引用类型的匿名函数，并在该函数内部采用&lt;code&gt;String(code,data)&lt;/code&gt;方法来处理HTTP服务的响应数据(返回Hello BGBiao字符串)，这个时候，你可能会想，我们在企业内部都是前后端分离，通常情况下后端仅会提供&lt;code&gt;RESTful API&lt;/code&gt;，并通过&lt;code&gt;JSON&lt;/code&gt;格式的数据和前端进行交互，那么Gin是如何处理其他非字符串类型的数据响应呢，这也是我们接下来要主要讲的&lt;code&gt;Context&lt;/code&gt;结构模型。&lt;/p&gt;
-
-&lt;h4 id=&#34;2-gin框架中的context结构体&#34;&gt;2.Gin框架中的Context结构体&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在Gin框架中由&lt;code&gt;Router&lt;/code&gt;结构体来负责路由和方法(URL和HTTP方法)的绑定，内的Handler采用&lt;code&gt;Context&lt;/code&gt;结构体来处理具体的HTTP数据传输方式，比如HTTP头部，请求体参数，状态码以及响应体和其他的一些常见HTTP行为。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;Context结构体&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;type Context struct {
-    // 一个包含size,status和ResponseWriter的结构体
-    writermem responseWriter
-    // http的请求体(指向原生的http.Request指针)
-    Request   *http.Request
-    // ResonseWriter接口
-    Writer    ResponseWriter
-
-    // 请求参数[]{&amp;#34;Key&amp;#34;:&amp;#34;Value&amp;#34;}
-    Params   Params
-    handlers HandlersChain
-    index int8
-    // http请求的全路径地址
-    fullPath string
-    // gin框架的Engine结构体指针
-    engine   *Engine
-    // 每个请求的context中的唯一键值对
-    Keys map[string]interface{}
-    // 绑定到所有使用该context的handler/middlewares的错误列表
-    Errors errorMsgs
-    // 定义了允许的格式被用于内容协商(content)
-    Accepted []string
-    // queryCache 使用url.ParseQuery来缓存参数查询结果(c.Request.URL.Query())
-    queryCache url.Values
-    // formCache 使用url.ParseQuery来缓存PostForm包含的表单数据(来自POST,PATCH,PUT请求体参数)
-    formCache url.Values
-}&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;Context结构体常用的一些方法&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;基本方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Copy(): 返回当前正在使用的context的拷贝(context指针)，当这个context必须在goroutine中用时，该方法比较有用&lt;/li&gt;
-&lt;li&gt;HandlerName(): 返回当前主handler的名称(比如:handler为handleGetUsers(),该方法将返回&amp;rdquo;main.handleGetUsers&amp;rdquo;)&lt;/li&gt;
-&lt;li&gt;HandlerNames(): 返回所有注册的handler的名称&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Handler()&lt;/code&gt;: 返回当前的主handler(&lt;code&gt;func (c *Context) Handler() HandlerFunc&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;FullPath(): 返回一个匹配路由的全路径(uri: &amp;ldquo;/user/:id&amp;rdquo;,c.FullPath() == &amp;ldquo;/user/:id&amp;rdquo; )&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;http常用方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ClientIP() string: 返回客户端ip(该方法会解析&lt;code&gt;X-Real-IP&lt;/code&gt;,&lt;code&gt;X-Forwarded-For&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;ContentType() string: 返回HTTP的Content-Type头&lt;/li&gt;
-&lt;li&gt;IsWebsocket() bool: 返回是否为ws链接&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;流控相关的方法:&lt;/code&gt;
-- Next(): 该方法仅被使用在middleware中，它会在被调用的handler链内部执行pending handler
-- IsAborted(): 如果当前的context被终止了，该方法返回true
-- Abort(): 该函数可以从正在被调用中保护pending handler. 该方法停止后不会停止当前正在执行的handler. 比如我们有一个鉴权的中间件来验证请求是否有权限，如果认证失败了(用户信息异常等)，此时调用Abort()来确保后面的handler不再被调用
-- AbortWithStatus(code int): 同上，在会写入状态码。context.AbortWithStatus(401)即可表示上述的鉴权失败
-- AbortWithStatusJSON(code int, jsonObj interface{}): 同上，会再加响应数据.该方法会停止整个handler链，再写入状态码和json的响应体，同时也会设置Content-Type=&amp;ldquo;application/json&amp;rdquo;
-- AbortWithError(code int, err error) *Error: 同上返回错误信息&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;错误管理&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Error(err error) *Error: 返回一些错误对象&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;元数据管理&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Set(key string, value interface{}): 给当前这个context设置一个新的键值对&lt;/li&gt;
-&lt;li&gt;Get(key string) (value interface{}, exists bool): 返回指定的key的值,以及是否存在&lt;/li&gt;
-&lt;li&gt;MustGet(key string) interface{}: 返回指定key的值，不存在则panic&lt;/li&gt;
-&lt;li&gt;GetString(key string) (s string): 以string类型返回指定的key&lt;/li&gt;
-&lt;li&gt;GetBool(key string) (b bool): 返回分配给该key的值(bool类型)&lt;/li&gt;
-&lt;li&gt;GetInt(key string) (i int):&lt;/li&gt;
-&lt;li&gt;GetStringSlice(key string) (ss []string): 返回key的slice类型&lt;/li&gt;
-&lt;li&gt;GetStringMap(key string) (sm map[string]interface{}): 返回interface{}类型的map结构&lt;/li&gt;
-&lt;li&gt;GetStringMapString(key string) (sms map[string]string): 返回string类型的map结构&lt;/li&gt;
-&lt;li&gt;GetStringMapStringSlice(key string) (smss map[string][]string): 同理&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;输入数据&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Param(key string) string: 返回URL的参数值(uri_patten: &amp;ldquo;/user/:id&amp;rdquo;,url: &amp;ldquo;/user/john&amp;rdquo;,c.Param(&amp;ldquo;id&amp;rdquo;) = &amp;ldquo;john&amp;rdquo;)&lt;/li&gt;
-&lt;li&gt;Query(key string) string: 返回url中的查询参数值(url: &amp;ldquo;/path?id=1234&amp;amp;name=Manu&amp;amp;value=&amp;ldquo;,c.Query(&amp;ldquo;id&amp;rdquo;)为1234,c.Query(&amp;ldquo;name&amp;rdquo;)为Manu,c.Query(&amp;ldquo;value&amp;rdquo;)为空)&lt;/li&gt;
-&lt;li&gt;DefaultQuery(key, defaultValue string) string: 返回url中的查询参数的默认值(同上，但是c.Query(&amp;ldquo;value&amp;rdquo;)就没有值，该方法可以设置默认值)&lt;/li&gt;
-&lt;li&gt;GetQuery(key string) (string, bool): 同Query()方法，并且会返回状态，如果对应的key不存在，返回(&amp;ldquo;&amp;rdquo;,false)&lt;/li&gt;
-&lt;li&gt;QueryArray(key string) []string: 返回指定key的对应的array(slice的长度取决于给定key的参数的数量)&lt;/li&gt;
-&lt;li&gt;GetQueryArray(key string) ([]string, bool): 同上，会返回状态&lt;/li&gt;
-&lt;li&gt;QueryMap(key string) map[string]string: 返回指定key对应map类型&lt;/li&gt;
-&lt;li&gt;GetQueryMap(key string) (map[string]string, bool): 同上，并且会返回状态&lt;/li&gt;
-&lt;li&gt;PostForm(key string) string: 该方法返回一个从POST 请求的urlencode表单或者multipart表单数据，不存在时返回空字符串&lt;/li&gt;
-&lt;li&gt;DefaultPostForm(key, defaultValue string) string: 同上，key不存在时返回默认值&lt;/li&gt;
-&lt;li&gt;GetPostForm(key string) (string, bool): 同PostForm()方法，并且会返回状态&lt;/li&gt;
-&lt;li&gt;PostFormArray(key string) []string: 该方法返回指定key的字符串类型的slice&lt;/li&gt;
-&lt;li&gt;GetPostFormArray(key string) ([]string, bool): 同上，并返回状态&lt;/li&gt;
-&lt;li&gt;PostFormMap(key string) map[string]string: 返回指定key的map类型&lt;/li&gt;
-&lt;li&gt;GetPostFormMap(key string) (map[string]string, bool): 同上，并返回状态&lt;/li&gt;
-&lt;li&gt;FormFile(name string) (*multipart.FileHeader, error): 返回指定key的第一个文件(用作文件上传)&lt;/li&gt;
-&lt;li&gt;MultipartForm() (*multipart.Form, error): 该方法解析multipart表单，包含file文件上传&lt;/li&gt;
-&lt;li&gt;SaveUploadedFile(file *multipart.FileHeader, dst string) error: 该方法用来上传指定的文件头到目标路径(dst)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;Bind家族相关方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Bind(obj interface{}) error: 自动解析&lt;code&gt;Content-Type&lt;/code&gt;并绑定到指定的binding引擎&lt;/li&gt;
-&lt;li&gt;BindJSON(obj interface{}) error: 同上，binding引擎为&lt;code&gt;binding.JSON&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;BindXML(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;BindQuery(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;BindYAML(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;BindHeader(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;BindUri(obj interface{}) error: 使用&lt;code&gt;binding.Uri&lt;/code&gt;来绑定传递的结构体指针&lt;/li&gt;
-&lt;li&gt;MustBindWith(obj interface{}, b binding.Binding) error: 使用指定的binding引擎来绑定传递的结构体指针(当有任何错误时，终止请求并返回400)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;ShouldBind家族相关方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ShouldBind(obj interface{}) error: 同上述的Bind()方法，但是该方法在json结构无效时不会返回400&lt;/li&gt;
-&lt;li&gt;ShouldBindJSON(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;ShouldBindXML(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;ShouldBindQuery(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;ShouldBindYAML(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;ShouldBindHeader(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;ShouldBindUri(obj interface{}) error:&lt;/li&gt;
-&lt;li&gt;ShouldBindWith(obj interface{}, b binding.Binding) error: 等同于MustBindWith()方法&lt;/li&gt;
-&lt;li&gt;ShouldBindBodyWith(obj interface{}, bb binding.BindingBody) (err error): 和ShouldBindWith()方法相似，但是他会存储请求体到context中，当下次调用时可以重用(因为该方法是在binding之前读取body，因此在你只使用一次时，为了更好的性能还是使用ShouldBindWith会比较好)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;HTTP响应相关的方法&lt;/code&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Status(code int): 设置http的响应码&lt;/li&gt;
-&lt;li&gt;Header(key, value string): 是&lt;code&gt;c.Writer.Header().Set(key, value)&lt;/code&gt;的简单实现，在响应体重写入一个header，如果value为空，则相当于调用了&lt;code&gt;c.Writer.Header().Del(key)&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;GetHeader(key string) string: 返回请求体重的header&lt;/li&gt;
-&lt;li&gt;GetRawData() ([]byte, error): 返回流式数据&lt;/li&gt;
-&lt;li&gt;SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool): 该方法将设置一个Set-Cookie到ResponseWriter的头中(注意:name必须是一个合法可用的名称,无效的coookie可能会被丢弃)&lt;/li&gt;
-&lt;li&gt;Cookie(name string) (string, error): 返回名称为name的cookie&lt;/li&gt;
-&lt;li&gt;Render(code int, r render.Render): 该方法写入响应头并调用render.Render去渲染数据&lt;/li&gt;
-&lt;li&gt;HTML(code int, name string, obj interface{}): 该方法使用指定文件模板名称去渲染http模板(同时会更新状态码并设置Content-Type as &amp;ldquo;text/html&amp;rdquo;.)&lt;/li&gt;
-&lt;li&gt;IndentedJSON(code int, obj interface{}): 该方法会序列化对象obj为一个pretty JSON 数据到响应体中，同时设置Content-Type as &amp;ldquo;application/json&amp;rdquo;(pretty JSON需要消耗cpu和带宽，强烈建议生产使用&lt;code&gt;Context.JSON()&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;SecureJSON(code int, obj interface{}): 同上，会序列化成&lt;code&gt;Secure Json&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;JSONP(code int, obj interface{}):&lt;/li&gt;
-&lt;li&gt;JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&amp;ldquo;application/json&amp;rdquo;头&lt;/li&gt;
-&lt;li&gt;AsciiJSON(code int, obj interface{}):&lt;/li&gt;
-&lt;li&gt;PureJSON(code int, obj interface{}):&lt;/li&gt;
-&lt;li&gt;XML(code int, obj interface{}): 序列化成&lt;code&gt;xml&lt;/code&gt;格式,并写Content-Type:&amp;ldquo;application/xml&amp;rdquo;&lt;/li&gt;
-&lt;li&gt;YAML(code int, obj interface{}): 序列化成&lt;code&gt;yaml&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;ProtoBuf(code int, obj interface{}): 序列化成&lt;code&gt;probuf&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;String(code int, format string, values &amp;hellip;interface{}): 将制定的string写入响应体&lt;/li&gt;
-&lt;li&gt;Redirect(code int, location string): 重定向&lt;/li&gt;
-&lt;li&gt;Data(code int, contentType string, data []byte): 写一些数据到响应体重，并更新响应码&lt;/li&gt;
-&lt;li&gt;DataFromReader(code int, contentLength int64, contentType string, reader io.Reader, extraHeaders map[string]string): 写一些制定模板的数据到响应体中，并更新状态码&lt;/li&gt;
-&lt;li&gt;File(filepath string): 以一种高效方式将制定文件写入响应体数据中&lt;/li&gt;
-&lt;li&gt;FileAttachment(filepath, filename string): 同上，但是在客户端文件会被直接下载下来&lt;/li&gt;
-&lt;li&gt;SSEvent(name string, message interface{}): 写Server-Sent Event到响应数据中&lt;/li&gt;
-&lt;li&gt;Stream(step func(w io.Writer) bool) bool: 发送一个流式的响应数据并返回状态&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;3-gin实例示例&#34;&gt;3.Gin实例示例&lt;/h4&gt;
-
-&lt;p&gt;&lt;strong&gt;3.1返回json格式的数据&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;为了解决我们在开头提到的问题，我们将使用context引用对象的JSON家族方法来处理该需求&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;gh&#34;&gt;# 使用context来返回json格式的数据
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ cat case2.go
-package main
-
-import (
-    &amp;#34;github.com/gin-gonic/gin&amp;#34;
-)
-
-// 我们定义一个通用的格式化的响应数据
-// 在Data字段中采用空接口类型来实际存放我们的业务数据
-type restData struct {
-    Data        interface{}   &lt;span class=&#34;sb&#34;&gt;`json:&amp;#34;data&amp;#34;`&lt;/span&gt;
-    Message     string        &lt;span class=&#34;sb&#34;&gt;`json:&amp;#34;message&amp;#34;`&lt;/span&gt;
-    Status      bool          &lt;span class=&#34;sb&#34;&gt;`json:&amp;#34;status&amp;#34;`&lt;/span&gt;
-}
-
-func main() {
-    // mock一个http响应数据
-    restdata := &amp;amp;restData{&amp;#34;Hello,BGBiao&amp;#34;,&amp;#34;&amp;#34;,true}
-    restdata1 := &amp;amp;restData{map[string]string{&amp;#34;name&amp;#34;:&amp;#34;BGBiao&amp;#34;,&amp;#34;website&amp;#34;:&amp;#34;https://bgbiao.top&amp;#34;},&amp;#34;&amp;#34;,true}
-
-    // 使用Gin框架启动一个http接口服务
-    ginObj := gin.Default()
-    ginObj.GET(&amp;#34;/api/test&amp;#34;,func(c &lt;span class=&#34;ge&#34;&gt;*gin.Context){
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;       // 我们的handlerFunc中入参是一个Context结构的引用对象c
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;       // 因此我们可以使用Context中的JSON方法来返回一个json结构的数据
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;       // 可用的方法有如下几种，我们可以根据实际需求进行选择
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;       /*&lt;/span&gt;
-          IndentedJSON(code int, obj interface{}): 带缩进的json(消耗cpu和mem)
-          SecureJSON(code int, obj interface{}): 安全化json
-          JSONP(code int, obj interface{})
-          JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&amp;#34;application/json&amp;#34;头
-       */
-       c.JSON(200,restdata)
-    })
-    ginObj.GET(&amp;#34;/api/test1&amp;#34;,func(c *gin.Context){
-        c.IndentedJSON(200,restdata1)
-    })
-
-    ginObj.Run(&amp;#34;localhost:8080&amp;#34;)
-}
-
-
-&lt;span class=&#34;gh&#34;&gt;# 实例运行(这里成功将我们写的两个api接口进行对外暴露)
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ go run case2.go
-....
-....
-[GIN-debug] GET    /api/test                 --&amp;gt; main.main.func1 (3 handlers)
-[GIN-debug] GET    /api/test1                --&amp;gt; main.main.func2 (3 handlers)
-
-&lt;span class=&#34;gh&#34;&gt;# 接口测试访问
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ curl localhost:8080/api/test
-{&amp;#34;data&amp;#34;:&amp;#34;Hello,BGBiao&amp;#34;,&amp;#34;message&amp;#34;:&amp;#34;&amp;#34;,&amp;#34;status&amp;#34;:true}
-$ curl localhost:8080/api/test1
-{
-    &amp;#34;data&amp;#34;: {
-        &amp;#34;name&amp;#34;: &amp;#34;BGBiao&amp;#34;,
-        &amp;#34;website&amp;#34;: &amp;#34;https://bgbiao.top&amp;#34;
-    },
-    &amp;#34;message&amp;#34;: &amp;#34;&amp;#34;,
-    &amp;#34;status&amp;#34;: true
-}% &lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;当然上面我们仅以JSON格式来示例，类似的方式我们可以使用&lt;code&gt;XML&lt;/code&gt;,&lt;code&gt;YAML&lt;/code&gt;,&lt;code&gt;ProtoBuf&lt;/code&gt;等方法来输出指定格式化后的数据。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;3.2其他常用的基本方法&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;在其他基本方法中我们仍然使用上述示例代码中的主逻辑，主要用来测试基本的方法.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;gh&#34;&gt;# 我们在/api/test这个路由中增加如下两行代码
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;// 设置响应体中的自定义header(通常我们可以通过自定义头来实现一个内部标识)
-c.Header(&amp;#34;Api-Author&amp;#34;,&amp;#34;BGBiao&amp;#34;)
-// GetHeader方法用来获取指定的请求头，比如我们经常会使用请求中的token来进行接口的认证和鉴权
-// 这里由于我们使用的restdata的指针，通过GetHeader方法获取到token赋值给Message
-// ClientIP()方法用于获取客户端的ip地址
-restdata.Message = fmt.Sprintf(&amp;#34;token:%s 当前有效，客户端ip:%s&amp;#34;,c.GetHeader(&amp;#34;token&amp;#34;),c.ClientIP())
-
-&lt;span class=&#34;gh&#34;&gt;# 访问接口示例(我们可以看到在响应体中多了一个我们自定义的Api-Author头，并且我们将请求头token的值)
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ curl -H &amp;#39;token:xxxxxxxx&amp;#39; localhost:8080/api/test -i
-HTTP/1.1 200 OK
-Api-Author: BGBiao
-Content-Type: application/json; charset=utf-8
-Date: Sun, 12 Jan 2020 14:41:01 GMT
-Content-Length: 66
-
-{&amp;#34;data&amp;#34;:&amp;#34;Hello,BGBiao&amp;#34;,&amp;#34;message&amp;#34;:&amp;#34;token:xxxxxxxx 当前有效，客户端ip:127.0.0.1&amp;#34;,&amp;#34;status&amp;#34;:true}&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;3.3用户数据输入&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;当然到这里后，你可能还会有新的疑问，就是通常情况下，我们开发后端接口会提供一些具体的参数，通过一些具体数据提交来实现具体的业务逻辑处理，这些参数通常会分为如下三类:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;使用HTTP GET方法获取到的url中的一些查询参数来执行更具体的业务逻辑(比如我们查询数据的指定条数之类的)&lt;/li&gt;
-&lt;li&gt;使用HTTP POST GET等其他方式以form表单方式提交的数据来验证和处理用户数据&lt;/li&gt;
-&lt;li&gt;在URL中获取一些可变参数(比如通常我们的url会定义为&amp;rdquo;/api/uid/:id&amp;rdquo;来表示用户id相关的接口，这个时候通常需要获取到url中的id字段)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;以上的基本需求，几乎都可以在Context结构体的&lt;code&gt;输入数据&lt;/code&gt;中找到响应的方法.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;  1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;106
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;107
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;108
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;109
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;110
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;111
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;112
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;113
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;114
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;115
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;116
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;117
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;gh&#34;&gt;# 接下来，我们依然在上述的代码中进行修改，增加如下路由
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ cat case2.go
-....
-....
-    // 比如我们该接口时用来获取全部数据，但是我们希望在url中增加参数来限制数据条数
-    datas := []string{&amp;#34;Golang&amp;#34;,&amp;#34;Python&amp;#34;,&amp;#34;Docker&amp;#34;,&amp;#34;Kubernetes&amp;#34;,&amp;#34;CloudNative&amp;#34;,&amp;#34;DevOps&amp;#34;}
-    ginObj.GET(&amp;#34;/api/testdata&amp;#34;,func(c &lt;span class=&#34;ge&#34;&gt;*gin.Context){
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        limit := c.Query(&amp;#34;limit&amp;#34;)
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // 其实既然这里我们已经确定需求了，当用户没有输入limit参数时我们就可以设置默认值
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // DefaultQuery(&amp;#34;limit&amp;#34;,&amp;#34;1&amp;#34;)
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // 同时我们其实也可以使用GetQuery方法来获取参数解析状态，即是否有对应的参数
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // 还有QueryArray和GetQueryArray类似的方法
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        if limit != &amp;#34;&amp;#34; {
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;            num,_&lt;/span&gt; := strconv.Atoi(limit)
-            restdata1.Data = datas[:num]
-        }else {
-            restdata1.Data = datas
-        }
-        c.IndentedJSON(200,restdata1)
-
-    })
-
-    // 使用form表单方式提交数据
-    ginObj.POST(&amp;#34;/api/testdata&amp;#34;,func(c &lt;span class=&#34;ge&#34;&gt;*gin.Context){
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // 使用c.PostForm方法来提交一个data数据
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // 同时我们可以使用DefaultPostForm方法来给提交数据一个默认值，比如我们有些参数是希望有默认值的
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // 当然也可以使用GetPostForm，PostFormArray，PostFormArray方法来获取多个数据和状态
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // data := c.PostForm(&amp;#34;data&amp;#34;)
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        // datas = append(datas,data)
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        /*&lt;/span&gt; 这里可能会有个问题就是同时提交多个数据时，使用PostForm方法就会不那么好使了
-        通常情况下回使用PostFormArray方法
-        */
-        data := c.PostFormArray(&amp;#34;data&amp;#34;)
-        datas = append(datas,data...)
-        restdata1.Data = datas
-        c.IndentedJSON(200,restdata1)
-    })
-
-    // 获取url中的路径参数
-    ginObj.GET(&amp;#34;/api/testdata/:data&amp;#34;,func(c &lt;span class=&#34;ge&#34;&gt;*gin.Context){
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        data := c.Param(&amp;#34;data&amp;#34;)
-&lt;/span&gt;&lt;span class=&#34;ge&#34;&gt;        for _&lt;/span&gt;,rawData := range datas {
-            if data == rawData {
-                restdata1.Data = data
-                break
-            }
-        }
-        if restdata1.Data != data {
-            restdata1.Data = &amp;#34;&amp;#34;
-            restdata1.Message = fmt.Sprintf(&amp;#34;%v 不存在&amp;#34;,data)
-            restdata1.Status = false
-        }
-        c.IndentedJSON(200,restdata1)
-    })
-....
-....
-
-
-
-&lt;span class=&#34;gh&#34;&gt;# 请求示例接口
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;# 我们可以看到使用GET方法默认会获取到全部数据，但是如果有了limit参数后，我们就可以限制数据的条数
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ curl -H &amp;#39;token:xxxxxxxx&amp;#39; localhost:8080/api/testdata
-{
-    &amp;#34;data&amp;#34;: [
-        &amp;#34;Golang&amp;#34;,
-        &amp;#34;Python&amp;#34;,
-        &amp;#34;Docker&amp;#34;,
-        &amp;#34;Kubernetes&amp;#34;,
-        &amp;#34;CloudNative&amp;#34;,
-        &amp;#34;DevOps&amp;#34;
-    ],
-    &amp;#34;message&amp;#34;: &amp;#34;&amp;#34;,
-    &amp;#34;status&amp;#34;: true
-}%
-$ curl -H &amp;#39;token:xxxxxxxx&amp;#39; &amp;#34;localhost:8080/api/testdata?limit=2&amp;#34;
-{
-    &amp;#34;data&amp;#34;: [
-        &amp;#34;Golang&amp;#34;,
-        &amp;#34;Python&amp;#34;
-    ],
-    &amp;#34;message&amp;#34;: &amp;#34;&amp;#34;,
-    &amp;#34;status&amp;#34;: true
-}%
-
-&lt;span class=&#34;gh&#34;&gt;# 当我们使用post接口往服务提交数据时，就可以让服务端按照需求进行数据处理
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;curl -X POST  -d data=&amp;#34;vue&amp;#34; &amp;#34;localhost:8080/api/testdata&amp;#34;
-{
-    &amp;#34;data&amp;#34;: [
-        &amp;#34;Golang&amp;#34;,
-        &amp;#34;Python&amp;#34;,
-        &amp;#34;Docker&amp;#34;,
-        &amp;#34;Kubernetes&amp;#34;,
-        &amp;#34;CloudNative&amp;#34;,
-        &amp;#34;DevOps&amp;#34;,
-        &amp;#34;vue&amp;#34;
-    ],
-    &amp;#34;message&amp;#34;: &amp;#34;&amp;#34;,
-    &amp;#34;status&amp;#34;: true
-}%
-
-&lt;span class=&#34;gh&#34;&gt;# 当我们同时需要提交多份数据时，可以使用PostFormArray方法，同时提交多份数据(可以理解为批量提交)
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ curl -X POST -d data=&amp;#34;vue&amp;#34; -d data=&amp;#34;Rust&amp;#34; &amp;#34;localhost:8080/api/testdata&amp;#34;
-
-&lt;span class=&#34;gh&#34;&gt;# 获取URL中的参数值
-&lt;/span&gt;&lt;span class=&#34;gh&#34;&gt;&lt;/span&gt;$ curl &amp;#34;localhost:8080/api/testdata/Golang&amp;#34;
-{
-    &amp;#34;data&amp;#34;: &amp;#34;Golang&amp;#34;,
-    &amp;#34;message&amp;#34;: &amp;#34;&amp;#34;,
-    &amp;#34;status&amp;#34;: true
-}%
-
-$ curl &amp;#34;localhost:8080/api/testdata/Java&amp;#34;
-{
-    &amp;#34;data&amp;#34;: &amp;#34;&amp;#34;,
-    &amp;#34;message&amp;#34;: &amp;#34;Java 不存在&amp;#34;,
-    &amp;#34;status&amp;#34;: false
-}%&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
       
     </item>
     

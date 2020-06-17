@@ -6,7 +6,7 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 14 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 15 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>kafka</title>
       <link>https://bgbiao.top/tags/kafka/</link>
-      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/kafka/</guid>
       <description></description>
@@ -23,7 +23,7 @@
     <item>
       <title>运维</title>
       <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
       <description></description>
@@ -102,7 +102,7 @@
     </item>
     
     <item>
-      <title>grafana</title>
+      <title>Grafana</title>
       <link>https://bgbiao.top/tags/grafana/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
@@ -120,7 +120,7 @@
     </item>
     
     <item>
-      <title>prometheus</title>
+      <title>Prometheus</title>
       <link>https://bgbiao.top/tags/prometheus/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
