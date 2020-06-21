@@ -24,7 +24,7 @@
 
 <meta name="author" content="BGBiao" />
   <meta name="description" content=" 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
- 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
+ 前言 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
  存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。 成员管理: 是指 Broker 节点的注册、注销以及属性变更。 Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
@@ -68,6 +68,8 @@
 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
 
 
+前言
+
 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
 
 
@@ -84,6 +86,8 @@ Controller 选举: 是指选举集群 Controller，而其他管理类任务包�
 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
 
 
+前言
+
 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
 
 
@@ -95,7 +99,7 @@ Controller 选举: 是指选举集群 Controller，而其他管理类任务包�
 
 <meta itemprop="datePublished" content="2020-06-21T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-21T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="2762">
+<meta itemprop="wordCount" content="2769">
 
 
 
@@ -105,6 +109,8 @@ Controller 选举: 是指选举集群 Controller，而其他管理类任务包�
 <meta name="twitter:description" content="
 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
 
+
+前言
 
 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
 
@@ -499,7 +505,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2762 words </span>
+        <span class="more-meta"> 2769 words </span>
           <span class="more-meta"> 6 min read </span>
 
         
@@ -515,7 +521,19 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#zookeeper服务">Zookeeper服务</a></li>
+<li><a href="#kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
   </div>
 </div>
 
@@ -525,6 +543,8 @@ if (!doNotTrack) {
 <p>我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在<a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum">KIP-500</a>中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。</p>
 </blockquote>
 
+<h3 id="前言">前言</h3>
+
 <p>在kafka集群中，ZooKeeper集群用于<code>存放集群元数据</code>、<code>成员管理</code>、<code>Controller 选举</code>，以及其他一些<code>管理类任务</code>。</p>
 
 <ul>
@@ -533,7 +553,7 @@ if (!doNotTrack) {
 <li><code>Controller 选举</code>: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。</li>
 </ul>
 
-<p><strong>Zookeeper服务</strong></p>
+<h3 id="zookeeper服务">Zookeeper服务</h3>
 
 <p>在开始之前，我们首先需要对Zookeeper服务有一定的了解。在官方文档中，Zookeeper有如下能力:</p>
 
@@ -571,7 +591,7 @@ if (!doNotTrack) {
 
 <p>而真正使得Zookeeper在Java语言生态中有如此大影响还依赖于另外一个功能: <code>watches</code>，Client 可以对某个 znode 设置<code>watch</code> 当这个 znode 有变更的时候，就会产生<code>watch</code> 事件，这个事件会由 ZooKeeper 通知至 Client, 即是 Client 会收到来自 Server 的通知，可以实现数据的动态变更。(之所以说是Java语言生态，是因为在云原生领域，Etcd几乎是Zookeeper的替代品，不同的是它是Golang语言生态体系中的)</p>
 
-<p><strong>kafka集群数据在zookeeper的存储</strong></p>
+<h3 id="kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</h3>
 
 <p>前面对Zookeeper服务进行了大概的说明,接下来我们一起看看kafka的集群数据在zookeeper中是如何存储和分布的。</p>
 
@@ -587,7 +607,7 @@ if (!doNotTrack) {
 </span><span class="lnt">7
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma"># 前面说到zookeeper支持命名空间，因此我们可以使用一个zookeeper集群来管理多个kafka集群 
+<pre class="chroma"># 前面说到zookeeper支持命名空间，因此我们可以使用一个zookeeper集群来管理多个kafka集群
 # 只需要在启动kafka时指定zk的chroot环境，比如/kafka 在zookeeper中将存储名称为`kafka`的集群的相关数据
 sh-4.2# sh zkCli.sh -server 127.0.0.1:2181
 Connecting to 127.0.0.1:2181
@@ -607,22 +627,19 @@ Connecting to 127.0.0.1:2181
 [admin, brokers, cluster, config, consumers, controller, controller_epoch, isr_change_notification, latest_producer_id_block, log_dir_event_notification]</pre></td></tr></table>
 </div>
 </div>
-<p>可以看到kafka集群的相关数据分布在如下目录中:</p>
+<p><strong>kafka元数据存储目录</strong>
+- admin: 存储管理员接口操作的相关信息，主要为topic删除事件，分区迁移事件，优先副本选举，信息(一般为临时节点)
+- brokers: 主要存储broker相关的信息，broker节点以及节点上的topic相关信息
+- cluster: 存储kafka集群信息
+- config: 存储broker，client，topic，user以及changer相关的配置信息
+- consumers: 存放消费者相关信息(一般为空)
+- controller: 用于存放控制节点信息(注意: 该节点是一个临时节点，用于controller节点注册)
+- controller_epoch: 用于存放controller节点当前的年龄
+- isr_change_notification: 用于存储isr的变更通知(临时节点，当有isr进行变动时，会用于事件通知，可进行watch获取集群isr状态变更)
+- latest_producer_id_block:  该节点用于存储处理事务相关的pid范围
+- log_dir_event_notification: 日志目录事件通知</p>
 
-<ul>
-<li>admin: 存储管理员接口操作的相关信息，主要为topic删除事件，分区迁移事件，优先副本选举，信息(一般为临时节点)</li>
-<li>brokers: 主要存储broker相关的信息，broker节点以及节点上的topic相关信息</li>
-<li>cluster: 存储kafka集群信息</li>
-<li>config: 存储broker，client，topic，user以及changer相关的配置信息</li>
-<li>consumers: 存放消费者相关信息(一般为空)</li>
-<li>controller: 用于存放控制节点信息(注意: 该节点是一个临时节点，用于controller节点注册)</li>
-<li>controller_epoch: 用于存放controller节点当前的年龄</li>
-<li>isr_change_notification: 用于存储isr的变更通知(临时节点，当有isr进行变动时，会用于事件通知，可进行watch获取集群isr状态变更)</li>
-<li>latest_producer_id_block:  该节点用于存储处理事务相关的pid范围</li>
-<li>log_dir_event_notification: 日志目录事件通知</li>
-</ul>
-
-<p>admin目录结构:</p>
+<p><strong>admin目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -641,7 +658,7 @@ Connecting to 127.0.0.1:2181
 null</pre></td></tr></table>
 </div>
 </div>
-<p>brokers目录结构:</p>
+<p><strong>brokers目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -684,7 +701,7 @@ null</pre></td></tr></table>
 [zk: 127.0.0.1:2181(CONNECTED) 5] ls /kafka/brokers
 [ids, seqid, topics]
 
-# 表示当前集群有3个节点 
+# 表示当前集群有3个节点
 [zk: 127.0.0.1:2181(CONNECTED) 6] ls /kafka/brokers/ids
 [1, 2, 3]
 [zk: 127.0.0.1:2181(CONNECTED) 7] ls /kafka/brokers/seqid
@@ -697,7 +714,7 @@ null</pre></td></tr></table>
 [zk: 127.0.0.1:2181(CONNECTED) 10] get  /kafka/brokers/ids/1
 {&#34;listener_security_protocol_map&#34;:{&#34;PLAINTEXT&#34;:&#34;PLAINTEXT&#34;},&#34;endpoints&#34;:[&#34;PLAINTEXT://10.0.0.1:9092&#34;],&#34;jmx_port&#34;:9999,&#34;host&#34;:&#34;10.0.0.1&#34;,&#34;timestamp&#34;:&#34;1588925944886&#34;,&#34;port&#34;:9092,&#34;version&#34;:4}
 
-# topic详情 
+# topic详情
 [zk: 127.0.0.1:2181(CONNECTED) 11] get  /kafka/brokers/topics/__consumer_offsets
 {&#34;version&#34;:2,&#34;partitions&#34;:{&#34;1&#34;:[2,1,3],&#34;0&#34;:[3,2,1],&#34;2&#34;:[1,2,3],&#34;adding_replicas&#34;:{},&#34;removing_replicas&#34;:{}}
 
@@ -716,7 +733,7 @@ null</pre></td></tr></table>
 {&#34;controller_epoch&#34;:3,&#34;leader&#34;:1,&#34;version&#34;:1,&#34;leader_epoch&#34;:12,&#34;isr&#34;:[3,1]}</pre></td></tr></table>
 </div>
 </div>
-<p>cluster目录结构:</p>
+<p><strong>cluster目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -749,7 +766,7 @@ dataLength = 45
 numChildren = 0</pre></td></tr></table>
 </div>
 </div>
-<p>config目录结构:</p>
+<p><strong>config目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -798,7 +815,7 @@ numChildren = 0</pre></td></tr></table>
 {&#34;version&#34;:1,&#34;config&#34;:{&#34;segment.bytes&#34;:&#34;104857600&#34;,&#34;compression.type&#34;:&#34;producer&#34;,&#34;cleanup.policy&#34;:&#34;compact&#34;}}</pre></td></tr></table>
 </div>
 </div>
-<p>controller目录结构:</p>
+<p><strong>controller目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -811,7 +828,7 @@ numChildren = 0</pre></td></tr></table>
 {&#34;version&#34;:1,&#34;brokerid&#34;:1,&#34;timestamp&#34;:&#34;1588833869354&#34;}</pre></td></tr></table>
 </div>
 </div>
-<p>controller_epoch 目录结构:</p>
+<p><strong>controller_epoch 目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -824,7 +841,7 @@ numChildren = 0</pre></td></tr></table>
 2</pre></td></tr></table>
 </div>
 </div>
-<p>其他几个目录结构:</p>
+<p><strong>其他几个目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -867,7 +884,9 @@ null
 null</pre></td></tr></table>
 </div>
 </div>
-<p>以上就是整个kafka元数据在zookeeper集群中的整体存储结构，下面附上一张kafka的元数据存储结构体。</p>
+<p>以上就是整个kafka元数据在zookeeper集群中的整体存储结构，下面附上一张kafka的元数据存储结构图。</p>
+
+<p><strong>kafka元数据在zk中的分布</strong></p>
 
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg0a21u6coj31am0u0tlf.jpg" alt="kafka在zookeeper中的存储结构" /></p>
 

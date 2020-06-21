@@ -21,6 +21,8 @@
 &lt;p&gt;我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在&lt;a href=&#34;https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum&#34;&gt;KIP-500&lt;/a&gt;中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。&lt;/p&gt;
 &lt;/blockquote&gt;
 
+&lt;h3 id=&#34;前言&#34;&gt;前言&lt;/h3&gt;
+
 &lt;p&gt;在kafka集群中，ZooKeeper集群用于&lt;code&gt;存放集群元数据&lt;/code&gt;、&lt;code&gt;成员管理&lt;/code&gt;、&lt;code&gt;Controller 选举&lt;/code&gt;，以及其他一些&lt;code&gt;管理类任务&lt;/code&gt;。&lt;/p&gt;
 
 &lt;ul&gt;
