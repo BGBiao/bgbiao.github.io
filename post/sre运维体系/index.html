@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>一文帮你理解整个SRE运维体系 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="SRE运维体系的构建和工作职责划分。 可观测性系统 在任何有一定规模的企业内部，一旦推行起来整个SRE的运维模式，那么对于可观测性系统的建设将变" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="一文帮你理解整个SRE运维体系" />
+<meta property="og:description" content="SRE运维体系的构建和工作职责划分。 可观测性系统 在任何有一定规模的企业内部，一旦推行起来整个SRE的运维模式，那么对于可观测性系统的建设将变" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/" />
+<meta property="article:published_time" content="2020-06-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-19T00:00:00+00:00" />
+<meta itemprop="name" content="一文帮你理解整个SRE运维体系">
+<meta itemprop="description" content="SRE运维体系的构建和工作职责划分。 可观测性系统 在任何有一定规模的企业内部，一旦推行起来整个SRE的运维模式，那么对于可观测性系统的建设将变">
+
+
+<meta itemprop="datePublished" content="2020-06-19T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-19T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5631">
+
+
+
+<meta itemprop="keywords" content="SRE,运维,运维体系," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="一文帮你理解整个SRE运维体系"/>
+<meta name="twitter:description" content="SRE运维体系的构建和工作职责划分。 可观测性系统 在任何有一定规模的企业内部，一旦推行起来整个SRE的运维模式，那么对于可观测性系统的建设将变"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">一文帮你理解整个SRE运维体系</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-06-19" class="post-time">
+          2020-06-19
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 5631 words </span>
+          <span class="more-meta"> 12 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#可观测性系统">可观测性系统</a></li>
+<li><a href="#故障响应">故障响应</a></li>
+<li><a href="#故障复盘">故障复盘</a></li>
+<li><a href="#测试与发布">测试与发布</a></li>
+<li><a href="#容量规划">容量规划</a></li>
+<li><a href="#自动化工具开发">自动化工具开发</a></li>
+<li><a href="#用户体验">用户体验</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      
+
+<blockquote>
+<p>SRE运维体系的构建和工作职责划分。</p>
+</blockquote>
+
+<h4 id="可观测性系统">可观测性系统</h4>
+
+<p>在任何有一定规模的企业内部，一旦推行起来整个SRE的运维模式，那么对于可观测性系统的建设将变得尤为重要，而在整个可观测性系统中，通常我们会分为如下三个方面:</p>
+
+<ul>
+<li>指标监控：即各种指标监控，比如基础资源指标，服务性能指标，业务的调用指标。</li>
+<li>日志：各种设备以及服务的运行日志监控。</li>
+<li>调用链：业务层面的调用链分析，通常在分布式系统中帮助运营、开发以及运维人员快速识别整体调用的瓶颈点</li>
+</ul>
+
+<p>一整套的可观测系统，它能确保你洞察系统，跟踪系统的健康状态、可用性以及系统内部发生的事情。</p>
+
+<p>对于整个可观测系统的建设，需要注意如下两点：</p>
+
+<ul>
+<li><code>确定质量标准是什么，并确保系统持续逼近或保持在质量标准极限范围内</code></li>
+<li><code>系统地关注这项工作—而不应该只是随机地查看一下系统</code></li>
+</ul>
+
+<p>在整个企业级可观测系统中，我认为至少应该包括如下几个特征：</p>
+
+<ul>
+<li>完备指标采集: 可以对接企业内大部分的设备与技术栈相应的监控指标；同时，支持常见设备的监控指标体系，可以快速接入监控设备和指标，避免所有设备监控都是从头构建；对于日志数据的采集支持</li>
+<li>海量设备支持: 企业IT系统数量和规模越来越大，因此监控系统比以前需要监控海量设备监控。</li>
+<li>监控数据存储和分析: 监控数据是运维分析、运维自动化和智能化的基础，因此海量监控数据存储以及基于监控数据的可视化分析是一个监控系统的基本能力。</li>
+</ul>
+
+<p>可观测系统是整个运维体系的基础，它需要提供整个运维体系的数据化支持。</p>
+
+<p>因此，一个企业级的可观测性系统应该是平台化的。一方面可以通过配置或者开发实现更多 <code>运维指标</code>的接入；另一方面，亦可对接更多的<code>专业运维工具</code>，整合并打通多元的运维数据，为更多运维场景提供数据服务。从整体上，可观测性系统为企业运维提供了一个<code>数据基础</code>，让我们对<code>事故响应以及容量预测</code>等方面更多使用数据而非凭借以往经验和拍脑袋做出决策。</p>
+
+<h4 id="故障响应">故障响应</h4>
+
+<p>如果有什么东西出了故障，该如何提醒大家并做出回应？工具可以帮助解决这个问题，国为它可以定义提醒人类的规则。</p>
+
+<p>故障响应是建立在<code>使用可观测性系统构建的数据</code>之上，并借助反馈循环，来帮助我们加强对服务的监控。</p>
+
+<p>故障响应通常包含如下几个动作:</p>
+
+<ul>
+<li>关注: 不论是主动发现瓶颈点或异常点，还是通过可观测性系统被动暴露瓶颈点，我们都应该进行主动关注</li>
+<li>交流: 及时将观察到风险点通知到相关方，并告知影响面以及相关的补救措施</li>
+<li>恢复: 三方达成一致后，根据补救措施进行修复相关风险点和异常点</li>
+</ul>
+
+<p>需要注意的是，如果在前期整个可观测性系统能够做好，通常故障应当始于一个简单的告警信息或一个报障电话，因此，通常情况下，可观测系统做的足够好仅能起到追溯和排查的作用，但是无法起到及时发现的作用，此时就需要依赖于各个观测数据进行计算和评估告警，以及时将相关的告警通知到相关人，以暴露风险点。</p>
+
+<p>告警只是整个故障响应的第一个环节，解决的是故障如何发现的问题，而大多数的故障响应工作都是关于定义处理策略和提供培训的，以便人们在收到警报时知道该怎么做，通常这部分更多的是过去历史经验和运维经历的总结和沉淀，包括经验的一些抽象和工具化沉淀，以保证故障响应的效率和普遍化(即不依赖人为经验)。</p>
+
+<p>而对于整个告警系统来说，需要确保的是告警的有效性，否则，整个报警系统很有可能沦落为垃圾数据制造机，告警有效性意味着需要满足如下两个需求:</p>
+
+<ul>
+<li>告警及时性: 系统有问题需要及时通过告警信息告知运维处理人员及时处理告警;</li>
+<li>告警准确性: 只要有告警信息系统必然出现问题(对于很多企业可能存在大量的无用告警，比如磁盘问题，mem等相关问题，当然这里涉及到了自动化、业务形态、告警阈值的问题);</li>
+</ul>
+
+<p>在整个运维过程中，我们经常会发现有大量的无关紧要的告警信息，让运维人员的注意力迷失在告警海洋当中，而通常非运维领域的领导会关注整个告警的响应程度，因此，抑制和消除无效的告警，让运维人员不被告警风暴所吞没，也是告警管理中重点建设的内容。</p>
+
+<p>通常情况，在我们的各个可观测系统构建完成后，可以通过整合到监控平台中的各种监控数据，应用趋势预测、短周期检测、间歇性恢复、基线判断、重复压缩等算法和手段实现告警压缩收敛，强化告警的有效性。</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxkaxxf68j30u00dhjtx.jpg" alt="" /></p>
+
+<p>同时，面向一线的运维人员，我们需要根据同一个系统或设备的多个监控指标进行综合性建模和分析，汇总成一个健康度的分值，给予一线运维人员系统的基于健康度的系统分层评价体系，真实、直观反映系统运行状态，实现问题快速定界。</p>
+
+<p>比如，通过基础资源的多个指标进行综合加权计算来整体评估该资源的利用率；通过一个应用关联的全部资源的资源利用率以及应用的运维架构整体建模分析来计算一个分值来整体评估该应用的健康程度。</p>
+
+<p>这个过程如果做得成熟一些，可以根据内部已有的解决方案和告警进行闭环打通，一个简单的场景就是，当磁盘满时，告警会首先触发一次标准化的磁盘巡检，并进行相关的可丢弃数据的删除，如果依然无法解决该报警，下次可直接关联到一线运维进行人工干预，之后进行标准化经验总结。</p>
+
+<h4 id="故障复盘">故障复盘</h4>
+
+<p>故障复盘就是对于过去的一些服务异常和服务中断情况进行回顾和总结，以确保相同问题下次不会再出现。为了让大家团结协作，我们希望建立一种无指责、透明的事后文化。个人不应该害怕事故，而是确信如果事故发生，团队将会响应和改进系统。</p>
+
+<p>备注: 其实在国内的SRE文化中，一般只有对大型，对业务有重大影响的事故才会进行复盘，但实际上如果在时间和经历允许的情况下，对于一般的普通事故也应该在小范围进行复盘，正所谓大的故障都是从不断的小问题一点一点积累的。另外，其实对于运维相关的个人而言，我们也应当及时的进行小故障复盘，以不断加强个人的故障处理和修复能力。</p>
+
+<p>我认为SRE的一个关键共识正是承认了系统的不完美性，追求永不停机的系统是不现实的。基于不完美系统，我们无可避免要面对和经历系统故障与失败。</p>
+
+<p>所以我们重要的并非找到为这个故障责任的这个人或者那个人，而是更应该创根问底地复盘这个故障和失败的根本原因是什么，以及如何避免再次出现相同的故障。系统可靠性是整个团队共同奋斗的方向，从失败中快速恢复并吸取教训，每个人放心地提出问题，应对停机，并努力改进系统。</p>
+
+<p>备注: 通常很多企业内部在故障复盘过程中，相关人员可能将故障和失败的根因追溯 不经意间 当做了故障定责和一系列的惩罚措施，通过一些惩戒措施来强行约定故障的发生，这种方式往往是非常不可取的，试想每个人都不想出现事故，要么是认知之外，要么是规则缺陷，永远没有一个人明知会有故障而偏偏去制造故障的。</p>
+
+<p>需要牢记的是: <code>故障是我们可以从中学习的东西，而不是让人害怕和羞耻的事情！</code></p>
+
+<p>在日常运维过程中，出现故障等事故对于我们而言其实是一个很好的复盘学习机会。通过历史监控数据，分析事故其中的根本原因，制定后续应对策略，并且通过运维平台将这些应对策略编辑成标准化、可重用、自动化的运维应用场景，为后续相同问题的处理提供标准且快捷的解决方案。这正是事后回顾这个过程最真实的价值体现。</p>
+
+<h4 id="测试与发布">测试与发布</h4>
+
+<p>测试与发布对于整个稳定性和可靠性的主要出于一个预防的作用，预防是指尝试限制发生的事故数量，并确保在发布新代码时基础架构和服务能够保持稳定。</p>
+
+<p>作为一个长期从事运维工作的人，可能内心中最为恐惧的莫过于新应用版本发布。因为除了硬件和网络设备损坏这个属于天灾级别的概率事件外，新应用版本发布的第二天通常是停机与事故的高危期。所以，对于一些量级较大的产品通常会在节假日以及重要活动前夕进行封网操作，以避免新版本上线而导致的业务bug出现。</p>
+
+<p>而测试是在成本和风险之间找到适当的平衡活动。如果过于冒险，你们可能就会疲于应付系统失败；反过来说，如果你太保守，你就不能足够快地发布新东西，让企业在市场上生存下来。</p>
+
+<p>在错误预算比较多（即在一段时间内故障导致系统停机时长较少）的情况下，可以适当减少测试资源并放宽系统上线的测试和条件，让业务可以有更多的功能上线，以保持业务的敏态；在错误预算比较少（即在一段时间内故障导致系统停机时长较多）的情况下，则要增加测试资源并收紧系统上线的测试，让系统的潜在风险得到更多有效的释放，避免系统停机保持系统的稳态。这种敏态与稳态之间的平衡，需要整个运维与开发团队来共同承担。</p>
+
+<p>除了测试外，应用发布也是一项运维团队通常要承担的责任。SRE的一个原则是将一切可以重复性劳动代码化和工具化；此外，应用发布的复杂程度往往与系统的复杂程度成正比。因此在应用系统上规模企业，往往已经着手基于自动化框架构建自动化的应用发布过程。</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxl3eouisj30u00c8dhq.jpg" alt="" /></p>
+
+<p>通过自动化发布工具，我们可以构建流水线实现部署的过程中所有的操作（如编译打包、测试发布、生产准备、告警屏蔽、服务停止、数据库执行、应用部署、服务重启等）全部自动化。</p>
+
+<h4 id="容量规划">容量规划</h4>
+
+<p>容量规划是关于预测未来和发现系统极限的，容量规划也是为了确保系统可以随着时间的推移得到完善和增强。</p>
+
+<p>规划的主要目标是管理风险和期望，对于容量规划，涉及到将容量扩展到整个业务；所关注的期望是人们在看到业务增长时期望服务如何响应。风险是在额外的基础设施上花费时间和金钱来处理这个问题。</p>
+
+<p>容量规划首先是对未来预测性的分析与判断，其预测的基础正是海量的运维数据。因此，容量规划除了有相应的架构和规划团队外，一个全面的运维数据中心是实现系统容量规划的必须设施。</p>
+
+<p>容量趋势预警和分析将综合地从各种运维监控、流程管理等数据源中收集、整理、清洗并结构化地存储各种运维数据，将这些来自于各种工具的运维数据打通融合并且构建各种数据主题。</p>
+
+<p>应用这些数据主题的数据用于帮助运维人员对问题进行评估，包括：</p>
+
+<ul>
+<li>当前的容量是多少</li>
+<li>何时达到容量极限</li>
+<li>应该如何更改容量</li>
+<li>执行容量规划</li>
+</ul>
+
+<p>运维平台除了可以提供必要的数据支持外，还需要提供必要的数据可视化支持能力。运维数据可视化提供了一些必要的能力保障运维人员可以更好地利用其中的运维数据评估容量。</p>
+
+<p>首先，运维平台需要有极强的数据检索能力。运维平台存储着海量的运维数据，运维人员为了尝试建立和验证一个探索性场景的时候，往往多次反复检索和查询特定数据。如果运维数据分析平台的数据查询很慢或者查询角度很少的情况下，运维人员建立场景的时间就会拖得很长甚至进行不下去。因此，运维人员可通过平台可以实现关键字、统计函数、单条件、多条件、模糊多维度查找功能，以及实现海量数据秒级查询，才能更有效帮助运维人员更便捷分析数据。</p>
+
+<p>其二，平台需要强大的数据可视化能力。人们常说“千言万语不及一图”，运维人员经常会通过各系统的运维数据进行统计分析并生成各类实时报表，对各类运维数据（如应用日志、交易日志、系统日志）进行多维度、多角度深入分析、预测及可视化展现，将他们分析的预测结果和经验向他人表达和推广。</p>
+
+<h4 id="自动化工具开发">自动化工具开发</h4>
+
+<p>SRE不仅涉及运营，还涉及软件开发，当然这部分指的是和运维以及SRE领域相关的工具和平台开发。在Google的SRE体系中，SRE工程师将花费大约一半的时间来开发新的工具和服务，这些工具的一部分用于自动化一些手动任务，而其他部分用于来不断填补和修复整个SRE体系内部的其他系统。</p>
+
+<p>通过编写代码把自己和其他人从重复的工作中解放出来，如果我们不需要人类来完成任务，那么就编写代码，这样人类就不需要参与其中了。</p>
+
+<p>SRE从内心上鄙视重复性的工作，将从原有的人工加被动响应，转变为<code>更高效、更为自动化</code>的运维体系。</p>
+
+<p>自动化运维框架:</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxlg6x4l2j30u00cogoj.jpg" alt="" /></p>
+
+<p>自动化运维工具的优势和必要性:</p>
+
+<ul>
+<li>提高效率: 由程序自动化操作，有效地降低运维人力资源的投入，也让运维人员的精力得以释放并投向更为重要的领域。</li>
+<li>操作的标准化: 将原来许多复杂、易错的手工操作实现统一运维操作入口，实现运维操作白屏化，提升运维操作的可管理性；同时，减少由于运维人员情绪带来手工误操作，避免“从删库到跑路”这样的悲剧的发生。</li>
+<li>运维经验能力的传承: 运维自动化工具将原来许多运维团队积累的经验以代码方式总结为各种运维工具，实现自动化和白屏化的运维操作。运维团队的后来者，可以有效地继承、重复使用并优化它们。这种代码化的工作传承，将个人能力转变为团队能力，并减少人员流动带来对工作的影响。</li>
+</ul>
+
+<p>构建自动化运维体系就必须以<code>运维场景</code>为基础，这些运维场景是在本企业内反复迭代和打造，是企业中最常用的运维场景。</p>
+
+<p>比如常见的运维场景：软件安装部署、应用发布交付、资产管理、告警自动处理、故障分析、资源申请、自动化巡检等等。因此，整个自动化运维体系建设时也应支持多种不同类型的自动化作业配置能力，通过简单的脚本开发、场景配置和可视化定制流程实现更多运维场景的实现。</p>
+
+<h4 id="用户体验">用户体验</h4>
+
+<p>用户体验这一层要说的是，作为SRE来讲，从用户的角度来保证业务的稳定性和可用性才是最终目标。这个才传统意义上的运维人员是不会关注这一点的，因为大家通常只会考虑到我底层运维的系统或底层资源是否稳定，但实际上整个业务的稳定才是SRE需要关心的问题，而业务的稳定性和可用性通常需要站在用户的角度来模拟和衡量整体的可用性和可靠性。</p>
+
+<p>在前面提到的所有SRE相关的工作范畴，无论是监控、事故响应、回顾、测试与发布、容量规划以及构建自动化工具，无非都是为了提供更好的系统用户业务体验而服务的。因此，我们在运维的过程中无不需要注意关注系统的用户体验。</p>
+
+<p>而在实际运维工作中，我们往往可以通过应用日志、监控数据、业务拔测等业务相关的用户体验信息。在运维数据平台中，通过这些用户体验监测数据之间的关联和串联，重现用户的最终业务调用链路以及各应用环节对性能数据的关系。最终形成从业务用户体验数据入手，逐步实现系统运行状态数据、设备运行状态数据链路的打通，让运维体系实现以最终用户体验为中心的目标。</p>
+
+<p>这些用户体验的信息，对于运维团队掌握客户整体的用户体验情况、系统可用性的监测以及系统针对性的优化提供着无可替代的作用。</p>
+
+<p>其实，SRE运维体系更为强调以用户的体验为核心，以自动化和运维数据为手段，实现应用业务连续性保障，从这个点出发，我们会发现和以往的传统运维还是有很大的区别的，我们不再仅仅是单纯的安装和部署工程师，我们需要通过一系列的技术手段来不断保障上层业务的稳定性和可靠性。</p>
+
+<hr />
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-06-19
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/sre/">SRE</a>
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/">运维体系</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">Kafka在Zookeeper中的存储结构</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/">
+            <span class="next-text nav-default">kafka中关于HW(High Watermark)和Leader Epoch的讨论</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Kafka在Zookeeper中的存储结构 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
+ 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
+ 存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。 成员管理: 是指 Broker 节点的注册、注销以及属性变更。 Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。 " />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="Kafka在Zookeeper中的存储结构" />
+<meta property="og:description" content="
+我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
+
+
+在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
+
+
+存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
+成员管理: 是指 Broker 节点的注册、注销以及属性变更。
+Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" />
+<meta property="article:published_time" content="2020-06-21T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-21T00:00:00+00:00" />
+<meta itemprop="name" content="Kafka在Zookeeper中的存储结构">
+<meta itemprop="description" content="
+我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
+
+
+在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
+
+
+存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
+成员管理: 是指 Broker 节点的注册、注销以及属性变更。
+Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
+">
+
+
+<meta itemprop="datePublished" content="2020-06-21T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-21T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2762">
+
+
+
+<meta itemprop="keywords" content="kafka,运维,Zookeeper," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kafka在Zookeeper中的存储结构"/>
+<meta name="twitter:description" content="
+我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
+
+
+在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
+
+
+存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
+成员管理: 是指 Broker 节点的注册、注销以及属性变更。
+Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Kafka在Zookeeper中的存储结构</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-06-21" class="post-time">
+          2020-06-21
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 2762 words </span>
+          <span class="more-meta"> 6 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在<a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum">KIP-500</a>中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。</p>
+</blockquote>
+
+<p>在kafka集群中，ZooKeeper集群用于<code>存放集群元数据</code>、<code>成员管理</code>、<code>Controller 选举</code>，以及其他一些<code>管理类任务</code>。</p>
+
+<ul>
+<li><code>存放元数据</code>: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。</li>
+<li><code>成员管理</code>: 是指 Broker 节点的注册、注销以及属性变更。</li>
+<li><code>Controller 选举</code>: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。</li>
+</ul>
+
+<p><strong>Zookeeper服务</strong></p>
+
+<p>在开始之前，我们首先需要对Zookeeper服务有一定的了解。在官方文档中，Zookeeper有如下能力:</p>
+
+<ul>
+<li>配置管理: 其实就是单纯的K/V存储，可以用来配置的存储和管理，实现对分布式系统组件的集中式的配置管理</li>
+<li>命名: 命令空间管理，在zookeeper中配置可通过不同的根路径来实现简单的命名空间隔离(简单的chroot隔离)</li>
+<li>分布式的同步服务: 可保证分布式的同步</li>
+<li>分组服务: 可以将一组服务配置进行分组管理，其实在Dubbo的注册中心中，就是使用分组和命名来统一进行生产者的注册和发现</li>
+</ul>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg095r9zy2j30go0553z6.jpg" alt="Zookeeper架构" /></p>
+
+<p>在Zookeeper中所有的命名空间和文件系统比较类似，每个节点都有一个唯一的<code>路径</code>，如下图:</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg09dvjkrnj30ca071mxh.jpg" alt="zookeeper内部存储结构" /></p>
+
+<p>为什么Zookeeper服务可以满足配置管理和协调服务呢？主要是因为它的节点属性，通常也是经常可能会忽略的问题，即在Zookeeper中存在两种节点: <code>持久节点</code>和<code>临时节点</code>，节点也称之为<code>znode</code>，而znode本身除了数据之外，还会存储一些额外的信息:</p>
+
+<ul>
+<li>数据变更的版本号</li>
+<li>ACL变更的版本号</li>
+<li>时间戳</li>
+</ul>
+
+<p>每次znode中的数据有变更，版本号都会递增，并且client在向znode获取数据时，不仅会获取实际数据，而且会获取到数据的版本，这在整个配置管理领域会相当有用。</p>
+
+<p>前面说到的<code>持久节点</code>只要znode创建后，便一直会存在，这种节点主要用于配置的持久化存储，只要zookeeper集群整体可用，那该节点也一直可用(及时集群异常后恢复，该节点依旧存在)；而<code>临时节点</code> 随着某个创建 znode 的会话的开始，被创建，而一旦这个会话被撤除掉，这个 znode 就会自动被 ZooKeeper 删除。</p>
+
+<p>对于<code>临时节点</code>来讲，经常会被用在如下场景:</p>
+
+<ul>
+<li>dubbo中的服务注册</li>
+<li>其他分布式服务中的leader选举</li>
+</ul>
+
+<p>而真正使得Zookeeper在Java语言生态中有如此大影响还依赖于另外一个功能: <code>watches</code>，Client 可以对某个 znode 设置<code>watch</code> 当这个 znode 有变更的时候，就会产生<code>watch</code> 事件，这个事件会由 ZooKeeper 通知至 Client, 即是 Client 会收到来自 Server 的通知，可以实现数据的动态变更。(之所以说是Java语言生态，是因为在云原生领域，Etcd几乎是Zookeeper的替代品，不同的是它是Golang语言生态体系中的)</p>
+
+<p><strong>kafka集群数据在zookeeper的存储</strong></p>
+
+<p>前面对Zookeeper服务进行了大概的说明,接下来我们一起看看kafka的集群数据在zookeeper中是如何存储和分布的。</p>
+
+<p>链接zk:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 前面说到zookeeper支持命名空间，因此我们可以使用一个zookeeper集群来管理多个kafka集群 
+# 只需要在启动kafka时指定zk的chroot环境，比如/kafka 在zookeeper中将存储名称为`kafka`的集群的相关数据
+sh-4.2# sh zkCli.sh -server 127.0.0.1:2181
+Connecting to 127.0.0.1:2181
+....
+[zk: 127.0.0.1:2181(CONNECTED) 0] ls /
+[kafka, zookeeper]</pre></td></tr></table>
+</div>
+</div>
+<p>查看kafka数据存储结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 1] ls /kafka
+[admin, brokers, cluster, config, consumers, controller, controller_epoch, isr_change_notification, latest_producer_id_block, log_dir_event_notification]</pre></td></tr></table>
+</div>
+</div>
+<p>可以看到kafka集群的相关数据分布在如下目录中:</p>
+
+<ul>
+<li>admin: 存储管理员接口操作的相关信息，主要为topic删除事件，分区迁移事件，优先副本选举，信息(一般为临时节点)</li>
+<li>brokers: 主要存储broker相关的信息，broker节点以及节点上的topic相关信息</li>
+<li>cluster: 存储kafka集群信息</li>
+<li>config: 存储broker，client，topic，user以及changer相关的配置信息</li>
+<li>consumers: 存放消费者相关信息(一般为空)</li>
+<li>controller: 用于存放控制节点信息(注意: 该节点是一个临时节点，用于controller节点注册)</li>
+<li>controller_epoch: 用于存放controller节点当前的年龄</li>
+<li>isr_change_notification: 用于存储isr的变更通知(临时节点，当有isr进行变动时，会用于事件通知，可进行watch获取集群isr状态变更)</li>
+<li>latest_producer_id_block:  该节点用于存储处理事务相关的pid范围</li>
+<li>log_dir_event_notification: 日志目录事件通知</li>
+</ul>
+
+<p>admin目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 2] ls /kafka/admin
+[delete_topics]
+[zk: 127.0.0.1:2181(CONNECTED) 3] ls /kafka/admin/delete_topics
+[]
+[zk: 127.0.0.1:2181(CONNECTED) 4] get  /kafka/admin/delete_topics
+null</pre></td></tr></table>
+</div>
+</div>
+<p>brokers目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># broker和topic列表数据
+[zk: 127.0.0.1:2181(CONNECTED) 5] ls /kafka/brokers
+[ids, seqid, topics]
+
+# 表示当前集群有3个节点 
+[zk: 127.0.0.1:2181(CONNECTED) 6] ls /kafka/brokers/ids
+[1, 2, 3]
+[zk: 127.0.0.1:2181(CONNECTED) 7] ls /kafka/brokers/seqid
+[]
+# 表示集群当前的topic信息
+[zk: 127.0.0.1:2181(CONNECTED) 8] ls /kafka/brokers/topics
+[__consumer_offsets, appjsonlog_heartbeat, nginx_log,ingress_log ]
+
+# broker详情
+[zk: 127.0.0.1:2181(CONNECTED) 10] get  /kafka/brokers/ids/1
+{&#34;listener_security_protocol_map&#34;:{&#34;PLAINTEXT&#34;:&#34;PLAINTEXT&#34;},&#34;endpoints&#34;:[&#34;PLAINTEXT://10.0.0.1:9092&#34;],&#34;jmx_port&#34;:9999,&#34;host&#34;:&#34;10.0.0.1&#34;,&#34;timestamp&#34;:&#34;1588925944886&#34;,&#34;port&#34;:9092,&#34;version&#34;:4}
+
+# topic详情 
+[zk: 127.0.0.1:2181(CONNECTED) 11] get  /kafka/brokers/topics/__consumer_offsets
+{&#34;version&#34;:2,&#34;partitions&#34;:{&#34;1&#34;:[2,1,3],&#34;0&#34;:[3,2,1],&#34;2&#34;:[1,2,3],&#34;adding_replicas&#34;:{},&#34;removing_replicas&#34;:{}}
+
+
+[zk: localhost:2181(CONNECTED) 3] ls /brokers/topics/__consumer_offsets
+[partitions]
+[zk: localhost:2181(CONNECTED) 4] ls /brokers/topics/__consumer_offsets/partitions
+[0, 1, 2]
+
+# 查看topic某个分区的状态详情
+[zk: localhost:2181(CONNECTED) 6] ls /brokers/topics/__consumer_offsets/partitions/1
+[state]
+[zk: localhost:2181(CONNECTED) 7] ls /brokers/topics/__consumer_offsets/partitions/1/state
+[]
+[zk: localhost:2181(CONNECTED) 8] get  /brokers/topics/__consumer_offsets/partitions/1/state
+{&#34;controller_epoch&#34;:3,&#34;leader&#34;:1,&#34;version&#34;:1,&#34;leader_epoch&#34;:12,&#34;isr&#34;:[3,1]}</pre></td></tr></table>
+</div>
+</div>
+<p>cluster目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 5] get   /kafka/cluster/id
+{&#34;version&#34;:&#34;1&#34;,&#34;id&#34;:&#34;5C-JZf4vRdqKzlca7Lv7pA&#34;}
+cZxid = 0x100000018
+ctime = Fri Mar 30 22:21:07 CST 2018
+mZxid = 0x100000018
+mtime = Fri Mar 30 22:21:07 CST 2018
+pZxid = 0x100000018
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 45
+numChildren = 0</pre></td></tr></table>
+</div>
+</div>
+<p>config目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 12] ls /kafka/config
+[brokers, changes, clients, topics, users]
+
+# 需要注意的是，config目录用来存放各种实体的配置，用于使用kafka相关工具对实体进行的配置变更存储
+# 因此，一般在kafka集群运行后，如不设置相关动态参数，该目录下的配置一般为空
+[zk: 127.0.0.1:2181(CONNECTED) 19] ls /kafka/config/brokers
+[]
+[zk: 127.0.0.1:2181(CONNECTED) 20] ls /kafka/config/changes
+[]
+[zk: 127.0.0.1:2181(CONNECTED) 21] ls /kafka/config/clients
+[]
+[zk: 127.0.0.1:2181(CONNECTED) 22] ls /kafka/config/topics
+[__consumer_offsets]
+[zk: 127.0.0.1:2181(CONNECTED) 23] ls /kafka/config/users
+[]
+
+# 可以看到，存储消费者偏移量的topic在配置中
+# 是因为该topic有一些额外的topic级别参数
+# 如果我们对topic参数有过动态变更，将会在这里存储
+[zk: 127.0.0.1:2181(CONNECTED) 24] get /kafka/config/topics/__consumer_offsets
+{&#34;version&#34;:1,&#34;config&#34;:{&#34;segment.bytes&#34;:&#34;104857600&#34;,&#34;compression.type&#34;:&#34;producer&#34;,&#34;cleanup.policy&#34;:&#34;compact&#34;}}</pre></td></tr></table>
+</div>
+</div>
+<p>controller目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 可以看到当前broker-1为集群的controller节点
+[zk: 127.0.0.1:2181(CONNECTED) 30] get  /kafka/controller
+{&#34;version&#34;:1,&#34;brokerid&#34;:1,&#34;timestamp&#34;:&#34;1588833869354&#34;}</pre></td></tr></table>
+</div>
+</div>
+<p>controller_epoch 目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 可以看到controller的年龄是2，说明controller经历过2次变更了
+[zk: 127.0.0.1:2181(CONNECTED) 32] get  /kafka/controller_epoch
+2</pre></td></tr></table>
+</div>
+</div>
+<p>其他几个目录结构:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 存储事务相关的pid范围数据
+# broker启动时提前预分配一段 PID，当前是 0~999，即提前分配出 1000 个 PID 来
+# 一旦 PID 超过了 999，则目前会按照 1000 的步长重新分配
+# 集群中所有 broker 启动时都会启动一个叫 TransactionCoordinator 的组件，该组件能够执行预分配 PID 块和分配 PID 的工作，而所有 broker 都使用 /latest_producer_id_block 节点来保存 PID 块
+
+[zk: 127.0.0.1:2181(CONNECTED) 37] get  /kafka/latest_producer_id_block
+{&#34;version&#34;:1,&#34;broker&#34;:1,&#34;block_start&#34;:&#34;19000&#34;,&#34;block_end&#34;:&#34;19999&#34;}
+
+
+[zk: 127.0.0.1:2181(CONNECTED) 39] ls /kafka/isr_change_notification
+[]
+[zk: 127.0.0.1:2181(CONNECTED) 40] get  /kafka/isr_change_notification
+null
+
+[zk: 127.0.0.1:2181(CONNECTED) 41] ls /kafka/log_dir_event_notification
+[]
+[zk: 127.0.0.1:2181(CONNECTED) 42] get  /kafka/log_dir_event_notification
+null</pre></td></tr></table>
+</div>
+</div>
+<p>以上就是整个kafka元数据在zookeeper集群中的整体存储结构，下面附上一张kafka的元数据存储结构体。</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg0a21u6coj31am0u0tlf.jpg" alt="kafka在zookeeper中的存储结构" /></p>
+
+<hr />
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-06-21
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/kafka/">kafka</a>
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/zookeeper/">Zookeeper</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/">
+            <span class="next-text nav-default">一文帮你理解整个SRE运维体系</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>
