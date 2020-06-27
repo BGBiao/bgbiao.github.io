@@ -6,10 +6,28 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 21 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Exception</title>
+      <link>https://bgbiao.top/tags/exception/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/exception/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Golang</title>
+      <link>https://bgbiao.top/tags/golang/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/golang/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>kafka</title>
@@ -170,24 +188,6 @@
       <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/traefik/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>可观测性</title>
-      <link>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</link>
-      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>GPU</title>
-      <link>https://bgbiao.top/tags/gpu/</link>
-      <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/gpu/</guid>
       <description></description>
     </item>
     

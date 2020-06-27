@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://bgbiao.top/post/golang-version/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/</loc>
     <lastmod>2020-06-21T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -493,34 +500,62 @@
   
   <url>
     <loc>https://bgbiao.top/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/kafka/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <loc>https://bgbiao.top/tags/exception/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/golang/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/categories/golang/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/kafka/</loc>
     <lastmod>2020-06-21T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -709,20 +744,6 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/golang/</loc>
-    <lastmod>2020-03-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/categories/golang/</loc>
-    <lastmod>2020-03-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://bgbiao.top/tags/jwt/</loc>
     <lastmod>2020-03-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -830,13 +851,6 @@
   <url>
     <loc>https://bgbiao.top/tags/%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/</loc>
     <lastmod>2020-01-16T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/</loc>
-    <lastmod>2020-01-15T16:53:30+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1019,13 +1033,6 @@
   <url>
     <loc>https://bgbiao.top/tags/elasticsearch6/</loc>
     <lastmod>2019-08-12T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/exception/</loc>
-    <lastmod>2020-01-15T16:53:30+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

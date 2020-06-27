@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-06-21T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-06-26T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,125 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/golang-version/">Golang中处理版本信息</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2020-06-26" class="post-time">
+        2020-06-26
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
+          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+          
+        </div>
+      <span class="more-meta"> 1931 words </span>
+      <span class="more-meta"> 4 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <h2 id="golang中的版本信息管理">Golang中的版本信息管理</h2>
+
+<blockquote>
+<p>我们都知道在一些Golang写的程序中，默认会有<code>version</code>或<code>-v</code>相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.</p>
+</blockquote>
+
+<p><strong>示例</strong></p>
+
+<p>比如我们常用的Golang开发的程序是这样输出版本相关信息的:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># k8s的客户端程序版本
+$ kubectl version -o json --client
+{
+  &#34;clientVersion&#34;: {
+    &#34;major&#34;: &#34;1&#34;,
+    &#34;minor&#34;: &#34;10&#34;,
+    &#34;gitVersion&#34;: &#34;v1.10.11&#34;,
+    &#34;gitCommit&#34;: &#34;637c7e288581ee40ab4ca210618a89a555b6e7e9&#34;,
+    &#34;gitTreeState&#34;: &#34;clean&#34;,
+    &#34;buildDate&#34;: &#34;2018-11-26T14:38:32Z&#34;,
+    &#34;goVersion&#34;: &#34;go1.9.3&#34;,
+    &#34;compiler&#34;: &#34;gc&#34;,
+    &#34;platform&#34;: &#34;darwin/amd64&#34;
+  }
+}
+
+# docker的客户端程序版本
+$ docker version
+Client: Docker Engine - Community
+ Version:           18.09.2
+ API version:       1.39
+ Go version:        go1.10.8
+ Git commit:        6247962
+ Built:             Sun Feb 10 04:12:39 2019
+ OS/Arch:           darwin/amd64
+ Experimental:      false
+
+# minio的客户端程序版本
+$ minio --version
+minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
+</div>
+</div>
+    </div>
+    <div class="read-more">
+      <a href="/post/golang-version/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/">Kafka在Zookeeper中的存储结构</a>
     </h1>
     
@@ -547,52 +666,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/">kafka中关于HW(High Watermark)和Leader Epoch的讨论</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-06-15" class="post-time">
-        2020-06-15
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 3168 words </span>
-      <span class="more-meta"> 7 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>我们知道在kafka中有一个名词叫做HW(High Watermark)，但是具体这个高水位是用来做什么的呢？我们一起来学习下</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -1290,6 +1363,30 @@ if (!doNotTrack) {
 
       
 
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
       
       
       <li><a href="/page/2/">»</a></li>
@@ -1297,7 +1394,7 @@ if (!doNotTrack) {
 
       
       
-      <li><a href="/page/23/">»»</a></li>
+      <li><a href="/page/24/">»»</a></li>
       
 
       </ul>

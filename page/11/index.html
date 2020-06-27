@@ -65,7 +65,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bgbiao.top/" />
 
-<meta property="og:updated_time" content="2020-06-21T00:00:00+00:00" />
+<meta property="og:updated_time" content="2020-06-26T00:00:00+00:00" />
 <meta itemprop="name" content="BGBiao的SRE人生">
 <meta itemprop="description" content="BGBiao的SRE人生.">
 
@@ -465,6 +465,55 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/">Goroutine与主进程的通信</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2019-12-13" class="post-time">
+        2019-12-13
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/golang/"> golang </a>
+          
+        </div>
+      <span class="more-meta"> 1398 words </span>
+      <span class="more-meta"> 3 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <p>还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过<code>context</code>这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。</p>
+
+<p>子goroutine与主线程同步的集中方式:
+- <code>channel</code>: 每个goroutine往主进程的<code>chan</code>写数据，然后由主进程去读取，直到读取完了全部goroutine的<code>chan</code>就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
+- <code>context</code>: 使用<code>context</code>中的<code>cancel</code>，这种模式是主线程通知子线程结束
+- <code>sync.WaitGroup</code>: 通过<code>Add</code>方法设置等待子goroutine的数量，使用<code>Done</code>方法设置等待子goroutine的数量减1，当等待数量为0时，<code>Wait</code>函数退出.</p>
+    </div>
+    <div class="read-more">
+      <a href="/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/">Linux下快速构建Android编译环境</a>
     </h1>
     
@@ -539,52 +588,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E4%BA%92%E8%81%94%E7%BD%91%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/">快速使用互联网检索有用数据</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-12-10" class="post-time">
-        2019-12-10
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E6%95%88%E7%8E%87/"> 效率 </a>
-          
-        </div>
-      <span class="more-meta"> 1344 words </span>
-      <span class="more-meta"> 3 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>背景: 随着互联网的普及和发展，互联网上充斥了大量的数据，如何从海量数据中识别自己最想要的数据成为了很多人头疼的问题，接下来给大家分享一些自己常用的检索数据的网站和方法.</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/%E4%BA%92%E8%81%94%E7%BD%91%E6%95%B0%E6%8D%AE%E6%A3%80%E7%B4%A2/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -1217,6 +1220,27 @@ if (!doNotTrack) {
 
       
 
+        
+
+        
+        
+
+          
+          
+          
+
+            
+
+          
+
+        
+        
+
+        
+        
+
+      
+
       
       
       <li><a href="/page/12/">»</a></li>
@@ -1224,7 +1248,7 @@ if (!doNotTrack) {
 
       
       
-      <li><a href="/page/23/">»»</a></li>
+      <li><a href="/page/24/">»»</a></li>
       
 
       </ul>
