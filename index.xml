@@ -480,9 +480,7 @@ OS/Arch: darwin/amd64 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
       
       <guid>https://bgbiao.top/post/gokafka/</guid>
       
-        <description>
-
-&lt;h2 id=&#34;kafka运维神器&#34;&gt;Kafka运维神器&lt;/h2&gt;
+        <description>&lt;h2 id=&#34;kafka运维神器&#34;&gt;Kafka运维神器&lt;/h2&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。&lt;/p&gt;
@@ -1155,8 +1153,7 @@ topic-part:sync-dev-3 log-offsize:261&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tabl
 &lt;/div&gt;
 &lt;hr /&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
-</description>
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
       
     </item>
     

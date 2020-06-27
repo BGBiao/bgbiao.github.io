@@ -3,14 +3,14 @@
   
   <url>
     <loc>https://bgbiao.top/post/golang-version/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/gokafka/</loc>
-    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -507,63 +507,63 @@
   
   <url>
     <loc>https://bgbiao.top/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/golang/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/golang/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/golang/</loc>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/kafka/</loc>
-    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/post/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/tags/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</loc>
-    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/</loc>
-    <lastmod>2020-06-27T13:56:46+08:00</lastmod>
+    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
