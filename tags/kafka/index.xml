@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>kafka on BGBiao的SRE人生</title>
+    <title>Kafka on BGBiao的SRE人生</title>
     <link>https://bgbiao.top/tags/kafka/</link>
-    <description>Recent content in kafka on BGBiao的SRE人生</description>
+    <description>Recent content in Kafka on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 21 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/kafka/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kafka运维神器之gokafka</title>
+      <link>https://bgbiao.top/post/gokafka/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/gokafka/</guid>
+      <description>Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的k</description>
+    </item>
     
     <item>
       <title>Kafka在Zookeeper中的存储结构</title>

@@ -12,15 +12,6 @@
     
     
     <item>
-      <title>Exception</title>
-      <link>https://bgbiao.top/tags/exception/</link>
-      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/exception/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Golang</title>
       <link>https://bgbiao.top/tags/golang/</link>
       <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
@@ -30,9 +21,9 @@
     </item>
     
     <item>
-      <title>kafka</title>
+      <title>Kafka</title>
       <link>https://bgbiao.top/tags/kafka/</link>
-      <pubDate>Sun, 21 Jun 2020 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/kafka/</guid>
       <description></description>
@@ -188,6 +179,15 @@
       <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/traefik/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>可观测性</title>
+      <link>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</link>
+      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</guid>
       <description></description>
     </item>
     

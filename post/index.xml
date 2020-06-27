@@ -95,6 +95,15 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
     </item>
     
     <item>
+      <title>Kafka运维神器之gokafka</title>
+      <link>https://bgbiao.top/post/gokafka/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/gokafka/</guid>
+      <description>Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的k</description>
+    </item>
+    
+    <item>
       <title>Kafka在Zookeeper中的存储结构</title>
       <link>https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/</link>
       <pubDate>Sun, 21 Jun 2020 00:00:00 +0000</pubDate>
@@ -307,15 +316,6 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       
       <guid>https://bgbiao.top/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
       <description>前言:gorm是Golang语言中一款性能极好的ORM库，对开发人员相对是比较友好的。当然还有另外一个xorm库也是比较出名的，感兴趣的也可</description>
-    </item>
-    
-    <item>
-      <title>过去这一个月的所思所想</title>
-      <link>https://bgbiao.top/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/</link>
-      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/</guid>
-      <description>这一个月以来，受疫情的影响，一直在家办公，可能对外人而言，觉得在家办公会相对比较轻松，能够除工作外做更多的事情，但这一个月下来，我却有颇多的</description>
     </item>
     
   </channel>

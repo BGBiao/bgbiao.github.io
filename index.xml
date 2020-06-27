@@ -459,7 +459,7 @@ Go Version: go1.14
 OS/Arch: darwin/amd64 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;细心的小伙伴们有没有发现，此时我们的版本输出信息和前面&lt;code&gt;docker&lt;/code&gt;以及&lt;code&gt;kubectl&lt;/code&gt;程序的版本信息有那么一丢丢相似了，其实目前大多数使用Golang开源的程序基本上也都是采用这种方式来管理程序的版本信息的，比如&lt;code&gt;kubectl&lt;/code&gt;中的version命令。&lt;/p&gt;
+&lt;p&gt;细心的小伙伴们有没有发现，此时我们的版本输出信息和前面&lt;code&gt;docker&lt;/code&gt;以及&lt;code&gt;kubectl&lt;/code&gt;程序的版本信息有那么一丢丢相似了，其实目前大多数使用Golang开源的程序基本上也都是采用这种方式来管理程序的版本信息的，比如&lt;code&gt;kubectl&lt;/code&gt;中的version命令:&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes/kubectl/blob/master/pkg/cmd/version/version.go#L38&#34;&gt;kubectl-version&lt;/a&gt;&lt;/p&gt;
 
@@ -470,6 +470,693 @@ OS/Arch: darwin/amd64 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;hr /&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Kafka运维神器之gokafka</title>
+      <link>https://bgbiao.top/post/gokafka/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/gokafka/</guid>
+      
+        <description>
+
+&lt;h2 id=&#34;kafka运维神器&#34;&gt;Kafka运维神器&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;kafka-manager&#34;&gt;kafka-manager&lt;/h3&gt;
+
+&lt;p&gt;由雅虎开源的kafka集群管理工具，不过现在已经改名为&lt;a href=&#34;https://github.com/yahoo/CMAK&#34;&gt;CMAK&lt;/a&gt;了(说明kafka的运维痛点还是蛮多的，项目还可以做更多的事情)，核心功能如下:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;多集群管理&lt;/li&gt;
+&lt;li&gt;集群瞬时监控(topics, brokers, 副本分布，分区分布等)&lt;/li&gt;
+&lt;li&gt;优先副本选举&lt;/li&gt;
+&lt;li&gt;主题，分区，副本管理(主题创建和参数调整，副本分配等)&lt;/li&gt;
+&lt;li&gt;Broker和Topic级别的metrics监控&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;消费者基本信息管理&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 源码编译
+$ ./sbt clean dist
+
+# docker 安装
+$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&amp;#34;zk-1:2181,zk-2:2181&amp;#34; -P      bgbiao/kafka-manager:2.0.0.2 
+# 自定义端口
+$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&amp;#34;zk-1:2181,zk-2:2181&amp;#34; -P      bgbiao/kafka-manager:2.0.0.2 -Dhttp.port=8080 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0rydqhj30xu0kkdhd.jpg&#34; alt=&#34;kafka-cluster&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0uopt4j30v90epac2.jpg&#34; alt=&#34;kafka-topic&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1kai7sj30w50oc429.jpg&#34; alt=&#34;kafka-topic-info&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1ziityj30k708kt9i.jpg&#34; alt=&#34;kafka-consumer&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v2i5kt5j30qe0pxgpq.jpg&#34; alt=&#34;kafka-consumer-info&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v34efi2j31rm0nbtdv.jpg&#34; alt=&#34;kafka-broker&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v3ivpuqj31bi0u0dnn.jpg&#34; alt=&#34;kafka-broker-info&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;kafkacat&#34;&gt;kafkacat&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/edenhill/kafkacat&#34;&gt;kafkacat&lt;/a&gt;是一个非JVM的命令行生产者和消费者，可以快速的对kafka消息进行生产和消费。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# mac 安装
+$ brew install kafkacat 
+
+# docker 安装
+# 官方仅支持Debian和openSUSE系列
+# 如下镜像支持在CentOS系列的环境中使用
+$ docker pull bgbiao/kafkacat &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;83
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 消费者模式
+$ kafkacat -b localhost:9092 -t mysql_users
+% Auto-selecting Consumer mode (use -P or -C to override)
+{&amp;#34;uid&amp;#34;:1,&amp;#34;name&amp;#34;:&amp;#34;Cliff&amp;#34;,&amp;#34;locale&amp;#34;:&amp;#34;en_US&amp;#34;,&amp;#34;address_city&amp;#34;:&amp;#34;St Louis&amp;#34;,&amp;#34;elite&amp;#34;:&amp;#34;P&amp;#34;}
+{&amp;#34;uid&amp;#34;:2,&amp;#34;name&amp;#34;:&amp;#34;Nick&amp;#34;,&amp;#34;locale&amp;#34;:&amp;#34;en_US&amp;#34;,&amp;#34;address_city&amp;#34;:&amp;#34;Palo Alto&amp;#34;,&amp;#34;elite&amp;#34;:&amp;#34;G&amp;#34;}
+[...]
+
+# 生产者模式
+# 默认是以换行符来决定一条消息(-D 可以指定分隔符)
+# 默认从stdin来读取消息
+$ kafkacat -b localhost:9092 -t new_topic -P
+test
+
+# 从文件中读取消息
+# -l参数用来指定将文件中的每一个行作为一个消息进行发送，如果没有该参数，整个文本将会以一个消息发送(对于二进制的数据比较
+有用)
+# -T 参数可以用于回显到stdout
+$ kafkacat -b localhost:9092 -t &amp;lt;my_topic&amp;gt; -T -P -l /tmp/msgs
+
+
+# 可以指定消息的key，使用-K参数
+$ kafkacat -b localhost:9092 -t keyed_topic -P -K:
+1:foo
+2:bar
+
+$ kafkacat -b localhost:9092 -t keyed_topic -C -f &amp;#39;Key: %k\nValue: %s\n&amp;#39;
+Key: 1
+Value: foo
+Key: 2
+Value: bar
+
+# 设置partition
+$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 1
+1:foo
+
+$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 2
+2:bar
+
+$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 3
+3:wibble
+
+
+# 元数据监听模式
+# 元数据的监听模式可以使用`-L`参数，会显示当前kafka集群的状态以及主题，分区，副本，以及ISR信息。
+# `-J`参数会以json格式进行输出
+$ kafkacat -b localhost:9092 -L
+
+$ kafkacat -b mybroker -L -J
+
+
+
+# docker方式简单使用
+# 从标准输入生产数据
+$ docker run --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -P &amp;lt;&amp;lt;EOF
+&amp;gt; ssabdkgjf
+&amp;gt; asfgnh
+&amp;gt; wertnh
+&amp;gt; waer
+&amp;gt; awegrtn
+&amp;gt; 2020-04-26
+&amp;gt; end time
+&amp;gt; EOF
+
+# 从指定topic接收数据
+$ docker run -it --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -C -f &amp;#39;\nKey (%K bytes): %k\t\nValue (%S bytes): %s\n\Partition: %p\tOffset: %o\n--\n&amp;#39;
+
+Key (-1 bytes):
+Value (13 bytes): test kafkacat
+Partition: 0	Offset: 11
+--
+% Reached end of topic test-biao [0] at offset 12
+
+Key (-1 bytes):
+Value (18 bytes): 2020-04-26 endtime
+Partition: 1	Offset: 8
+--
+% Reached end of topic test-biao [1] at offset 9
+
+Key (-1 bytes):
+Value (7 bytes): overlay
+Partition: 2	Offset: 6
+--
+% Reached end of topic test-biao [2] at offset 7&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 如果想要把docker镜像中的&lt;code&gt;kafkacat&lt;/code&gt;二进制文件拷贝出来使用，仅需要在当前环境中安装&lt;code&gt;librdkafka-devel&lt;/code&gt;即可。&lt;/p&gt;
+
+&lt;h3 id=&#34;gokafka&#34;&gt;gokafka&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/goops-top/gokafka&#34;&gt;gokafka&lt;/a&gt;也是一个非JVM的kafka运维管理工具，不仅可以进行简单的消息模拟生产，而且可以对指定topic进行消息预览，同时也支持kafka集群的常见的运维管理操作.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;快速开始&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ git clone https://github.com/goops-top/gokafka.git
+$ cd gokafka
+$ go build -o build/goops-kafka
+
+$ ./build/goops-kafka
+goops-kafka: A kafka tools with golang that can operate the kafka for describe,create,update and so on.
+
+ Note: Without the jvm,so you must be specify the [--broker or --cluster and the Value must be in --config entry.]
+
+Usage:
+  gokafka [command]
+
+Available Commands:
+  consumer    consumer  a topic message data with specified kafka-cluster.
+  create      create the kafka topic with some base params in specify kafka-cluster.
+  describe    describe the kafka some info (cluster,topic,broker,loginfo)
+  help        Help about any command
+  init        init the gokafka some default config.
+  list        list the kafka some info (cluster,topic,broker)
+  producer    producer  a topic message data with specified kafka-cluster.
+  version     print version info of goops-kafka tool
+
+Flags:
+      --broker string    指定broker地址
+      --cluster string   指定集群
+      --config string    指定配置文件(default is $HOME/.goops-kafka)
+  -h, --help             help for gokafka
+
+Use &amp;#34;gokafka [command] --help&amp;#34; for more information about a command.
+
+# 使用make编译
+# 会自动生成mac和linux发行版本的二进制文件
+$ make default&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;简单使用&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 查看工具版本
+$ ./build/gokafka.mac version
+Version: 0.0.1
+GitBranch: master
+CommitId: 445f935
+Build Date: 2020-06-26T18:49:48+0800
+Go Version: go1.14
+OS/Arch: darwin/amd64
+
+# 初始化配置文件
+# gokafka 采用配置文件的方式快速管理多个kafka集群
+$ ./build/gokafka.mac  init
+gokafka config init ok.
+
+# 在用户家目录下生成集群配置文件
+$ cat ~/.goops-kafka
+
+app: gokafka
+spec:
+  clusters:
+  - name: test-kafka
+    version: V2_5_0_0
+    brokers:
+    - 10.0.0.1:9092
+    - 10.0.0.2:9092
+    - 10.0.0.3:9092
+  - name: dev-kafka
+    version: V1_0_0_0
+    brokers:
+    - 192.168.0.22:9092
+    - 192.168.0.23:9092
+    - 192.168.0.24:9092
+
+# 也可以使用--config 来指定集群配置文件
+$ ./build/gokafka.mac  --config ./kafka-cluster.yaml version
+Version: 0.0.1
+GitBranch: master
+CommitId: 445f935
+Build Date: 2020-06-26T18:53:25+0800
+Go Version: go1.14
+OS/Arch: darwin/amd64
+
+# 查看配置文件中的集群详情
+$ ./build/gokafka.mac  list cluster
+cluster:test-kafka version:V2_5_0_0 connector_brokers:[10.0.0.1:9092]
+cluster:dev-kafka version:V1_0_0_0 connector_brokers:[192.168.0.22:9092]
+
+./build/gokafka.mac  list cluster --config ./kafka-cluster.yaml
+cluster:log-kafka version:V2_5_0_0 connector_brokers:[log-kafka-1.bgbiao.cn:9092]
+
+# 注意: 当使用集群配置文件管理集群时，需要使用--cluster全局参数指定操作的目标集群
+# 当然也可以直接指定broker进行操作
+$ ./build/gokafka.mac  --cluster dev-kafka describe broker
+controller: 3
+brokers num: 3
+broker list: [2 1 3]
+id:2		 broker:192.168.0.22:9092
+id:1		 broker:192.168.0.23:9092
+id:3		 broker:192.168.0.24:9092
+
+$ ./build/gokafka.mac  --broker 10.0.0.1:9092  describe broker
+controller: 3
+brokers num: 3
+broker list: [2 1 3]
+id:2		 broker:192.168.0.22:9092
+id:1		 broker:192.168.0.23:9092
+id:3		 broker:192.168.0.24:9092&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;常用功能&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;90
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;91
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;92
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;93
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;94
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;95
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;96
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;97
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;98
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 1.创建topic
+# 可以指定分区和副本数
+$ ./build/gokafka.mac  --cluster dev-kafka create --topic test-bgbiao-1
+true
+
+
+# 2.查看topic
+$ ./build/gokafka.mac  --cluster dev-kafka list topic --topic-list test-bgbiao-1
+Topic:test-bgbiao-1	PartNum:3	Replicas:3	Config:
+Topic-Part:test-bgbiao-1-2	ReplicaAssign:[1 3 2]
+Topic-Part:test-bgbiao-1-1	ReplicaAssign:[2 1 3]
+Topic-Part:test-bgbiao-1-0	ReplicaAssign:[3 2 1]
+
+# 3.获取topic的分区和副本状态
+$ ./build/gokafka.mac  --cluster dev-kafka describe  topic --topic-list test-bgbiao-1
+Topic-Part:test-bgbiao-1-2	Leader:1	Replicas:[1 3 2]	ISR:[1 3 2]	OfflineRep:[]
+Topic-Part:test-bgbiao-1-1	Leader:2	Replicas:[2 1 3]	ISR:[2 1 3]	OfflineRep:[]
+Topic-Part:test-bgbiao-1-0	Leader:3	Replicas:[3 2 1]	ISR:[3 2 1]	OfflineRep:[]
+
+# 4.向topic中生产消息
+$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &amp;#34;Hello, BGBiao.&amp;#34;
+INFO[0000] Produce msg:Hello, BGBiao. to topic:test-bgbiao-1
+INFO[0000] topic:test-bgbiao-1 send ok with offset:0
+
+$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &amp;#34;Nice to meet you.&amp;#34;
+INFO[0000] Produce msg:Nice to meet you. to topic:test-bgbiao-1
+INFO[0000] topic:test-bgbiao-1 send ok with offset:0
+
+# 5.消费消息(gokafka中创建了一个默认的消费组用来预览消息)
+# 在终端进行实时消费，ctrl+c 可取消
+$ ./build/gokafka.mac  --cluster dev-kafka consumer --topic test-bgbiao-1
+INFO[0000] Sarama consumer up and running!...
+INFO[0004] part:2 offset:0
+msg: Nice to meet you.
+INFO[0004] part:1 offset:0
+msg: Hello, BGBiao.
+
+# 6.查看集群的broker列表以及controller
+$ ./build/gokafka.mac  --cluster dev-kafka describe broker
+controller: 3
+brokers num: 3
+broker list: [2 1 3]
+id:2		 broker:192.168.0.23:9092
+id:1		 broker:192.168.0.22:9092
+id:3		 broker:192.168.0.24:9092
+
+# 7.查看topic的日志大小
+$ ./build/gokafka.mac  --cluster dev-kafka describe loginfo --topic-list test-bgbiao-1
+topic:test-bgbiao-1
+172.16.32.23:9092
+logdir:/soul/data/kafka/kafka-logs
+topic-part		log-size(M)		offset-lag
+----------		-----------		----------
+test-bgbiao-1-0		0		0
+test-bgbiao-1-1		0		0
+test-bgbiao-1-2		0		0
+172.16.32.22:9092
+logdir:/soul/data/kafka/kafka-logs
+topic-part		log-size(M)		offset-lag
+----------		-----------		----------
+test-bgbiao-1-0		0		0
+test-bgbiao-1-1		0		0
+test-bgbiao-1-2		0		0
+172.16.32.24:9092
+logdir:/soul/data/kafka/kafka-logs
+topic-part		log-size(M)		offset-lag
+----------		-----------		----------
+test-bgbiao-1-0		0		0
+test-bgbiao-1-1		0		0
+test-bgbiao-1-2		0		0
+
+# 8.列出kafka集群的消费者组
+$ ./build/gokafka.mac  --cluster dev-kafka list  consumer-g | grep -i gokafka
+GoKafka
+
+# 9.查看消费者组详细信息
+# 因为上面我们停止了消费，该消费者组当前是空的
+$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list GoKafka
+--------------------------------------------------------------------------------------------
+consumer-group:GoKafka consumer-state:Empty
+
+# 我们来看一个有实际消费状态的消费者组
+# 可以看到一个消费者组下的全部消费者线程以及消费者实例，消费的对应的topic列表
+$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list group-sync
+--------------------------------------------------------------------------------------------
+consumer-group:group-sync consumer-state:Stable
+consumer-id					consumer-ip			topic-list
+consumer-1-a9437739-e5cb-4b41-a9d3-2640b9878965	/172.16.64.207		[sync-dev]
+consumer-1-92eb690b-d327-468b-8990-9c21e1ee405d	/172.16.32.235		[sync-dev]
+
+
+# 10. 还可以查看某个消费者组消费某个topic的日志详情
+$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-group-offset --group group-sync --topic sync-dev
+sync-dev
+topic-part:sync-dev-0 log-offsize:98
+topic-part:sync-dev-1 log-offsize:0
+topic-part:sync-dev-2 log-offsize:340
+topic-part:sync-dev-3 log-offsize:261&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
+</description>
       
     </item>
     
@@ -9688,84 +10375,6 @@ db.Unscoped().Where(&amp;#34;age = 20&amp;#34;).Find(&amp;amp;users)&lt;/pre&gt;
 db.Unscoped().Delete(&amp;amp;order)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
-</description>
-      
-    </item>
-    
-    <item>
-      <title>过去这一个月的所思所想</title>
-      <link>https://bgbiao.top/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/</link>
-      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/</guid>
-      
-        <description>&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gceh0gxrolj313y0u07wl.jpg&#34; alt=&#34;可乐葱三结义&#34; /&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;这一个月以来，受疫情的影响，一直在家办公，可能对外人而言，觉得在家办公会相对比较轻松，能够除工作外做更多的事情，但这一个月下来，我却有颇多的不爽和不适，也因此把公众号的更新耽误了许久。本来计划3月2号全员复工的我们，在2月的尾巴突然通知延迟到3月16号上班，这让我顿时有了紧迫感，2020年的规划和计划得赶紧抓紧执行了，公号也得更起来。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;strong&gt;先说说在家办公吧。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;在春节期间，由于疫情的爆发，国家将法定的春节延长至2月2日(正月初九)，所以我们正式的远程办公是在2月3日开始执行的，截止2月底，相当于已经整整在家办公四周了。&lt;/p&gt;
-
-&lt;p&gt;在家的办公的这四周里，虽然对于个人实际的工作内容没有太大的变化，但整个工作形式、工作状态以及工作效能却是有很大的变化的。(&lt;code&gt;注意:这里说的是在家办公而非远程办公&lt;/code&gt;)&lt;/p&gt;
-
-&lt;p&gt;在工作形式上可谓是百花齐放。相关的协作和协同工具也基本上处于头部几家互联网大厂，首当其冲的肯定属于阿里旗下的&lt;code&gt;钉钉&lt;/code&gt;,由于其早已在TOB领域深耕多年，在这次特殊情况下也就自然发挥了其作用，不过在以直播方式应用在中小学教学领域时也是遭遇&lt;code&gt;1分好评&lt;/code&gt;的尴尬场面。其次是企业微信和头条旗下的&lt;code&gt;飞书&lt;/code&gt;，前者由于存在个人版，所以没做尝试，而飞书前两天在&lt;code&gt;姜胡说&lt;/code&gt;作者胡子老师的直播会议时有幸做了尝试，只能说用过了钉钉，基本很难去转向飞书，毕竟作为TOB产品，以及协作工具，后者的功能更全，生态更广。&lt;/p&gt;
-
-&lt;p&gt;为什么在家办公一个月我会有很多不适？我总结了几个点：&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;早中午的打卡(每天按点进行团队视频打卡)&lt;/li&gt;
-&lt;li&gt;网络的限制&lt;/li&gt;
-&lt;li&gt;家庭办公中的生活干扰&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;在家办公后公司采取了一系列措施来保证员工的安全和&amp;rdquo;到岗&amp;rdquo;，而钉钉则解决了团队以及项目的沟通和协作问题，看起来似乎即使因为疫情的影响，对于互联网业务的技术岗位来说，也基本不会影响业务进度。事实上也的确是这个样子的。&lt;/p&gt;
-
-&lt;p&gt;但是，对于员工个人(其实是我自己)而言，需要克服的是更多的困难。&lt;/p&gt;
-
-&lt;p&gt;比如家庭网络对于远程办公场景的支撑如何，又如家庭场景的多样性对办公场景的干扰性如何，因为疫情是突然爆发的，所以大部分人在这两方面应该没有足够的准备，也因此可以确定的是，在目标导向或者结果导向的情况下，在家办公的工作内容可能会花费更多的时间。&lt;/p&gt;
-
-&lt;p&gt;我不知道其他小伙伴们如何，但事实上，在北漂出租屋办公一个月的日子里，我好像每天都要加班到晚上十点，才能勉强将当日的计划做完，并且办公环境的限制会使得身体各种不舒服。&lt;/p&gt;
-
-&lt;p&gt;说了这么多我的在家办公情况，其实并未想表明什么，只是希望疫情能够快速过去，企业能早日复工，而我也能去公司去做工作上的事情。&lt;/p&gt;
-
-&lt;p&gt;不过上周五，收到这个通知，感觉又要痛苦两周。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcepuaum3fj30ks0axt9k.jpg&#34; alt=&#34;延期办公&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;但其实，如果在家办公久了，也许以后会成为常态，那对于技术工作者而言是不是也会不再受地域的限制，会不会未来北上广深的技术人员在家办公即可，如此以来不是企业降负，员工自由么，那个时候就可以在家置办个高速网络和工作台，真正实现SOHO了(容我自己YY会儿)。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;蜗居生活&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;在家办公这一周可以算得上是真正的蜗居生活了，对于我这种天生好动的人来说，一周出门两三次，活动空间不超过40平，这种情况下，也很难会有比较好的心情(主要是我也不咋喜欢宅的娱乐活动)。&lt;/p&gt;
-
-&lt;p&gt;所以，偶然在一次做饭中，想起来将菜根留下来做水培，也就有了题图的&amp;rdquo;可乐葱三结义&amp;rdquo;，一方面是因为实在没事干，想用这种小葱根水培来见证蜗居的日子，另外一方面是因为从假期开始也一直在看电视剧《三国》，每每看到刘备取得一定成绩时，就会想起这桃园三兄弟，三人有勇有谋，且情同手足。&lt;/p&gt;
-
-&lt;p&gt;可叹刘备的胸襟，关羽的忠义，张飞的粗狂。&lt;/p&gt;
-
-&lt;p&gt;话说，活动空间有限，又不能出门，对于运动细胞发达的我更是煎熬，为了不使自己在疫情过后丢掉了矫健的步伐，开始了每晚的Keep运动，每晚10点开始一天的简单运动放松，项目是: 李现HIT全身燃脂。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;关于成长&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;其实当人越是处于一个封闭的物理环境时，越容易有焦虑感，这种焦虑感一方面源自于个人成长多样性，另外一方面也源于缺乏与真实环境的正面反馈。&lt;/p&gt;
-
-&lt;p&gt;在家办公的一个月(加上环境的限制)，的确在个人成长方面受限了很多，比如没有足够时间和经历去学习一些新技术，也很难抽出一小段时间来专注读技术之外的书籍(不过还是读完了两本)，这对于整个人的体系化成长会有很大的影响。&lt;/p&gt;
-
-&lt;p&gt;所以，虽然突然又多出来两周的在家办公时间，但是我已经调整了整个生活和工作计划，打算充分利用在家办工的这段时间。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;其他&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;其他，就没有什么了，我打算趁着现在还没复工，好好梳理梳理我的运维知识体系和个人价值体系以及财富体系，毕竟整个2月一个月的时间整个收益曲线变化很大，现在刚好是可以整理自己思绪的时候，加油吧，baby！&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gceh0txnrhj313y0u01l9.jpg&#34; alt=&#34;坚定的眼神&#34; /&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;

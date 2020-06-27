@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Kafka在Zookeeper中的存储结构 - BGBiao的SRE人生</title>
+  <title>Kafka运维神器之gokafka - BGBiao的SRE人生</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,9 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content=" 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
- 前言 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
- 存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。 成员管理: 是指 Broker 节点的注册、注销以及属性变更。 Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。 " />
+  <meta name="description" content="Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的k" />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
@@ -37,7 +35,7 @@
 <meta name="generator" content="Hugo 0.58.2" />
 
 
-<link rel="canonical" href="https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" />
+<link rel="canonical" href="https://bgbiao.top/post/gokafka/" />
 
 
 
@@ -63,62 +61,26 @@
 <link rel="stylesheet" href="/css/custom.css">
 
 
-<meta property="og:title" content="Kafka在Zookeeper中的存储结构" />
-<meta property="og:description" content="
-我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
-
-
-前言
-
-在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
-
-
-存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
-成员管理: 是指 Broker 节点的注册、注销以及属性变更。
-Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
-" />
+<meta property="og:title" content="Kafka运维神器之gokafka" />
+<meta property="og:description" content="Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的k" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" />
-<meta property="article:published_time" content="2020-06-21T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-06-21T00:00:00+00:00" />
-<meta itemprop="name" content="Kafka在Zookeeper中的存储结构">
-<meta itemprop="description" content="
-我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
+<meta property="og:url" content="https://bgbiao.top/post/gokafka/" />
+<meta property="article:published_time" content="2020-06-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-26T00:00:00+00:00" />
+<meta itemprop="name" content="Kafka运维神器之gokafka">
+<meta itemprop="description" content="Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的k">
 
 
-前言
-
-在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
-
-
-存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
-成员管理: 是指 Broker 节点的注册、注销以及属性变更。
-Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
-">
-
-
-<meta itemprop="datePublished" content="2020-06-21T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-06-21T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="2769">
+<meta itemprop="datePublished" content="2020-06-26T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-26T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2464">
 
 
 
-<meta itemprop="keywords" content="kafka,运维,Zookeeper," />
+<meta itemprop="keywords" content="Golang,Kafka," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Kafka在Zookeeper中的存储结构"/>
-<meta name="twitter:description" content="
-我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
-
-
-前言
-
-在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
-
-
-存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
-成员管理: 是指 Broker 节点的注册、注销以及属性变更。
-Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
-"/>
+<meta name="twitter:title" content="Kafka运维神器之gokafka"/>
+<meta name="twitter:description" content="Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的k"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -495,18 +457,19 @@ if (!doNotTrack) {
           <article class="post bg-white">
     
     <header class="post-header">
-      <h1 class="post-title">Kafka在Zookeeper中的存储结构</h1>
+      <h1 class="post-title">Kafka运维神器之gokafka</h1>
       
       <div class="post-meta">
-        <time datetime="2020-06-21" class="post-time">
-          2020-06-21
+        <time datetime="2020-06-26" class="post-time">
+          2020-06-26
         </time>
         <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2769 words </span>
-          <span class="more-meta"> 6 min read </span>
+        <span class="more-meta"> 2464 words </span>
+          <span class="more-meta"> 5 min read </span>
 
         
         
@@ -525,11 +488,11 @@ if (!doNotTrack) {
 <ul>
 <li>
 <ul>
-<li>
+<li><a href="#kafka运维神器">Kafka运维神器</a>
 <ul>
-<li><a href="#前言">前言</a></li>
-<li><a href="#zookeeper服务">Zookeeper服务</a></li>
-<li><a href="#kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</a></li>
+<li><a href="#kafka-manager">kafka-manager</a></li>
+<li><a href="#kafkacat">kafkacat</a></li>
+<li><a href="#gokafka">gokafka</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -539,63 +502,26 @@ if (!doNotTrack) {
 
     
     <div class="post-content">
-      <blockquote>
-<p>我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在<a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum">KIP-500</a>中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。</p>
+      
+
+<h2 id="kafka运维神器">Kafka运维神器</h2>
+
+<blockquote>
+<p>在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。</p>
 </blockquote>
 
-<h3 id="前言">前言</h3>
+<h3 id="kafka-manager">kafka-manager</h3>
 
-<p>在kafka集群中，ZooKeeper集群用于<code>存放集群元数据</code>、<code>成员管理</code>、<code>Controller 选举</code>，以及其他一些<code>管理类任务</code>。</p>
-
-<ul>
-<li><code>存放元数据</code>: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。</li>
-<li><code>成员管理</code>: 是指 Broker 节点的注册、注销以及属性变更。</li>
-<li><code>Controller 选举</code>: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。</li>
-</ul>
-
-<h3 id="zookeeper服务">Zookeeper服务</h3>
-
-<p>在开始之前，我们首先需要对Zookeeper服务有一定的了解。在官方文档中，Zookeeper有如下能力:</p>
+<p>由雅虎开源的kafka集群管理工具，不过现在已经改名为<a href="https://github.com/yahoo/CMAK">CMAK</a>了(说明kafka的运维痛点还是蛮多的，项目还可以做更多的事情)，核心功能如下:</p>
 
 <ul>
-<li>配置管理: 其实就是单纯的K/V存储，可以用来配置的存储和管理，实现对分布式系统组件的集中式的配置管理</li>
-<li>命名: 命令空间管理，在zookeeper中配置可通过不同的根路径来实现简单的命名空间隔离(简单的chroot隔离)</li>
-<li>分布式的同步服务: 可保证分布式的同步</li>
-<li>分组服务: 可以将一组服务配置进行分组管理，其实在Dubbo的注册中心中，就是使用分组和命名来统一进行生产者的注册和发现</li>
-</ul>
+<li>多集群管理</li>
+<li>集群瞬时监控(topics, brokers, 副本分布，分区分布等)</li>
+<li>优先副本选举</li>
+<li>主题，分区，副本管理(主题创建和参数调整，副本分配等)</li>
+<li>Broker和Topic级别的metrics监控</li>
 
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg095r9zy2j30go0553z6.jpg" alt="Zookeeper架构" /></p>
-
-<p>在Zookeeper中所有的命名空间和文件系统比较类似，每个节点都有一个唯一的<code>路径</code>，如下图:</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg09dvjkrnj30ca071mxh.jpg" alt="zookeeper内部存储结构" /></p>
-
-<p>为什么Zookeeper服务可以满足配置管理和协调服务呢？主要是因为它的节点属性，通常也是经常可能会忽略的问题，即在Zookeeper中存在两种节点: <code>持久节点</code>和<code>临时节点</code>，节点也称之为<code>znode</code>，而znode本身除了数据之外，还会存储一些额外的信息:</p>
-
-<ul>
-<li>数据变更的版本号</li>
-<li>ACL变更的版本号</li>
-<li>时间戳</li>
-</ul>
-
-<p>每次znode中的数据有变更，版本号都会递增，并且client在向znode获取数据时，不仅会获取实际数据，而且会获取到数据的版本，这在整个配置管理领域会相当有用。</p>
-
-<p>前面说到的<code>持久节点</code>只要znode创建后，便一直会存在，这种节点主要用于配置的持久化存储，只要zookeeper集群整体可用，那该节点也一直可用(及时集群异常后恢复，该节点依旧存在)；而<code>临时节点</code> 随着某个创建 znode 的会话的开始，被创建，而一旦这个会话被撤除掉，这个 znode 就会自动被 ZooKeeper 删除。</p>
-
-<p>对于<code>临时节点</code>来讲，经常会被用在如下场景:</p>
-
-<ul>
-<li>dubbo中的服务注册</li>
-<li>其他分布式服务中的leader选举</li>
-</ul>
-
-<p>而真正使得Zookeeper在Java语言生态中有如此大影响还依赖于另外一个功能: <code>watches</code>，Client 可以对某个 znode 设置<code>watch</code> 当这个 znode 有变更的时候，就会产生<code>watch</code> 事件，这个事件会由 ZooKeeper 通知至 Client, 即是 Client 会收到来自 Server 的通知，可以实现数据的动态变更。(之所以说是Java语言生态，是因为在云原生领域，Etcd几乎是Zookeeper的替代品，不同的是它是Golang语言生态体系中的)</p>
-
-<h3 id="kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</h3>
-
-<p>前面对Zookeeper服务进行了大概的说明,接下来我们一起看看kafka的集群数据在zookeeper中是如何存储和分布的。</p>
-
-<p>链接zk:</p>
+<li><p>消费者基本信息管理</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -607,39 +533,34 @@ if (!doNotTrack) {
 </span><span class="lnt">7
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma"># 前面说到zookeeper支持命名空间，因此我们可以使用一个zookeeper集群来管理多个kafka集群
-# 只需要在启动kafka时指定zk的chroot环境，比如/kafka 在zookeeper中将存储名称为`kafka`的集群的相关数据
-sh-4.2# sh zkCli.sh -server 127.0.0.1:2181
-Connecting to 127.0.0.1:2181
-....
-[zk: 127.0.0.1:2181(CONNECTED) 0] ls /
-[kafka, zookeeper]</pre></td></tr></table>
-</div>
-</div>
-<p>查看kafka数据存储结构:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 1] ls /kafka
-[admin, brokers, cluster, config, consumers, controller, controller_epoch, isr_change_notification, latest_producer_id_block, log_dir_event_notification]</pre></td></tr></table>
-</div>
-</div>
-<p><strong>kafka元数据存储目录</strong>
-- admin: 存储管理员接口操作的相关信息，主要为topic删除事件，分区迁移事件，优先副本选举，信息(一般为临时节点)
-- brokers: 主要存储broker相关的信息，broker节点以及节点上的topic相关信息
-- cluster: 存储kafka集群信息
-- config: 存储broker，client，topic，user以及changer相关的配置信息
-- consumers: 存放消费者相关信息(一般为空)
-- controller: 用于存放控制节点信息(注意: 该节点是一个临时节点，用于controller节点注册)
-- controller_epoch: 用于存放controller节点当前的年龄
-- isr_change_notification: 用于存储isr的变更通知(临时节点，当有isr进行变动时，会用于事件通知，可进行watch获取集群isr状态变更)
-- latest_producer_id_block:  该节点用于存储处理事务相关的pid范围
-- log_dir_event_notification: 日志目录事件通知</p>
+<pre class="chroma"># 源码编译
+$ ./sbt clean dist
 
-<p><strong>admin目录结构</strong></p>
+# docker 安装
+$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 
+# 自定义端口
+$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 -Dhttp.port=8080 </pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0rydqhj30xu0kkdhd.jpg" alt="kafka-cluster" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0uopt4j30v90epac2.jpg" alt="kafka-topic" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1kai7sj30w50oc429.jpg" alt="kafka-topic-info" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1ziityj30k708kt9i.jpg" alt="kafka-consumer" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v2i5kt5j30qe0pxgpq.jpg" alt="kafka-consumer-info" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v34efi2j31rm0nbtdv.jpg" alt="kafka-broker" /></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v3ivpuqj31bi0u0dnn.jpg" alt="kafka-broker-info" /></p>
+
+<h3 id="kafkacat">kafkacat</h3>
+
+<p><a href="https://github.com/edenhill/kafkacat">kafkacat</a>是一个非JVM的命令行生产者和消费者，可以快速的对kafka消息进行生产和消费。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -648,17 +569,269 @@ Connecting to 127.0.0.1:2181
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
+</span><span class="lnt">7
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 2] ls /kafka/admin
-[delete_topics]
-[zk: 127.0.0.1:2181(CONNECTED) 3] ls /kafka/admin/delete_topics
-[]
-[zk: 127.0.0.1:2181(CONNECTED) 4] get  /kafka/admin/delete_topics
-null</pre></td></tr></table>
+<pre class="chroma"># mac 安装
+$ brew install kafkacat 
+
+# docker 安装
+# 官方仅支持Debian和openSUSE系列
+# 如下镜像支持在CentOS系列的环境中使用
+$ docker pull bgbiao/kafkacat </pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 消费者模式
+$ kafkacat -b localhost:9092 -t mysql_users
+% Auto-selecting Consumer mode (use -P or -C to override)
+{&#34;uid&#34;:1,&#34;name&#34;:&#34;Cliff&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;St Louis&#34;,&#34;elite&#34;:&#34;P&#34;}
+{&#34;uid&#34;:2,&#34;name&#34;:&#34;Nick&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;Palo Alto&#34;,&#34;elite&#34;:&#34;G&#34;}
+[...]
+
+# 生产者模式
+# 默认是以换行符来决定一条消息(-D 可以指定分隔符)
+# 默认从stdin来读取消息
+$ kafkacat -b localhost:9092 -t new_topic -P
+test
+
+# 从文件中读取消息
+# -l参数用来指定将文件中的每一个行作为一个消息进行发送，如果没有该参数，整个文本将会以一个消息发送(对于二进制的数据比较
+有用)
+# -T 参数可以用于回显到stdout
+$ kafkacat -b localhost:9092 -t &lt;my_topic&gt; -T -P -l /tmp/msgs
+
+
+# 可以指定消息的key，使用-K参数
+$ kafkacat -b localhost:9092 -t keyed_topic -P -K:
+1:foo
+2:bar
+
+$ kafkacat -b localhost:9092 -t keyed_topic -C -f &#39;Key: %k\nValue: %s\n&#39;
+Key: 1
+Value: foo
+Key: 2
+Value: bar
+
+# 设置partition
+$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 1
+1:foo
+
+$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 2
+2:bar
+
+$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 3
+3:wibble
+
+
+# 元数据监听模式
+# 元数据的监听模式可以使用`-L`参数，会显示当前kafka集群的状态以及主题，分区，副本，以及ISR信息。
+# `-J`参数会以json格式进行输出
+$ kafkacat -b localhost:9092 -L
+
+$ kafkacat -b mybroker -L -J
+
+
+
+# docker方式简单使用
+# 从标准输入生产数据
+$ docker run --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -P &lt;&lt;EOF
+&gt; ssabdkgjf
+&gt; asfgnh
+&gt; wertnh
+&gt; waer
+&gt; awegrtn
+&gt; 2020-04-26
+&gt; end time
+&gt; EOF
+
+# 从指定topic接收数据
+$ docker run -it --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -C -f &#39;\nKey (%K bytes): %k\t\nValue (%S bytes): %s\n\Partition: %p\tOffset: %o\n--\n&#39;
+
+Key (-1 bytes):
+Value (13 bytes): test kafkacat
+Partition: 0	Offset: 11
+--
+% Reached end of topic test-biao [0] at offset 12
+
+Key (-1 bytes):
+Value (18 bytes): 2020-04-26 endtime
+Partition: 1	Offset: 8
+--
+% Reached end of topic test-biao [1] at offset 9
+
+Key (-1 bytes):
+Value (7 bytes): overlay
+Partition: 2	Offset: 6
+--
+% Reached end of topic test-biao [2] at offset 7</pre></td></tr></table>
 </div>
 </div>
-<p><strong>brokers目录结构</strong></p>
+<p><code>注意:</code> 如果想要把docker镜像中的<code>kafkacat</code>二进制文件拷贝出来使用，仅需要在当前环境中安装<code>librdkafka-devel</code>即可。</p>
+
+<h3 id="gokafka">gokafka</h3>
+
+<p><a href="https://github.com/goops-top/gokafka">gokafka</a>也是一个非JVM的kafka运维管理工具，不仅可以进行简单的消息模拟生产，而且可以对指定topic进行消息预览，同时也支持kafka集群的常见的运维管理操作.</p>
+
+<p><strong>快速开始</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ git clone https://github.com/goops-top/gokafka.git
+$ cd gokafka
+$ go build -o build/goops-kafka
+
+$ ./build/goops-kafka
+goops-kafka: A kafka tools with golang that can operate the kafka for describe,create,update and so on.
+
+ Note: Without the jvm,so you must be specify the [--broker or --cluster and the Value must be in --config entry.]
+
+Usage:
+  gokafka [command]
+
+Available Commands:
+  consumer    consumer  a topic message data with specified kafka-cluster.
+  create      create the kafka topic with some base params in specify kafka-cluster.
+  describe    describe the kafka some info (cluster,topic,broker,loginfo)
+  help        Help about any command
+  init        init the gokafka some default config.
+  list        list the kafka some info (cluster,topic,broker)
+  producer    producer  a topic message data with specified kafka-cluster.
+  version     print version info of goops-kafka tool
+
+Flags:
+      --broker string    指定broker地址
+      --cluster string   指定集群
+      --config string    指定配置文件(default is $HOME/.goops-kafka)
+  -h, --help             help for gokafka
+
+Use &#34;gokafka [command] --help&#34; for more information about a command.
+
+# 使用make编译
+# 会自动生成mac和linux发行版本的二进制文件
+$ make default</pre></td></tr></table>
+</div>
+</div>
+<p><strong>简单使用</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -695,78 +868,111 @@ null</pre></td></tr></table>
 </span><span class="lnt">32
 </span><span class="lnt">33
 </span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma"># broker和topic列表数据
-[zk: 127.0.0.1:2181(CONNECTED) 5] ls /kafka/brokers
-[ids, seqid, topics]
+<pre class="chroma"># 查看工具版本
+$ ./build/gokafka.mac version
+Version: 0.0.1
+GitBranch: master
+CommitId: 445f935
+Build Date: 2020-06-26T18:49:48+0800
+Go Version: go1.14
+OS/Arch: darwin/amd64
 
-# 表示当前集群有3个节点
-[zk: 127.0.0.1:2181(CONNECTED) 6] ls /kafka/brokers/ids
-[1, 2, 3]
-[zk: 127.0.0.1:2181(CONNECTED) 7] ls /kafka/brokers/seqid
-[]
-# 表示集群当前的topic信息
-[zk: 127.0.0.1:2181(CONNECTED) 8] ls /kafka/brokers/topics
-[__consumer_offsets, appjsonlog_heartbeat, nginx_log,ingress_log ]
+# 初始化配置文件
+# gokafka 采用配置文件的方式快速管理多个kafka集群
+$ ./build/gokafka.mac  init
+gokafka config init ok.
 
-# broker详情
-[zk: 127.0.0.1:2181(CONNECTED) 10] get  /kafka/brokers/ids/1
-{&#34;listener_security_protocol_map&#34;:{&#34;PLAINTEXT&#34;:&#34;PLAINTEXT&#34;},&#34;endpoints&#34;:[&#34;PLAINTEXT://10.0.0.1:9092&#34;],&#34;jmx_port&#34;:9999,&#34;host&#34;:&#34;10.0.0.1&#34;,&#34;timestamp&#34;:&#34;1588925944886&#34;,&#34;port&#34;:9092,&#34;version&#34;:4}
+# 在用户家目录下生成集群配置文件
+$ cat ~/.goops-kafka
 
-# topic详情
-[zk: 127.0.0.1:2181(CONNECTED) 11] get  /kafka/brokers/topics/__consumer_offsets
-{&#34;version&#34;:2,&#34;partitions&#34;:{&#34;1&#34;:[2,1,3],&#34;0&#34;:[3,2,1],&#34;2&#34;:[1,2,3],&#34;adding_replicas&#34;:{},&#34;removing_replicas&#34;:{}}
+app: gokafka
+spec:
+  clusters:
+  - name: test-kafka
+    version: V2_5_0_0
+    brokers:
+    - 10.0.0.1:9092
+    - 10.0.0.2:9092
+    - 10.0.0.3:9092
+  - name: dev-kafka
+    version: V1_0_0_0
+    brokers:
+    - 192.168.0.22:9092
+    - 192.168.0.23:9092
+    - 192.168.0.24:9092
 
+# 也可以使用--config 来指定集群配置文件
+$ ./build/gokafka.mac  --config ./kafka-cluster.yaml version
+Version: 0.0.1
+GitBranch: master
+CommitId: 445f935
+Build Date: 2020-06-26T18:53:25+0800
+Go Version: go1.14
+OS/Arch: darwin/amd64
 
-[zk: localhost:2181(CONNECTED) 3] ls /brokers/topics/__consumer_offsets
-[partitions]
-[zk: localhost:2181(CONNECTED) 4] ls /brokers/topics/__consumer_offsets/partitions
-[0, 1, 2]
+# 查看配置文件中的集群详情
+$ ./build/gokafka.mac  list cluster
+cluster:test-kafka version:V2_5_0_0 connector_brokers:[10.0.0.1:9092]
+cluster:dev-kafka version:V1_0_0_0 connector_brokers:[192.168.0.22:9092]
 
-# 查看topic某个分区的状态详情
-[zk: localhost:2181(CONNECTED) 6] ls /brokers/topics/__consumer_offsets/partitions/1
-[state]
-[zk: localhost:2181(CONNECTED) 7] ls /brokers/topics/__consumer_offsets/partitions/1/state
-[]
-[zk: localhost:2181(CONNECTED) 8] get  /brokers/topics/__consumer_offsets/partitions/1/state
-{&#34;controller_epoch&#34;:3,&#34;leader&#34;:1,&#34;version&#34;:1,&#34;leader_epoch&#34;:12,&#34;isr&#34;:[3,1]}</pre></td></tr></table>
+./build/gokafka.mac  list cluster --config ./kafka-cluster.yaml
+cluster:log-kafka version:V2_5_0_0 connector_brokers:[log-kafka-1.bgbiao.cn:9092]
+
+# 注意: 当使用集群配置文件管理集群时，需要使用--cluster全局参数指定操作的目标集群
+# 当然也可以直接指定broker进行操作
+$ ./build/gokafka.mac  --cluster dev-kafka describe broker
+controller: 3
+brokers num: 3
+broker list: [2 1 3]
+id:2		 broker:192.168.0.22:9092
+id:1		 broker:192.168.0.23:9092
+id:3		 broker:192.168.0.24:9092
+
+$ ./build/gokafka.mac  --broker 10.0.0.1:9092  describe broker
+controller: 3
+brokers num: 3
+broker list: [2 1 3]
+id:2		 broker:192.168.0.22:9092
+id:1		 broker:192.168.0.23:9092
+id:3		 broker:192.168.0.24:9092</pre></td></tr></table>
 </div>
 </div>
-<p><strong>cluster目录结构</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 5] get   /kafka/cluster/id
-{&#34;version&#34;:&#34;1&#34;,&#34;id&#34;:&#34;5C-JZf4vRdqKzlca7Lv7pA&#34;}
-cZxid = 0x100000018
-ctime = Fri Mar 30 22:21:07 CST 2018
-mZxid = 0x100000018
-mtime = Fri Mar 30 22:21:07 CST 2018
-pZxid = 0x100000018
-cversion = 0
-dataVersion = 0
-aclVersion = 0
-ephemeralOwner = 0x0
-dataLength = 45
-numChildren = 0</pre></td></tr></table>
-</div>
-</div>
-<p><strong>config目录结构</strong></p>
+<p><strong>常用功能</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -790,109 +996,189 @@ numChildren = 0</pre></td></tr></table>
 </span><span class="lnt">19
 </span><span class="lnt">20
 </span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span><span class="lnt">96
+</span><span class="lnt">97
+</span><span class="lnt">98
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 12] ls /kafka/config
-[brokers, changes, clients, topics, users]
+<pre class="chroma"># 1.创建topic
+# 可以指定分区和副本数
+$ ./build/gokafka.mac  --cluster dev-kafka create --topic test-bgbiao-1
+true
 
-# 需要注意的是，config目录用来存放各种实体的配置，用于使用kafka相关工具对实体进行的配置变更存储
-# 因此，一般在kafka集群运行后，如不设置相关动态参数，该目录下的配置一般为空
-[zk: 127.0.0.1:2181(CONNECTED) 19] ls /kafka/config/brokers
-[]
-[zk: 127.0.0.1:2181(CONNECTED) 20] ls /kafka/config/changes
-[]
-[zk: 127.0.0.1:2181(CONNECTED) 21] ls /kafka/config/clients
-[]
-[zk: 127.0.0.1:2181(CONNECTED) 22] ls /kafka/config/topics
-[__consumer_offsets]
-[zk: 127.0.0.1:2181(CONNECTED) 23] ls /kafka/config/users
-[]
 
-# 可以看到，存储消费者偏移量的topic在配置中
-# 是因为该topic有一些额外的topic级别参数
-# 如果我们对topic参数有过动态变更，将会在这里存储
-[zk: 127.0.0.1:2181(CONNECTED) 24] get /kafka/config/topics/__consumer_offsets
-{&#34;version&#34;:1,&#34;config&#34;:{&#34;segment.bytes&#34;:&#34;104857600&#34;,&#34;compression.type&#34;:&#34;producer&#34;,&#34;cleanup.policy&#34;:&#34;compact&#34;}}</pre></td></tr></table>
+# 2.查看topic
+$ ./build/gokafka.mac  --cluster dev-kafka list topic --topic-list test-bgbiao-1
+Topic:test-bgbiao-1	PartNum:3	Replicas:3	Config:
+Topic-Part:test-bgbiao-1-2	ReplicaAssign:[1 3 2]
+Topic-Part:test-bgbiao-1-1	ReplicaAssign:[2 1 3]
+Topic-Part:test-bgbiao-1-0	ReplicaAssign:[3 2 1]
+
+# 3.获取topic的分区和副本状态
+$ ./build/gokafka.mac  --cluster dev-kafka describe  topic --topic-list test-bgbiao-1
+Topic-Part:test-bgbiao-1-2	Leader:1	Replicas:[1 3 2]	ISR:[1 3 2]	OfflineRep:[]
+Topic-Part:test-bgbiao-1-1	Leader:2	Replicas:[2 1 3]	ISR:[2 1 3]	OfflineRep:[]
+Topic-Part:test-bgbiao-1-0	Leader:3	Replicas:[3 2 1]	ISR:[3 2 1]	OfflineRep:[]
+
+# 4.向topic中生产消息
+$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &#34;Hello, BGBiao.&#34;
+INFO[0000] Produce msg:Hello, BGBiao. to topic:test-bgbiao-1
+INFO[0000] topic:test-bgbiao-1 send ok with offset:0
+
+$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &#34;Nice to meet you.&#34;
+INFO[0000] Produce msg:Nice to meet you. to topic:test-bgbiao-1
+INFO[0000] topic:test-bgbiao-1 send ok with offset:0
+
+# 5.消费消息(gokafka中创建了一个默认的消费组用来预览消息)
+# 在终端进行实时消费，ctrl+c 可取消
+$ ./build/gokafka.mac  --cluster dev-kafka consumer --topic test-bgbiao-1
+INFO[0000] Sarama consumer up and running!...
+INFO[0004] part:2 offset:0
+msg: Nice to meet you.
+INFO[0004] part:1 offset:0
+msg: Hello, BGBiao.
+
+# 6.查看集群的broker列表以及controller
+$ ./build/gokafka.mac  --cluster dev-kafka describe broker
+controller: 3
+brokers num: 3
+broker list: [2 1 3]
+id:2		 broker:192.168.0.23:9092
+id:1		 broker:192.168.0.22:9092
+id:3		 broker:192.168.0.24:9092
+
+# 7.查看topic的日志大小
+$ ./build/gokafka.mac  --cluster dev-kafka describe loginfo --topic-list test-bgbiao-1
+topic:test-bgbiao-1
+172.16.32.23:9092
+logdir:/soul/data/kafka/kafka-logs
+topic-part		log-size(M)		offset-lag
+----------		-----------		----------
+test-bgbiao-1-0		0		0
+test-bgbiao-1-1		0		0
+test-bgbiao-1-2		0		0
+172.16.32.22:9092
+logdir:/soul/data/kafka/kafka-logs
+topic-part		log-size(M)		offset-lag
+----------		-----------		----------
+test-bgbiao-1-0		0		0
+test-bgbiao-1-1		0		0
+test-bgbiao-1-2		0		0
+172.16.32.24:9092
+logdir:/soul/data/kafka/kafka-logs
+topic-part		log-size(M)		offset-lag
+----------		-----------		----------
+test-bgbiao-1-0		0		0
+test-bgbiao-1-1		0		0
+test-bgbiao-1-2		0		0
+
+# 8.列出kafka集群的消费者组
+$ ./build/gokafka.mac  --cluster dev-kafka list  consumer-g | grep -i gokafka
+GoKafka
+
+# 9.查看消费者组详细信息
+# 因为上面我们停止了消费，该消费者组当前是空的
+$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list GoKafka
+--------------------------------------------------------------------------------------------
+consumer-group:GoKafka consumer-state:Empty
+
+# 我们来看一个有实际消费状态的消费者组
+# 可以看到一个消费者组下的全部消费者线程以及消费者实例，消费的对应的topic列表
+$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list group-sync
+--------------------------------------------------------------------------------------------
+consumer-group:group-sync consumer-state:Stable
+consumer-id					consumer-ip			topic-list
+consumer-1-a9437739-e5cb-4b41-a9d3-2640b9878965	/172.16.64.207		[sync-dev]
+consumer-1-92eb690b-d327-468b-8990-9c21e1ee405d	/172.16.32.235		[sync-dev]
+
+
+# 10. 还可以查看某个消费者组消费某个topic的日志详情
+$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-group-offset --group group-sync --topic sync-dev
+sync-dev
+topic-part:sync-dev-0 log-offsize:98
+topic-part:sync-dev-1 log-offsize:0
+topic-part:sync-dev-2 log-offsize:340
+topic-part:sync-dev-3 log-offsize:261</pre></td></tr></table>
 </div>
 </div>
-<p><strong>controller目录结构</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># 可以看到当前broker-1为集群的controller节点
-[zk: 127.0.0.1:2181(CONNECTED) 30] get  /kafka/controller
-{&#34;version&#34;:1,&#34;brokerid&#34;:1,&#34;timestamp&#34;:&#34;1588833869354&#34;}</pre></td></tr></table>
-</div>
-</div>
-<p><strong>controller_epoch 目录结构</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># 可以看到controller的年龄是2，说明controller经历过2次变更了
-[zk: 127.0.0.1:2181(CONNECTED) 32] get  /kafka/controller_epoch
-2</pre></td></tr></table>
-</div>
-</div>
-<p><strong>其他几个目录结构</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># 存储事务相关的pid范围数据
-# broker启动时提前预分配一段 PID，当前是 0~999，即提前分配出 1000 个 PID 来
-# 一旦 PID 超过了 999，则目前会按照 1000 的步长重新分配
-# 集群中所有 broker 启动时都会启动一个叫 TransactionCoordinator 的组件，该组件能够执行预分配 PID 块和分配 PID 的工作，而所有 broker 都使用 /latest_producer_id_block 节点来保存 PID 块
-
-[zk: 127.0.0.1:2181(CONNECTED) 37] get  /kafka/latest_producer_id_block
-{&#34;version&#34;:1,&#34;broker&#34;:1,&#34;block_start&#34;:&#34;19000&#34;,&#34;block_end&#34;:&#34;19999&#34;}
-
-
-[zk: 127.0.0.1:2181(CONNECTED) 39] ls /kafka/isr_change_notification
-[]
-[zk: 127.0.0.1:2181(CONNECTED) 40] get  /kafka/isr_change_notification
-null
-
-[zk: 127.0.0.1:2181(CONNECTED) 41] ls /kafka/log_dir_event_notification
-[]
-[zk: 127.0.0.1:2181(CONNECTED) 42] get  /kafka/log_dir_event_notification
-null</pre></td></tr></table>
-</div>
-</div>
-<p>以上就是整个kafka元数据在zookeeper集群中的整体存储结构，下面附上一张kafka的元数据存储结构图。</p>
-
-<p><strong>kafka元数据在zk中的分布</strong></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg0a21u6coj31am0u0tlf.jpg" alt="kafka在zookeeper中的存储结构" /></p>
-
 <hr />
 
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+
     </div>
 
     
@@ -905,7 +1191,7 @@ null</pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-06-21
+      2020-06-26
       
     </span>
   </p>
@@ -939,16 +1225,15 @@ null</pre></td></tr></table>
 
     <footer class="post-footer">
       <div class="post-tags">
-          <a href="https://bgbiao.top/tags/kafka/">kafka</a>
-          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
-          <a href="https://bgbiao.top/tags/zookeeper/">Zookeeper</a>
+          <a href="https://bgbiao.top/tags/golang/">Golang</a>
+          <a href="https://bgbiao.top/tags/kafka/">Kafka</a>
           
         </div>
 
       
       <nav class="post-nav">
         
-          <a class="prev" href="/post/gokafka/">
+          <a class="prev" href="/post/golang-version/">
             
             <i class="iconfont">
               <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -958,12 +1243,12 @@ null</pre></td></tr></table>
 </svg>
 
             </i>
-            <span class="prev-text nav-default">Kafka运维神器之gokafka</span>
+            <span class="prev-text nav-default">Golang中处理版本信息</span>
             <span class="prev-text nav-mobile">Prev</span>
           </a>
         
-          <a class="next" href="/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/">
-            <span class="next-text nav-default">一文帮你理解整个SRE运维体系</span>
+          <a class="next" href="/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/">
+            <span class="next-text nav-default">Kafka在Zookeeper中的存储结构</span>
             <span class="prev-text nav-mobile">Next</span>
             
             <i class="iconfont">
