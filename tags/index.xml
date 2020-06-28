@@ -6,10 +6,46 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>http</title>
+      <link>https://bgbiao.top/tags/http/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/http/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>kubernetes</title>
+      <link>https://bgbiao.top/tags/kubernetes/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>traefik</title>
+      <link>https://bgbiao.top/tags/traefik/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/traefik/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>状态码异常</title>
+      <link>https://bgbiao.top/tags/%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Golang</title>
@@ -138,7 +174,7 @@
     </item>
     
     <item>
-      <title>Grafana</title>
+      <title>grafana</title>
       <link>https://bgbiao.top/tags/grafana/</link>
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
@@ -152,42 +188,6 @@
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/minio/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Prometheus</title>
-      <link>https://bgbiao.top/tags/prometheus/</link>
-      <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/prometheus/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>kubernetes</title>
-      <link>https://bgbiao.top/tags/kubernetes/</link>
-      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/kubernetes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>traefik</title>
-      <link>https://bgbiao.top/tags/traefik/</link>
-      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/traefik/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>可观测性</title>
-      <link>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</link>
-      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/</guid>
       <description></description>
     </item>
     

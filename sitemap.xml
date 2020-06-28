@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/post/golang-version/</loc>
     <lastmod>2020-06-27T15:19:36+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -10,7 +17,7 @@
   
   <url>
     <loc>https://bgbiao.top/post/gokafka/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
+    <lastmod>2020-06-27T15:45:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -507,14 +514,70 @@
   
   <url>
     <loc>https://bgbiao.top/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/http/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/kubernetes/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/post/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/traefik/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</loc>
+    <lastmod>2020-06-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://bgbiao.top/tags/golang/</loc>
+    <lastmod>2020-06-27T15:45:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -527,43 +590,15 @@
   </url>
   
   <url>
-    <loc>https://bgbiao.top/tags/golang/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>https://bgbiao.top/tags/kafka/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/post/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
+    <lastmod>2020-06-27T15:45:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/</loc>
-    <lastmod>2020-06-27T15:19:36+08:00</lastmod>
+    <lastmod>2020-06-27T15:45:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -669,20 +704,6 @@
   <url>
     <loc>https://bgbiao.top/tags/prometheus/</loc>
     <lastmod>2020-04-12T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/kubernetes/</loc>
-    <lastmod>2020-04-07T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://bgbiao.top/tags/traefik/</loc>
-    <lastmod>2020-04-07T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

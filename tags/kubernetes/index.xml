@@ -6,10 +6,21 @@
     <description>Recent content in kubernetes on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 07 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Traefik中的502-500状态码异常排查</title>
+      <link>https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;我们都知道在Kubernetes集群中通常会使用Ingress方案来统一代理集群内部的流量，而常用的Ingress方案为&lt;a href=&#34;https://docs.traefik.io/&#34;&gt;traefik&lt;/a&gt;和&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx&#34;&gt;nginx&lt;/a&gt;，和传统的Nginx作为企业内部的反向代理以及负载设备一样，在不同的场景下可能需要专有的配置才能满足需求，否则会出现奇奇怪怪的异常状态码。本篇文章一起来看下，我们在&lt;code&gt;traefik&lt;/code&gt;中遇到的500和502异常。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>Traefik的可观测性方案</title>
