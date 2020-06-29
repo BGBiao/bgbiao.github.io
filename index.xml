@@ -22,7 +22,7 @@
 &lt;p&gt;我们都知道在Kubernetes集群中通常会使用Ingress方案来统一代理集群内部的流量，而常用的Ingress方案为&lt;a href=&#34;https://docs.traefik.io/&#34;&gt;traefik&lt;/a&gt;和&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx&#34;&gt;nginx&lt;/a&gt;，和传统的Nginx作为企业内部的反向代理以及负载设备一样，在不同的场景下可能需要专有的配置才能满足需求，否则会出现奇奇怪怪的异常状态码。本篇文章一起来看下，我们在&lt;code&gt;traefik&lt;/code&gt;中遇到的500和502异常。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;h3 id=&#34;前言&#34;&gt;前言&lt;/h3&gt;
+&lt;h3 id=&#34;一-前言&#34;&gt;一、前言&lt;/h3&gt;
 
 &lt;p&gt;在开始之前，我们先来看几个在Nginx作为反向代理工具中经常遇到的几个异常状态码：&lt;/p&gt;
 
@@ -100,9 +100,9 @@ proxy_read_timeout         90;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;traefik中诡异的500和502&#34;&gt;traefik中诡异的500和502&lt;/h3&gt;
+&lt;h3 id=&#34;二-traefik中诡异的500和502&#34;&gt;二、traefik中诡异的500和502&lt;/h3&gt;
 
-&lt;p&gt;&lt;strong&gt;traefik在Kubernetes集群中的配置&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;traefik在kubernetes集群中的部署配置&#34;&gt;traefik在Kubernetes集群中的部署配置&lt;/h4&gt;
 
 &lt;p&gt;我们当前集群的traefik的配置如下:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -345,7 +345,7 @@ spec:
       name: admin&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;Python的对外API接口&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;python的对外api接口&#34;&gt;Python的对外API接口&lt;/h4&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -402,7 +402,7 @@ Vary: Accept-Encoding
 Date: Sun, 28 Jun 2020 14:56:33 GMT&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;诡异的500和502&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;诡异的500和502&#34;&gt;诡异的500和502&lt;/h4&gt;
 
 &lt;p&gt;在服务部署完成后，一切皆正常，但是简单压测后发现服务出现部分请求失败。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -533,7 +533,7 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
       1 POST /account/users/login/ HTTP/1.0&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;traefik的500和502问题排查&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;traefik中500和502问题排查&#34;&gt;traefik中500和502问题排查&lt;/h4&gt;
 
 &lt;p&gt;前面我们提到了在Nginx的场景中的500和502状态码的原因以及相关的解决方式，那么在Kubernetes集群中，traefik起到的作用和Nginx的作用也是相似的。&lt;/p&gt;
 
@@ -557,17 +557,17 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;$ tail -f access.log | grep data-api.bgbiao.cn | grep -v &amp;#39;HTTP/1.0&amp;#34; 200&amp;#39;
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267376 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 0ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267385 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267410 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267418 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267484 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 502 11 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267518 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:39 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267550 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 4ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 502 11 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272696 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 2ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 502 11 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272711 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 1ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272836 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 0ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272837 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 0ms&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267376 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 0ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267385 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267410 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267418 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267484 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 502 11 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267518 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:39 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122267550 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 4ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 502 11 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272696 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 2ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 502 11 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272711 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 1ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272836 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.26.9:8080&amp;#34; 0ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &amp;#34;POST /account/users/login/ HTTP/1.0&amp;#34; 500 21 &amp;#34;-&amp;#34; &amp;#34;ApacheBench/2.3&amp;#34; 122272837 &amp;#34;data-api.bgbiao.cn/&amp;#34; &amp;#34;http://20.0.41.8:8080&amp;#34; 0ms&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;可以看到，和我们压测结果里失败请求的状态码相同，都是&lt;code&gt;500&lt;/code&gt;和&lt;code&gt;502&lt;/code&gt;，虽然数量上不止4个，但这暂时不太重要。&lt;/p&gt;
@@ -635,7 +635,9 @@ time=&amp;#34;2020-06-28T15:35:05Z&amp;#34; level=debug msg=&amp;#34;vulcand/oxy
 
 &lt;p&gt;一个是500的issues，一个是502的issues，但通常这两个问题都是成双出现的。&lt;/p&gt;
 
-&lt;p&gt;在第一个issue中提到，traefik在http的反向代理功能中默认开启了http的keep-alive功能，但是python的应用中未开启http的keep-alive，因为我们上面的测试程序其实也是使用的python开发的，先对该参数进行调整。&lt;/p&gt;
+&lt;h4 id=&#34;500和502问题解决方案&#34;&gt;500和502问题解决方案&lt;/h4&gt;
+
+&lt;p&gt;在上面第一个issue中提到，traefik在http的反向代理功能中默认开启了http的keep-alive功能，但是python的应用中未开启http的keep-alive，因为我们上面的测试程序其实也是使用的python开发的，先对该参数进行调整。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -653,6 +655,43 @@ time=&amp;#34;2020-06-28T15:35:05Z&amp;#34; level=debug msg=&amp;#34;vulcand/oxy
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;# 在uwsgi.ini中增加keep-alive参数即可
@@ -668,8 +707,45 @@ processes = 2
 threads = 10
 
 # 重启应用后，再次进行压测
-# 发现，之前出现的502和500错误基本都消失了
-$ ab  -c 20 -n 100   -T &amp;#39;application/json&amp;#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+# 之前出现的502和500错误基本都消失了
+# 并发200，共1万个请求，失败的请求数为0，总耗时1min(qps才到160😸)
+$ ab  -c 200 -n 10000   -T &amp;#39;application/json&amp;#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
+....
+....
+
+Concurrency Level:      200
+Time taken for tests:   59.323 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      4670000 bytes
+Total body sent:        2320000
+HTML transferred:       2500000 bytes
+Requests per second:    168.57 [#/sec] (mean)
+Time per request:       1186.454 [ms] (mean)
+Time per request:       5.932 [ms] (mean, across all concurrent requests)
+Transfer rate:          76.88 [Kbytes/sec] received
+                        38.19 kb/s sent
+                        115.07 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        1    3  38.6      1    1035
+Processing:   101  942 1457.7    857   32684
+Waiting:      101  942 1457.7    857   32684
+Total:        102  945 1458.0    861   32685
+
+# p99达到7.3s
+Percentage of the requests served within a certain time (ms)
+  50%    861
+  66%   1033
+  75%   1136
+  80%   1191
+  90%   1886
+  95%   2281
+  98%   4209
+  99%   7399
+ 100%  32685 (longest request)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;通过对业务层的http的keep-alive参数的开启，来暂时解决了500和502的问题，那能否通过traefik层的参数来优化该问题呢，上面第二个issue中其实也提到了。&lt;/p&gt;
@@ -677,19 +753,98 @@ $ ab  -c 20 -n 100   -T &amp;#39;application/json&amp;#39; -p /root/login.json h
 &lt;p&gt;即，通过修改traefik的如下几个参数，并重新部署整个traefik集群即可:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间
+&lt;pre class=&#34;chroma&#34;&gt;# 关闭traefik的keep-alive参数，参数默认为200，如果参数为0，则使用go标准库中的DefaultMaxIdleConnsPerHost参数
+# keep-alive主要是用来复用链接来减少open files的，但是对于大量的短连接来将这种链接复用就可能出现上述情况
+--maxidleconnsperhost=-1 
+# 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间,默认是0次
 --retry.attempts=10
+# 该参数已经替换为--respondingtimeouts.idletimeout参数了，默认为3m0s
 --idletimeout=60s
---forwardingtimeouts.responseheadertimeout=60s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+# 默认是0s
+--forwardingtimeouts.responseheadertimeout=60s
+
+# traefik 空闲链接超时
+$ ./traefik --help | grep idletimeout
+    --idletimeout                                 (Deprecated) maximum amount of time an idle (keep-alive) connection will remain  (default &amp;#34;0s&amp;#34;)
+    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &amp;#34;3m0s&amp;#34;)
+
+# 响应超时相关参数
+ $ ./traefik --help | grep respondingtimeouts
+    --respondingtimeouts                          Timeouts for incoming requests to the Traefik instance                           (default &amp;#34;true&amp;#34;)
+    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &amp;#34;3m0s&amp;#34;)
+    --respondingtimeouts.readtimeout              ReadTimeout is the maximum duration for reading the entire request, including    (default &amp;#34;0s&amp;#34;)
+    --respondingtimeouts.writetimeout             WriteTimeout is the maximum duration before timing out writes of the response.   (default &amp;#34;0s&amp;#34;)
+
+
+# 转发的超时
+$ ./traefik --help | grep forwardingtimeouts
+    --forwardingtimeouts                          Timeouts for requests forwarded to the backend servers                           (default &amp;#34;true&amp;#34;)
+    --forwardingtimeouts.dialtimeout              The amount of time to wait until a connection to a backend server can be         (default &amp;#34;30s&amp;#34;)
+    --forwardingtimeouts.responseheadertimeout    The amount of time to wait for a server&amp;#39;s response headers after fully writing   (default &amp;#34;0s&amp;#34;)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3 id=&#34;slb中诡异的503&#34;&gt;SLB中诡异的503&lt;/h3&gt;
+&lt;p&gt;最终修改后的traefik的参数如下:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 可以根据实际情况考虑是否要关闭keep-alive 即增加参数: --maxidleconnsperhost=-1
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+        - --traefikLog.filePath=/logdata/traefik.log
+        - --configfile=/config/traefik.toml
+        - --accesslog.filepath=/logdata/access.log
+        - --accesslog.bufferingsize=100
+        - --forwardingtimeouts.responseheadertimeout=60s
+        - --respondingtimeouts.idletimeout=180s
+        - --retry.attempts=10
+        - --idletimeout=180s&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;三-slb中诡异的503&#34;&gt;三、SLB中诡异的503&lt;/h3&gt;
 
 &lt;p&gt;在发现域名直接解析到traefik节点上不再出现502和500后，我们将traefik的节点负载到某云的内网slb中，但是又开始出现了诡异的503问题。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -746,6 +901,8 @@ $ cat traefik-log.txt  | grep  &amp;#39;HTTP/1.0 200&amp;#39; | wc -l
 2000&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;p&gt;&lt;a href=&#34;https://help.aliyun.com/knowledge_detail/102765.html?spm=5176.2000002.0.0.1f9641e8ymfAas&#34;&gt;阿里云TPS-503&lt;/a&gt;&lt;/p&gt;
+
 &lt;hr /&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>

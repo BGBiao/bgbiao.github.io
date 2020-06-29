@@ -78,7 +78,7 @@
 
 <meta itemprop="datePublished" content="2020-06-28T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-06-28T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4015">
+<meta itemprop="wordCount" content="4742">
 
 
 
@@ -474,8 +474,8 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 4015 words </span>
-          <span class="more-meta"> 9 min read </span>
+        <span class="more-meta"> 4742 words </span>
+          <span class="more-meta"> 10 min read </span>
 
         
         
@@ -496,9 +496,16 @@ if (!doNotTrack) {
 <ul>
 <li>
 <ul>
-<li><a href="#前言">前言</a></li>
-<li><a href="#traefik中诡异的500和502">traefik中诡异的500和502</a></li>
-<li><a href="#slb中诡异的503">SLB中诡异的503</a></li>
+<li><a href="#一-前言">一、前言</a></li>
+<li><a href="#二-traefik中诡异的500和502">二、traefik中诡异的500和502</a>
+<ul>
+<li><a href="#traefik在kubernetes集群中的部署配置">traefik在Kubernetes集群中的部署配置</a></li>
+<li><a href="#python的对外api接口">Python的对外API接口</a></li>
+<li><a href="#诡异的500和502">诡异的500和502</a></li>
+<li><a href="#traefik中500和502问题排查">traefik中500和502问题排查</a></li>
+<li><a href="#500和502问题解决方案">500和502问题解决方案</a></li>
+</ul></li>
+<li><a href="#三-slb中诡异的503">三、SLB中诡异的503</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -512,7 +519,7 @@ if (!doNotTrack) {
 <p>我们都知道在Kubernetes集群中通常会使用Ingress方案来统一代理集群内部的流量，而常用的Ingress方案为<a href="https://docs.traefik.io/">traefik</a>和<a href="https://github.com/kubernetes/ingress-nginx">nginx</a>，和传统的Nginx作为企业内部的反向代理以及负载设备一样，在不同的场景下可能需要专有的配置才能满足需求，否则会出现奇奇怪怪的异常状态码。本篇文章一起来看下，我们在<code>traefik</code>中遇到的500和502异常。</p>
 </blockquote>
 
-<h3 id="前言">前言</h3>
+<h3 id="一-前言">一、前言</h3>
 
 <p>在开始之前，我们先来看几个在Nginx作为反向代理工具中经常遇到的几个异常状态码：</p>
 
@@ -590,9 +597,9 @@ proxy_read_timeout         90;</pre></td></tr></table>
 </div></li>
 </ul>
 
-<h3 id="traefik中诡异的500和502">traefik中诡异的500和502</h3>
+<h3 id="二-traefik中诡异的500和502">二、traefik中诡异的500和502</h3>
 
-<p><strong>traefik在Kubernetes集群中的配置</strong></p>
+<h4 id="traefik在kubernetes集群中的部署配置">traefik在Kubernetes集群中的部署配置</h4>
 
 <p>我们当前集群的traefik的配置如下:</p>
 <div class="highlight"><div class="chroma">
@@ -835,7 +842,7 @@ spec:
       name: admin</pre></td></tr></table>
 </div>
 </div>
-<p><strong>Python的对外API接口</strong></p>
+<h4 id="python的对外api接口">Python的对外API接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -892,7 +899,7 @@ Vary: Accept-Encoding
 Date: Sun, 28 Jun 2020 14:56:33 GMT</pre></td></tr></table>
 </div>
 </div>
-<p><strong>诡异的500和502</strong></p>
+<h4 id="诡异的500和502">诡异的500和502</h4>
 
 <p>在服务部署完成后，一切皆正常，但是简单压测后发现服务出现部分请求失败。</p>
 <div class="highlight"><div class="chroma">
@@ -1023,7 +1030,7 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
       1 POST /account/users/login/ HTTP/1.0</pre></td></tr></table>
 </div>
 </div>
-<p><strong>traefik的500和502问题排查</strong></p>
+<h4 id="traefik中500和502问题排查">traefik中500和502问题排查</h4>
 
 <p>前面我们提到了在Nginx的场景中的500和502状态码的原因以及相关的解决方式，那么在Kubernetes集群中，traefik起到的作用和Nginx的作用也是相似的。</p>
 
@@ -1047,17 +1054,17 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 </span></pre></td>
 <td class="lntd">
 <pre class="chroma">$ tail -f access.log | grep data-api.bgbiao.cn | grep -v &#39;HTTP/1.0&#34; 200&#39;
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267376 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267385 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267410 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267418 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267484 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267518 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
-172.16.21.23 - - [28/Jun/2020:14:57:39 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267550 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 4ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272696 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 2ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272711 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272836 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 0ms
-172.16.21.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272837 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms</pre></td></tr></table>
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267376 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267385 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267410 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267418 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267484 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267518 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
+192.168.0.23 - - [28/Jun/2020:14:57:39 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267550 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 4ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272696 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 2ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272711 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272836 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 0ms
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272837 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms</pre></td></tr></table>
 </div>
 </div>
 <p>可以看到，和我们压测结果里失败请求的状态码相同，都是<code>500</code>和<code>502</code>，虽然数量上不止4个，但这暂时不太重要。</p>
@@ -1125,7 +1132,9 @@ time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/htt
 
 <p>一个是500的issues，一个是502的issues，但通常这两个问题都是成双出现的。</p>
 
-<p>在第一个issue中提到，traefik在http的反向代理功能中默认开启了http的keep-alive功能，但是python的应用中未开启http的keep-alive，因为我们上面的测试程序其实也是使用的python开发的，先对该参数进行调整。</p>
+<h4 id="500和502问题解决方案">500和502问题解决方案</h4>
+
+<p>在上面第一个issue中提到，traefik在http的反向代理功能中默认开启了http的keep-alive功能，但是python的应用中未开启http的keep-alive，因为我们上面的测试程序其实也是使用的python开发的，先对该参数进行调整。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -1143,6 +1152,43 @@ time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/htt
 </span><span class="lnt">13
 </span><span class="lnt">14
 </span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
 </span></pre></td>
 <td class="lntd">
 <pre class="chroma"># 在uwsgi.ini中增加keep-alive参数即可
@@ -1158,8 +1204,45 @@ processes = 2
 threads = 10
 
 # 重启应用后，再次进行压测
-# 发现，之前出现的502和500错误基本都消失了
-$ ab  -c 20 -n 100   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/</pre></td></tr></table>
+# 之前出现的502和500错误基本都消失了
+# 并发200，共1万个请求，失败的请求数为0，总耗时1min(qps才到160😸)
+$ ab  -c 200 -n 10000   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
+....
+....
+
+Concurrency Level:      200
+Time taken for tests:   59.323 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      4670000 bytes
+Total body sent:        2320000
+HTML transferred:       2500000 bytes
+Requests per second:    168.57 [#/sec] (mean)
+Time per request:       1186.454 [ms] (mean)
+Time per request:       5.932 [ms] (mean, across all concurrent requests)
+Transfer rate:          76.88 [Kbytes/sec] received
+                        38.19 kb/s sent
+                        115.07 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        1    3  38.6      1    1035
+Processing:   101  942 1457.7    857   32684
+Waiting:      101  942 1457.7    857   32684
+Total:        102  945 1458.0    861   32685
+
+# p99达到7.3s
+Percentage of the requests served within a certain time (ms)
+  50%    861
+  66%   1033
+  75%   1136
+  80%   1191
+  90%   1886
+  95%   2281
+  98%   4209
+  99%   7399
+ 100%  32685 (longest request)</pre></td></tr></table>
 </div>
 </div>
 <p>通过对业务层的http的keep-alive参数的开启，来暂时解决了500和502的问题，那能否通过traefik层的参数来优化该问题呢，上面第二个issue中其实也提到了。</p>
@@ -1167,19 +1250,98 @@ $ ab  -c 20 -n 100   -T &#39;application/json&#39; -p /root/login.json http://da
 <p>即，通过修改traefik的如下几个参数，并重新部署整个traefik集群即可:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma"># 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间
+<pre class="chroma"># 关闭traefik的keep-alive参数，参数默认为200，如果参数为0，则使用go标准库中的DefaultMaxIdleConnsPerHost参数
+# keep-alive主要是用来复用链接来减少open files的，但是对于大量的短连接来将这种链接复用就可能出现上述情况
+--maxidleconnsperhost=-1 
+# 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间,默认是0次
 --retry.attempts=10
+# 该参数已经替换为--respondingtimeouts.idletimeout参数了，默认为3m0s
 --idletimeout=60s
---forwardingtimeouts.responseheadertimeout=60s</pre></td></tr></table>
+# 默认是0s
+--forwardingtimeouts.responseheadertimeout=60s
+
+# traefik 空闲链接超时
+$ ./traefik --help | grep idletimeout
+    --idletimeout                                 (Deprecated) maximum amount of time an idle (keep-alive) connection will remain  (default &#34;0s&#34;)
+    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &#34;3m0s&#34;)
+
+# 响应超时相关参数
+ $ ./traefik --help | grep respondingtimeouts
+    --respondingtimeouts                          Timeouts for incoming requests to the Traefik instance                           (default &#34;true&#34;)
+    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &#34;3m0s&#34;)
+    --respondingtimeouts.readtimeout              ReadTimeout is the maximum duration for reading the entire request, including    (default &#34;0s&#34;)
+    --respondingtimeouts.writetimeout             WriteTimeout is the maximum duration before timing out writes of the response.   (default &#34;0s&#34;)
+
+
+# 转发的超时
+$ ./traefik --help | grep forwardingtimeouts
+    --forwardingtimeouts                          Timeouts for requests forwarded to the backend servers                           (default &#34;true&#34;)
+    --forwardingtimeouts.dialtimeout              The amount of time to wait until a connection to a backend server can be         (default &#34;30s&#34;)
+    --forwardingtimeouts.responseheadertimeout    The amount of time to wait for a server&#39;s response headers after fully writing   (default &#34;0s&#34;)</pre></td></tr></table>
 </div>
 </div>
-<h3 id="slb中诡异的503">SLB中诡异的503</h3>
+<p>最终修改后的traefik的参数如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 可以根据实际情况考虑是否要关闭keep-alive 即增加参数: --maxidleconnsperhost=-1
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+        - --traefikLog.filePath=/logdata/traefik.log
+        - --configfile=/config/traefik.toml
+        - --accesslog.filepath=/logdata/access.log
+        - --accesslog.bufferingsize=100
+        - --forwardingtimeouts.responseheadertimeout=60s
+        - --respondingtimeouts.idletimeout=180s
+        - --retry.attempts=10
+        - --idletimeout=180s</pre></td></tr></table>
+</div>
+</div>
+<h3 id="三-slb中诡异的503">三、SLB中诡异的503</h3>
 
 <p>在发现域名直接解析到traefik节点上不再出现502和500后，我们将traefik的节点负载到某云的内网slb中，但是又开始出现了诡异的503问题。</p>
 <div class="highlight"><div class="chroma">
@@ -1236,6 +1398,8 @@ $ cat traefik-log.txt  | grep  &#39;HTTP/1.0 200&#39; | wc -l
 2000</pre></td></tr></table>
 </div>
 </div>
+<p><a href="https://help.aliyun.com/knowledge_detail/102765.html?spm=5176.2000002.0.0.1f9641e8ymfAas">阿里云TPS-503</a></p>
+
 <hr />
 
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
