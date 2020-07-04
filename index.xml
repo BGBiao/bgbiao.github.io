@@ -6,10 +6,987 @@
     <description>Recent content on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jul 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ElasticSearch容量管理实践</title>
+      <link>https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Sat, 04 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;为什么要做容量管理&#34;&gt;为什么要做容量管理&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;在生产环境使用 ES 要面对的第一个问题通常是索引容量的规划，不合理的分片数，副本数和分片大小会对索引的性能产生直接的影响。&lt;/li&gt;
+&lt;li&gt;Elasticsearch 中的每个索引都由一个或多个分片组成的，每个分片都是一个 Lucene 索引实例，您可以将其视作一个独立的搜索引擎，它能够对 Elasticsearch 集群中的数据子集进行索引并处理相关查询。&lt;/li&gt;
+&lt;li&gt;查询和写入的性能与索引的大小是正相关的，所以要保证高性能，一定要限制索引的大小，具体来说是限制分片数量和单个分片的大小。&lt;/li&gt;
+&lt;li&gt;分片和索引的大小太大和太多容易导致性能问题。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.elastic.co/cn/blog/how-many-shards-should-i-have-in-my-elasticsearch-cluster?nsukey=GabPjf5OZF0QUSaLqrsDSnv0gl3NYrMXkFpMCqgodCTJVDuEWGlFFEpd2M4FL6peUue8SXsLBtSh24jg5sT73xK%2BIMFUQ%2FcrYnpp2fjHbiId72hUU4n6CPs4SW78M0r4sAldN%2BGI%2B2kiYoGJ4G2p%2Br767kWmctAZhBWU99rxb9he%2BAwTBK%2B1lA49grlc7tQ2xU7XHd6xhx%2FCAy%2FneZWNSg%3D%3D&#34;&gt;官方博客建议的分片数量&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt; ES 官方推荐分片的大小是 20G - 40G，最大不能超过 50G。&lt;/p&gt;
+
+&lt;h3 id=&#34;如何管理es的容量&#34;&gt;如何管理ES的容量&lt;/h3&gt;
+
+&lt;p&gt;在介绍了为何要管理ES的容量后，我们接下来需要考虑的是如何进行管理，以下为通常的做法。&lt;/p&gt;
+
+&lt;h4 id=&#34;1-使用在索引名称上带上时间的方法管理索引&#34;&gt;1. 使用在索引名称上带上时间的方法管理索引&lt;/h4&gt;
+
+&lt;p&gt;例如: &lt;logs-{now{yyyyMMddHH|+08:00}}-000001&gt;&lt;/p&gt;
+
+&lt;p&gt;需要注意的是，在使用HTTP接口创建索引时，索引名称要进行urlencode编码:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1.1写入和查询索引&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 创建索引
+$ PUT /%3Cnginxlogs-%7Bnow%7ByyyyMMddHH%7C%2B08%3A00%7D%7D-000001%3E
+{
+  &amp;#34;aliases&amp;#34;: {
+  &amp;#34;nginxlogs-read-alias&amp;#34;: {}
+  }
+}
+# 返回结果
+{
+  &amp;#34;acknowledged&amp;#34; : true,
+  &amp;#34;shards_acknowledged&amp;#34; : true,
+  &amp;#34;index&amp;#34; : &amp;#34;nginxlogs-2020061518-000001&amp;#34;
+}
+
+# 写入数据
+$ POST /%3Cnginxlogs-%7Bnow%7ByyyyMMddHH%7C%2B08%3A00%7D%7D-000001%3E/_doc
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+{
+  &amp;#34;_index&amp;#34; : &amp;#34;nginxlogs-2020061518-000001&amp;#34;,
+  &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+  &amp;#34;_id&amp;#34; : &amp;#34;VNZut3IBgpLCCHbxDzDB&amp;#34;,
+  &amp;#34;_version&amp;#34; : 1,
+  &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+  &amp;#34;_shards&amp;#34; : {
+    &amp;#34;total&amp;#34; : 2,
+    &amp;#34;successful&amp;#34; : 2,
+    &amp;#34;failed&amp;#34; : 0
+  },
+  &amp;#34;_seq_no&amp;#34; : 0,
+  &amp;#34;_primary_term&amp;#34; : 1
+}
+
+# 查询数据 
+## 使用多索引查询
+$ GET /nginxlogs-2020061518-000001,nginxlogs-2020061519-000001/_search
+{&amp;#34;query&amp;#34;:{&amp;#34;match_all&amp;#34;:{}}}
+
+## 使用通配符查询多索引
+$ GET /nginxlogs-*/_search
+{
+  &amp;#34;query&amp;#34;: {
+    &amp;#34;match_all&amp;#34;: {}
+  }
+}
+{
+  &amp;#34;took&amp;#34; : 0,
+  &amp;#34;timed_out&amp;#34; : false,
+  &amp;#34;_shards&amp;#34; : {
+    &amp;#34;total&amp;#34; : 1,
+    &amp;#34;successful&amp;#34; : 1,
+    &amp;#34;skipped&amp;#34; : 0,
+    &amp;#34;failed&amp;#34; : 0
+  },
+  &amp;#34;hits&amp;#34; : {
+    &amp;#34;total&amp;#34; : {
+      &amp;#34;value&amp;#34; : 1,
+      &amp;#34;relation&amp;#34; : &amp;#34;eq&amp;#34;
+    },
+    &amp;#34;max_score&amp;#34; : 1.0,
+    &amp;#34;hits&amp;#34; : [
+      {
+        &amp;#34;_index&amp;#34; : &amp;#34;nginxlogs-2020061518-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;VNZut3IBgpLCCHbxDzDB&amp;#34;,
+        &amp;#34;_score&amp;#34; : 1.0,
+        &amp;#34;_source&amp;#34; : {
+          &amp;#34;name&amp;#34; : &amp;#34;xxx&amp;#34;
+        }
+      }
+    ]
+  }
+}
+
+# 使用别名查询
+$ GET /nginxlogs-read-alias/_search
+{
+  &amp;#34;query&amp;#34;: {
+    &amp;#34;match_all&amp;#34;: {}
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;1.2时间索引的缺点&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt; 虽然使用带时间的索引可以带来很多方便，但是在实际过程中使用带时间的索引也有一定的缺陷。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;对于写入之后需要数据变更的不是用时间索引&lt;/li&gt;
+&lt;li&gt;直接使用时间分割也可能存在某段时间数据量集中，导致索引分片超过设计容量的问题，可能影响性能&lt;/li&gt;
+&lt;li&gt;索引维护起来比较麻烦(当然可以使用template进行管理，前提是满足业务需求)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;2-使用-rollover-管理索引&#34;&gt;2. 使用 Rollover 管理索引&lt;/h4&gt;
+
+&lt;p&gt;Rollover 的原理是使用一个别名指向真正的索引，当指向的索引满足一定条件（&lt;strong&gt;文档数或时间或索引大小&lt;/strong&gt;）更新实际指向的索引。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.1创建索引&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;PUT myro-000001
+{
+  &amp;#34;aliases&amp;#34;: {
+    &amp;#34;myro_write_alias&amp;#34;:{}
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;2.2通过别名写入数据&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这里使用&lt;code&gt;bulk&lt;/code&gt;接口进行写入数据&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ POST /myro_write_alias/_bulk?refresh=true
+{&amp;#34;create&amp;#34;:{}}
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+{&amp;#34;create&amp;#34;:{}}
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+{&amp;#34;create&amp;#34;:{}}
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+
+{
+  &amp;#34;took&amp;#34; : 37,
+  &amp;#34;errors&amp;#34; : false,
+  &amp;#34;items&amp;#34; : [
+    {
+      &amp;#34;create&amp;#34; : {
+        &amp;#34;_index&amp;#34; : &amp;#34;myro-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;wVvFtnIBUTVfQxRWwXyM&amp;#34;,
+        &amp;#34;_version&amp;#34; : 1,
+        &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+        &amp;#34;forced_refresh&amp;#34; : true,
+        &amp;#34;_shards&amp;#34; : {
+          &amp;#34;total&amp;#34; : 2,
+          &amp;#34;successful&amp;#34; : 2,
+          &amp;#34;failed&amp;#34; : 0
+        },
+        &amp;#34;_seq_no&amp;#34; : 0,
+        &amp;#34;_primary_term&amp;#34; : 1,
+        &amp;#34;status&amp;#34; : 201
+      }
+    },
+    {
+      &amp;#34;create&amp;#34; : {
+        &amp;#34;_index&amp;#34; : &amp;#34;myro-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;wlvFtnIBUTVfQxRWwXyM&amp;#34;,
+        &amp;#34;_version&amp;#34; : 1,
+        &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+        &amp;#34;forced_refresh&amp;#34; : true,
+        &amp;#34;_shards&amp;#34; : {
+          &amp;#34;total&amp;#34; : 2,
+          &amp;#34;successful&amp;#34; : 2,
+          &amp;#34;failed&amp;#34; : 0
+        },
+        &amp;#34;_seq_no&amp;#34; : 1,
+        &amp;#34;_primary_term&amp;#34; : 1,
+        &amp;#34;status&amp;#34; : 201
+      }
+    },
+    {
+      &amp;#34;create&amp;#34; : {
+        &amp;#34;_index&amp;#34; : &amp;#34;myro-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;w1vFtnIBUTVfQxRWwXyM&amp;#34;,
+        &amp;#34;_version&amp;#34; : 1,
+        &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+        &amp;#34;forced_refresh&amp;#34; : true,
+        &amp;#34;_shards&amp;#34; : {
+          &amp;#34;total&amp;#34; : 2,
+          &amp;#34;successful&amp;#34; : 2,
+          &amp;#34;failed&amp;#34; : 0
+        },
+        &amp;#34;_seq_no&amp;#34; : 2,
+        &amp;#34;_primary_term&amp;#34; : 1,
+        &amp;#34;status&amp;#34; : 201
+      }
+    }
+  ]
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;2.3执行 rollover 操作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;给索引设置具体的&lt;code&gt;rollover&lt;/code&gt;条件，任意一个条件触发都会进行rollover:&lt;/p&gt;
+
+&lt;p&gt;下面我们给索引别名设置rollover规则为&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;最大文档数为3&lt;/li&gt;
+&lt;li&gt;分片最大大小为5gb&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;文档最长时间7d&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ POST /myro_write_alias/_rollover
+{
+&amp;#34;conditions&amp;#34;: {
+&amp;#34;max_age&amp;#34;:   &amp;#34;7d&amp;#34;,
+&amp;#34;max_docs&amp;#34;:  3,
+&amp;#34;max_size&amp;#34;: &amp;#34;5gb&amp;#34;
+}
+}
+{
+&amp;#34;acknowledged&amp;#34; : true,
+&amp;#34;shards_acknowledged&amp;#34; : true,
+&amp;#34;old_index&amp;#34; : &amp;#34;myro-000001&amp;#34;,
+&amp;#34;new_index&amp;#34; : &amp;#34;myro-000002&amp;#34;,
+&amp;#34;rolled_over&amp;#34; : true,
+&amp;#34;dry_run&amp;#34; : false,
+&amp;#34;conditions&amp;#34; : {
+&amp;#34;[max_docs: 3]&amp;#34; : true,
+&amp;#34;[max_size: 5gb]&amp;#34; : false,
+&amp;#34;[max_age: 7d]&amp;#34; : false
+}
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;此时，我们已经设置了rollover规则，这个时候尝试继续写入.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ POST /myro_write_alias/_doc
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+# 发现已经写入新的索引，因为前面已经有三个doc，这次写入触发了rollover规则
+{
+  &amp;#34;_index&amp;#34; : &amp;#34;myro-000002&amp;#34;,
+  &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+  &amp;#34;_id&amp;#34; : &amp;#34;BdbMtnIBgpLCCHbxhihi&amp;#34;,
+  &amp;#34;_version&amp;#34; : 1,
+  &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+  &amp;#34;_shards&amp;#34; : {
+    &amp;#34;total&amp;#34; : 2,
+    &amp;#34;successful&amp;#34; : 2,
+    &amp;#34;failed&amp;#34; : 0
+  },
+  &amp;#34;_seq_no&amp;#34; : 0,
+  &amp;#34;_primary_term&amp;#34; : 1
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;2.4使用 Rollover 的缺点&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;必须对索引别名先进行&lt;code&gt;rollover&lt;/code&gt;规则设置才可以进行自动roll&lt;/li&gt;
+&lt;li&gt;对于开发者不够友好&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;3-使用-ilm-index-lifecycle-management-管理索引&#34;&gt;3. 使用 ILM（Index Lifecycle Management ） 管理索引&lt;/h4&gt;
+
+&lt;p&gt;ES 一直在索引管理这块进行优化迭代，从 6.7 版本推出了索引生命周期管理（Index Lifecycle Management ，简称 ILM) 机制，是目前官方提供的比较完善的索引管理方法。所谓 Lifecycle (生命周期) 是把索引定义了四个阶段：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1ggffd4ohqzj30r505a0tb.jpg&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Hot&lt;/code&gt;: 索引可写入，也可查询，也就是我们通常说的热数据，为保证性能数据通常都是在内存中的&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Warm&lt;/code&gt;: 索引不可写入，但可查询，介于热和冷之间，数据可以是全内存的，也可以是在 SSD 的硬盘上的&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Cold&lt;/code&gt;: 索引不可写入，但很少被查询，查询的慢点也可接受，基本不再使用的数据，数据通常在大容量的磁盘上&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Delete&lt;/code&gt;: 索引可被安全的删除&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这 4 个阶段是 ES 定义的一个索引从生到死的过程，Hot -&amp;gt; Warm -&amp;gt; Cold -&amp;gt; Delete 4 个阶段只有 Hot 阶段是必须的，其他 3 个阶段根据业务的需求可选。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.1简历Lifecycle策略&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1ggfff9rinjj30u00rc77v.jpg&#34; alt=&#34;kibina中创建lifecycle策略&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如图，只启用了&lt;code&gt;Hot&lt;/code&gt;阶段，并且设置了rollover规则。&lt;/p&gt;
+
+&lt;p&gt;对应的HTTP请求参数如下:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ PUT _ilm/policy/myindex-lifecycle
+{
+  &amp;#34;policy&amp;#34;: {
+    &amp;#34;phases&amp;#34;: {
+      &amp;#34;hot&amp;#34;: {
+        &amp;#34;min_age&amp;#34;: &amp;#34;0ms&amp;#34;,
+        &amp;#34;actions&amp;#34;: {
+          &amp;#34;rollover&amp;#34;: {
+            &amp;#34;max_age&amp;#34;: &amp;#34;30d&amp;#34;,
+            &amp;#34;max_size&amp;#34;: &amp;#34;50gb&amp;#34;,
+            &amp;#34;max_docs&amp;#34;: 2
+          },
+          &amp;#34;set_priority&amp;#34;: {
+            &amp;#34;priority&amp;#34;: 100
+          }
+        }
+      }
+    }
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;4.2建立索引模板&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ PUT /_template/myindex_template
+{
+  &amp;#34;index_patterns&amp;#34;: [
+    &amp;#34;myindex-*&amp;#34;
+  ],
+  &amp;#34;aliases&amp;#34;: {
+    &amp;#34;myindex_reade_alias&amp;#34;: {}
+  },
+  &amp;#34;settings&amp;#34;: {
+    &amp;#34;index&amp;#34;: {
+      &amp;#34;lifecycle&amp;#34;: {
+        &amp;#34;name&amp;#34;: &amp;#34;myindex-lifecycle&amp;#34;,
+        &amp;#34;rollover_alias&amp;#34;: &amp;#34;myindex_write_alias&amp;#34;
+      },
+      &amp;#34;refresh_interval&amp;#34;: &amp;#34;30s&amp;#34;,
+      &amp;#34;number_of_shards&amp;#34;: &amp;#34;12&amp;#34;,
+      &amp;#34;number_of_replicas&amp;#34;: &amp;#34;1&amp;#34;
+    }
+  },
+  &amp;#34;mappings&amp;#34;: {
+    &amp;#34;properties&amp;#34;: {
+      &amp;#34;name&amp;#34;: {
+        &amp;#34;type&amp;#34;: &amp;#34;keyword&amp;#34;
+      }
+    }
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;模板匹配以索引前缀开头的索引(myindex-)&lt;/li&gt;
+&lt;li&gt;使用此模板的索引会自动创建&lt;code&gt;myindex_write_alias&lt;/code&gt;的别名，方便数据检索&lt;/li&gt;
+&lt;li&gt;模版绑定了上面创建的 Lifecycle 策略，并且用于 rollover 的别名是&lt;code&gt;myindex_write_alias&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;4.3创建索引&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ PUT /myindex-testindex-000001
+{
+  &amp;#34;aliases&amp;#34;: {
+    &amp;#34;myindex_write_alias&amp;#34;:{}
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;4.4查看索引配置&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ GET /myindex-testindex-000001
+{}
+{
+  &amp;#34;myindex-testindex-000001&amp;#34; : {
+    &amp;#34;aliases&amp;#34; : {
+      &amp;#34;myindex_reade_alias&amp;#34; : { },
+      &amp;#34;myindex_write_alias&amp;#34; : { }
+    },
+    &amp;#34;mappings&amp;#34; : {
+      &amp;#34;dynamic_templates&amp;#34; : [
+        {
+          &amp;#34;message_full&amp;#34; : {
+            &amp;#34;match&amp;#34; : &amp;#34;message_full&amp;#34;,
+            &amp;#34;mapping&amp;#34; : {
+              &amp;#34;fields&amp;#34; : {
+                &amp;#34;keyword&amp;#34; : {
+                  &amp;#34;ignore_above&amp;#34; : 2048,
+                  &amp;#34;type&amp;#34; : &amp;#34;keyword&amp;#34;
+                }
+              },
+              &amp;#34;type&amp;#34; : &amp;#34;text&amp;#34;
+            }
+          }
+        },
+        {
+          &amp;#34;message&amp;#34; : {
+            &amp;#34;match&amp;#34; : &amp;#34;message&amp;#34;,
+            &amp;#34;mapping&amp;#34; : {
+              &amp;#34;type&amp;#34; : &amp;#34;text&amp;#34;
+            }
+          }
+        },
+        {
+          &amp;#34;strings&amp;#34; : {
+            &amp;#34;match_mapping_type&amp;#34; : &amp;#34;string&amp;#34;,
+            &amp;#34;mapping&amp;#34; : {
+              &amp;#34;type&amp;#34; : &amp;#34;keyword&amp;#34;
+            }
+          }
+        }
+      ],
+      &amp;#34;properties&amp;#34; : {
+        &amp;#34;name&amp;#34; : {
+          &amp;#34;type&amp;#34; : &amp;#34;keyword&amp;#34;
+        }
+      }
+    },
+    &amp;#34;settings&amp;#34; : {
+      &amp;#34;index&amp;#34; : {
+        &amp;#34;lifecycle&amp;#34; : {
+          &amp;#34;name&amp;#34; : &amp;#34;myindex-lifecycle&amp;#34;,
+          &amp;#34;rollover_alias&amp;#34; : &amp;#34;myindex_write_alias&amp;#34;
+        },
+        &amp;#34;refresh_interval&amp;#34; : &amp;#34;30s&amp;#34;,
+        &amp;#34;number_of_shards&amp;#34; : &amp;#34;12&amp;#34;,
+        &amp;#34;translog&amp;#34; : {
+          &amp;#34;sync_interval&amp;#34; : &amp;#34;5s&amp;#34;,
+          &amp;#34;durability&amp;#34; : &amp;#34;async&amp;#34;
+        },
+        &amp;#34;provided_name&amp;#34; : &amp;#34;myindex-testindex-000001&amp;#34;,
+        &amp;#34;max_result_window&amp;#34; : &amp;#34;65536&amp;#34;,
+        &amp;#34;creation_date&amp;#34; : &amp;#34;1592222799955&amp;#34;,
+        &amp;#34;unassigned&amp;#34; : {
+          &amp;#34;node_left&amp;#34; : {
+            &amp;#34;delayed_timeout&amp;#34; : &amp;#34;5m&amp;#34;
+          }
+        },
+        &amp;#34;priority&amp;#34; : &amp;#34;100&amp;#34;,
+        &amp;#34;number_of_replicas&amp;#34; : &amp;#34;1&amp;#34;,
+        &amp;#34;uuid&amp;#34; : &amp;#34;tPwDbkuvRjKtRHiL4fKcPA&amp;#34;,
+        &amp;#34;version&amp;#34; : {
+          &amp;#34;created&amp;#34; : &amp;#34;7050199&amp;#34;
+        }
+      }
+    }
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;4.5写入数据&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;$ POST /myindex_write_alias/_bulk?refresh=true
+{&amp;#34;create&amp;#34;:{}}
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+{&amp;#34;create&amp;#34;:{}}
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+{&amp;#34;create&amp;#34;:{}}
+{&amp;#34;name&amp;#34;:&amp;#34;xxx&amp;#34;}
+
+{
+  &amp;#34;took&amp;#34; : 18,
+  &amp;#34;errors&amp;#34; : false,
+  &amp;#34;items&amp;#34; : [
+    {
+      &amp;#34;create&amp;#34; : {
+        &amp;#34;_index&amp;#34; : &amp;#34;myindex-testindex-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;jF3it3IBUTVfQxRW1Xys&amp;#34;,
+        &amp;#34;_version&amp;#34; : 1,
+        &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+        &amp;#34;forced_refresh&amp;#34; : true,
+        &amp;#34;_shards&amp;#34; : {
+          &amp;#34;total&amp;#34; : 2,
+          &amp;#34;successful&amp;#34; : 2,
+          &amp;#34;failed&amp;#34; : 0
+        },
+        &amp;#34;_seq_no&amp;#34; : 0,
+        &amp;#34;_primary_term&amp;#34; : 1,
+        &amp;#34;status&amp;#34; : 201
+      }
+    },
+    {
+      &amp;#34;create&amp;#34; : {
+        &amp;#34;_index&amp;#34; : &amp;#34;myindex-testindex-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;jV3it3IBUTVfQxRW1Xys&amp;#34;,
+        &amp;#34;_version&amp;#34; : 1,
+        &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+        &amp;#34;forced_refresh&amp;#34; : true,
+        &amp;#34;_shards&amp;#34; : {
+          &amp;#34;total&amp;#34; : 2,
+          &amp;#34;successful&amp;#34; : 2,
+          &amp;#34;failed&amp;#34; : 0
+        },
+        &amp;#34;_seq_no&amp;#34; : 0,
+        &amp;#34;_primary_term&amp;#34; : 1,
+        &amp;#34;status&amp;#34; : 201
+      }
+    },
+    {
+      &amp;#34;create&amp;#34; : {
+        &amp;#34;_index&amp;#34; : &amp;#34;myindex-testindex-000001&amp;#34;,
+        &amp;#34;_type&amp;#34; : &amp;#34;_doc&amp;#34;,
+        &amp;#34;_id&amp;#34; : &amp;#34;jl3it3IBUTVfQxRW1Xys&amp;#34;,
+        &amp;#34;_version&amp;#34; : 1,
+        &amp;#34;result&amp;#34; : &amp;#34;created&amp;#34;,
+        &amp;#34;forced_refresh&amp;#34; : true,
+        &amp;#34;_shards&amp;#34; : {
+          &amp;#34;total&amp;#34; : 2,
+          &amp;#34;successful&amp;#34; : 2,
+          &amp;#34;failed&amp;#34; : 0
+        },
+        &amp;#34;_seq_no&amp;#34; : 0,
+        &amp;#34;_primary_term&amp;#34; : 1,
+        &amp;#34;status&amp;#34; : 201
+      }
+    }
+  ]
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;4.6配置 Lifecycle 自动 Rollover 的时间间隔&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;由于ElasticSearch并不是一个realtime的的系统，因此很多操作并不能及时生效，因此需要在lifecycle中设置时间间隔。而ElasticSearch中默认的&lt;code&gt;ILM&lt;/code&gt;策略的时间间隔为10min。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;# 修改时间间隔
+$ PUT _cluster/settings
+{
+  &amp;#34;transient&amp;#34;: {
+    &amp;#34;indices.lifecycle.poll_interval&amp;#34;: &amp;#34;3s&amp;#34;
+  }
+}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>Traefik中的502-500状态码异常排查</title>
@@ -846,7 +1823,9 @@ $ ./traefik --help | grep forwardingtimeouts
 &lt;/div&gt;
 &lt;h3 id=&#34;三-slb中诡异的503&#34;&gt;三、SLB中诡异的503&lt;/h3&gt;
 
-&lt;p&gt;在发现域名直接解析到traefik节点上不再出现502和500后，我们将traefik的节点负载到某云的内网slb中，但是又开始出现了诡异的503问题。&lt;/p&gt;
+&lt;p&gt;在发现域名直接解析到traefik节点上不再出现502和500后，我们将traefik的节点挂载到阿里云的内网slb中，但是又开始出现了诡异的503问题。&lt;/p&gt;
+
+&lt;p&gt;接入slb后的简单压测情况(内网使用的是免费低配的slb😹)&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -901,6 +1880,8 @@ $ cat traefik-log.txt  | grep  &amp;#39;HTTP/1.0 200&amp;#39; | wc -l
 2000&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;p&gt;后来在阿里云文档中看到如下文档，基本上就是在阿里云的SLB侧对不同规格的SLB做了一定的限流策略，此时会向客户端返回503。&lt;/p&gt;
+
 &lt;p&gt;&lt;a href=&#34;https://help.aliyun.com/knowledge_detail/102765.html?spm=5176.2000002.0.0.1f9641e8ymfAas&#34;&gt;阿里云TPS-503&lt;/a&gt;&lt;/p&gt;
 
 &lt;hr /&gt;
@@ -9088,828 +10069,6 @@ CMD [&amp;#34;./hello&amp;#34;]&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>使用jwt-go验证API</title>
-      <link>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
-      
-        <description>
-
-&lt;blockquote&gt;
-&lt;p&gt;背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行实现。本篇文章主要分享下在Golang语言下使用&lt;a href=&#34;https://github.com/dgrijalva/jwt-go&#34;&gt;jwt-go&lt;/a&gt;来实现后端的token认证逻辑。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;code&gt;JSON Web Token(JWT)&lt;/code&gt;是一个常用语HTTP的客户端和服务端间进行身份认证和鉴权的标准规范，使用JWT可以允许我们在用户和服务器之间传递安全可靠的信息。&lt;/p&gt;
-
-&lt;p&gt;在开始学习&lt;a href=&#34;https://jwt.io/&#34;&gt;JWT&lt;/a&gt;之前，我们可以先了解下早期的几种方案。&lt;/p&gt;
-
-&lt;h3 id=&#34;token-cookie-session的区别&#34;&gt;token、cookie、session的区别&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;Cookie&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Cookie总是保存在客户端中，按在客户端中的存储位置，可分为&lt;code&gt;内存Cookie&lt;/code&gt;和&lt;code&gt;硬盘Cookie&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;内存Cookie由浏览器维护，保存在内存中，浏览器关闭后就消失了，其存在时间是短暂的。硬盘Cookie保存在硬盘里，有一个过期时间，除非用户手工清理或到了过期时间，硬盘Cookie不会被删除，其存在时间是长期的。所以，按存在时间，可分为&lt;code&gt;非持久Cookie和持久Cookie&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;cookie 是一个非常具体的东西，指的就是浏览器里面能永久存储的一种数据，仅仅是浏览器实现的一种数据存储功能。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;cookie由服务器生成，发送给浏览器&lt;/code&gt;，浏览器把cookie以key-value形式保存到某个目录下的文本文件内，下一次请求同一网站时会把该cookie发送给服务器。由于cookie是存在客户端上的，所以浏览器加入了一些限制确保cookie不会被恶意使用，同时不会占据太多磁盘空间，所以每个域的cookie数量是有限的。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Session&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Session字面意思是会话，主要用来标识自己的身份。比如在无状态的api服务在多次请求数据库时，如何知道是同一个用户，这个就可以通过session的机制，服务器要知道当前发请求给自己的是谁&lt;/p&gt;
-
-&lt;p&gt;为了区分客户端请求，&lt;code&gt;服务端会给具体的客户端生成身份标识session&lt;/code&gt;，然后客户端每次向服务器发请求的时候，都带上这个“身份标识”，服务器就知道这个请求来自于谁了。&lt;/p&gt;
-
-&lt;p&gt;至于客户端如何保存该标识，可以有很多方式，对于浏览器而言，一般都是使用&lt;code&gt;cookie&lt;/code&gt;的方式&lt;/p&gt;
-
-&lt;p&gt;服务器使用session把用户信息临时保存了服务器上，用户离开网站就会销毁，这种凭证存储方式相对于cookie来说更加安全，但是session会有一个缺陷: 如果web服务器做了负载均衡，那么下一个操作请求到了另一台服务器的时候session会丢失。&lt;/p&gt;
-
-&lt;p&gt;因此，通常企业里会使用&lt;code&gt;redis,memcached&lt;/code&gt;缓存中间件来实现session的共享，此时web服务器就是一个完全无状态的存在，所有的用户凭证可以通过共享session的方式存取，当前session的过期和销毁机制需要用户做控制。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Token&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;token的意思是“令牌”，是用户身份的验证方式，最简单的token组成: &lt;code&gt;uid(用户唯一标识)&lt;/code&gt;+&lt;code&gt;time(当前时间戳)&lt;/code&gt;+&lt;code&gt;sign(签名,由token的前几位+盐以哈希算法压缩成一定长度的十六进制字符串)&lt;/code&gt;，同时还可以将不变的参数也放进token&lt;/p&gt;
-
-&lt;p&gt;这里我们主要想讲的就是&lt;code&gt;Json Web Token&lt;/code&gt;，也就是本篇的主题:JWT&lt;/p&gt;
-
-&lt;h3 id=&#34;json-web-token-jwt-介绍&#34;&gt;Json-Web-Token(JWT)介绍&lt;/h3&gt;
-
-&lt;p&gt;一般而言，用户注册登陆后会生成一个jwt token返回给浏览器，浏览器向服务端请求数据时携带&lt;code&gt;token&lt;/code&gt;，服务器端使用&lt;code&gt;signature&lt;/code&gt;中定义的方式进行解码，进而对token进行解析和验证。&lt;/p&gt;
-
-&lt;h4 id=&#34;jwt-token组成部分&#34;&gt;JWT Token组成部分&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpwngvonhj30hx03xwf0.jpg&#34; alt=&#34;JWT-Token组成部分&#34; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;header: 用来指定使用的算法(HMAC SHA256 RSA)和token类型(如JWT)&lt;/li&gt;
-&lt;li&gt;payload: 包含声明(要求)，声明通常是用户信息或其他数据的声明，比如用户id，名称，邮箱等. 声明可分为三种: registered,public,private&lt;/li&gt;
-&lt;li&gt;signature: 用来保证JWT的真实性，可以使用不同的算法&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;header&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;{
-    &amp;#34;alg&amp;#34;: &amp;#34;HS256&amp;#34;,
-    &amp;#34;typ&amp;#34;: &amp;#34;JWT&amp;#34;
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;对上面的json进行base64编码即可得到JWT的第一个部分&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;payload&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;registered claims: 预定义的声明，通常会放置一些预定义字段，比如过期时间，主题等(iss:issuer,exp:expiration time,sub:subject,aud:audience)&lt;/li&gt;
-&lt;li&gt;public claims: 可以设置公开定义的字段&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;private claims: 用于统一使用他们的各方之间的共享信息&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;{
-&amp;#34;sub&amp;#34;: &amp;#34;xxx-api&amp;#34;,
-&amp;#34;name&amp;#34;: &amp;#34;bgbiao.top&amp;#34;,
-&amp;#34;admin&amp;#34;: true
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;对payload部分的json进行base64编码后即可得到JWT的第二个部分&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 不要在header和payload中放置敏感信息，除非信息本身已经做过脱敏处理&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;signature&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;为了得到签名部分，必须有编码过的header和payload，以及一个秘钥，签名算法使用header中指定的那个，然后对其进行签名即可&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;HMACSHA256(base64UrlEncode(header)+&amp;quot;.&amp;quot;+base64UrlEncode(payload),secret)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;签名是&lt;code&gt;用于验证消息在传递过程中有没有被更改&lt;/code&gt;，并且，对于使用私钥签名的token，它还可以验证JWT的发送方是否为它所称的发送方。&lt;/p&gt;
-
-&lt;p&gt;在&lt;a href=&#34;https://jwt.io&#34;&gt;jwt.io&lt;/a&gt;网站中，提供了一些JWT token的编码，验证以及生成jwt的工具。&lt;/p&gt;
-
-&lt;p&gt;下图就是一个典型的jwt-token的组成部分。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpxe1ungej30wq0mygo8.jpg&#34; alt=&#34;jwt官方签名结构&#34; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&#34;什么时候用jwt&#34;&gt;什么时候用JWT&lt;/h4&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Authorization(授权): 典型场景，用户请求的token中包含了该令牌允许的路由，服务和资源。单点登录其实就是现在广泛使用JWT的一个特性&lt;/li&gt;
-&lt;li&gt;Information Exchange(信息交换):  对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式.因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;jwt-json-web-tokens-是如何工作的&#34;&gt;JWT(Json Web Tokens)是如何工作的&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcptxpqcrxj30ct0bsq3h.jpg&#34; alt=&#34;JWT认证过程&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;所以，基本上整个过程分为两个阶段，第一个阶段，客户端向服务端获取token，第二阶段，客户端带着该token去请求相关的资源.&lt;/p&gt;
-
-&lt;p&gt;通常比较重要的是，服务端如何根据指定的规则进行token的生成。&lt;/p&gt;
-
-&lt;p&gt;在认证的时候，当用户用他们的凭证成功登录以后，一个JSON Web Token将会被返回。&lt;/p&gt;
-
-&lt;p&gt;此后，token就是用户凭证了，你必须非常小心以防止出现安全问题。&lt;/p&gt;
-
-&lt;p&gt;一般而言，你保存令牌的时候不应该超过你所需要它的时间。&lt;/p&gt;
-
-&lt;p&gt;无论何时用户想要访问受保护的路由或者资源的时候，用户代理（通常是浏览器）都应该带上JWT，典型的，通常放在Authorization header中，用Bearer schema:
-&lt;code&gt;Authorization: Bearer &amp;lt;token&amp;gt;&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;服务器上的受保护的路由将会检查Authorization header中的JWT是否有效，如果有效，则用户可以访问受保护的资源。如果JWT包含足够多的必需的数据，那么就可以减少对某些操作的数据库查询的需要，尽管可能并不总是如此。&lt;/p&gt;
-
-&lt;p&gt;如果token是在授权头（Authorization header）中发送的，那么跨源资源共享(CORS)将不会成为问题，因为它不使用cookie.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpxi6z1dmj315o0fvab0.jpg&#34; alt=&#34;获取JWT以及访问APIs以及资源&#34; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;客户端向授权接口请求授权&lt;/li&gt;
-&lt;li&gt;服务端授权后返回一个access token给客户端&lt;/li&gt;
-&lt;li&gt;客户端使用access token访问受保护的资源&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;基于token的身份认证和基于服务器的身份认证&#34;&gt;基于Token的身份认证和基于服务器的身份认证&lt;/h4&gt;
-
-&lt;p&gt;&lt;strong&gt;1.基于服务器的认证&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;前面说到过session，cookie以及token的区别，在之前传统的做法就是基于存储在服务器上的session来做用户的身份认证，但是通常会有如下问题:
-- Sessions: 认证通过后需要将用户的session数据保存在内存中，随着认证用户的增加，内存开销会大
-- 扩展性: 由于session存储在内存中，扩展性会受限，虽然后期可以使用redis,memcached来缓存数据
-- CORS: 当多个终端访问同一份数据时，可能会遇到禁止请求的问题
-- CSRF: 用户容易受到CSRF攻击&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2.Session和JWT Token的异同&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;都可以存储用户相关信息，但是session存储在服务端，JWT存储在客户端&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gcpxunv5qcj30dd0gfgmp.jpg&#34; alt=&#34;session和jwt数据存储位置&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;3.基于Token的身份认证如何工作&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;基于Token的身份认证是无状态的，服务器或者session中不会存储任何用户信息.(很好的解决了共享session的问题)&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;用户携带用户名和密码请求获取token(接口数据中可使用appId,appKey)&lt;/li&gt;
-&lt;li&gt;服务端校验用户凭证，并返回用户或客户端一个Token&lt;/li&gt;
-&lt;li&gt;客户端存储token,并在请求头中携带Token&lt;/li&gt;
-&lt;li&gt;服务端校验token并返回数据&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt;
-- 随后客户端的每次请求都需要使用token
-- token应该放在header中
-- 需要将服务器设置为接收所有域的请求: &lt;code&gt;Access-Control-Allow-Origin: *&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;4.用Token的好处&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;无状态和可扩展性&lt;/li&gt;
-&lt;li&gt;安全: 防止CSRF攻击;token过期重新认证&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;5.JWT和OAuth的区别&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;1.OAuth2是一种授权框架 ，JWT是一种认证协议&lt;/li&gt;
-&lt;li&gt;2.无论使用哪种方式切记用HTTPS来保证数据的安全性&lt;/li&gt;
-&lt;li&gt;3.OAuth2用在&lt;code&gt;使用第三方账号登录的情况&lt;/code&gt;(比如使用weibo, qq, github登录某个app)，而&lt;code&gt;JWT是用在前后端分离&lt;/code&gt;, 需要简单的对后台API进行保护时使用&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;使用gin框架集成jwt&#34;&gt;使用Gin框架集成JWT&lt;/h3&gt;
-
-&lt;p&gt;在Golang语言中，&lt;a href=&#34;https://github.com/dgrijalva/jwt-go&#34;&gt;jwt-go&lt;/a&gt;库提供了一些jwt编码和验证的工具，因此我们很容易使用该库来实现token认证。&lt;/p&gt;
-
-&lt;p&gt;另外，我们也知道&lt;a href=&#34;https://github.com/gin-gonic/gin&#34;&gt;gin&lt;/a&gt;框架中支持用户自定义middleware，我们可以很好的将jwt相关的逻辑封装在middleware中，然后对具体的接口进行认证。&lt;/p&gt;
-
-&lt;h4 id=&#34;自定义中间件&#34;&gt;自定义中间件&lt;/h4&gt;
-
-&lt;p&gt;在gin框架中，自定义中间件比较容易，只要返回一个&lt;code&gt;gin.HandlerFunc&lt;/code&gt;即完成一个中间件定义。&lt;/p&gt;
-
-&lt;p&gt;接下来，我们先定义一个用于jwt认证的中间件.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// 定义一个JWTAuth的中间件
-func JWTAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// 通过http header中的token解析来认证
-		token := c.Request.Header.Get(&amp;#34;token&amp;#34;)
-		if token == &amp;#34;&amp;#34; {
-			c.JSON(http.StatusOK, gin.H{
-				&amp;#34;status&amp;#34;: -1,
-				&amp;#34;msg&amp;#34;:    &amp;#34;请求未携带token，无权限访问&amp;#34;,
-				&amp;#34;data&amp;#34;:   nil,
-			})
-			c.Abort()
-			return
-		}
-
-		log.Print(&amp;#34;get token: &amp;#34;, token)
-
-		// 初始化一个JWT对象实例，并根据结构体方法来解析token
-		j := NewJWT()
-		// 解析token中包含的相关信息(有效载荷)
-		claims, err := j.ParserToken(token)
-
-		if err != nil {
-			// token过期
-			if err == TokenExpired {
-				c.JSON(http.StatusOK, gin.H{
-					&amp;#34;status&amp;#34;: -1,
-					&amp;#34;msg&amp;#34;:    &amp;#34;token授权已过期，请重新申请授权&amp;#34;,
-					&amp;#34;data&amp;#34;:   nil,
-				})
-				c.Abort()
-				return
-			}
-			// 其他错误
-			c.JSON(http.StatusOK, gin.H{
-				&amp;#34;status&amp;#34;: -1,
-				&amp;#34;msg&amp;#34;:    err.Error(),
-				&amp;#34;data&amp;#34;:   nil,
-			})
-			c.Abort()
-			return
-		}
-
-		// 将解析后的有效载荷claims重新写入gin.Context引用对象中
-		c.Set(&amp;#34;claims&amp;#34;, claims)
-
-	}
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;定义jwt编码和解码逻辑&#34;&gt;定义jwt编码和解码逻辑&lt;/h4&gt;
-
-&lt;p&gt;根据前面提到的jwt-token的组成部分，以及&lt;code&gt;jwt-go&lt;/code&gt;中相关的定义，我们可以使用如下方法进行生成token.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// 定义一个jwt对象
-type JWT struct {
-	// 声明签名信息
-	SigningKey []byte
-}
-
-// 初始化jwt对象
-func NewJWT() *JWT {
-	return &amp;amp;JWT{
-		[]byte(&amp;#34;bgbiao.top&amp;#34;),
-	}
-}
-
-// 自定义有效载荷(这里采用自定义的Name和Email作为有效载荷的一部分)
-type CustomClaims struct {
-	Name  string `json:&amp;#34;name&amp;#34;`
-	Email string `json:&amp;#34;email&amp;#34;`
-	// StandardClaims结构体实现了Claims接口(Valid()函数)
-	jwt.StandardClaims
-}
-
-
-// 调用jwt-go库生成token
-// 指定编码的算法为jwt.SigningMethodHS256
-func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
-	// https://gowalker.org/github.com/dgrijalva/jwt-go#Token
-	// 返回一个token的结构体指针
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(j.SigningKey)
-}
-
-
-// token解码
-func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
-	// https://gowalker.org/github.com/dgrijalva/jwt-go#ParseWithClaims
-	// 输入用户自定义的Claims结构体对象,token,以及自定义函数来解析token字符串为jwt的Token结构体指针
-	// Keyfunc是匿名函数类型: type Keyfunc func(*Token) (interface{}, error)
-	// func ParseWithClaims(tokenString string, claims Claims, keyFunc Keyfunc) (*Token, error) {}
-	token, err := jwt.ParseWithClaims(tokenString, &amp;amp;CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return j.SigningKey, nil
-	})
-
-	if err != nil {
-		// https://gowalker.org/github.com/dgrijalva/jwt-go#ValidationError
-		// jwt.ValidationError 是一个无效token的错误结构
-		if ve, ok := err.(*jwt.ValidationError); ok {
-			// ValidationErrorMalformed是一个uint常量，表示token不可用
-			if ve.Errors&amp;amp;jwt.ValidationErrorMalformed != 0 {
-				return nil, fmt.Errorf(&amp;#34;token不可用&amp;#34;)
-				// ValidationErrorExpired表示Token过期
-			} else if ve.Errors&amp;amp;jwt.ValidationErrorExpired != 0 {
-				return nil, fmt.Errorf(&amp;#34;token过期&amp;#34;)
-				// ValidationErrorNotValidYet表示无效token
-			} else if ve.Errors&amp;amp;jwt.ValidationErrorNotValidYet != 0 {
-				return nil, fmt.Errorf(&amp;#34;无效的token&amp;#34;)
-			} else {
-				return nil, fmt.Errorf(&amp;#34;token不可用&amp;#34;)
-			}
-
-		}
-	}
-
-	// 将token中的claims信息解析出来并断言成用户自定义的有效载荷结构
-	if claims, ok := token.Claims.(*CustomClaims); ok &amp;amp;&amp;amp; token.Valid {
-		return claims, nil
-	}
-
-	return nil, fmt.Errorf(&amp;#34;token无效&amp;#34;)
-
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;定义登陆验证逻辑&#34;&gt;定义登陆验证逻辑&lt;/h4&gt;
-
-&lt;p&gt;接下来的部分就是普通api的具体逻辑了，比如可以在登陆时进行用户校验，成功后未该次认证请求生成token。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// 定义登陆逻辑
-// model.LoginReq中定义了登陆的请求体(name,passwd)
-func Login(c *gin.Context) {
-	var loginReq model.LoginReq
-	if c.BindJSON(&amp;amp;loginReq) == nil {
-		// 登陆逻辑校验(查库，验证用户是否存在以及登陆信息是否正确)
-		isPass, user, err := model.LoginCheck(loginReq)
-		// 验证通过后为该次请求生成token
-		if isPass {
-			generateToken(c, user)
-		} else {
-			c.JSON(http.StatusOK, gin.H{
-				&amp;#34;status&amp;#34;: -1,
-				&amp;#34;msg&amp;#34;:    &amp;#34;验证失败&amp;#34; + err.Error(),
-				&amp;#34;data&amp;#34;:   nil,
-			})
-		}
-
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			&amp;#34;status&amp;#34;: -1,
-			&amp;#34;msg&amp;#34;:    &amp;#34;用户数据解析失败&amp;#34;,
-			&amp;#34;data&amp;#34;:   nil,
-		})
-	}
-}
-
-// token生成器
-// md 为上面定义好的middleware中间件
-func generateToken(c *gin.Context, user model.User) {
-	// 构造SignKey: 签名和解签名需要使用一个值
-	j := md.NewJWT()
-
-	// 构造用户claims信息(负荷)
-	claims := md.CustomClaims{
-		user.Name,
-		user.Email,
-		jwtgo.StandardClaims{
-			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
-			ExpiresAt: int64(time.Now().Unix() + 3600), // 签名过期时间
-			Issuer:    &amp;#34;bgbiao.top&amp;#34;,                    // 签名颁发者
-		},
-	}
-
-	// 根据claims生成token对象
-	token, err := j.CreateToken(claims)
-
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			&amp;#34;status&amp;#34;: -1,
-			&amp;#34;msg&amp;#34;:    err.Error(),
-			&amp;#34;data&amp;#34;:   nil,
-		})
-	}
-
-	log.Println(token)
-	// 封装一个响应数据,返回用户名和token
-	data := LoginResult{
-		Name:  user.Name,
-		Token: token,
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		&amp;#34;status&amp;#34;: 0,
-		&amp;#34;msg&amp;#34;:    &amp;#34;登陆成功&amp;#34;,
-		&amp;#34;data&amp;#34;:   data,
-	})
-	return
-
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;定义普通待验证接口&#34;&gt;定义普通待验证接口&lt;/h4&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;// 定义一个普通controller函数，作为一个验证接口逻辑
-func GetDataByTime(c *gin.Context) {
-	// 上面我们在JWTAuth()中间中将&amp;#39;claims&amp;#39;写入到gin.Context的指针对象中，因此在这里可以将之解析出来
-	claims := c.MustGet(&amp;#34;claims&amp;#34;).(*md.CustomClaims)
-	if claims != nil {
-		c.JSON(http.StatusOK, gin.H{
-			&amp;#34;status&amp;#34;: 0,
-			&amp;#34;msg&amp;#34;:    &amp;#34;token有效&amp;#34;,
-			&amp;#34;data&amp;#34;:   claims,
-		})
-	}
-}
-
-
-// 在主函数中定义路由规则
-	router := gin.Default()
-	v1 := router.Group(&amp;#34;/apis/v1/&amp;#34;)
-	{
-		v1.POST(&amp;#34;/register&amp;#34;, controller.RegisterUser)
-		v1.POST(&amp;#34;/login&amp;#34;, controller.Login)
-	}
-
-	// secure v1
-	sv1 := router.Group(&amp;#34;/apis/v1/auth/&amp;#34;)
-	// 加载自定义的JWTAuth()中间件,在整个sv1的路由组中都生效
-	sv1.Use(md.JWTAuth())
-	{
-		sv1.GET(&amp;#34;/time&amp;#34;, controller.GetDataByTime)
-
-	}
-	router.Run(&amp;#34;:8081&amp;#34;)&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;验证使用jwt后的接口&#34;&gt;验证使用JWT后的接口&lt;/h4&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# 运行项目
-$ go run main.go
-127.0.0.1
-13306
-root:bgbiao.top@tcp(127.0.0.1:13306)/test_api?charset=utf8mb4&amp;amp;parseTime=True&amp;amp;loc=Local
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
-
-[GIN-debug] [WARNING] Running in &amp;#34;debug&amp;#34; mode. Switch to &amp;#34;release&amp;#34; mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
-
-[GIN-debug] POST   /apis/v1/register         --&amp;gt; warnning-trigger/controller.RegisterUser (3 handlers)
-[GIN-debug] POST   /apis/v1/login            --&amp;gt; warnning-trigger/controller.Login (3 handlers)
-[GIN-debug] GET    /apis/v1/auth/time        --&amp;gt; warnning-trigger/controller.GetDataByTime (4 handlers)
-[GIN-debug] Listening and serving HTTP on :8081
-
-# 注册用户
-$ curl -i -X POST \
-   -H &amp;#34;Content-Type:application/json&amp;#34; \
-   -d \
-&amp;#39;{
-  &amp;#34;name&amp;#34;: &amp;#34;hahaha1&amp;#34;,
-  &amp;#34;password&amp;#34;: &amp;#34;hahaha1&amp;#34;,
-  &amp;#34;email&amp;#34;: &amp;#34;hahaha1@bgbiao.top&amp;#34;,
-  &amp;#34;phone&amp;#34;: 10000000000
-}&amp;#39; \
- &amp;#39;http://localhost:8081/apis/v1/register&amp;#39;
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Sun, 15 Mar 2020 07:09:28 GMT
-Content-Length: 41
-
-{&amp;#34;data&amp;#34;:null,&amp;#34;msg&amp;#34;:&amp;#34;success &amp;#34;,&amp;#34;status&amp;#34;:0}%
-
-
-# 登陆用户以获取token
-$ curl -i -X POST \
-   -H &amp;#34;Content-Type:application/json&amp;#34; \
-   -d \
-&amp;#39;{
-  &amp;#34;name&amp;#34;:&amp;#34;hahaha1&amp;#34;,
-  &amp;#34;password&amp;#34;:&amp;#34;hahaha1&amp;#34;
-}&amp;#39; \
- &amp;#39;http://localhost:8081/apis/v1/login&amp;#39;
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Sun, 15 Mar 2020 07:10:41 GMT
-Content-Length: 290
-
-{&amp;#34;data&amp;#34;:{&amp;#34;token&amp;#34;:&amp;#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&amp;#34;,&amp;#34;name&amp;#34;:&amp;#34;hahaha1&amp;#34;},&amp;#34;msg&amp;#34;:&amp;#34;登陆成功&amp;#34;,&amp;#34;status&amp;#34;:0}
-
-
-# 访问需要认证的接口
-# 因为我们对/apis/v1/auth/的分组路由中加载了jwt的middleware，因此该分组下的api都需要使用jwt-token认证
-$ curl http://localhost:8081/apis/v1/auth/time
-{&amp;#34;data&amp;#34;:null,&amp;#34;msg&amp;#34;:&amp;#34;请求未携带token，无权限访问&amp;#34;,&amp;#34;status&amp;#34;:-1}%
-
-# 使用token认证
-$ curl http://localhost:8081/apis/v1/auth/time -H &amp;#39;token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&amp;#39;
-{&amp;#34;data&amp;#34;:{&amp;#34;userName&amp;#34;:&amp;#34;hahaha1&amp;#34;,&amp;#34;email&amp;#34;:&amp;#34;hahaha1@bgbiao.top&amp;#34;,&amp;#34;exp&amp;#34;:1584259841,&amp;#34;iss&amp;#34;:&amp;#34;bgbiao.top&amp;#34;,&amp;#34;nbf&amp;#34;:1584255241},&amp;#34;msg&amp;#34;:&amp;#34;token有效&amp;#34;,&amp;#34;status&amp;#34;:0}%&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;a href=&#34;https://github.com/BGBiao/gin-jwt-token&#34;&gt;gin-jwt-go源码&lt;/a&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34; /&gt;&lt;/p&gt;
-</description>
       
     </item>
     

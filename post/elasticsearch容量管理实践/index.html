@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>ElasticSearch容量管理实践 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content=" 前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。
+" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.58.2" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="ElasticSearch容量管理实践" />
+<meta property="og:description" content="
+前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/" />
+<meta property="article:published_time" content="2020-07-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-07-04T00:00:00+00:00" />
+<meta itemprop="name" content="ElasticSearch容量管理实践">
+<meta itemprop="description" content="
+前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。
+">
+
+
+<meta itemprop="datePublished" content="2020-07-04T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-07-04T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2954">
+
+
+
+<meta itemprop="keywords" content="运维,ElasticSearch,ELK," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ElasticSearch容量管理实践"/>
+<meta name="twitter:description" content="
+前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">ElasticSearch容量管理实践</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-07-04" class="post-time">
+          2020-07-04
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 2954 words </span>
+          <span class="more-meta"> 6 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#为什么要做容量管理">为什么要做容量管理</a></li>
+<li><a href="#如何管理es的容量">如何管理ES的容量</a>
+<ul>
+<li><a href="#1-使用在索引名称上带上时间的方法管理索引">1. 使用在索引名称上带上时间的方法管理索引</a></li>
+<li><a href="#2-使用-rollover-管理索引">2. 使用 Rollover 管理索引</a></li>
+<li><a href="#3-使用-ilm-index-lifecycle-management-管理索引">3. 使用 ILM（Index Lifecycle Management ） 管理索引</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <blockquote>
+<p>前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。</p>
+</blockquote>
+
+<h3 id="为什么要做容量管理">为什么要做容量管理</h3>
+
+<ul>
+<li>在生产环境使用 ES 要面对的第一个问题通常是索引容量的规划，不合理的分片数，副本数和分片大小会对索引的性能产生直接的影响。</li>
+<li>Elasticsearch 中的每个索引都由一个或多个分片组成的，每个分片都是一个 Lucene 索引实例，您可以将其视作一个独立的搜索引擎，它能够对 Elasticsearch 集群中的数据子集进行索引并处理相关查询。</li>
+<li>查询和写入的性能与索引的大小是正相关的，所以要保证高性能，一定要限制索引的大小，具体来说是限制分片数量和单个分片的大小。</li>
+<li>分片和索引的大小太大和太多容易导致性能问题。</li>
+</ul>
+
+<p><a href="https://www.elastic.co/cn/blog/how-many-shards-should-i-have-in-my-elasticsearch-cluster?nsukey=GabPjf5OZF0QUSaLqrsDSnv0gl3NYrMXkFpMCqgodCTJVDuEWGlFFEpd2M4FL6peUue8SXsLBtSh24jg5sT73xK%2BIMFUQ%2FcrYnpp2fjHbiId72hUU4n6CPs4SW78M0r4sAldN%2BGI%2B2kiYoGJ4G2p%2Br767kWmctAZhBWU99rxb9he%2BAwTBK%2B1lA49grlc7tQ2xU7XHd6xhx%2FCAy%2FneZWNSg%3D%3D">官方博客建议的分片数量</a></p>
+
+<p><strong>注意:</strong> ES 官方推荐分片的大小是 20G - 40G，最大不能超过 50G。</p>
+
+<h3 id="如何管理es的容量">如何管理ES的容量</h3>
+
+<p>在介绍了为何要管理ES的容量后，我们接下来需要考虑的是如何进行管理，以下为通常的做法。</p>
+
+<h4 id="1-使用在索引名称上带上时间的方法管理索引">1. 使用在索引名称上带上时间的方法管理索引</h4>
+
+<p>例如: <logs-{now{yyyyMMddHH|+08:00}}-000001></p>
+
+<p>需要注意的是，在使用HTTP接口创建索引时，索引名称要进行urlencode编码:</p>
+
+<p><strong>1.1写入和查询索引</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 创建索引
+$ PUT /%3Cnginxlogs-%7Bnow%7ByyyyMMddHH%7C%2B08%3A00%7D%7D-000001%3E
+{
+  &#34;aliases&#34;: {
+  &#34;nginxlogs-read-alias&#34;: {}
+  }
+}
+# 返回结果
+{
+  &#34;acknowledged&#34; : true,
+  &#34;shards_acknowledged&#34; : true,
+  &#34;index&#34; : &#34;nginxlogs-2020061518-000001&#34;
+}
+
+# 写入数据
+$ POST /%3Cnginxlogs-%7Bnow%7ByyyyMMddHH%7C%2B08%3A00%7D%7D-000001%3E/_doc
+{&#34;name&#34;:&#34;xxx&#34;}
+{
+  &#34;_index&#34; : &#34;nginxlogs-2020061518-000001&#34;,
+  &#34;_type&#34; : &#34;_doc&#34;,
+  &#34;_id&#34; : &#34;VNZut3IBgpLCCHbxDzDB&#34;,
+  &#34;_version&#34; : 1,
+  &#34;result&#34; : &#34;created&#34;,
+  &#34;_shards&#34; : {
+    &#34;total&#34; : 2,
+    &#34;successful&#34; : 2,
+    &#34;failed&#34; : 0
+  },
+  &#34;_seq_no&#34; : 0,
+  &#34;_primary_term&#34; : 1
+}
+
+# 查询数据 
+## 使用多索引查询
+$ GET /nginxlogs-2020061518-000001,nginxlogs-2020061519-000001/_search
+{&#34;query&#34;:{&#34;match_all&#34;:{}}}
+
+## 使用通配符查询多索引
+$ GET /nginxlogs-*/_search
+{
+  &#34;query&#34;: {
+    &#34;match_all&#34;: {}
+  }
+}
+{
+  &#34;took&#34; : 0,
+  &#34;timed_out&#34; : false,
+  &#34;_shards&#34; : {
+    &#34;total&#34; : 1,
+    &#34;successful&#34; : 1,
+    &#34;skipped&#34; : 0,
+    &#34;failed&#34; : 0
+  },
+  &#34;hits&#34; : {
+    &#34;total&#34; : {
+      &#34;value&#34; : 1,
+      &#34;relation&#34; : &#34;eq&#34;
+    },
+    &#34;max_score&#34; : 1.0,
+    &#34;hits&#34; : [
+      {
+        &#34;_index&#34; : &#34;nginxlogs-2020061518-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;VNZut3IBgpLCCHbxDzDB&#34;,
+        &#34;_score&#34; : 1.0,
+        &#34;_source&#34; : {
+          &#34;name&#34; : &#34;xxx&#34;
+        }
+      }
+    ]
+  }
+}
+
+# 使用别名查询
+$ GET /nginxlogs-read-alias/_search
+{
+  &#34;query&#34;: {
+    &#34;match_all&#34;: {}
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>1.2时间索引的缺点</strong></p>
+
+<p><strong>注意:</strong> 虽然使用带时间的索引可以带来很多方便，但是在实际过程中使用带时间的索引也有一定的缺陷。</p>
+
+<ul>
+<li>对于写入之后需要数据变更的不是用时间索引</li>
+<li>直接使用时间分割也可能存在某段时间数据量集中，导致索引分片超过设计容量的问题，可能影响性能</li>
+<li>索引维护起来比较麻烦(当然可以使用template进行管理，前提是满足业务需求)</li>
+</ul>
+
+<h4 id="2-使用-rollover-管理索引">2. 使用 Rollover 管理索引</h4>
+
+<p>Rollover 的原理是使用一个别名指向真正的索引，当指向的索引满足一定条件（<strong>文档数或时间或索引大小</strong>）更新实际指向的索引。</p>
+
+<p><strong>2.1创建索引</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">PUT myro-000001
+{
+  &#34;aliases&#34;: {
+    &#34;myro_write_alias&#34;:{}
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>2.2通过别名写入数据</strong></p>
+
+<p>这里使用<code>bulk</code>接口进行写入数据</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ POST /myro_write_alias/_bulk?refresh=true
+{&#34;create&#34;:{}}
+{&#34;name&#34;:&#34;xxx&#34;}
+{&#34;create&#34;:{}}
+{&#34;name&#34;:&#34;xxx&#34;}
+{&#34;create&#34;:{}}
+{&#34;name&#34;:&#34;xxx&#34;}
+
+{
+  &#34;took&#34; : 37,
+  &#34;errors&#34; : false,
+  &#34;items&#34; : [
+    {
+      &#34;create&#34; : {
+        &#34;_index&#34; : &#34;myro-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;wVvFtnIBUTVfQxRWwXyM&#34;,
+        &#34;_version&#34; : 1,
+        &#34;result&#34; : &#34;created&#34;,
+        &#34;forced_refresh&#34; : true,
+        &#34;_shards&#34; : {
+          &#34;total&#34; : 2,
+          &#34;successful&#34; : 2,
+          &#34;failed&#34; : 0
+        },
+        &#34;_seq_no&#34; : 0,
+        &#34;_primary_term&#34; : 1,
+        &#34;status&#34; : 201
+      }
+    },
+    {
+      &#34;create&#34; : {
+        &#34;_index&#34; : &#34;myro-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;wlvFtnIBUTVfQxRWwXyM&#34;,
+        &#34;_version&#34; : 1,
+        &#34;result&#34; : &#34;created&#34;,
+        &#34;forced_refresh&#34; : true,
+        &#34;_shards&#34; : {
+          &#34;total&#34; : 2,
+          &#34;successful&#34; : 2,
+          &#34;failed&#34; : 0
+        },
+        &#34;_seq_no&#34; : 1,
+        &#34;_primary_term&#34; : 1,
+        &#34;status&#34; : 201
+      }
+    },
+    {
+      &#34;create&#34; : {
+        &#34;_index&#34; : &#34;myro-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;w1vFtnIBUTVfQxRWwXyM&#34;,
+        &#34;_version&#34; : 1,
+        &#34;result&#34; : &#34;created&#34;,
+        &#34;forced_refresh&#34; : true,
+        &#34;_shards&#34; : {
+          &#34;total&#34; : 2,
+          &#34;successful&#34; : 2,
+          &#34;failed&#34; : 0
+        },
+        &#34;_seq_no&#34; : 2,
+        &#34;_primary_term&#34; : 1,
+        &#34;status&#34; : 201
+      }
+    }
+  ]
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>2.3执行 rollover 操作</strong></p>
+
+<p>给索引设置具体的<code>rollover</code>条件，任意一个条件触发都会进行rollover:</p>
+
+<p>下面我们给索引别名设置rollover规则为</p>
+
+<ul>
+<li>最大文档数为3</li>
+<li>分片最大大小为5gb</li>
+
+<li><p>文档最长时间7d</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ POST /myro_write_alias/_rollover
+{
+&#34;conditions&#34;: {
+&#34;max_age&#34;:   &#34;7d&#34;,
+&#34;max_docs&#34;:  3,
+&#34;max_size&#34;: &#34;5gb&#34;
+}
+}
+{
+&#34;acknowledged&#34; : true,
+&#34;shards_acknowledged&#34; : true,
+&#34;old_index&#34; : &#34;myro-000001&#34;,
+&#34;new_index&#34; : &#34;myro-000002&#34;,
+&#34;rolled_over&#34; : true,
+&#34;dry_run&#34; : false,
+&#34;conditions&#34; : {
+&#34;[max_docs: 3]&#34; : true,
+&#34;[max_size: 5gb]&#34; : false,
+&#34;[max_age: 7d]&#34; : false
+}
+}</pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+
+<p>此时，我们已经设置了rollover规则，这个时候尝试继续写入.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ POST /myro_write_alias/_doc
+{&#34;name&#34;:&#34;xxx&#34;}
+# 发现已经写入新的索引，因为前面已经有三个doc，这次写入触发了rollover规则
+{
+  &#34;_index&#34; : &#34;myro-000002&#34;,
+  &#34;_type&#34; : &#34;_doc&#34;,
+  &#34;_id&#34; : &#34;BdbMtnIBgpLCCHbxhihi&#34;,
+  &#34;_version&#34; : 1,
+  &#34;result&#34; : &#34;created&#34;,
+  &#34;_shards&#34; : {
+    &#34;total&#34; : 2,
+    &#34;successful&#34; : 2,
+    &#34;failed&#34; : 0
+  },
+  &#34;_seq_no&#34; : 0,
+  &#34;_primary_term&#34; : 1
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>2.4使用 Rollover 的缺点</strong></p>
+
+<ul>
+<li>必须对索引别名先进行<code>rollover</code>规则设置才可以进行自动roll</li>
+<li>对于开发者不够友好</li>
+</ul>
+
+<h4 id="3-使用-ilm-index-lifecycle-management-管理索引">3. 使用 ILM（Index Lifecycle Management ） 管理索引</h4>
+
+<p>ES 一直在索引管理这块进行优化迭代，从 6.7 版本推出了索引生命周期管理（Index Lifecycle Management ，简称 ILM) 机制，是目前官方提供的比较完善的索引管理方法。所谓 Lifecycle (生命周期) 是把索引定义了四个阶段：</p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggffd4ohqzj30r505a0tb.jpg" alt="" /></p>
+
+<ul>
+<li><code>Hot</code>: 索引可写入，也可查询，也就是我们通常说的热数据，为保证性能数据通常都是在内存中的</li>
+<li><code>Warm</code>: 索引不可写入，但可查询，介于热和冷之间，数据可以是全内存的，也可以是在 SSD 的硬盘上的</li>
+<li><code>Cold</code>: 索引不可写入，但很少被查询，查询的慢点也可接受，基本不再使用的数据，数据通常在大容量的磁盘上</li>
+<li><code>Delete</code>: 索引可被安全的删除</li>
+</ul>
+
+<p>这 4 个阶段是 ES 定义的一个索引从生到死的过程，Hot -&gt; Warm -&gt; Cold -&gt; Delete 4 个阶段只有 Hot 阶段是必须的，其他 3 个阶段根据业务的需求可选。</p>
+
+<p><strong>3.1简历Lifecycle策略</strong></p>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggfff9rinjj30u00rc77v.jpg" alt="kibina中创建lifecycle策略" /></p>
+
+<p>如图，只启用了<code>Hot</code>阶段，并且设置了rollover规则。</p>
+
+<p>对应的HTTP请求参数如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ PUT _ilm/policy/myindex-lifecycle
+{
+  &#34;policy&#34;: {
+    &#34;phases&#34;: {
+      &#34;hot&#34;: {
+        &#34;min_age&#34;: &#34;0ms&#34;,
+        &#34;actions&#34;: {
+          &#34;rollover&#34;: {
+            &#34;max_age&#34;: &#34;30d&#34;,
+            &#34;max_size&#34;: &#34;50gb&#34;,
+            &#34;max_docs&#34;: 2
+          },
+          &#34;set_priority&#34;: {
+            &#34;priority&#34;: 100
+          }
+        }
+      }
+    }
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>4.2建立索引模板</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ PUT /_template/myindex_template
+{
+  &#34;index_patterns&#34;: [
+    &#34;myindex-*&#34;
+  ],
+  &#34;aliases&#34;: {
+    &#34;myindex_reade_alias&#34;: {}
+  },
+  &#34;settings&#34;: {
+    &#34;index&#34;: {
+      &#34;lifecycle&#34;: {
+        &#34;name&#34;: &#34;myindex-lifecycle&#34;,
+        &#34;rollover_alias&#34;: &#34;myindex_write_alias&#34;
+      },
+      &#34;refresh_interval&#34;: &#34;30s&#34;,
+      &#34;number_of_shards&#34;: &#34;12&#34;,
+      &#34;number_of_replicas&#34;: &#34;1&#34;
+    }
+  },
+  &#34;mappings&#34;: {
+    &#34;properties&#34;: {
+      &#34;name&#34;: {
+        &#34;type&#34;: &#34;keyword&#34;
+      }
+    }
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><code>注意:</code></p>
+
+<ul>
+<li>模板匹配以索引前缀开头的索引(myindex-)</li>
+<li>使用此模板的索引会自动创建<code>myindex_write_alias</code>的别名，方便数据检索</li>
+<li>模版绑定了上面创建的 Lifecycle 策略，并且用于 rollover 的别名是<code>myindex_write_alias</code></li>
+</ul>
+
+<p><strong>4.3创建索引</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ PUT /myindex-testindex-000001
+{
+  &#34;aliases&#34;: {
+    &#34;myindex_write_alias&#34;:{}
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>4.4查看索引配置</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ GET /myindex-testindex-000001
+{}
+{
+  &#34;myindex-testindex-000001&#34; : {
+    &#34;aliases&#34; : {
+      &#34;myindex_reade_alias&#34; : { },
+      &#34;myindex_write_alias&#34; : { }
+    },
+    &#34;mappings&#34; : {
+      &#34;dynamic_templates&#34; : [
+        {
+          &#34;message_full&#34; : {
+            &#34;match&#34; : &#34;message_full&#34;,
+            &#34;mapping&#34; : {
+              &#34;fields&#34; : {
+                &#34;keyword&#34; : {
+                  &#34;ignore_above&#34; : 2048,
+                  &#34;type&#34; : &#34;keyword&#34;
+                }
+              },
+              &#34;type&#34; : &#34;text&#34;
+            }
+          }
+        },
+        {
+          &#34;message&#34; : {
+            &#34;match&#34; : &#34;message&#34;,
+            &#34;mapping&#34; : {
+              &#34;type&#34; : &#34;text&#34;
+            }
+          }
+        },
+        {
+          &#34;strings&#34; : {
+            &#34;match_mapping_type&#34; : &#34;string&#34;,
+            &#34;mapping&#34; : {
+              &#34;type&#34; : &#34;keyword&#34;
+            }
+          }
+        }
+      ],
+      &#34;properties&#34; : {
+        &#34;name&#34; : {
+          &#34;type&#34; : &#34;keyword&#34;
+        }
+      }
+    },
+    &#34;settings&#34; : {
+      &#34;index&#34; : {
+        &#34;lifecycle&#34; : {
+          &#34;name&#34; : &#34;myindex-lifecycle&#34;,
+          &#34;rollover_alias&#34; : &#34;myindex_write_alias&#34;
+        },
+        &#34;refresh_interval&#34; : &#34;30s&#34;,
+        &#34;number_of_shards&#34; : &#34;12&#34;,
+        &#34;translog&#34; : {
+          &#34;sync_interval&#34; : &#34;5s&#34;,
+          &#34;durability&#34; : &#34;async&#34;
+        },
+        &#34;provided_name&#34; : &#34;myindex-testindex-000001&#34;,
+        &#34;max_result_window&#34; : &#34;65536&#34;,
+        &#34;creation_date&#34; : &#34;1592222799955&#34;,
+        &#34;unassigned&#34; : {
+          &#34;node_left&#34; : {
+            &#34;delayed_timeout&#34; : &#34;5m&#34;
+          }
+        },
+        &#34;priority&#34; : &#34;100&#34;,
+        &#34;number_of_replicas&#34; : &#34;1&#34;,
+        &#34;uuid&#34; : &#34;tPwDbkuvRjKtRHiL4fKcPA&#34;,
+        &#34;version&#34; : {
+          &#34;created&#34; : &#34;7050199&#34;
+        }
+      }
+    }
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>4.5写入数据</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$ POST /myindex_write_alias/_bulk?refresh=true
+{&#34;create&#34;:{}}
+{&#34;name&#34;:&#34;xxx&#34;}
+{&#34;create&#34;:{}}
+{&#34;name&#34;:&#34;xxx&#34;}
+{&#34;create&#34;:{}}
+{&#34;name&#34;:&#34;xxx&#34;}
+
+{
+  &#34;took&#34; : 18,
+  &#34;errors&#34; : false,
+  &#34;items&#34; : [
+    {
+      &#34;create&#34; : {
+        &#34;_index&#34; : &#34;myindex-testindex-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;jF3it3IBUTVfQxRW1Xys&#34;,
+        &#34;_version&#34; : 1,
+        &#34;result&#34; : &#34;created&#34;,
+        &#34;forced_refresh&#34; : true,
+        &#34;_shards&#34; : {
+          &#34;total&#34; : 2,
+          &#34;successful&#34; : 2,
+          &#34;failed&#34; : 0
+        },
+        &#34;_seq_no&#34; : 0,
+        &#34;_primary_term&#34; : 1,
+        &#34;status&#34; : 201
+      }
+    },
+    {
+      &#34;create&#34; : {
+        &#34;_index&#34; : &#34;myindex-testindex-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;jV3it3IBUTVfQxRW1Xys&#34;,
+        &#34;_version&#34; : 1,
+        &#34;result&#34; : &#34;created&#34;,
+        &#34;forced_refresh&#34; : true,
+        &#34;_shards&#34; : {
+          &#34;total&#34; : 2,
+          &#34;successful&#34; : 2,
+          &#34;failed&#34; : 0
+        },
+        &#34;_seq_no&#34; : 0,
+        &#34;_primary_term&#34; : 1,
+        &#34;status&#34; : 201
+      }
+    },
+    {
+      &#34;create&#34; : {
+        &#34;_index&#34; : &#34;myindex-testindex-000001&#34;,
+        &#34;_type&#34; : &#34;_doc&#34;,
+        &#34;_id&#34; : &#34;jl3it3IBUTVfQxRW1Xys&#34;,
+        &#34;_version&#34; : 1,
+        &#34;result&#34; : &#34;created&#34;,
+        &#34;forced_refresh&#34; : true,
+        &#34;_shards&#34; : {
+          &#34;total&#34; : 2,
+          &#34;successful&#34; : 2,
+          &#34;failed&#34; : 0
+        },
+        &#34;_seq_no&#34; : 0,
+        &#34;_primary_term&#34; : 1,
+        &#34;status&#34; : 201
+      }
+    }
+  ]
+}</pre></td></tr></table>
+</div>
+</div>
+<p><strong>4.6配置 Lifecycle 自动 Rollover 的时间间隔</strong></p>
+
+<p>由于ElasticSearch并不是一个realtime的的系统，因此很多操作并不能及时生效，因此需要在lifecycle中设置时间间隔。而ElasticSearch中默认的<code>ILM</code>策略的时间间隔为10min。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"># 修改时间间隔
+$ PUT _cluster/settings
+{
+  &#34;transient&#34;: {
+    &#34;indices.lifecycle.poll_interval&#34;: &#34;3s&#34;
+  }
+}</pre></td></tr></table>
+</div>
+</div>
+<hr />
+
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-07-04
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/elasticsearch/">ElasticSearch</a>
+          <a href="https://bgbiao.top/tags/elk/">ELK</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/">
+            <span class="next-text nav-default">Traefik中的502-500状态码异常排查</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

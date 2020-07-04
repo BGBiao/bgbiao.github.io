@@ -6,10 +6,37 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ElasticSearch</title>
+      <link>https://bgbiao.top/tags/elasticsearch/</link>
+      <pubDate>Sat, 04 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/elasticsearch/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ELK</title>
+      <link>https://bgbiao.top/tags/elk/</link>
+      <pubDate>Sat, 04 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/elk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>运维</title>
+      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Sat, 04 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>http</title>
@@ -75,15 +102,6 @@
     </item>
     
     <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Sun, 21 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>SRE</title>
       <link>https://bgbiao.top/tags/sre/</link>
       <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
@@ -138,15 +156,6 @@
     </item>
     
     <item>
-      <title>ElasticSearch</title>
-      <link>https://bgbiao.top/tags/elasticsearch/</link>
-      <pubDate>Wed, 27 May 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/elasticsearch/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Kibana</title>
       <link>https://bgbiao.top/tags/kibana/</link>
       <pubDate>Wed, 27 May 2020 00:00:00 +0000</pubDate>
@@ -179,15 +188,6 @@
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/grafana/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>minio</title>
-      <link>https://bgbiao.top/tags/minio/</link>
-      <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/minio/</guid>
       <description></description>
     </item>
     

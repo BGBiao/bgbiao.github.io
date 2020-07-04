@@ -6,10 +6,21 @@
     <description>Recent content in 运维 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 21 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ElasticSearch容量管理实践</title>
+      <link>https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Sat, 04 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>Kafka在Zookeeper中的存储结构</title>

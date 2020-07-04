@@ -465,19 +465,19 @@ if (!doNotTrack) {
 
         </span>
       
-      <a class="post-link" href="/post/golang-module/">Golang module的使用</a>
+      <a class="post-link" href="/post/docker-api-for-python/">Docker的Python版API使用</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="2019-09-18" class="post-time">
-        2019-09-18
+      <time datetime="0001-01-01" class="post-time">
+        0001-01-01
       </time>
       <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
           
         </div>
-      <span class="more-meta"> 2312 words </span>
-      <span class="more-meta"> 5 min read </span>
+      <span class="more-meta"> 4983 words </span>
+      <span class="more-meta"> 10 min read </span>
       
       
       
@@ -488,118 +488,11 @@ if (!doNotTrack) {
     
     <div class="post-summary">
       <blockquote>
-<p>前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用<code>vendor</code>或者<code>glide</code>的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为<code>go modules</code>的版本管理机制。</p>
-</blockquote>
-
-<p><code>注意:</code>
-- 在Golang1.11版本中需要使用<code>export GO111MODULE=on</code>来显式开启go module
-- 在Golang1.12之后默认开启了module</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/golang-module/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/k8s-dashboard-http/">k8s dashboard的http接口改造</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-09-18" class="post-time">
-        2019-09-18
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
-          
-        </div>
-      <span class="more-meta"> 1733 words </span>
-      <span class="more-meta"> 4 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件<a href="https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/">dashboard</a>,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了<code>https</code>并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).</p>
+<p>使用Docker API for Python来更好的管理容器！</p>
 </blockquote>
     </div>
     <div class="read-more">
-      <a href="/post/k8s-dashboard-http/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/">Golang的ElasticSearch6的SDK问题处理</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2019-08-12" class="post-time">
-        2019-08-12
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          
-        </div>
-      <span class="more-meta"> 1162 words </span>
-      <span class="more-meta"> 3 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <h2 id="es6-版本的golang-sdk问题处理">es6 版本的golang-sdk问题处理</h2>
-
-<blockquote>
-<p>ElasticSearch6版本的Golang SDK问题处理.</p>
-</blockquote>
-
-<p><a href="https://olivere.github.io/elastic/">golang-sdk</a></p>
-
-<p>es_version: 6.4.3</p>
-
-<p>官方建议的sdk版本:     <a href="https://github.com/olivere/elastic">https://github.com/olivere/elastic</a></p>
-
-<p><code>注意:很好奇,作者其他版本都采用vN来标记版本，但是在v6的时候直接采用github版本</code></p>
-    </div>
-    <div class="read-more">
-      <a href="/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/" class="read-more-link">Read more</a>
+      <a href="/post/docker-api-for-python/" class="read-more-link">Read more</a>
     </div>
     
   </div>
@@ -639,7 +532,7 @@ if (!doNotTrack) {
 
       
       
-      <li><a href="/page/14/">«</a></li>
+      <li><a href="/page/24/">«</a></li>
       
 
       
@@ -655,28 +548,9 @@ if (!doNotTrack) {
           
 
             
-
-          
-
-        
-        
-
-        
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
             
 
+          
           
 
         
@@ -697,7 +571,9 @@ if (!doNotTrack) {
           
 
             
+            
 
+          
           
 
         
@@ -718,7 +594,9 @@ if (!doNotTrack) {
           
 
             
+            
 
+          
           
 
         
@@ -739,7 +617,9 @@ if (!doNotTrack) {
           
 
             
+            
 
+          
           
 
         
@@ -760,7 +640,9 @@ if (!doNotTrack) {
           
 
             
+            
 
+          
           
 
         
@@ -781,7 +663,9 @@ if (!doNotTrack) {
           
 
             
+            
 
+          
           
 
         
@@ -802,7 +686,9 @@ if (!doNotTrack) {
           
 
             
+            
 
+          
           
 
         
@@ -822,126 +708,127 @@ if (!doNotTrack) {
           
           
 
+            
+            
+
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
+            
+
+          
+          
+
+        
+        
+
+        
+        
+
+      
+
+        
+
+        
+        
+
+          
+          
+          
+
+            
             
               
             
 
           
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/9/">
-              9
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-              
-            
-
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/10/">
-              10
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-              
-            
-
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/11/">
-              11
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-              
-            
-
-          
-
-        
-        
-
-        
-        
-          <li class="">
-            <a href="/page/12/">
-              12
-            </a>
-          </li>
-        
-
-      
-
-        
-
-        
-        
-
-          
-          
-          
-
-            
-              
-            
-
           
 
         
@@ -968,9 +855,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -997,9 +886,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1007,7 +898,7 @@ if (!doNotTrack) {
 
         
         
-          <li class="active">
+          <li class="">
             <a href="/page/15/">
               15
             </a>
@@ -1026,9 +917,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1055,9 +948,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1084,9 +979,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1113,9 +1010,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1142,9 +1041,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1171,9 +1072,11 @@ if (!doNotTrack) {
           
 
             
+            
               
             
 
+          
           
 
         
@@ -1200,13 +1103,23 @@ if (!doNotTrack) {
           
 
             
+            
+              
+            
 
+          
           
 
         
         
 
         
+        
+          <li class="">
+            <a href="/page/22/">
+              22
+            </a>
+          </li>
         
 
       
@@ -1221,13 +1134,23 @@ if (!doNotTrack) {
           
 
             
+            
+              
+            
 
+          
           
 
         
         
 
         
+        
+          <li class="">
+            <a href="/page/23/">
+              23
+            </a>
+          </li>
         
 
       
@@ -1242,13 +1165,23 @@ if (!doNotTrack) {
           
 
             
+            
+              
+            
 
+          
           
 
         
         
 
         
+        
+          <li class="">
+            <a href="/page/24/">
+              24
+            </a>
+          </li>
         
 
       
@@ -1263,7 +1196,11 @@ if (!doNotTrack) {
           
 
             
+            
+              
+            
 
+          
           
 
         
@@ -1271,17 +1208,19 @@ if (!doNotTrack) {
 
         
         
+          <li class="active">
+            <a href="/page/25/">
+              25
+            </a>
+          </li>
+        
 
       
 
       
       
-      <li><a href="/page/16/">»</a></li>
-      
 
       
-      
-      <li><a href="/page/25/">»»</a></li>
       
 
       </ul>

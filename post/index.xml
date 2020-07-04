@@ -6,10 +6,21 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ElasticSearch容量管理实践</title>
+      <link>https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</link>
+      <pubDate>Sat, 04 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 了解 ES 的索引管理方法有助于扬长避短，更好的利用 ES 的强大功能，特别是当遇到性能问题时，原因通常都可回溯至数据的索引方式以及集群中的分片数量。如果未能在一开始做出最佳选择，随着数据量越来越大，便有可能会引发性能问题。集群中的数据越多，要纠正这一问题就越难，本文旨在帮助大家了解 ES 容量管理的方法，在一开始就管理好索引的容量，避免给后面留坑。&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
     
     <item>
       <title>Traefik中的502-500状态码异常排查</title>
@@ -313,15 +324,6 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       <description>&lt;blockquote&gt;
 &lt;p&gt;背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用&lt;code&gt;RUN&lt;/code&gt;指令，执行了一次&lt;code&gt;chmod a+x tomcat&lt;/code&gt;，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>使用jwt-go验证API</title>
-      <link>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
-      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
-      <description>背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行</description>
     </item>
     
   </channel>
