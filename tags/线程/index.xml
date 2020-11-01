@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>线程 on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in 线程 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/%E7%BA%BF%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/%E7%BA%BF%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Goroutine与主进程的通信</title>
       <link>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</link>
@@ -18,11 +14,12 @@
       
       <guid>https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/</guid>
       <description>&lt;p&gt;还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过&lt;code&gt;context&lt;/code&gt;这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。&lt;/p&gt;
-
-&lt;p&gt;子goroutine与主线程同步的集中方式:
-- &lt;code&gt;channel&lt;/code&gt;: 每个goroutine往主进程的&lt;code&gt;chan&lt;/code&gt;写数据，然后由主进程去读取，直到读取完了全部goroutine的&lt;code&gt;chan&lt;/code&gt;就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
-- &lt;code&gt;context&lt;/code&gt;: 使用&lt;code&gt;context&lt;/code&gt;中的&lt;code&gt;cancel&lt;/code&gt;，这种模式是主线程通知子线程结束
-- &lt;code&gt;sync.WaitGroup&lt;/code&gt;: 通过&lt;code&gt;Add&lt;/code&gt;方法设置等待子goroutine的数量，使用&lt;code&gt;Done&lt;/code&gt;方法设置等待子goroutine的数量减1，当等待数量为0时，&lt;code&gt;Wait&lt;/code&gt;函数退出.&lt;/p&gt;</description>
+&lt;p&gt;子goroutine与主线程同步的集中方式:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;channel&lt;/code&gt;: 每个goroutine往主进程的&lt;code&gt;chan&lt;/code&gt;写数据，然后由主进程去读取，直到读取完了全部goroutine的&lt;code&gt;chan&lt;/code&gt;就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;context&lt;/code&gt;: 使用&lt;code&gt;context&lt;/code&gt;中的&lt;code&gt;cancel&lt;/code&gt;，这种模式是主线程通知子线程结束&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sync.WaitGroup&lt;/code&gt;: 通过&lt;code&gt;Add&lt;/code&gt;方法设置等待子goroutine的数量，使用&lt;code&gt;Done&lt;/code&gt;方法设置等待子goroutine的数量减1，当等待数量为0时，&lt;code&gt;Wait&lt;/code&gt;函数退出.&lt;/li&gt;
+&lt;/ul&gt;</description>
     </item>
     
   </channel>

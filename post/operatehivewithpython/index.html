@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/operatehivewithpython/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,23 +67,19 @@
 <meta property="og:description" content="
 背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了Hive作为数据仓库工具，同时使用Hue来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.
 
-
 本篇简单记录下使用Python操作Hive。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/operatehivewithpython/" />
 <meta property="article:published_time" content="2018-10-28T14:14:39+00:00" />
-<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="使用Python来操作Hive中的数据">
 <meta itemprop="description" content="
 背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了Hive作为数据仓库工具，同时使用Hue来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.
 
-
 本篇简单记录下使用Python操作Hive。">
-
-
-<meta itemprop="datePublished" content="2018-10-28T14:14:39&#43;00:00" />
-<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
-<meta itemprop="wordCount" content="3114">
+<meta itemprop="datePublished" content="2018-10-28T14:14:39+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="3115">
 
 
 
@@ -92,7 +88,6 @@
 <meta name="twitter:title" content="使用Python来操作Hive中的数据"/>
 <meta name="twitter:description" content="
 背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了Hive作为数据仓库工具，同时使用Hue来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.
-
 
 本篇简单记录下使用Python操作Hive。"/>
 
@@ -481,7 +476,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             
           </div>
-        <span class="more-meta"> 3114 words </span>
+        <span class="more-meta"> 3115 words </span>
           <span class="more-meta"> 7 min read </span>
 
         
@@ -498,21 +493,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#前言">前言</a></li>
-<li><a href="#python操作hive">Python操作Hive</a>
-<ul>
-<li><a href="#安装pyhive模块">安装pyhive模块</a></li>
-<li><a href="#python链接hive以及基本使用">Python链接Hive以及基本使用</a></li>
-<li><a href="#尝试用python脚本进行数据库操作">尝试用python脚本进行数据库操作</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#python操作hive">Python操作Hive</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -522,39 +510,33 @@ if (!doNotTrack) {
       <blockquote>
 <p>背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了<a href="http://hive.apache.org/">Hive</a>作为数据仓库工具，同时使用<a href="https://github.com/cloudera/hue">Hue</a>来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.</p>
 </blockquote>
-
 <p>本篇简单记录下使用Python操作Hive。</p>
-
 <h3 id="前言">前言</h3>
-
-<p>我们当前整个<a href="https://baike.baidu.com/item/ETL/1251949">ETL</a>过程大概如下:
-- 1.使用Python程序对各个维度的运维数据进行采集、加工和初步的清洗处理,按照一定的数据标准和数仓模型进行数据存储
-- 2.将上述抽取出来的相对结构化的数据存储到HDFS集群中
-- 3.使用Hive定期从HDFS集群中加载数据，并根据已有数据进行再次加工处理，并提取价值信息</p>
-
+<p>我们当前整个<a href="https://baike.baidu.com/item/ETL/1251949">ETL</a>过程大概如下:</p>
+<ul>
+<li>1.使用Python程序对各个维度的运维数据进行采集、加工和初步的清洗处理,按照一定的数据标准和数仓模型进行数据存储</li>
+<li>2.将上述抽取出来的相对结构化的数据存储到HDFS集群中</li>
+<li>3.使用Hive定期从HDFS集群中加载数据，并根据已有数据进行再次加工处理，并提取价值信息</li>
+</ul>
 <p>ETL的质量问题具体表现为正确性、完整性、一致性、完备性、有效性、时效性和可获取性等几个特性。由于我们构建的运维数据仓库需要涉及到不同的数据源，且数据源的数据模型各不相同，为保证数据的正确性和完整性，数据加工过程选择在源数据库端执行，进行初步清洗加工后再进行转储到目标数据仓库中。</p>
-
 <h3 id="python操作hive">Python操作Hive</h3>
-
 <p><code>注意:想要使用hive，必须要有一个可用的hive集群，同时为了保证可用使用API操作hive，我们需要要求提供hiveserver2服务</code></p>
-
 <p>假设我们的hiveserver2地址为<code>10.0.1.18:10000</code>,且用户为<code>hdfs</code>.使用<a href="https://pypi.org/project/PyHive/">PyHive</a>库链接Hive.</p>
-
 <h4 id="安装pyhive模块">安装pyhive模块</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 过程中可能需要依赖sasl，thrift等相关服务，如有需要可以使用系统的包管理器安装(apt-get或yum)
-pip install sasl thrift thrift-sasl PyHive</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 过程中可能需要依赖sasl，thrift等相关服务，如有需要可以使用系统的包管理器安装(apt-get或yum)
+pip install sasl thrift thrift-sasl PyHive
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="python链接hive以及基本使用">Python链接Hive以及基本使用</h4>
+</div><h4 id="python链接hive以及基本使用">Python链接Hive以及基本使用</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -583,9 +565,10 @@ pip install sasl thrift thrift-sasl PyHive</pre></td></tr></table>
 </span><span class="lnt">27
 </span><span class="lnt">28
 </span><span class="lnt">29
-</span></pre></td>
+</span><span class="lnt">30
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat pytest_hive.py
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat pytest_hive.py
 # 导入hive模块
 from pyhive import hive
 
@@ -613,15 +596,15 @@ hivecur.close()
 hiveconn.close()
 
 # hive的回滚操作
-hiveconn.rollback()</pre></td></tr></table>
-</div>
-</div>
-<h4 id="尝试用python脚本进行数据库操作">尝试用python脚本进行数据库操作</h4>
+hiveconn.rollback()
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="尝试用python脚本进行数据库操作">尝试用python脚本进行数据库操作</h4>
 <p><strong>1. 数据库查询操作</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -658,9 +641,11 @@ hiveconn.rollback()</pre></td></tr></table>
 </span><span class="lnt">35
 </span><span class="lnt">36
 </span><span class="lnt">37
-</span></pre></td>
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 首先我们使用pyhive库链接hive并查看指定数据库下的表
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 首先我们使用pyhive库链接hive并查看指定数据库下的表
 $ cat pyhive_test.py
 import sys
 reload(sys)
@@ -696,15 +681,16 @@ if __name__ == &#39;__main__&#39;:
     hiveobj.querydata(sql)
 
 $ python pyhive_test.py
-(u&#39;asset&#39;,)</pre></td></tr></table>
-</div>
-</div>
-<p><strong>2. 数据库更新操作</strong></p>
+(u&#39;asset&#39;,)
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>2. 数据库更新操作</strong></p>
 <p><code>思考:其实数据库可以分为两种操作(读和写)，一种为单纯的查询操作，不会对库表结构和数据造成变更，也即为读操作;另外一种为写操作，会对库表结构和数据造成的变更操作，也即写操作.</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -759,9 +745,9 @@ $ python pyhive_test.py
 </span><span class="lnt">53
 </span><span class="lnt">54
 </span><span class="lnt">55
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 给我们的hiveObj类增加一个写数据操作方法
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 给我们的hiveObj类增加一个写数据操作方法
 $ cat pyhive_test.py
 ....
 ....
@@ -815,15 +801,14 @@ $ python pyhive_test.py
 (u&#39;asset&#39;,)
 creating a table....
 (u&#39;appinfo&#39;,)
-(u&#39;asset&#39;,) </pre></td></tr></table>
+(u&#39;asset&#39;,) 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>3. 进行数据加载和读取操作</strong></p>
-
+</div><p><strong>3. 进行数据加载和读取操作</strong></p>
 <p><code>注意:上面其实我们已经封装了两个抽象的读写方法，可以对hive表进行数据加载和读取操作了</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -868,9 +853,10 @@ creating a table....
 </span><span class="lnt">43
 </span><span class="lnt">44
 </span><span class="lnt">45
-</span></pre></td>
+</span><span class="lnt">46
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 假如我们的hdfs上已经存在一份如下结构化的数据
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 假如我们的hdfs上已经存在一份如下结构化的数据
 $ hdfs dfs -cat /ips.txt;
 data-web|p0|bgbiao|ops1|10.0.0.1,10.0.0.2
 data-api|p0|biaoge|sre1|192.168.0.1,192.168.0.2
@@ -914,13 +900,14 @@ $ python pyhive_test.py
     #sql = &#34;insert into table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&#34;
     sql = &#34;insert overwrite table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&#34;
     hiveobj.changedata(sql)
-    hiveobj.querydata(&#39;select * from tmpapp limit 1&#39;)</pre></td></tr></table>
+    hiveobj.querydata(&#39;select * from tmpapp limit 1&#39;)
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>4. 源码文件</strong></p>
+</div><p><strong>4. 源码文件</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -992,9 +979,9 @@ $ python pyhive_test.py
 </span><span class="lnt">70
 </span><span class="lnt">71
 </span><span class="lnt">72
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat pyhive_test.py
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat pyhive_test.py
 import sys
 reload(sys)
 sys.setdefaultencoding(&#39;utf-8&#39;)
@@ -1065,7 +1052,8 @@ if __name__ == &#39;__main__&#39;:
     #sql = &#34;insert into table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&#34;
     sql = &#34;insert overwrite table tmpapp select ip,appname,leader,dep from appinfo  LATERAL VIEW explode(ips) appinfo  AS ip&#34;
     hiveobj.changedata(sql)
-    hiveobj.querydata(&#39;select * from tmpapp limit 1&#39;)</pre></td></tr></table>
+    hiveobj.querydata(&#39;select * from tmpapp limit 1&#39;)
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>
@@ -1080,7 +1068,7 @@ if __name__ == &#39;__main__&#39;:
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2019-12-03
+      2020-11-01
       
         
         

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>KVM on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in KVM on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 09 Nov 2017 21:57:45 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/kvm/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Thu, 09 Nov 2017 21:57:45 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/kvm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CPU虚拟化技术探究</title>
       <link>https://bgbiao.top/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/</link>

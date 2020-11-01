@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/gokafka/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -65,24 +65,20 @@
 <meta property="og:title" content="Kafka运维神器之gokafka" />
 <meta property="og:description" content="Kafka运维神器
 
-
 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/gokafka/" />
 <meta property="article:published_time" content="2020-06-26T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-06-27T15:45:03+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Kafka运维神器之gokafka">
 <meta itemprop="description" content="Kafka运维神器
 
-
 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。
 ">
-
-
-<meta itemprop="datePublished" content="2020-06-26T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-06-27T15:45:03&#43;08:00" />
-<meta itemprop="wordCount" content="2464">
+<meta itemprop="datePublished" content="2020-06-26T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="2469">
 
 
 
@@ -90,7 +86,6 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Kafka运维神器之gokafka"/>
 <meta name="twitter:description" content="Kafka运维神器
-
 
 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。
 "/>
@@ -481,7 +476,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2464 words </span>
+        <span class="more-meta"> 2469 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -498,17 +493,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#kafka运维神器">Kafka运维神器</a>
-<ul>
-<li><a href="#kafka-manager">kafka-manager</a></li>
-<li><a href="#kafkacat">kafkacat</a></li>
-<li><a href="#gokafka">gokafka</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#kafka运维神器">Kafka运维神器</a>
+      <ul>
+        <li><a href="#kafka-manager">kafka-manager</a></li>
+        <li><a href="#kafkacat">kafkacat</a></li>
+        <li><a href="#gokafka">gokafka</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -516,84 +509,73 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h2 id="kafka运维神器">Kafka运维神器</h2>
-
 <blockquote>
 <p>在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。</p>
 </blockquote>
-
 <h3 id="kafka-manager">kafka-manager</h3>
-
 <p>由雅虎开源的kafka集群管理工具，不过现在已经改名为<a href="https://github.com/yahoo/CMAK">CMAK</a>了(说明kafka的运维痛点还是蛮多的，项目还可以做更多的事情)，核心功能如下:</p>
-
 <ul>
 <li>多集群管理</li>
 <li>集群瞬时监控(topics, brokers, 副本分布，分区分布等)</li>
 <li>优先副本选举</li>
 <li>主题，分区，副本管理(主题创建和参数调整，副本分配等)</li>
 <li>Broker和Topic级别的metrics监控</li>
-
-<li><p>消费者基本信息管理</p>
+<li>消费者基本信息管理</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 源码编译
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 源码编译
 $ ./sbt clean dist
 
 # docker 安装
 $ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 
 # 自定义端口
-$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 -Dhttp.port=8080 </pre></td></tr></table>
+$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 -Dhttp.port=8080 
+
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0rydqhj30xu0kkdhd.jpg" alt="kafka-cluster" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0uopt4j30v90epac2.jpg" alt="kafka-topic" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1kai7sj30w50oc429.jpg" alt="kafka-topic-info" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1ziityj30k708kt9i.jpg" alt="kafka-consumer" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v2i5kt5j30qe0pxgpq.jpg" alt="kafka-consumer-info" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v34efi2j31rm0nbtdv.jpg" alt="kafka-broker" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v3ivpuqj31bi0u0dnn.jpg" alt="kafka-broker-info" /></p>
-
+</div><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0rydqhj30xu0kkdhd.jpg" alt="kafka-cluster"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0uopt4j30v90epac2.jpg" alt="kafka-topic"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1kai7sj30w50oc429.jpg" alt="kafka-topic-info"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v1ziityj30k708kt9i.jpg" alt="kafka-consumer"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v2i5kt5j30qe0pxgpq.jpg" alt="kafka-consumer-info"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v34efi2j31rm0nbtdv.jpg" alt="kafka-broker"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v3ivpuqj31bi0u0dnn.jpg" alt="kafka-broker-info"></p>
 <h3 id="kafkacat">kafkacat</h3>
-
 <p><a href="https://github.com/edenhill/kafkacat">kafkacat</a>是一个非JVM的命令行生产者和消费者，可以快速的对kafka消息进行生产和消费。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># mac 安装
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># mac 安装
 $ brew install kafkacat 
 
 # docker 安装
 # 官方仅支持Debian和openSUSE系列
 # 如下镜像支持在CentOS系列的环境中使用
-$ docker pull bgbiao/kafkacat </pre></td></tr></table>
+$ docker pull bgbiao/kafkacat 
+</code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -676,9 +658,9 @@ $ docker pull bgbiao/kafkacat </pre></td></tr></table>
 </span><span class="lnt">81
 </span><span class="lnt">82
 </span><span class="lnt">83
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 消费者模式
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 消费者模式
 $ kafkacat -b localhost:9092 -t mysql_users
 % Auto-selecting Consumer mode (use -P or -C to override)
 {&#34;uid&#34;:1,&#34;name&#34;:&#34;Cliff&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;St Louis&#34;,&#34;elite&#34;:&#34;P&#34;}
@@ -760,19 +742,16 @@ Key (-1 bytes):
 Value (7 bytes): overlay
 Partition: 2	Offset: 6
 --
-% Reached end of topic test-biao [2] at offset 7</pre></td></tr></table>
+% Reached end of topic test-biao [2] at offset 7
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意:</code> 如果想要把docker镜像中的<code>kafkacat</code>二进制文件拷贝出来使用，仅需要在当前环境中安装<code>librdkafka-devel</code>即可。</p>
-
+</div><p><code>注意:</code> 如果想要把docker镜像中的<code>kafkacat</code>二进制文件拷贝出来使用，仅需要在当前环境中安装<code>librdkafka-devel</code>即可。</p>
 <h3 id="gokafka">gokafka</h3>
-
 <p><a href="https://github.com/goops-top/gokafka">gokafka</a>也是一个非JVM的kafka运维管理工具，不仅可以进行简单的消息模拟生产，而且可以对指定topic进行消息预览，同时也支持kafka集群的常见的运维管理操作.</p>
-
 <p><strong>快速开始</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -805,9 +784,10 @@ Partition: 2	Offset: 6
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
-</span></pre></td>
+</span><span class="lnt">34
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ git clone https://github.com/goops-top/gokafka.git
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/goops-top/gokafka.git
 $ cd gokafka
 $ go build -o build/goops-kafka
 
@@ -839,13 +819,14 @@ Use &#34;gokafka [command] --help&#34; for more information about a command.
 
 # 使用make编译
 # 会自动生成mac和linux发行版本的二进制文件
-$ make default</pre></td></tr></table>
+$ make default
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>简单使用</strong></p>
+</div><p><strong>简单使用</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -912,9 +893,11 @@ $ make default</pre></td></tr></table>
 </span><span class="lnt">65
 </span><span class="lnt">66
 </span><span class="lnt">67
-</span></pre></td>
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 查看工具版本
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看工具版本
 $ ./build/gokafka.mac version
 Version: 0.0.1
 GitBranch: master
@@ -980,13 +963,15 @@ brokers num: 3
 broker list: [2 1 3]
 id:2		 broker:192.168.0.22:9092
 id:1		 broker:192.168.0.23:9092
-id:3		 broker:192.168.0.24:9092</pre></td></tr></table>
+id:3		 broker:192.168.0.24:9092
+
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>常用功能</strong></p>
+</div><p><strong>常用功能</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1084,9 +1069,10 @@ id:3		 broker:192.168.0.24:9092</pre></td></tr></table>
 </span><span class="lnt">96
 </span><span class="lnt">97
 </span><span class="lnt">98
-</span></pre></td>
+</span><span class="lnt">99
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 1.创建topic
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 1.创建topic
 # 可以指定分区和副本数
 $ ./build/gokafka.mac  --cluster dev-kafka create --topic test-bgbiao-1
 true
@@ -1183,12 +1169,12 @@ sync-dev
 topic-part:sync-dev-0 log-offsize:98
 topic-part:sync-dev-1 log-offsize:0
 topic-part:sync-dev-2 log-offsize:340
-topic-part:sync-dev-3 log-offsize:261</pre></td></tr></table>
-</div>
-</div>
-<hr />
+topic-part:sync-dev-3 log-offsize:261
 
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</code></pre></td></tr></table>
+</div>
+</div><hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -1201,7 +1187,7 @@ topic-part:sync-dev-3 log-offsize:261</pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-06-27
+      2020-11-01
       
         
         

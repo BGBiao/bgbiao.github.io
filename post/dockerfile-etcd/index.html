@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/dockerfile-etcd/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,16 +69,14 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/dockerfile-etcd/" />
 <meta property="article:published_time" content="2017-08-26T17:56:15+00:00" />
-<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="手把手构建Etcd镜像">
 <meta itemprop="description" content="
 本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境
 ">
-
-
-<meta itemprop="datePublished" content="2017-08-26T17:56:15&#43;00:00" />
-<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
-<meta itemprop="wordCount" content="1058">
+<meta itemprop="datePublished" content="2017-08-26T17:56:15+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="1061">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 1058 words </span>
+        <span class="more-meta"> 1061 words </span>
           <span class="more-meta"> 3 min read </span>
 
         
@@ -491,17 +489,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#一-etcd镜像的dockerfile文件结构">一、etcd镜像的Dockerfile文件结构</a></li>
-<li><a href="#二-构建并使用image">二、构建并使用image</a></li>
-<li><a href="#三-自由发挥时间">三、自由发挥时间</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一etcd镜像的dockerfile文件结构">一、etcd镜像的Dockerfile文件结构</a></li>
+        <li><a href="#二构建并使用image">二、构建并使用image</a></li>
+        <li><a href="#三自由发挥时间">三、自由发挥时间</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -511,15 +507,12 @@ if (!doNotTrack) {
       <blockquote>
 <p>本篇文章手把手教你如何使用Dockerfile构建自己etcd镜像，并且已经提供基于etcd3.0.10 的image供读者使用，用户可以快速使用docker image构建自己的etcd集群环境</p>
 </blockquote>
-
-<h3 id="一-etcd镜像的dockerfile文件结构">一、etcd镜像的Dockerfile文件结构</h3>
-
+<h3 id="一etcd镜像的dockerfile文件结构">一、etcd镜像的Dockerfile文件结构</h3>
 <p><code>注意：优秀的docker镜像源文件都是会尝试去除所有依赖的，也即是该文件无论被谁拿走使用，都可以快速构建属于自己的image</code></p>
-
 <p>etcd镜像的Dockerfile项目文件结构：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -591,9 +584,9 @@ if (!doNotTrack) {
 </span><span class="lnt">70
 </span><span class="lnt">71
 </span><span class="lnt">72
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ tree .
+<pre class="chroma"><code class="language-bash" data-lang="bash">$ tree .
 .
 ├──Dockerfile
 ├──docker-entrypoint.sh
@@ -602,7 +595,7 @@ if (!doNotTrack) {
 <span class="c1"># Dockerfile 文件</span>
 $ cat Dockerfile
 FROM centos-biaoge
-MAINTAINER <span class="m">371990778</span>@qq.com
+MAINTAINER 371990778@qq.com
 ENV <span class="nv">LANG</span><span class="o">=</span>zh_CN.UTF-8<span class="p">;</span><span class="se">\
 </span><span class="se"></span>    <span class="nv">LC_ALL</span><span class="o">=</span>zh_CN.UTF-8<span class="p">;</span><span class="se">\
 </span><span class="se"></span>    <span class="nv">TZ</span><span class="o">=</span><span class="s2">&#34;Asia/Shanghai&#34;</span><span class="p">;</span><span class="se">\
@@ -625,7 +618,7 @@ ENTRYPOINT <span class="o">[</span><span class="s2">&#34;/docker-entrypoint.sh&#
 $ cat docker-entrypoint.sh
 <span class="c1">#!/bin/bash</span>
 <span class="c1">#Filename:docker-entrypoint.sh</span>
-<span class="c1">#Author_by:Andy_xu</span> 
+<span class="c1">#Author_by:Andy_xu </span>
 <span class="c1">#Contact:[mail:371990778@qq.com,QQ:371990778]</span>
 <span class="c1">#Date:2017-07-25 16:42</span>
 <span class="c1">#Description:</span>
@@ -664,40 +657,37 @@ $ cat docker-entrypoint.sh
 </span><span class="s2">	--initial-cluster-state </span><span class="si">${</span><span class="nv">CLUSTER_STATE</span><span class="si">}</span><span class="s2"> \
 </span><span class="s2">	</span><span class="nv">$*</span><span class="s2">&#34;</span>
 <span class="nb">echo</span> -e <span class="s2">&#34;Running &#39;</span><span class="nv">$ETCD_CMD</span><span class="s2">&#39;\nBEGIN ETCD OUTPUT\n&#34;</span>
-<span class="nb">exec</span> <span class="nv">$ETCD_CMD</span></pre></td></tr></table>
+<span class="nb">exec</span> <span class="nv">$ETCD_CMD</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="二-构建并使用image">二、构建并使用image</h3>
-
+</div><h3 id="二构建并使用image">二、构建并使用image</h3>
 <p><strong>1.构建etcd的image</strong></p>
-
 <p>进入项目路径下，执行以下命令：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ docker build -t xxbandy123/etcd:3.0.10</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ docker build -t xxbandy123/etcd:3.0.10
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>2.使用默认参数创建etcd单实例</strong></p>
+</div><p><strong>2.使用默认参数创建etcd单实例</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ docker run -itd --name etcd-1 xxbandy123/etcd:3.0.10  --auto-compaction-retention 1</pre></td></tr></table>
-</div>
-</div>
-<p><code>注意：后面的 --auto-compaction-retention 1 为额外增加的参数表示1小时自动压缩保留
-默认的容器启动后面都可以增加额外的参数</code></p>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ docker run -itd --name etcd-1 xxbandy123/etcd:3.0.10  --auto-compaction-retention 1
 
+</code></pre></td></tr></table>
+</div>
+</div><p><code>注意：后面的 --auto-compaction-retention 1 为额外增加的参数表示1小时自动压缩保留 默认的容器启动后面都可以增加额外的参数</code></p>
 <p><strong>3.使用自定义的参数进行创建etcd单实例</strong></p>
-
 <p>image内部定义的默认参数如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -715,9 +705,9 @@ $ cat docker-entrypoint.sh
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">NAME=my-etcd-1
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">NAME=my-etcd-1
 DATADIR=/export/etcd_data
 MYHOST=http://localhost
 PORT=2379
@@ -734,22 +724,24 @@ etcd --name ${NAME} --data-dir ${DATADIR}  \
     --initial-advertise-peer-urls ${MYHOST}:${CLUSTER_PORT} \
     --initial-cluster $CLUSTER  \
      --initial-cluster-token $CLUSTER_TOKEN \
-    --initial-cluster-state ${CLUSTER_STATE} </pre></td></tr></table>
+    --initial-cluster-state ${CLUSTER_STATE} 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>可以通过环境变量的方式启动单实例的etcd，也可以将该image传入不通变量去构造集群</p>
+</div><p>可以通过环境变量的方式启动单实例的etcd，也可以将该image传入不通变量去构造集群</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ docker run -itd -e DATADIR=/root/etcd_data -e CLUSTER_TOKEN=biaoge xxbandy123/etcd:3.0.10 --auto-compaction-retention 1</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ docker run -itd -e DATADIR=/root/etcd_data -e CLUSTER_TOKEN=biaoge xxbandy123/etcd:3.0.10 --auto-compaction-retention 1
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>4.如何使用etcd</strong></p>
+</div><p><strong>4.如何使用etcd</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -780,9 +772,10 @@ etcd --name ${NAME} --data-dir ${DATADIR}  \
 </span><span class="lnt">29
 </span><span class="lnt">30
 </span><span class="lnt">31
-</span></pre></td>
+</span><span class="lnt">32
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">docker pull xxbandy123/etcd:3.0.10
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">docker pull xxbandy123/etcd:3.0.10
 
 # docker  ps -l
 CONTAINER ID        IMAGE                            COMMAND                  CREATED             STATUS              PORTS                                            NAMES
@@ -812,20 +805,20 @@ biaoge
     &#34;key&#34;: &#34;/test&#34;
   },
   &#34;action&#34;: &#34;get&#34;
-}</pre></td></tr></table>
-</div>
-</div>
-<h3 id="三-自由发挥时间">三、自由发挥时间</h3>
+}
 
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="三自由发挥时间">三、自由发挥时间</h3>
 <p>由于该etcd实例可以通过环境变量传入参数，因此虽然是一个image，但是却非常灵活，用户可以在很快的时间内创建出来一个etcd集群。So，学会如何构建一个etcd镜像后，可以尝试下使用该image来快速构建一个etcd集群。</p>
-
 <p>为方便大家的使用，该image已经上传到docker hub中，读者可以直接在本地pull后进行使用：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">docker pull xxbandy123/etcd:3.0.10</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">docker pull xxbandy123/etcd:3.0.10
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>
@@ -840,7 +833,7 @@ biaoge
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2019-12-03
+      2020-11-01
       
         
         

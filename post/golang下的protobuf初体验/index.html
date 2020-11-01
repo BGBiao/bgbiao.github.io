@@ -23,9 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="protpbuf简介  protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。
-google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。
-可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。
+  <meta name="description" content="protpbuf简介  protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。
 " />
 
@@ -36,7 +34,7 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/" />
@@ -57,7 +55,7 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -68,9 +66,8 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 <meta property="og:title" content="Golang下的protobuf初体验" />
 <meta property="og:description" content="protpbuf简介
 
-
-protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。
-google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。
+protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 
+google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 
 可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。
 " />
@@ -81,17 +78,14 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 <meta itemprop="name" content="Golang下的protobuf初体验">
 <meta itemprop="description" content="protpbuf简介
 
-
-protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。
-google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。
+protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 
+google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 
 可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。
 ">
-
-
-<meta itemprop="datePublished" content="2018-04-03T15:01:07&#43;00:00" />
-<meta itemprop="dateModified" content="2018-04-03T15:01:07&#43;00:00" />
-<meta itemprop="wordCount" content="1509">
+<meta itemprop="datePublished" content="2018-04-03T15:01:07+00:00" />
+<meta itemprop="dateModified" content="2018-04-03T15:01:07+00:00" />
+<meta itemprop="wordCount" content="1510">
 
 
 
@@ -100,9 +94,8 @@ google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python�
 <meta name="twitter:title" content="Golang下的protobuf初体验"/>
 <meta name="twitter:description" content="protpbuf简介
 
-
-protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。
-google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。
+protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 
+google 提供了多种语言的实现：Java、c#、c&#43;&#43;、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 
 可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。
 "/>
@@ -493,7 +486,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        <span class="more-meta"> 1509 words </span>
+        <span class="more-meta"> 1510 words </span>
           <span class="more-meta"> 4 min read </span>
 
         
@@ -510,22 +503,20 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#protpbuf简介">protpbuf简介</a></li>
-<li><a href="#准备工作">准备工作</a></li>
-<li><a href="#准备基础环境">准备基础环境</a></li>
-<li><a href="#准备protobuf底层库环境">准备protobuf底层库环境</a></li>
-<li><a href="#准备protobuf模块以及插件">准备protobuf模块以及插件</a></li>
-<li><a href="#使用protobuf构造golang的模块代码">使用protobuf构造golang的模块代码</a></li>
-<li><a href="#使用-goprotobuf-包中定义的protobuf数据格式进行通信">使用<code>goprotobuf</code>包中定义的protobuf数据格式进行通信</a></li>
-<li><a href="#相关链接">相关链接</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#protpbuf简介">protpbuf简介</a></li>
+        <li><a href="#准备工作">准备工作</a></li>
+        <li><a href="#准备基础环境">准备基础环境</a></li>
+        <li><a href="#准备protobuf底层库环境">准备protobuf底层库环境</a></li>
+        <li><a href="#准备protobuf模块以及插件">准备protobuf模块以及插件</a></li>
+        <li><a href="#使用protobuf构造golang的模块代码">使用protobuf构造golang的模块代码</a></li>
+        <li><a href="#使用goprotobuf包中定义的protobuf数据格式进行通信">使用<code>goprotobuf</code>包中定义的protobuf数据格式进行通信</a></li>
+        <li><a href="#相关链接">相关链接</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -533,83 +524,80 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h3 id="protpbuf简介">protpbuf简介</h3>
-
 <blockquote>
-<p>protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。<br />
-google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。<br />
-可以把它用于分布式应用之间的数据通信或者异构环境下的<code>数据交换</code>。<br />
+<p>protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 <br>
+google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 <br>
+可以把它用于分布式应用之间的数据通信或者异构环境下的<code>数据交换</code>。<br>
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。</p>
 </blockquote>
-
 <h3 id="准备工作">准备工作</h3>
-
 <ul>
 <li>准备golang的基础环境，GOPATH等等</li>
 <li>准备protobuf底层库环境(conda或者源码编译)</li>
 <li>准备protobuf相关包和插件</li>
 </ul>
-
 <h3 id="准备基础环境">准备基础环境</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">sh-4.2# go version
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# go version
 go version go1.8.3 linux/amd64
 sh-4.2# go env
 ....
 GOROOT=&#34;/usr/lib/golang&#34;
 GOPATH=&#34;/root/go&#34;
-....</pre></td></tr></table>
+....
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="准备protobuf底层库环境">准备protobuf底层库环境</h3>
+</div><h3 id="准备protobuf底层库环境">准备protobuf底层库环境</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span><span class="lnt">7
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 因为工作原因会使用conda管理一些基础包，所以可以使用conda去安装基础模块
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 因为工作原因会使用conda管理一些基础包，所以可以使用conda去安装基础模块
 
 $ source /export/python2.7/setenv.sh
 $ conda install libprotobuf -y
 $ protoc --version
-libprotoc 3.0.0</pre></td></tr></table>
+libprotoc 3.0.0
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="准备protobuf模块以及插件">准备protobuf模块以及插件</h3>
+</div><h3 id="准备protobuf模块以及插件">准备protobuf模块以及插件</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># protoc-gen-go是用来将protobuf的的代码转换成go语言代码的一个插件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># protoc-gen-go是用来将protobuf的的代码转换成go语言代码的一个插件
 $ go get -u github.com/golang/protobuf/protoc-gen-go
 # proto是protobuf在golang中的接口模块
-$ go get -u github.com/golang/protobuf/proto</pre></td></tr></table>
+$ go get -u github.com/golang/protobuf/proto
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="使用protobuf构造golang的模块代码">使用protobuf构造golang的模块代码</h3>
-
+</div><h3 id="使用protobuf构造golang的模块代码">使用protobuf构造golang的模块代码</h3>
 <p><a href="https://segmentfault.com/a/1190000007917576">Protobuf语法</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -668,9 +656,9 @@ $ go get -u github.com/golang/protobuf/proto</pre></td></tr></table>
 </span><span class="lnt">57
 </span><span class="lnt">58
 </span><span class="lnt">59
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">创建项目</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">创建项目</span>
 <span class="err">$</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="s">&#34;${GOPATH}/src/protobuf-study&#34;</span>
 
 <span class="err">#</span> <span class="nx">生成protobuf和相应的golang代码</span>
@@ -728,13 +716,13 @@ $ go get -u github.com/golang/protobuf/proto</pre></td></tr></table>
 		<span class="k">return</span> <span class="o">*</span><span class="nx">m</span><span class="p">.</span><span class="nx">Opt</span>
 	<span class="p">}</span>
 	<span class="k">return</span> <span class="mi">0</span>
-<span class="p">}</span></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="使用-goprotobuf-包中定义的protobuf数据格式进行通信">使用<code>goprotobuf</code>包中定义的protobuf数据格式进行通信</h3>
+</div><h3 id="使用goprotobuf包中定义的protobuf数据格式进行通信">使用<code>goprotobuf</code>包中定义的protobuf数据格式进行通信</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -813,9 +801,9 @@ $ go get -u github.com/golang/protobuf/proto</pre></td></tr></table>
 </span><span class="lnt">77
 </span><span class="lnt">78
 </span><span class="lnt">79
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">$</span> <span class="nx">pushd</span> <span class="err">$</span><span class="nx">GOPATH</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">protobuf</span><span class="o">-</span><span class="nx">study</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">pushd</span> <span class="err">$</span><span class="nx">GOPATH</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">protobuf</span><span class="o">-</span><span class="nx">study</span>
 
 <span class="err">#</span> <span class="nx">一个简单使用protobuf进行读写文件的例子</span>
 <span class="err">$</span> <span class="nx">cat</span> <span class="nx">write</span><span class="p">.</span><span class="k">go</span>
@@ -893,16 +881,13 @@ $ go get -u github.com/golang/protobuf/proto</pre></td></tr></table>
 <span class="nx">读取文件</span><span class="p">:</span><span class="nx">protobuf</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="nx">txt</span>
 <span class="nx">name</span><span class="p">:</span><span class="nx">BGbiao</span>
 <span class="nx">id</span><span class="p">:</span><span class="mi">17</span>
-<span class="nx">opt</span><span class="p">:</span><span class="mi">18</span></pre></td></tr></table>
+<span class="nx">opt</span><span class="p">:</span><span class="mi">18</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="相关链接">相关链接</h3>
-
+</div><h3 id="相关链接">相关链接</h3>
 <p><a href="https://segmentfault.com/a/1190000007917576">Protobuf语法</a></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

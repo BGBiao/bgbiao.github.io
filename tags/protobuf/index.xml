@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Protobuf on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in Protobuf on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 03 Apr 2018 15:01:07 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/protobuf/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 03 Apr 2018 15:01:07 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/protobuf/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang下的protobuf初体验</title>
       <link>https://bgbiao.top/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
@@ -18,11 +14,10 @@
       
       <guid>https://bgbiao.top/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
       <description>&lt;h3 id=&#34;protpbuf简介&#34;&gt;protpbuf简介&lt;/h3&gt;
-
 &lt;blockquote&gt;
-&lt;p&gt;protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。&lt;br /&gt;
-google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。&lt;br /&gt;
-可以把它用于分布式应用之间的数据通信或者异构环境下的&lt;code&gt;数据交换&lt;/code&gt;。&lt;br /&gt;
+&lt;p&gt;protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 &lt;br&gt;
+google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 &lt;br&gt;
+可以把它用于分布式应用之间的数据通信或者异构环境下的&lt;code&gt;数据交换&lt;/code&gt;。&lt;br&gt;
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
     </item>

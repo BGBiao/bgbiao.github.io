@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,10 +69,8 @@
 <meta property="article:modified_time" content="2020-01-16T00:00:00+00:00" />
 <meta itemprop="name" content="Golang中的逃逸分析">
 <meta itemprop="description" content="背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具">
-
-
-<meta itemprop="datePublished" content="2020-01-16T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-16T00:00:00&#43;00:00" />
+<meta itemprop="datePublished" content="2020-01-16T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-01-16T00:00:00+00:00" />
 <meta itemprop="wordCount" content="4238">
 
 
@@ -484,99 +482,69 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#概念介绍">概念介绍</a></li>
-<li><a href="#逃逸分析示例">逃逸分析示例</a></li>
-<li><a href="#总结">总结</a></li>
-<li><a href="#思考">思考</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#概念介绍">概念介绍</a></li>
+        <li><a href="#逃逸分析示例">逃逸分析示例</a></li>
+        <li><a href="#总结">总结</a></li>
+        <li><a href="#思考">思考</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<blockquote>
+      <blockquote>
 <p>背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具来实现生产环境的各种常规操作以及日常运维管理，而对于整个Golang语言内部的一些细节都不甚了解。但随着对Ops要求的提高，以及向SRE理念转型的需要，我们越来越需要深入理解一些内部底层的原理，这样在我们去管理的我们的Kubernetes集群，或者其他的一些内部系统时才能真正做到游刃有余。</p>
 </blockquote>
-
 <p>在Golang中，一个对象最终是分配到<code>堆</code>还是<code>栈</code>呢，接下来我们就一起通过<code>逃逸分析</code>来一起学习学习。</p>
-
 <h3 id="概念介绍">概念介绍</h3>
-
 <p><strong>逃逸分析</strong></p>
-
 <p><code>逃逸分析</code>是编译器用来确定由程序创建的值所处位置的过程。具体来说，<code>编译器执行静态代码分析</code>，以确定是否可以将值放在构造函数的<code>栈(帧)</code>上，或者该值是否必须<code>逃逸</code>到<code>堆</code>上。</p>
-
 <p>所以，更通俗一点讲，逃逸分析就是确定一个对象是要放在<code>堆</code>还是<code>栈</code>上，一般遵循如下规则:</p>
-
 <ul>
 <li>1.是否有非局部调用(对象定义之外的调用).即:如果有可能被<code>引用</code>，那通常会被分配到堆上，否则就在<code>栈上</code></li>
 <li>2.如果对象太大(即使没有被引用),无法放在栈区也是可能放到<code>堆</code>上的</li>
 </ul>
-
 <p>总结起来就是: <code>如果在函数外部引用，必定在堆中分配;如果没有外部引用，优先在栈中分配;如果一个函数返回的是一个（局部）变量的地址，那么这个变量就发生逃逸</code></p>
-
 <p><code>避免逃逸的好处:</code></p>
-
 <ul>
 <li>1.减少gc的压力，不逃逸的对象分配在栈上，当函数返回时就回收了资源，不需要gc标记清除</li>
 <li>2.逃逸分析完后可以确定哪些变量可以分配在栈上，栈的分配比堆快，性能好(系统开销少)</li>
 <li>3.减少动态分配所造成的内存碎片</li>
 </ul>
-
 <p><strong>如何进行逃逸分析</strong></p>
-
 <p><code>注意:</code> Golang程序中是在编译阶段确定逃逸的，而非运行时，因此我们可以使用<code>go build</code>的相关工具来进行逃逸分析.</p>
-
 <p>分析工具:</p>
-
 <ul>
 <li>1.通过编译工具查看详细的逃逸分析过程(<code>go build -gcflags '-m -l' main.go</code>)</li>
 <li>2.通过反编译命令查看<code>go tool compile -S main.go</code></li>
 </ul>
-
 <p><code>编译参数介绍(-gcflags):</code></p>
-
 <ul>
 <li><code>-N</code>: 禁止编译优化</li>
 <li><code>-l</code>: 禁止内联(可以有效减少程序大小)</li>
 <li><code>-m</code>: 逃逸分析(最多可重复四次)</li>
 <li><code>-benchmem</code>: 压测时打印内存分配统计</li>
 </ul>
-
 <p><strong>堆</strong></p>
-
 <p>堆是除栈之外的第二个内存区域，用于存储值，<code>全局变量、内存占用大的局部变量、发生了逃逸的局部变量存在的地方就是堆</code>，这块的内存没有特定的结构，也没有固定大小，可以根据需要进行调整(但也造成管理成本)，因此堆不像栈那样是自清理的，使用这个内存的成本更大(一般各个语言都会有自己的GC机制，在Golang中会使用<code>三色标记法</code>来进行堆内存的垃圾回收)。</p>
-
 <p>首先，成本与垃圾收集器(GC)有关，垃圾收集器必须参与进来以保持该区域的清洁。当GC运行时，它将使用25%的可用CPU资源。此外，它可能会产生微秒级的“stop the world”延迟。拥有GC的好处是你不需要担心内存的管理问题，因为内存管理是相当复杂、也容易出错的。</p>
-
 <p>堆上的值构成Go中的内存分配。这些分配对GC造成压力，因为堆中不再被指针引用的每个值都需要删除。需要检查和删除的值越多，GC每次运行时必须执行的工作就越多。因此，GC算法一直在努力在堆的大小分配和运行速度之间寻求平衡。</p>
-
 <p><code>注意:</code>堆是进程级别的</p>
-
 <p><strong>栈</strong></p>
-
 <p>在程序中，每个函数块都会有自己的<code>内存区域</code>用来存自己的<code>局部变量</code>（内存占用少）、返回<code>地址、返回值</code>之类的数据，这一块内存区域有特定的结构和寻址方式，<code>大小在编译时已经确定</code>，寻址起来也十分迅速，开销很少。</p>
-
-<p>这块内存地址称为<code>栈</code>，<code>栈是线程级别</code>的，<code>大小在创建的时候已经确定</code>，所以当数据太大的时候，就会发生&rdquo;stack overflow&rdquo;</p>
-
+<p>这块内存地址称为<code>栈</code>，<code>栈是线程级别</code>的，<code>大小在创建的时候已经确定</code>，所以当数据太大的时候，就会发生&quot;stack overflow&quot;</p>
 <p><code>注意:</code>在Golang程序中，函数都是运行在<code>栈</code>上的，在栈上声明临时变量分配内存，函数运行完成后回收该段栈空间，并且每个函数的栈空间都是独立的，其他代码不可访问的。但是在某些场景下，<code>栈上的空间</code>需要在该函数被释放后依旧能访问到(函数外调用)，这时候就涉及到内存的逃逸了，而逃逸往往会对应对象的内存分配到堆上.</p>
-
 <h3 id="逃逸分析示例">逃逸分析示例</h3>
-
 <p><strong>1.示例-参数泄露</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -603,9 +571,9 @@ if (!doNotTrack) {
 </span><span class="lnt">25
 </span><span class="lnt">26
 </span><span class="lnt">27
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">测试代码</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">测试代码</span>
 <span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="p">.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="p">(</span>
@@ -631,55 +599,55 @@ if (!doNotTrack) {
 </span><span class="c1"></span>    <span class="nx">user</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">user</span><span class="p">{</span><span class="s">&#34;BGBiao&#34;</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="s">&#34;https://bgbiao.top&#34;</span><span class="p">}</span>
     <span class="nf">GetUserInfo</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
     <span class="nf">GetName</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
-<span class="p">}</span></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>使用<code>逃逸分析</code>来进行内存分析</p>
+</div><p>使用<code>逃逸分析</code>来进行内存分析</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
 # command-line-arguments
 ./taoyi.go:21:18: leaking param: u to result ~r1 level=0
 ./taoyi.go:25:14: leaking param: u to result ~r1 level=1
-./taoyi.go:31:31: main &amp;user literal does not escape</pre></td></tr></table>
+./taoyi.go:31:31: main &amp;user literal does not escape
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>由上述输出的<code>leaking param</code>可以看到，在<code>GetUserInfo</code>和<code>GetName</code>函数中的<code>指针变量u</code>是一个泄露参数，在两个函数中均没有对<code>u</code>进行变量操作，就直接返回了变量内容，因此最后的该变量<code>user</code>并没有发生逃逸，<code>&amp;user</code>对象还是作用在了<code>main()</code>函数中。</p>
-
+</div><p>由上述输出的<code>leaking param</code>可以看到，在<code>GetUserInfo</code>和<code>GetName</code>函数中的<code>指针变量u</code>是一个泄露参数，在两个函数中均没有对<code>u</code>进行变量操作，就直接返回了变量内容，因此最后的该变量<code>user</code>并没有发生逃逸，<code>&amp;user</code>对象还是作用在了<code>main()</code>函数中。</p>
 <p><strong>2.示例-未知类型</strong></p>
-
 <p>这个时候，我们把上面的代码稍微改动一下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">....
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">....
 ....
 func main() {
     user := &amp;user{&#34;BGBiao&#34;,18,&#34;https://bgbiao.top&#34;}
     fmt.Println(GetUserInfo(user))
     fmt.Println(GetName(user))
-}</pre></td></tr></table>
+}
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>再次进行逃逸分析:</p>
+</div><p>再次进行逃逸分析:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -688,9 +656,9 @@ func main() {
 </span><span class="lnt">7
 </span><span class="lnt">8
 </span><span class="lnt">9
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
 # command-line-arguments
 ./taoyi.go:21:18: leaking param: u to result ~r1 level=0
 ./taoyi.go:25:14: leaking param: u to result ~r1 level=1
@@ -698,41 +666,40 @@ func main() {
 ./taoyi.go:32:16: main ... argument does not escape
 ./taoyi.go:32:28: GetUserInfo(user) escapes to heap
 ./taoyi.go:33:16: main ... argument does not escape
-./taoyi.go:33:24: GetName(user) escapes to heap</pre></td></tr></table>
+./taoyi.go:33:24: GetName(user) escapes to heap
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>由上可以发现我们的指针对象<code>&amp;user</code>在该程序中发生了逃逸，具体是在<code>GetUserInfo(user)</code>和<code>GetName(user)</code>发生了逃逸.</p>
-
+</div><p>由上可以发现我们的指针对象<code>&amp;user</code>在该程序中发生了逃逸，具体是在<code>GetUserInfo(user)</code>和<code>GetName(user)</code>发生了逃逸.</p>
 <p>这是为什么呢？怎么加了个<code>fmt.Println</code>之后对象就发生了逃逸呢?</p>
-
 <p>其实主要原因为<code>fmt.Println</code>函数的原因:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">func Println(a ...interface{}) (n int, err error)</pre></td></tr></table>
-</div>
-</div>
-<p>我们可以看到<code>fmt.Println(a)</code>函数中入参为<code>interface{}</code>类型，在编译阶段编译器无法确定其具体的类型。因此会产生逃逸，最终分配到堆上(最本质的原因是interface{}类型一般情况下底层会进行<code>reflect</code>，而使用的<code>reflect.TypeOf(arg).Kind()</code>获取接口类型对象的底层数据类型时发生了堆逃逸，最终就会反映为当入参是空接口类型时发生了逃逸)。</p>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">func Println(a ...interface{}) (n int, err error)
 
+</code></pre></td></tr></table>
+</div>
+</div><p>我们可以看到<code>fmt.Println(a)</code>函数中入参为<code>interface{}</code>类型，在编译阶段编译器无法确定其具体的类型。因此会产生逃逸，最终分配到堆上(最本质的原因是interface{}类型一般情况下底层会进行<code>reflect</code>，而使用的<code>reflect.TypeOf(arg).Kind()</code>获取接口类型对象的底层数据类型时发生了堆逃逸，最终就会反映为当入参是空接口类型时发生了逃逸)。</p>
 <p><strong>3.示例-指针</strong></p>
-
 <p>此时，我们再小改点代码:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// 返回结构体对象的指针，此时就会产生逃逸
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 返回结构体对象的指针，此时就会产生逃逸
 func GetUserInfo(u user) (*user) {
     return &amp;u
 }
@@ -740,13 +707,14 @@ func GetUserInfo(u user) (*user) {
 func main() {
     user := user{&#34;BGBiao&#34;,18,&#34;https://bgbiao.top&#34;}
     GetUserInfo(user)
-}</pre></td></tr></table>
+}
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>逃逸分析:</p>
+</div><p>逃逸分析:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -795,9 +763,10 @@ func main() {
 </span><span class="lnt">47
 </span><span class="lnt">48
 </span><span class="lnt">49
-</span></pre></td>
+</span><span class="lnt">50
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
 # command-line-arguments
 ./taoyi.go:21:18: moved to heap: u
 
@@ -845,15 +814,15 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 	0x0093 00147 (taoyi.go:21)	PCDATA	$1, $-1
 	0x0093 00147 (taoyi.go:21)	PCDATA	$0, $-1
 	0x0093 00147 (taoyi.go:21)	CALL	runtime.morestack_noctxt(SB)
-	0x0098 00152 (taoyi.go:21)	JMP	0</pre></td></tr></table>
-</div>
-</div>
-<p>由以上输出可以看到在<code>GetUserInfo(u user)</code>函数中的对象u已经被移到<code>堆</code>上了，这是因为该函数返回的是<code>指针对象</code>，引用对象被返回到方法之外了(此时该引用对象可以在外部被调用和修改)，因此编译器会把该对象分配到堆上(否则方法结束后，局部变量被回收岂不是很惨)。</p>
+	0x0098 00152 (taoyi.go:21)	JMP	0
 
+</code></pre></td></tr></table>
+</div>
+</div><p>由以上输出可以看到在<code>GetUserInfo(u user)</code>函数中的对象u已经被移到<code>堆</code>上了，这是因为该函数返回的是<code>指针对象</code>，引用对象被返回到方法之外了(此时该引用对象可以在外部被调用和修改)，因此编译器会把该对象分配到堆上(否则方法结束后，局部变量被回收岂不是很惨)。</p>
 <p><strong>4.示例-综合案例</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -865,9 +834,10 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span></pre></td>
+</span><span class="lnt">13
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
@@ -878,17 +848,16 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 
 <span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
 <span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span></pre></td></tr></table>
-</div>
-</div>
-<p>在上面第三个示例中我们提到，当返回对象是<code>指针类型</code>(引用对象)时，就会发现逃逸，但上面的示例其实告诉我们虽然<code>*name</code>是一个指针类型，但是并未发生逃逸，这是因为<code>该引用类型未被外部使用</code>.</p>
+<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
 
+</code></pre></td></tr></table>
+</div>
+</div><p>在上面第三个示例中我们提到，当返回对象是<code>指针类型</code>(引用对象)时，就会发现逃逸，但上面的示例其实告诉我们虽然<code>*name</code>是一个指针类型，但是并未发生逃逸，这是因为<code>该引用类型未被外部使用</code>.</p>
 <p>但是又如第二个示例中所说，如果我们在上面的示例中增加<code>fmt.Println(name)</code>后，会发现该实例又会出现逃逸.</p>
-
 <p><code>注意</code>:虽然当使用fmt.Println的时候又会出现逃逸，但是当使用fmt.Println(*name)和fmt.Println(name)，也是不同的。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -902,9 +871,10 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span></pre></td>
+</span><span class="lnt">15
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo1</span><span class="p">.</span><span class="k">go</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo1</span><span class="p">.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="p">(</span><span class="s">&#34;fmt&#34;</span><span class="p">)</span>
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
@@ -917,13 +887,14 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 <span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
 <span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
 <span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="o">...</span> <span class="nx">argument</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">:</span> <span class="o">*</span><span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span></pre></td></tr></table>
+<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">:</span> <span class="o">*</span><span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>由上述输出可看到，当使用引用类型来获取底层的值时，在<code>fmt.Println</code>的入参处<code>*name</code>发生了逃逸.</p>
+</div><p>由上述输出可看到，当使用引用类型来获取底层的值时，在<code>fmt.Println</code>的入参处<code>*name</code>发生了逃逸.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -937,9 +908,10 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span></pre></td>
+</span><span class="lnt">15
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo2</span><span class="p">.</span><span class="k">go</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo2</span><span class="p">.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="p">(</span><span class="s">&#34;fmt&#34;</span><span class="p">)</span>
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
@@ -952,44 +924,33 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 <span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
 <span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
 <span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="o">...</span> <span class="nx">argument</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span></pre></td></tr></table>
-</div>
-</div>
-<p>而这次我们使用<code>fmt.Println(name)</code>来输出底层值，就会发现变量<code>name</code>在初始化的时候就会出现逃逸<code>new(string)</code>，</p>
+<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
 
+</code></pre></td></tr></table>
+</div>
+</div><p>而这次我们使用<code>fmt.Println(name)</code>来输出底层值，就会发现变量<code>name</code>在初始化的时候就会出现逃逸<code>new(string)</code>，</p>
 <h3 id="总结">总结</h3>
-
 <p>通过上面的概念和实例分析，我们基本知道了逃逸分析的概念和规则，并且大概知道何时，那种对象会被分配到堆或栈内存中，在实际情况中可能情况会更加复杂，需要具体分析。</p>
-
-<p>不过，有如下几点可能在我们实际使用过程中要注意下:
-- 静态分配到栈上，性能一定比动态分配到堆上好
-- 底层分配到堆，还是栈。实际上对你来说是透明的，不需要过度关心
-- 每个 Go 版本的逃逸分析都会有所不同（会改变，会优化)
-- 直接通过<code>go build -gcflags '-m -l'</code> 就可以看到逃逸分析的过程和结果
-- 到处都用<code>指针传递并不一定是最好的</code>，要用对
-- map &amp; slice 初始化时，预估容量，避免由扩展导致的内存分配。但是如果太大（10000）也会逃逸，因为栈的空间是有限的</p>
-
+<p>不过，有如下几点可能在我们实际使用过程中要注意下:</p>
+<ul>
+<li>静态分配到栈上，性能一定比动态分配到堆上好</li>
+<li>底层分配到堆，还是栈。实际上对你来说是透明的，不需要过度关心</li>
+<li>每个 Go 版本的逃逸分析都会有所不同（会改变，会优化)</li>
+<li>直接通过<code>go build -gcflags '-m -l'</code> 就可以看到逃逸分析的过程和结果</li>
+<li>到处都用<code>指针传递并不一定是最好的</code>，要用对</li>
+<li>map &amp; slice 初始化时，预估容量，避免由扩展导致的内存分配。但是如果太大（10000）也会逃逸，因为栈的空间是有限的</li>
+</ul>
 <h3 id="思考">思考</h3>
-
 <p><strong>函数传递指针真的比传值效率高吗？</strong></p>
-
 <p>我们知道传递指针可以减少底层值的拷贝，可以提高效率，但是如果拷贝的数据量小，由于指针传递会产生逃逸，可能会使用堆，也可能会增加GC的负担，所以传递指针不一定是高效的。</p>
-
 <p><strong>内存碎片化问题</strong></p>
-
 <p>实际项目基本都是通过 <code>c := make([]int, 0, l)</code> 来申请内存，长度都是不确定的，自然而然这些变量都会申请到堆上面了.</p>
-
 <p>Golang使用的垃圾回收算法是『标记——清除』.</p>
-
 <p>简单得说，就是程序要从操作系统申请一块比较大的内存，内存分成小块，通过链表链接。</p>
-
 <p>每次程序申请内存，就从链表上面遍历每一小块，找到符合的就返回其地址，没有合适的就从操作系统再申请。如果申请内存次数较多，而且申请的大小不固定，就会引起内存碎片化的问题。</p>
-
 <p>申请的堆内存并没有用完，但是用户申请的内存的时候却没有合适的空间提供。这样会遍历整个链表，还会继续向操作系统申请内存。这就能解释我一开始描述的问题，申请一块内存变成了慢语句。</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
 
     </div>
 

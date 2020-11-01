@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/docker-api-for-python/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -68,15 +68,13 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/docker-api-for-python/" />
-<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Docker的Python版API使用">
 <meta itemprop="description" content="
 使用Docker API for Python来更好的管理容器！
 ">
-
-
-<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
-<meta itemprop="wordCount" content="4983">
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="4980">
 
 
 
@@ -472,7 +470,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 4983 words </span>
+        <span class="more-meta"> 4980 words </span>
           <span class="more-meta"> 10 min read </span>
 
         
@@ -489,24 +487,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#一-初始化客户端">一、初始化客户端</a>
-<ul>
-<li><a href="#1-docker客户端的初始化工作">1.Docker客户端的初始化工作</a></li>
-</ul></li>
-<li><a href="#二-api方法使用示例">二、api方法使用示例</a>
-<ul>
-<li><a href="#1-login方法定义">1. login方法定义</a></li>
-<li><a href="#2-images-类定义">2.images 类定义：</a></li>
-<li><a href="#3-docker管理容器相关">3.docker管理容器相关</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一初始化客户端">一、初始化客户端</a></li>
+        <li><a href="#二api方法使用示例">二、api方法使用示例</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -516,32 +504,32 @@ if (!doNotTrack) {
       <blockquote>
 <p>使用Docker API for Python来更好的管理容器！</p>
 </blockquote>
-
 <p><code>客户端初始化的三种方法</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span><span class="lnt">7
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">import docker
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">import docker
 docker.api()
 docker.APIClient()
 docker.client()
 docker.DockerClient() 其实就是docker.client()的一个子集
-docker.from_env() 其实也是docker.client()的一个子集</pre></td></tr></table>
-</div>
-</div>
-<h3 id="一-初始化客户端">一、初始化客户端</h3>
+docker.from_env() 其实也是docker.client()的一个子集
 
-<h4 id="1-docker客户端的初始化工作">1.Docker客户端的初始化工作</h4>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="一初始化客户端">一、初始化客户端</h3>
+<h4 id="1docker客户端的初始化工作">1.Docker客户端的初始化工作</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -553,9 +541,9 @@ docker.from_env() 其实也是docker.client()的一个子集</pre></td></tr></ta
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">&gt;&gt;&gt; import docker
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">&gt;&gt;&gt; import docker
 &gt;&gt;&gt; client = docker.APIClient(base_url=&#39;unix://var/run/docker.sock’,version=&#39;1.21&#39;,timeout=5)
 &gt;&gt;&gt; client.version()
 {u&#39;ApiVersion&#39;: u&#39;1.21’,
@@ -566,11 +554,12 @@ docker.from_env() 其实也是docker.client()的一个子集</pre></td></tr></ta
  u&#39;GoVersion&#39;: u&#39;go1.6.3&#39;,
  u&#39;KernelVersion&#39;: u&#39;4.4.22-moby&#39;,
  u&#39;Os&#39;: u&#39;linux&#39;,
- u&#39;Version&#39;: u&#39;1.12.2-rc1&#39;}</pre></td></tr></table>
+ u&#39;Version&#39;: u&#39;1.12.2-rc1&#39;}
+</code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -579,9 +568,9 @@ docker.from_env() 其实也是docker.client()的一个子集</pre></td></tr></ta
 </span><span class="lnt">7
 </span><span class="lnt">8
 </span><span class="lnt">9
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">   Args:
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">   Args:
       base_url (str): 指定链接路径，可以通过socket或者tcp方式链接
           ``unix:///var/run/docker.sock`` or ``tcp://127.0.0.1:1234``.
       version (str): 指定API使用的版本(docker=2.0.0默认的api版本是1.24,最低支持1.21,docker1.9+的api是1.21),因此在使用python的docker模块时一定要注意docker的api以及docker模块的api是否兼容。当然如果设置为 ``auto`` 降回去自动检测server的版本
@@ -589,13 +578,13 @@ docker.from_env() 其实也是docker.client()的一个子集</pre></td></tr></ta
       tls (bool or :py:class:`~docker.tls.TLSConfig`): Enable TLS. Pass
           ``True`` to enable it with default options, or pass a
           :py:class:`~docker.tls.TLSConfig` object to use custom
-          configuration.</pre></td></tr></table>
+          configuration.
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>查看docker引擎当前版本:</strong></p>
+</div><p><strong>查看docker引擎当前版本:</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -611,9 +600,9 @@ docker.from_env() 其实也是docker.client()的一个子集</pre></td></tr></ta
 </span><span class="lnt">14
 </span><span class="lnt">15
 </span><span class="lnt">16
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ sudo docker version
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ sudo docker version
 Client:
  Version:      1.9.1
  API version:  1.21
@@ -628,34 +617,34 @@ Server:
  Go version:   go1.4.3
  Git commit:   a34a1d5-dirty
  Built:        Tue Mar 28 15:39:19 UTC 2017
- OS/Arch:      linux/amd64</pre></td></tr></table>
+ OS/Arch:      linux/amd64
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>The sdk of docker for python&ndash;docker==2.0.0:</strong></p>
+</div><p><strong>The sdk of docker for python&ndash;docker==2.0.0:</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">1.丢弃了python2.6的支持
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">1.丢弃了python2.6的支持
 2.最低支持API版本为1.12(Engine version 1.9.0+)
 3.`docker.Client`被替换成`docker.APIClient`
 4.`docker.from_env`初始化一个docker客户端实例代替了`APIClient `实例 
 5.从`APIClient.start`中移除了HostConfig参数
 6.开始由之前的docker-py模块变为docker
-7.`docker.ssladapter`替换为`docker.transport.ssladapter`</pre></td></tr></table>
+7.`docker.ssladapter`替换为`docker.transport.ssladapter`
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>####2.Docker客户端的具体方法</p>
+</div><p>####2.Docker客户端的具体方法</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -678,9 +667,9 @@ Server:
 </span><span class="lnt">21
 </span><span class="lnt">22
 </span><span class="lnt">23
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">import docker
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">import docker
 C  = docker.DockerClient(base_url=&#39;unix://var/run/docker.sock&#39;,version=&#39;auto&#39;,timeout=10)
 
 ##docker相关的方法使用
@@ -702,15 +691,14 @@ C.volumes,
 
 
 #输出docker的相关信息，相当于docker info
-C.info()</pre></td></tr></table>
+C.info()
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="二-api方法使用示例">二、api方法使用示例</h3>
-
+</div><h3 id="二api方法使用示例">二、api方法使用示例</h3>
 <h4 id="1-login方法定义">1. login方法定义</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -734,9 +722,10 @@ C.info()</pre></td></tr></table>
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span><span class="lnt">25
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">C.login()
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">C.login()
 login(*args, **kwargs) method of docker.client.DockerClient instance
     Authenticate with a registry. Similar to the ``docker login`` command.
     
@@ -759,13 +748,14 @@ login(*args, **kwargs) method of docker.client.DockerClient instance
             If the server returns an error.
 
 ##使用login方法登录
-C.login(&#39;xxbandy123&#39;,&#39;nslalla&#39;)</pre></td></tr></table>
+C.login(&#39;xxbandy123&#39;,&#39;nslalla&#39;)
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="2-images-类定义">2.images 类定义：</h4>
+</div><h4 id="2images-类定义">2.images 类定义：</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -800,9 +790,9 @@ C.login(&#39;xxbandy123&#39;,&#39;nslalla&#39;)</pre></td></tr></table>
 </span><span class="lnt">33
 </span><span class="lnt">34
 </span><span class="lnt">35
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">build方法
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">build方法
 get方法：
 get(self, name)
     Gets an image.
@@ -836,13 +826,13 @@ list方法：
     
     Raises:
         :py:class:`docker.errors.APIError`
-            If the server returns an error.</pre></td></tr></table>
+            If the server returns an error.
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>示例：</p>
+</div><p>示例：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -850,20 +840,21 @@ list方法：
 </span><span class="lnt">6
 </span><span class="lnt">7
 </span><span class="lnt">8
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">查看默认所有的镜像文件，以image-id进行区分
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">查看默认所有的镜像文件，以image-id进行区分
 In [34]: C.images.list()
 Out[34]: 
 [&lt;Image: &#39;busybox:latest&#39;&gt;,
  &lt;Image: &#39;rancher-server:latest&#39;, &#39;rancher/server:latest&#39;&gt;,
  &lt;Image: &#39;singleuser:latest&#39;&gt;,
  &lt;Image: &#39;registry:2&#39;&gt;,
- &lt;Image: &#39;rancher-agent:latest&#39;, &#39;rancher/agent:v1.0.2&#39;&gt;]</pre></td></tr></table>
+ &lt;Image: &#39;rancher-agent:latest&#39;, &#39;rancher/agent:v1.0.2&#39;&gt;]
+</code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -930,9 +921,10 @@ Out[34]:
 </span><span class="lnt">65
 </span><span class="lnt">66
 </span><span class="lnt">67
-</span></pre></td>
+</span><span class="lnt">68
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">load方法：相当于docker load
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">load方法：相当于docker load
 
 pull方法：下载镜像文件
  pull(self, name, **kwargs)
@@ -998,41 +990,42 @@ search(self, *args, **kwargs)
         term (str): A term to search for.
     
     Returns:
-        (list of dicts): The response of the search.</pre></td></tr></table>
-</div>
-</div>
-<h4 id="3-docker管理容器相关">3.docker管理容器相关</h4>
+        (list of dicts): The response of the search.
 
-<p>C.containers类，下面有相关的方法：
-* client
-* create
-* get
-* list
-* model
-* run &hellip;</p>
-
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="3docker管理容器相关">3.docker管理容器相关</h4>
+<p>C.containers类，下面有相关的方法：</p>
+<ul>
+<li>client</li>
+<li>create</li>
+<li>get</li>
+<li>list</li>
+<li>model</li>
+<li>run &hellip;</li>
+</ul>
 <p>列出当前存活的容器：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">C.containers.list()</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">C.containers.list()
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>列出指定容器：</p>
+</div><p>列出指定容器：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">C.containers.get(&#39;&#39;)</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">C.containers.get(&#39;&#39;)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>创建容器：</p>
+</div><p>创建容器：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1202,9 +1195,9 @@ search(self, *args, **kwargs)
 </span><span class="lnt">168
 </span><span class="lnt">169
 </span><span class="lnt">170
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">C.containers.create
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">C.containers.create
 create(image, command=None, **kwargs) method of docker.models.containers.ContainerCollection instance
     Create a container without starting it. Similar to ``docker create``.
     
@@ -1373,14 +1366,14 @@ run(image, command=None, stdout=True, stderr=False, remove=False, **kwargs) meth
         :py:class:`docker.errors.ImageNotFound`
         如果是服务返回一个错误
         :py:class:`docker.errors.APIError`
-            If the server returns an error.</pre></td></tr></table>
+            If the server returns an error.
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>示例：
+</div><p>示例：
 一个完整的创建容器的例子：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1415,9 +1408,9 @@ run(image, command=None, stdout=True, stderr=False, remove=False, **kwargs) meth
 </span><span class="lnt">33
 </span><span class="lnt">34
 </span><span class="lnt">35
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">Command line:
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Command line:
 $ docker run -itd -P --cpuset_cpus=&#39;0,1&#39; --cpu_shares=2 --cpu_period=10000 --hostname=xxbandy --mem_limit=512m --net=none --oom_kill_disable=True -P -u admin busybox /bin/sh
 
 Python API:
@@ -1451,13 +1444,13 @@ c1.update    动态调整容器内部信息（blkio_weight，cpu_period，cpu_qu
         mem_reservation (int or str): 内存软限制
         memswap_limit (int or str): swap限制总的可使用内存限制(memory + swap)，-1表示关闭swap
         kernel_memory (int or str): 内核内存限制
-        restart_policy (dict): 重启策略</pre></td></tr></table>
+        restart_policy (dict): 重启策略
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意:</code>update方法在docker1.10之后才增加了改功能</p>
+</div><p><code>注意:</code>update方法在docker1.10之后才增加了改功能</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1481,9 +1474,9 @@ c1.update    动态调整容器内部信息（blkio_weight，cpu_period，cpu_qu
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">查看容器相关信息：
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">查看容器相关信息：
 容器id，64位的字符
 In [20]: c1.id
 Out[20]: &#39;499db0824206d61d09db2f36c70aa84bdb1a4b6d508b001a618d2010a23fea7e&#39;
@@ -1506,13 +1499,12 @@ docker update -m 1024M xuxuebiao-test
 # cat memory.limit_in_bytes 
 1073741824
 # grep hierarchical_memory_limit memory.stat 
-hierarchical_memory_limit 1073741824</pre></td></tr></table>
+hierarchical_memory_limit 1073741824
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>个人博客：<a href="https://my.oschina.net/xxbAndy/blog">https://my.oschina.net/xxbAndy/blog</a>
+</div><p>个人博客：https://my.oschina.net/xxbAndy/blog
 微信公众号：</p>
-
-<p><img src="http://upload-images.jianshu.io/upload_images/2577135-5d2191eacf61c6dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="wechat.png" /></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/2577135-5d2191eacf61c6dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="wechat.png"></p>
     </div>
 
     
@@ -1525,7 +1517,7 @@ hierarchical_memory_limit 1073741824</pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2019-12-03
+      2020-11-01
       
         
         

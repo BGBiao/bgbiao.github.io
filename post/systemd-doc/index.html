@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>如何更加优雅的使用 Systemd 管理服务 - BGBiao的SRE人生</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="BGBiao" />
+  <meta name="description" content="如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do" />
+
+  <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.77.0" />
+
+
+<link rel="canonical" href="https://bgbiao.top/post/systemd-doc/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+
+
+
+
+<link rel="stylesheet" href="/css/custom.css">
+
+
+<meta property="og:title" content="如何更加优雅的使用 Systemd 管理服务" />
+<meta property="og:description" content="如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/systemd-doc/" />
+<meta property="article:published_time" content="2020-11-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="name" content="如何更加优雅的使用 Systemd 管理服务">
+<meta itemprop="description" content="如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do">
+<meta itemprop="datePublished" content="2020-11-01T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="4271">
+
+
+
+<meta itemprop="keywords" content="运维,Systemd,Docker,服务管理," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="如何更加优雅的使用 Systemd 管理服务"/>
+<meta name="twitter:description" content="如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-151318936-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BGBiao的SRE人生</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              学习文档
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+        
+      </li>
+    
+
+    
+      <li class="mobile-menu-item">
+        <a id="openSearchMobile" class="mobile-menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+    
+<div class="modal-dialog">
+    
+    <div class="modal-content">
+      <div id="closeSearch" title="Close" class="close">X</div>
+      <div class="modal-header">
+        <div class="modal-title">Search</div>
+      </div>
+      <div class="modal-body">
+          <script>
+            (function() {
+              var cx = '006410550977056989513:rg9ancg1smm';
+              var gcse = document.createElement('script');
+              gcse.type = 'text/javascript';
+              gcse.async = true;
+              gcse.src = (document.location.protocol == 'https:' ? 'https:' :
+                  'http:') +
+                '//cse.google.com/cse.js?cx=' + cx;
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(gcse, s);
+            })();
+          </script>
+          <gcse:search></gcse:search>
+      </div>
+    </div>
+</div>
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      BGBiao的SRE人生
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/">首页</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/post/">全部文章</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/categories/">分类</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+      <li class="menu-item">
+        <a id="openSearch" class="menu-item-link menu-item-search" href="#">
+          <i class="iconfont">
+            <svg version="1.1" viewBox="0 0 1024 1024"
+  xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M973.81454219 973.81454219a91.78207815 91.78207815 0 0 1-129.80999631 0l-161.97482118-161.97482118a425.48527711 425.48527711 0 0 1-230.35931791 68.16531768 428.3346319 428.3346319 0 1 1 428.3346319-428.3346319 425.48527711 425.48527711 0 0 1-68.16531768 230.35931791l162.02961656 161.97482118a91.83687354 91.83687354 0 0 1-0.05479538 129.80999631zM451.67040679 145.69361559a305.97679241 305.97679241 0 1 0 0 611.95358361 305.97679241 305.97679241 0 0 0 0-611.95358361z">
+  </path>
+</svg>
+
+          </i>
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">如何更加优雅的使用 Systemd 管理服务</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-11-01" class="post-time">
+          2020-11-01
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+            
+          </div>
+        <span class="more-meta"> 4271 words </span>
+          <span class="more-meta"> 9 min read </span>
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#如何优雅的使用-systemd-管理服务">如何优雅的使用 Systemd 管理服务</a>
+      <ul>
+        <li><a href="#unit-块">Unit 块</a></li>
+        <li><a href="#service-块">Service 块</a></li>
+        <li><a href="#install-块">Install 块</a></li>
+        <li><a href="#完整示例">完整示例</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h2 id="如何优雅的使用-systemd-管理服务">如何优雅的使用 Systemd 管理服务</h2>
+<blockquote>
+<p>背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用docker方式进行运行，但我们在整个集群内部仍然大量使用了 <code>systemd</code> 来管理基础服务。不过在使用过程中发现可能出现相关依赖的服务组件异常后导致节点上服务不可用，其次还有可能出现个别服务bug而导致整个节点资源消耗殆尽的情况(幸好发现的早，及时处理后没有产生业务上的应用)，因此，诞生了使用 systemd 在管理服务的过程中，能帮我们管理上下游依赖服务的状态，且能相对限制部分资源的想法。</p>
+</blockquote>
+<p>通常情况下，当用户自己使用systemd进行管理服务时，需要关注systemd service 中的如下几个配置块:</p>
+<ul>
+<li><code>Unit</code>: 主要用于配置整个服务的详情信息以及服务依赖，用于快速识别该服务的相关情况以及依赖项目</li>
+<li><code>Service</code>: 主要用于配置整个服务生命周期的管理行为</li>
+<li><code>Install</code>: 用于配置服务的安装级别，当我们设置服务在Linux的那种级别下启动或开机自启动时会加载该部分(典型的当chkconfig nginx on或者systemctl enable|disable nginx.service时会读取该部分的配置)</li>
+</ul>
+<h3 id="unit-块">Unit 块</h3>
+<p>Unit 块除了可以简单描述整个服务的相关详情外，还有最重要的一点可以用来管理该服务的启动顺序和启动依赖(必须也得由systemd管理)。</p>
+<p>比如通常我们有一些服务，必须依赖一些基础环境(ntpd，rsyslog，network)才能启动成功，或者必须在某个服务后启动，那我们就可以在这里进行配置。</p>
+<p><code>注意:</code> 在Unit 快中，每个指令后都可以指定一个以空格分隔的列表</p>
+<p><strong>服务描述</strong></p>
+<p>在systemd 的 service 配置中，我们通常会使用如下几个配置项来描述该服务的基本信息:</p>
+<ul>
+<li><code>Description</code>: 服务的简单描述</li>
+<li><code>Documentation</code>: 指定服务的文档，便于管理员快速追溯，一般可以使用&quot;http://&quot;, &ldquo;https://&rdquo;, &ldquo;file:&rdquo;, &ldquo;info:&rdquo;, &ldquo;man:&rdquo; 五种 URI 类型</li>
+</ul>
+<p><strong>服务依赖管理</strong></p>
+<p>systemd 中会有几种服务依赖管理的指令，可能在实际使用过程中会有一些疑惑，有时候功能可能重叠，因此需要根据具体的使用场景进行组合。</p>
+<ul>
+<li><code>After</code>: 用于指定该服务在那些服务之后启动 ，停止时正好相反</li>
+<li><code>Before</code>: 用于指定该服务在那些服务之前启动，停止时正好相反</li>
+<li><code>Requires</code>: 设置该服务必须依赖的其他服务，因此在该服务启动之前，指定的服务列表必须全部在线，否则服务将启动失败或掉线。但如果未设置<code>After</code>和<code>Before</code>指令时，该服务和依赖的服务将会并行的同时启动。注意: 该指令依赖的服务不一定要在整个生命周期都保持一直在线，这取决于其他的检查条件</li>
+<li><code>Requisite</code>: 和<code>Requires</code>类似，区别是在该服务启动时，该指令指定的依赖资源必须全部处于启动成功的状态，否则该服务立马失败，并且不会启动那些失败的依赖服务。因此一般建议<code>Requisite</code>和<code>After</code> 一起联合使用会比较好。</li>
+<li><code>Wants</code>: <code>Requires</code>的弱化版，当该服务启动时，尽可能的启动该指令指定的服务，但不会影响该服务的启动</li>
+<li><code>BindsTo</code>: 和<code>Requires</code>类似，但是依赖性更强，这里列出来的任何服务停止运行或崩溃，该服务将立即被停止。考虑服务的启动依赖，一般会和<code>After</code>一起使用</li>
+<li><code>PartOf</code>: 和<code>Requires</code>类似，但仅作用于服务的停止和重启，表示该服务是所列服务的一部分，会随指定服务的启动而启动。注意: 该指令是单向依赖，服务的主动的重启不会影响其他</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/0081Kckwly1gk8fy7gcmcj30xi0l6n2c.jpg" alt="Unit块的依赖属性"></p>
+<p><strong>示例</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">
+# 这里指定了内部的Kubelet进程必须在docker 和kube-proxy 之后启动，且需要强依赖，减少调度失败和pod转发失败的问题
+[Unit]
+Description=kubelet - k8s node lifecycle manager.
+Documentation=https://kubernetes.io/zh/docs/reference/command-line-tools-reference/kubelet/
+After=docker.service kube-proxy.service
+Requisite=docker.service kube-proxy.service
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="service-块">Service 块</h3>
+<p>毋庸置疑的是，我们通常使用systemd 最初的想法是用来启动和停止进程，因此，整个systemd最核心的部分也就在 Service 块了，因此我们需要对该部分有很熟悉的理解。</p>
+<p><strong>基本指令</strong></p>
+<ul>
+<li><code>Type</code>: 指定进程的启动类型，必须设为 simple, exec, forking, oneshot, dbus, notify, idle 之一。常用的几种如下</li>
+<li>
+<ul>
+<li>simple: 一般没有其他指令时，为默认值，表示<code>ExecStart</code>后的指令为主进程，主进程启动后服务即启动成功。如果进程需要为其他进程提供服务，需要通过socket来进行</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>exec: 同simple类似，但是表示该服务的主服务进程执行完成之后，才真正启动成功。</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>forking: 标识在使用<code>ExecStart</code>后的指令启动程序后，会进行<code>fork()</code>的系统调用。传统Unix中守护进程的经典做法，如果使用此类型，建议设置<code>PIDFile=</code>来指定该服务的主进程。比如<code>nginx</code>进程的daemon方式，主进程执行完成后，至少有1个进程在运行，此时服务状态会变成<code>active</code>状态</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>oneshot: 同simple类似，但是表示只有在该服务的主服务进程退出之后，才真正执行成功。一般用于执行一次性任务(配置RemainAfterExit=yes设置可停止的一次性服务)</li>
+</ul>
+</li>
+<li><code>PIDFile</code>: 指定该服务的PID文件路径。systemd会在启动后读取主服务进程的PID，并记录在MAINPID变量中，在停止服务后，会主动进行删除该文件</li>
+<li><code>KillMode</code>: 指定停止服务时，杀死进程的方式，必须设为 control-group, process, mixed, none之一。(process表示仅杀死主进程;mixed表示向主进程发SIGTERM信号，然后想服务内cgroup的其他进程发SIGKILL信号;none表示仅执行ExecStop动作，而不杀死进程)</li>
+</ul>
+<p><code>注意:</code> 建议对长时间持续运行的服务尽可能使用 Type=simple；如果有master/slave进程的建议使用 Type=forking</p>
+<p><strong>环境变量初始化</strong></p>
+<p>通常我们的服务主进程可能会有比较多的参数，建议的做法是使用环境变量方式进行维护对应的参数，而在 systemd 中可支持K/V和配置文件方式来进行设置。</p>
+<ul>
+<li><code>Environment</code>: 指定Key=Value 的环境配置</li>
+<li><code>EnvironmentFile</code>: 指定包含key=value 的配置文件</li>
+</ul>
+<p><code>注意:</code> 通常情况下，我们会看到<code>EnvironmentFile=-filename</code> 和<code>EnvironmentFile=filename</code> 的写法，前者表示可忽略，即当文件不存在或环境变量加载失败时也不影响后续的处理逻辑。(在etcd的高版本里，大部分参数采用了环境变量加载的方式，可见未来通过环境变量来控制服务的启动参数已经是趋势)</p>
+<p><strong>进程生命周期管理</strong></p>
+<p>整个进程的生命周期是从准备启动进程开始到整个进程结束的过程管理。通常情况下，可以包含为如下几个环节:</p>
+<ul>
+<li><code>ExecStartPre</code>: 启动前， 该指令可用于在进程启动前加载一些列的基础环境以及初始化检查机制</li>
+<li><code>ExecStart</code>: 启动逻辑， 该指令用于启动进程的核心逻辑</li>
+<li><code>ExecStartPost</code>: 启动后， 该指令用于在启动进程后进行回调的相关操作</li>
+<li><code>ExecReload</code>: 热加载， 该指令用于对进程进行热加载，通常情况用于 配置变更后的热重启(<code>/bin/kill -s HUP $MAINPID</code>)</li>
+<li><code>ExecStop</code>: 停止， 该指令用于对进程执行指定的停止操作，通常情况下用于进行进程的优雅停止(<code>/bin/kill -s TERM $MAINPID</code>)</li>
+<li><code>ExecStopPost</code>: 停止后， 该指令用于在进程停止后，进行一些列的资源释放和等待操作，因为通常情况当进程停止后，相关资源不能立即释放，因为服务不算真正呗停止，如果此时认为进程已停止而强制做一些操作，可能会影响到相关服务处理逻辑</li>
+<li><code>TimeoutStopSec</code>: 停止超时时间， 指定服务停止后的超时时间，一般在通知服务是会使用SIGTERM信号，待超时时间内资源未释放，将使用SIGKILL进行强制杀死</li>
+</ul>
+<p><strong>重启策略</strong></p>
+<ul>
+<li><code>Restart</code>: 当服务进程 正常退出、异常退出、被杀死、超时的时候， 是否重新启动该服务。</li>
+<li><code>RestartSec</code>: 多久后重启</li>
+<li><code>StartLimitBurst</code>:  启动的最大次数限制，超过后停止继续重启</li>
+<li><code>StartLimitInterval</code>: 启动时间的最大间隔</li>
+</ul>
+<p>所谓&quot;服务进程&quot; 是指 <code>ExecStartPre=, ExecStartPost=, ExecStop=, ExecStopPost=, ExecReload= </code>中设置的进程。 当进程是由于 systemd 的正常操作(例如 systemctl stop|restart)而被停止时， 该服务不会被重新启动。 所谓&quot;超时&quot;可以是看门狗的&quot;keep-alive ping&quot;超时， 也可以是 systemctl start|reload|stop 操作超时.</p>
+<p>可选值如下:</p>
+<ul>
+<li><code>no</code>:默认值，不会重启</li>
+<li><code>on-success</code>: 服务进程正常退出(退出码为&quot;0&quot;， 或者进程收到 SIGHUP, SIGINT, SIGTERM, SIGPIPE 信号之一， 并且 退出码符合 SuccessExitStatus= 的设置)时进行重启</li>
+<li><code>on-failure</code>: 仅在服务进程异常退出(退出码不为&quot;0&quot;， 或者 进程被强制杀死(包括 &ldquo;core dump&quot;以及收到 SIGHUP, SIGINT, SIGTERM, SIGPIPE 之外的其他信号)， 或者进程由于 看门狗超时 或者 systemd 的操作超时 而被杀死)时重启</li>
+<li><code>always</code>: 无条件重启</li>
+</ul>
+<p><strong>资源限制</strong></p>
+<p>通常情况下，我们会对目标服务或进程进行一定资源的限制，以防止服务bug导致的整个系统资源耗尽。</p>
+<p>在systemd 中，可以使用如下指令进行简单的资源限制:</p>
+<ul>
+<li><code>LimitCPU</code>: 限制CPU使用时长(秒)，等同<code>ulimit -t</code></li>
+<li><code>LimitNOFILE</code>: 限制进程使用的文件描述符数量，等同<code>ulimit -n</code></li>
+<li><code>LimitNPROC</code>: 限制进程的数量，等同于<code>ulimit -u</code></li>
+</ul>
+<p><code>注意:</code> 一般为防止服务导致的系统过载，会对进程设置一些资源限制</p>
+<p><strong>计算资源调度</strong></p>
+<ul>
+<li><code>CPUSchedulingPolicy</code>: 设置CPU的调度策略可设为 other, batch, idle, fifo, rr 之一</li>
+<li><code>CPUSchedulingPriority</code>: 设置CPU调度的优先级，取决于调度策略</li>
+<li><code>CPUAffinity</code>: 设置CPU的亲和性，可以指定cpu的编号，比如0,1</li>
+</ul>
+<p><strong>示例</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[Service]
+EnvironmentFile=/etc/calico/calico.env
+ExecStartPre=-/usr/bin/docker pull ${CALICO_IMAGE}
+ExecStart=/usr/bin/docker run --net=host --privileged ${CALICO_IMAGE}
+ExecStop=-/usr/bin/docker stop calico-node
+ExecStopPost=-/usr/bin/docker rm -f -v calico-node
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=3
+StartLimitInterval=60s
+CPUSchedulingPolicy=fifo
+CPUAffinity=0,2
+LimitNOFILE=1000
+LimitNPROC=3000
+LimitCORE=infinity
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="install-块">Install 块</h3>
+<p>在systemd 的服务管理中，install块主要包含了单元的启用信息。只有systemctl 的enable/disable 指令会调用该部分内容。</p>
+<ul>
+<li><code>Alias</code>: 指定服务的别名信息</li>
+<li><code>WantedBy/RequiredBy</code>: 设置启用服务的依赖服务</li>
+</ul>
+<p><strong>示例</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[Install]
+Alias=syslog.service
+WantedBy=multi-user.target
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="完整示例">完整示例</h3>
+<p><strong>systemd service 完整配置</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat  /usr/lib/systemd/system/docker.service
+[Unit]
+Description=Docker CE Binary Release.
+Documentation=https://docs.docker.com
+Documentation=https://download.docker.com/linux/static/stable/x86_64/
+After=network-online.target firewalld.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+Environment=&#34;WELCOME=BGBiao Docker Base Environment.&#34;
+ExecStartPre=/bin/echo ${WELCOME}
+ExecStart=/usr/local/sbin/dockerd  $DOCKER_NETWORK_OPTIONS --live-restore --data-root /opt/data/docker
+ExecStartPost=/usr/sbin/iptables -P FORWARD ACCEPT
+ExecReload=/bin/kill -s HUP ${MAINPID}
+ExecStop=/bin/kill -s TERM ${MAINPID}
+ExecStopPost=/usr/bin/sleep 3
+
+LimitNOFILE=100
+LimitNPROC=3000
+LimitCORE=infinity
+TimeoutStartSec=0
+Delegate=yes
+KillMode=process
+Restart=always
+StartLimitBurst=3
+StartLimitInterval=60s
+
+[Install]
+WantedBy=multi-user.target
+
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>service 生命周期过程</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 加载配置并重启docker
+$ systemctl daemon-reload
+$ systemctl restart docker
+
+# 查看整个启动过程信息
+$ cat /var/log/messages
+
+Oct 31 14:56:39 host-192-168-0-171 systemd: Reloading.
+Oct 31 14:56:43 host-192-168-0-171 systemd: Starting Docker CE Binary Release....
+Oct 31 14:56:43 host-192-168-0-171 echo: BGBiao Docker Base Environment.
+Oct 31 14:56:43 host-192-168-0-171 dockerd: time=&#34;2020-10-31T14:56:43.390806162+08:00&#34; level=info msg=&#34;Starting up&#34;
+......
+Oct 31 14:56:43 host-192-168-0-171 systemd: Started Docker CE Binary Release..
+
+
+# 停止docker，查看整个过程
+
+$ echo &gt;  /var/log/messages
+$ systemctl stop docker
+$ cat /var/log/messages
+
+Oct 31 15:01:11 host-192-168-0-171 systemd: Stopping Docker CE Binary Release....
+Oct 31 15:01:11 host-192-168-0-171 dockerd: time=&#34;2020-10-31T15:01:11.618357841+08:00&#34; level=info msg=&#34;Processing signal &#39;terminated&#39;&#34;
+Oct 31 15:01:11 host-192-168-0-171 dockerd: time=&#34;2020-10-31T15:01:11.618919303+08:00&#34; level=info msg=&#34;Daemon shutdown complete&#34;
+Oct 31 15:01:11 host-192-168-0-171 dockerd: time=&#34;2020-10-31T15:01:11.618948850+08:00&#34; level=info msg=&#34;stopping healthcheck following graceful shutdown&#34; module=libcontainerd
+Oct 31 15:01:11 host-192-168-0-171 dockerd: time=&#34;2020-10-31T15:01:11.618971913+08:00&#34; level=info msg=&#34;stopping event stream following graceful shutdown&#34; error=&#34;context canceled&#34; module=libcontainerd namespace=plugins.moby
+Oct 31 15:01:11 host-192-168-0-171 dockerd: time=&#34;2020-10-31T15:01:11.618952081+08:00&#34; level=info msg=&#34;stopping event stream following graceful shutdown&#34; error=&#34;context canceled&#34; module=libcontainerd namespace=moby
+Oct 31 15:01:11 host-192-168-0-171 dockerd: time=&#34;2020-10-31T15:01:11.618954836+08:00&#34; level=info msg=&#34;Processing signal &#39;terminated&#39;&#34;
+Oct 31 15:01:15 host-192-168-0-171 systemd: Stopped Docker CE Binary Release..
+
+
+# 执行
+$ systemctl enable docker
+Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.
+
+# 会在多用户下创建服务软链，可保证系统在启动时默认启动服务
+$ ls -ld /etc/systemd/system/multi-user.target.wants/docker.service
+lrwxrwxrwx 1 root root 38 Oct 31 15:05 /etc/systemd/system/multi-user.target.wants/docker.service -&gt; /usr/lib/systemd/system/docker.service
+
+
+# 查看资源限制
+## 系统的资源限制
+$ ulimit -a | egrep  &#39;(files|processes)&#39;
+open files                      (-n) 65535
+max user processes              (-u) 63457
+
+$ systemctl status docker | grep -i pid
+ Main PID: 21926 (dockerd)
+
+## dockerd 进程的资源限制(生产环境需严格设置参数)
+$ cat /proc/21926/limits | egrep &#39;(files|processes)&#39;
+Max processes             3000                 3000                 processes
+Max open files            100                  100                  files
+
+
+</code></pre></td></tr></table>
+</div>
+</div><p>由上述的整个过程可以看到，我们在整个 dockerd 的生命周期中，systemd 如何去管理进程的生命周期的。</p>
+<p><strong>Tips</strong></p>
+<p>需要注意的是，对于资源限制，Linux中的<code>/etc/security/limits.conf</code> 作用域变小了(只对登录用户的资源进行限制)，可能对systemd 的 service 的资源限制不生效，因此对于systemd servie的资源限制，可以对全局文件进行修改:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat /etc/systemd/system.conf
+DefaultLimitNOFILE=100000
+DefaultLimitNPROC=65535
+</code></pre></td></tr></table>
+</div>
+</div><p><a href="http://www.jinbuguo.com/systemd/systemd.index.html">参考文章</a></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-11-01
+      
+        
+        
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Wechat</span>
+      </label>
+    
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="/reward_wechat.png">
+        <span>Alipay</span>
+      </label>
+  </div>
+</div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          <a href="https://bgbiao.top/tags/systemd/">Systemd</a>
+          <a href="https://bgbiao.top/tags/docker/">Docker</a>
+          <a href="https://bgbiao.top/tags/%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86/">服务管理</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/elasticsearch%E5%AE%B9%E9%87%8F%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/">
+            <span class="next-text nav-default">ElasticSearch容量管理实践</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="mailto:weichuangxxb@qq.com" rel="me noopener" class="iconfont"
+      title="email" >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/BGBiao/" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://bgbiao.top/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2020
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        BGBiao
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    $("#openSearch, #openSearchMobile").click(function(){
+      $(".modal-dialog").addClass("visible");
+    });
+
+    $("#closeSearch").click(function(){
+      $(".modal-dialog").removeClass("visible");
+    });
+
+    $(document).click(function(event) {
+    
+      if (!$(event.target).closest(".modal-content, #openSearch, #openSearchMobile").length) {
+        $("body").find(".modal-dialog").removeClass("visible");
+      }
+    });
+  </script>
+
+
+
+
+
+</body>
+</html>

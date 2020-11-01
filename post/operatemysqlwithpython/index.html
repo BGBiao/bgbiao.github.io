@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/operatemysqlwithpython/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,16 +69,14 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/operatemysqlwithpython/" />
 <meta property="article:published_time" content="2018-10-27T13:53:40+00:00" />
-<meta property="article:modified_time" content="2019-12-03T10:56:01+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="使用Python操作MySQL">
 <meta itemprop="description" content="
 前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。
 ">
-
-
-<meta itemprop="datePublished" content="2018-10-27T13:53:40&#43;00:00" />
-<meta itemprop="dateModified" content="2019-12-03T10:56:01&#43;08:00" />
-<meta itemprop="wordCount" content="4479">
+<meta itemprop="datePublished" content="2018-10-27T13:53:40+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="4462">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
             
           </div>
-        <span class="more-meta"> 4479 words </span>
+        <span class="more-meta"> 4462 words </span>
           <span class="more-meta"> 9 min read </span>
 
         
@@ -491,24 +489,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#mysql数据库环境准备">MySQL数据库环境准备</a></li>
-<li><a href="#使用python进行操作mysql">使用Python进行操作MySQL</a>
-<ul>
-<li><a href="#安装pymysql库">安装pymysql库</a></li>
-<li><a href="#python链接mysql以及基本使用">python链接MySQL以及基本使用</a></li>
-<li><a href="#mysql数据库常用的一些操作">MySQL数据库常用的一些操作</a></li>
-<li><a href="#对指定数据库进行相关查询操作">对指定数据库进行相关查询操作</a></li>
-<li><a href="#对mysql数据库进行插入操作">对MySQL数据库进行插入操作</a></li>
-<li><a href="#源码">源码</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#mysql数据库环境准备">MySQL数据库环境准备</a></li>
+        <li><a href="#使用python进行操作mysql">使用Python进行操作MySQL</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -518,15 +506,12 @@ if (!doNotTrack) {
       <blockquote>
 <p>前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。</p>
 </blockquote>
-
 <h3 id="mysql数据库环境准备">MySQL数据库环境准备</h3>
-
 <p><code>注意:在当前容器化基础设施已经全面覆盖的时代，为了快速验证效果，我们及其推荐使用以Docker为代表的容器化基础设施来快速构建你的基础环境。</code></p>
-
 <p>在<a href="https://hub.docker.com/">DockerHub</a>上有丰富的基础中间件的镜像，我们可以使用Docker快速的构建我们的MySQL基础环境，而不必每次重新安装各种复杂的中间件环境，因为我们只是使用者，我相信每个团队都会有专门的中间件维护者。好吧，如果没有，那你依然可以自己根据实际的需求和标准进行构建Docker镜像，这样就为我们创造了一个未来很长一段时间可复用的组件。总之，想说的一件事就是，下面的MySQL环境是用Docker容器跑的。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -575,9 +560,9 @@ if (!doNotTrack) {
 </span><span class="lnt">47
 </span><span class="lnt">48
 </span><span class="lnt">49
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 确保docker环境正常
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 确保docker环境正常
 $ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 
@@ -625,53 +610,87 @@ mysql&gt; show variables like &#39;%char%&#39;;
 | character_set_system     | utf8                       |
 | character_sets_dir       | /usr/share/mysql/charsets/ |
 +--------------------------+----------------------------+
-8 rows in set (0.00 sec)</pre></td></tr></table>
+8 rows in set (0.00 sec)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>至此，一个MySQL数据库已经准备好，需要我们注意的是，因为使用的是官方的Docker image，我们需要进行相关配置的检查和设置，否则可能会为后期的操作造成一定麻烦，比如设置数据库的字符编码.<br />
-让MySQL支持中文，一般而言需要关注以下几个点:
-- 1. 修改MySQL配置中客户端和服务端的字符编码为<code>utf8</code>，分别为[mysqld的default-character-set和character-set-server参数以及client的default-character-set参数]
-- 2. 创建表时指定表的字符编码(default charset=utf8;)
-- 3. 链接数据库的时候指定链接字符编码(charset=utf8)
-- 4. 使用Python操作数据库时需要对Python文件进行utf8支持(#encoding=utf-8和sys.setdefaultencoding(utf-8))
-- 5. 使用<code>show variables like '%char%';</code>命令检查mysql字符集是否为<code>utf8格式</code>，并使用<code>SET NAMES UTF8; 或者set character_set_server = utf8;</code>进行设置</p>
-
+</div><p>至此，一个MySQL数据库已经准备好，需要我们注意的是，因为使用的是官方的Docker image，我们需要进行相关配置的检查和设置，否则可能会为后期的操作造成一定麻烦，比如设置数据库的字符编码.  <br>
+让MySQL支持中文，一般而言需要关注以下几个点:</p>
+<ul>
+<li>
+<ol>
+<li>修改MySQL配置中客户端和服务端的字符编码为<code>utf8</code>，分别为[mysqld的default-character-set和character-set-server参数以及client的default-character-set参数]</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>创建表时指定表的字符编码(default charset=utf8;)</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>链接数据库的时候指定链接字符编码(charset=utf8)</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>使用Python操作数据库时需要对Python文件进行utf8支持(#encoding=utf-8和sys.setdefaultencoding(utf-8))</li>
+</ol>
+</li>
+<li>
+<ol start="5">
+<li>使用<code> show variables like '%char%';</code>命令检查mysql字符集是否为<code>utf8格式</code>，并使用<code>SET NAMES UTF8; 或者set character_set_server = utf8;</code>进行设置</li>
+</ol>
+</li>
+</ul>
 <h3 id="使用python进行操作mysql">使用Python进行操作MySQL</h3>
-
-<p>首先，在使用之前我们需要对Python版的MySQL库有一个了解，当前主流的库有<code>MySQLdb</code>,<code>PyMySQL</code>和<code>SQLAlchemy</code>.<br />
-- <code>MySQLdb</code>:一般是Linux系统发行版中默认支持的，通常包名为<code>Python-MySQL</code>，核心由C语言打造，接口精炼，性能最棒，缺点是环境依赖较多，安装复杂，近两年已停止更新，只支持Python2，不支持Python3
-- <code>PyMySQL</code>:纯python打造，接口与Python-MySQL兼容，安装方便，支持Python3
-- <code>SQLAlchemy</code>: 一个ORM框架，它并不提供底层的数据库操作，而是要借助于MySQLdb、PyMySQL等第三方库来完成，目前SQLAlchemy在Web编程领域应用广泛
-<code>备注:其实还有类似mysqlclient之类的库，主要集成在一些web框架中作为依赖</code></p>
-
+<p>首先，在使用之前我们需要对Python版的MySQL库有一个了解，当前主流的库有<code>MySQLdb</code>,<code>PyMySQL</code>和<code>SQLAlchemy</code>.</p>
+<ul>
+<li><code>MySQLdb</code>:一般是Linux系统发行版中默认支持的，通常包名为<code>Python-MySQL</code>，核心由C语言打造，接口精炼，性能最棒，缺点是环境依赖较多，安装复杂，近两年已停止更新，只支持Python2，不支持Python3</li>
+<li><code>PyMySQL</code>:纯python打造，接口与Python-MySQL兼容，安装方便，支持Python3</li>
+<li><code>SQLAlchemy</code>: 一个ORM框架，它并不提供底层的数据库操作，而是要借助于MySQLdb、PyMySQL等第三方库来完成，目前SQLAlchemy在Web编程领域应用广泛
+<code>备注:其实还有类似mysqlclient之类的库，主要集成在一些web框架中作为依赖</code></li>
+</ul>
 <p>由于为了快速实现业务逻辑，在接下来的操作中主要使用<code>PyMySQL</code>库进行操作数据库，虽然性能不及<code>MySQLdb</code>，但是可以使用<code>pymysql.install_as_MySQLdb()</code>来兼容<code>MySQLdb</code>，在业务正式上线时可以不改变业务代码逻辑而平滑的使用<code>MySQLdb</code>库。</p>
-
 <h4 id="安装pymysql库">安装pymysql库</h4>
-
-<p>在<code>Linux</code>环境下，大多数系统工具使用Python语言进行编写，因此在安装额外的Python模块时，通常会有几种选择:
-- 1. 使用系统自带工具安装<code>apt-get install or yum install</code>，该种方式会将模块默认安装的系统环境，可能会影响系统环境
-- 2. 使用Python原声的包管理工具<code>pip install</code> ，该种方式会默认安装到<code>pip</code>命令所在的Python解释环境下，因此取决于Python环境是否独立于系统环境的Python，通常情况下会使用<code>pyenv</code>之类的工具进行环境隔离
-- 3. 使用包管理工具<code>conda</code>相关工具进行管理python，可以有效管理python多环境依赖，并且可以很方便构建数据科学相关环境.<a href="https://www.jianshu.com/c/d2372cb5978e">conda使用指南</a></p>
+<p>在<code>Linux</code>环境下，大多数系统工具使用Python语言进行编写，因此在安装额外的Python模块时，通常会有几种选择:</p>
+<ul>
+<li>
+<ol>
+<li>使用系统自带工具安装<code>apt-get install or yum install</code>，该种方式会将模块默认安装的系统环境，可能会影响系统环境</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>使用Python原声的包管理工具<code>pip install</code> ，该种方式会默认安装到<code>pip</code>命令所在的Python解释环境下，因此取决于Python环境是否独立于系统环境的Python，通常情况下会使用<code>pyenv</code>之类的工具进行环境隔离</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>使用包管理工具<code>conda</code>相关工具进行管理python，可以有效管理python多环境依赖，并且可以很方便构建数据科学相关环境.<a href="https://www.jianshu.com/c/d2372cb5978e">conda使用指南</a></li>
+</ol>
+</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span><span class="lnt">5
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 安装pymysql库
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 安装pymysql库
 $ pip install pymysql
 or 
-$ conda install pymysql</pre></td></tr></table>
-</div>
-</div>
-<h4 id="python链接mysql以及基本使用">python链接MySQL以及基本使用</h4>
+$ conda install pymysql
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="python链接mysql以及基本使用">python链接MySQL以及基本使用</h4>
 <p><strong>使用pymysql库操作mysql</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -694,9 +713,10 @@ $ conda install pymysql</pre></td></tr></table>
 </span><span class="lnt">21
 </span><span class="lnt">22
 </span><span class="lnt">23
-</span></pre></td>
+</span><span class="lnt">24
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat pytest_mysql.py
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat pytest_mysql.py
 import pymysql
 # 获取一个mysql链接对象
 conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, charset=&#39;utf8&#39;)
@@ -718,13 +738,14 @@ conn.commit()
 
 # 及时关闭数据库链接以及打开的游标[以防止在并发情况下系统打开连接数过多]
 cursor.close()
-conn.close()</pre></td></tr></table>
+conn.close()
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>尝试用python脚本进行数据库操作</strong></p>
+</div><p><strong>尝试用python脚本进行数据库操作</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -785,9 +806,10 @@ conn.close()</pre></td></tr></table>
 </span><span class="lnt">59
 </span><span class="lnt">60
 </span><span class="lnt">61
-</span></pre></td>
+</span><span class="lnt">62
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat test_show_table.py
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat test_show_table.py
 import sys
 reload(sys)
 sys.setdefaultencoding(&#39;utf-8&#39;)
@@ -847,17 +869,16 @@ $ python test_show_table.py
 (u&#39;time_zone_name&#39;,)
 (u&#39;time_zone_transition&#39;,)
 (u&#39;time_zone_transition_type&#39;,)
-(u&#39;user&#39;,)</pre></td></tr></table>
-</div>
-</div>
-<h4 id="mysql数据库常用的一些操作">MySQL数据库常用的一些操作</h4>
+(u&#39;user&#39;,)
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="mysql数据库常用的一些操作">MySQL数据库常用的一些操作</h4>
 <p><code>注意:在之前我们创建的MySQL实例中仅是一个空的数据库，在实际使用之前，我们需要进行数据库的库表结构创建，以及相关的数据库授权，而这一部分操作通常会由专业的数据库管理员(DBA)进行操作和处理</code></p>
-
 <p>接下来对一个<code>website</code>数据库和<code>use</code>表进行操作:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -875,9 +896,10 @@ $ python test_show_table.py
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span><span class="lnt">19
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">mysql&gt; create database website;
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">mysql&gt; create database website;
 Query OK, 1 row affected (0.00 sec)
 mysql&gt; CREATE TABLE  IF NOT EXISTS useinfo (userid int(10) primary key not null auto_increment,username varchar(20) not null,usersite varchar(50),other varchar(50)) DEFAULT CHARSET=utf8;
 Query OK, 0 rows affected (0.02 sec)
@@ -894,13 +916,14 @@ mysql&gt; describe useinfo;
 
 # 数据库授权[授权所有的主机可以以root用户,123456的密码去操作website库]
 mysql&gt; grant all on website.* to root@&#39;%&#39; identified by &#34;123456&#34;;
-Query OK, 0 rows affected (0.00 sec)</pre></td></tr></table>
+Query OK, 0 rows affected (0.00 sec)
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="对指定数据库进行相关查询操作">对指定数据库进行相关查询操作</h4>
+</div><h4 id="对指定数据库进行相关查询操作">对指定数据库进行相关查询操作</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -916,9 +939,9 @@ Query OK, 0 rows affected (0.00 sec)</pre></td></tr></table>
 </span><span class="lnt">14
 </span><span class="lnt">15
 </span><span class="lnt">16
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 依然是上面那个test_show_table.py脚本,不过我们改变一下`__main__`
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 依然是上面那个test_show_table.py脚本,不过我们改变一下`__main__`
 $ cat test_show_table.py
 .....
 if __name__ == &#39;__main__&#39;:
@@ -933,16 +956,15 @@ $ python test_show_table.py
 (u&#39;userid&#39;, u&#39;int(10)&#39;, u&#39;NO&#39;, u&#39;PRI&#39;, None, u&#39;auto_increment&#39;)
 (u&#39;username&#39;, u&#39;varchar(20)&#39;, u&#39;NO&#39;, u&#39;&#39;, None, u&#39;&#39;)
 (u&#39;usersite&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)
-(u&#39;other&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)</pre></td></tr></table>
+(u&#39;other&#39;, u&#39;varchar(20)&#39;, u&#39;YES&#39;, u&#39;&#39;, None, u&#39;&#39;)
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="对mysql数据库进行插入操作">对MySQL数据库进行插入操作</h4>
-
+</div><h4 id="对mysql数据库进行插入操作">对MySQL数据库进行插入操作</h4>
 <p><code>注意:插入操作分为单条记录插入和批量插入,一般数据库都支持批量插入方法,在pysql中为cursor.executemany(sql,args)</code>
 <code>为我们的mysqlObj类增加一个插入操作:</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1015,9 +1037,9 @@ $ python test_show_table.py
 </span><span class="lnt">71
 </span><span class="lnt">72
 </span><span class="lnt">73
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat test_show_table.py
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat test_show_table.py
 ....
 ....
     #注意插入数据时单条记录使用tuple()类型;批量插入数据时使用list()类型
@@ -1089,13 +1111,13 @@ mysql&gt; select * from website.useinfo;
 |      2 | xxbandy  | http://xxbandy.github.io               | NULL  |
 |      3 | 彪哥   | http://xxbandy.github.io               | NULL  |
 |      4 | bgbiao   | https://www.jianshu.com/u/9c46ece5b7bd | NULL  |
-+--------+----------+----------------------------------------+-------+</pre></td></tr></table>
++--------+----------+----------------------------------------+-------+
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="源码">源码</h4>
+</div><h4 id="源码">源码</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1169,9 +1191,10 @@ mysql&gt; select * from website.useinfo;
 </span><span class="lnt">72
 </span><span class="lnt">73
 </span><span class="lnt">74
-</span></pre></td>
+</span><span class="lnt">75
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">import sys
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">import sys
 reload(sys)
 sys.setdefaultencoding(&#39;utf-8&#39;)
 import pymysql
@@ -1244,7 +1267,9 @@ if __name__ == &#39;__main__&#39;:
     #更新数据
     data = &#34;https://my.oschina.net/xxbAndy&#34;
     mysqlobj.changedata(&#39;&#39;&#39;update useinfo set usersite=%s where userid = 1&#39;&#39;&#39;,data)
-    mysqlobj.querydata(&#34;select * from useinfo&#34;)</pre></td></tr></table>
+    mysqlobj.querydata(&#34;select * from useinfo&#34;)
+
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>
@@ -1259,7 +1284,7 @@ if __name__ == &#39;__main__&#39;:
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2019-12-03
+      2020-11-01
       
         
         

@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,10 +69,8 @@
 <meta property="article:modified_time" content="2020-06-08T00:00:00+00:00" />
 <meta itemprop="name" content="Git常用命令">
 <meta itemprop="description" content="在日常工作中，可能经常会遇到一些一致性需求，需要将本地代码和Git远端代码保持一致，因此这里就主要来记录一些Git的日常操作。 强制覆盖本地代">
-
-
-<meta itemprop="datePublished" content="2020-06-08T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-06-08T00:00:00&#43;00:00" />
+<meta itemprop="datePublished" content="2020-06-08T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-06-08T00:00:00+00:00" />
 <meta itemprop="wordCount" content="311">
 
 
@@ -483,7 +481,7 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
 
@@ -492,13 +490,11 @@ if (!doNotTrack) {
       <blockquote>
 <p>在日常工作中，可能经常会遇到一些一致性需求，需要将本地代码和Git远端代码保持一致，因此这里就主要来记录一些Git的日常操作。</p>
 </blockquote>
-
 <p><strong>强制覆盖本地代码</strong></p>
-
 <p>有时候，我们不小心修改错了代码或者之前构思的业务逻辑被推翻了，但是这个迭代中我们增加了很多代码，想要尽快回滚到上一个稳定版本的分支，我们就可以采用强制覆盖本地代码的方式来实现，此时距离上一次commit修改的代码将会被强制覆盖，可以很好的将我们本次的错误需求代码清理掉。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -512,9 +508,9 @@ if (!doNotTrack) {
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 首先将远端代码全部fetch下来
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 首先将远端代码全部fetch下来
 ➜  kafka git:(master) ✗ git fetch --all
 Fetching origin
 Fetching bgbiao
@@ -527,12 +523,11 @@ HEAD is now at 1223981 update the go.mod fix the &#39;module declares its path a
 
 # 重新pull
 ➜  kafka git:(master) git pull
-Already up to date.</pre></td></tr></table>
+Already up to date.
+</code></pre></td></tr></table>
 </div>
-</div>
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</div><hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
 
     </div>
 

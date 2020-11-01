@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>gin on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in gin on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/gin/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/gin/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>使用jwt-go验证API</title>
       <link>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
@@ -38,9 +34,7 @@
       
       <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/</guid>
       <description>&lt;h3 id=&#34;gin框架介绍&#34;&gt;Gin框架介绍&lt;/h3&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://github.com/gin-gonic/gin&#34;&gt;Gin&lt;/a&gt;是一个用 Go (Golang) 编写的 web 框架。它是一个类似于&lt;a href=&#34;https://github.com/go-martini/martini&#34;&gt;martini&lt;/a&gt;但性能更好的API框架，不同于谢大主导的&lt;a href=&#34;https://beego.me/&#34;&gt;Beego&lt;/a&gt;web框架，后者更像是Python语言中的&lt;code&gt;Django&lt;/code&gt;框架，内部包含了开发一个web程序所需的各种组件。&lt;/p&gt;
-
 &lt;p&gt;如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。&lt;/p&gt;</description>
     </item>
     

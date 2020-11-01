@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>状态码异常 on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in 状态码异常 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Traefik中的502-500状态码异常排查</title>
       <link>https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/</link>

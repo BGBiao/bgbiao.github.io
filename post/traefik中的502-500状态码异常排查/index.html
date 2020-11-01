@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -74,11 +74,9 @@
 <meta itemprop="description" content="
 我们都知道在Kubernetes集群中通常会使用Ingress方案来统一代理集群内部的流量，而常用的Ingress方案为traefik和nginx，和传统的Nginx作为企业内部的反向代理以及负载设备一样，在不同的场景下可能需要专有的配置才能满足需求，否则会出现奇奇怪怪的异常状态码。本篇文章一起来看下，我们在traefik中遇到的500和502异常。
 ">
-
-
-<meta itemprop="datePublished" content="2020-06-28T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-06-28T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="4835">
+<meta itemprop="datePublished" content="2020-06-28T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-06-28T00:00:00+00:00" />
+<meta itemprop="wordCount" content="4845">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 4835 words </span>
+        <span class="more-meta"> 4845 words </span>
           <span class="more-meta"> 10 min read </span>
 
         
@@ -491,24 +489,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#一-前言">一、前言</a></li>
-<li><a href="#二-traefik中诡异的500和502">二、traefik中诡异的500和502</a>
-<ul>
-<li><a href="#traefik在kubernetes集群中的部署配置">traefik在Kubernetes集群中的部署配置</a></li>
-<li><a href="#python的对外api接口">Python的对外API接口</a></li>
-<li><a href="#诡异的500和502">诡异的500和502</a></li>
-<li><a href="#traefik中500和502问题排查">traefik中500和502问题排查</a></li>
-<li><a href="#500和502问题解决方案">500和502问题解决方案</a></li>
-</ul></li>
-<li><a href="#三-slb中诡异的503">三、SLB中诡异的503</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一前言">一、前言</a></li>
+        <li><a href="#二traefik中诡异的500和502">二、traefik中诡异的500和502</a></li>
+        <li><a href="#三slb中诡异的503">三、SLB中诡异的503</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -518,20 +507,17 @@ if (!doNotTrack) {
       <blockquote>
 <p>我们都知道在Kubernetes集群中通常会使用Ingress方案来统一代理集群内部的流量，而常用的Ingress方案为<a href="https://docs.traefik.io/">traefik</a>和<a href="https://github.com/kubernetes/ingress-nginx">nginx</a>，和传统的Nginx作为企业内部的反向代理以及负载设备一样，在不同的场景下可能需要专有的配置才能满足需求，否则会出现奇奇怪怪的异常状态码。本篇文章一起来看下，我们在<code>traefik</code>中遇到的500和502异常。</p>
 </blockquote>
-
-<h3 id="一-前言">一、前言</h3>
-
+<h3 id="一前言">一、前言</h3>
 <p>在开始之前，我们先来看几个在Nginx作为反向代理工具中经常遇到的几个异常状态码：</p>
-
 <ul>
 <li>499: 客户端主动断开连接。通常为一次请求未在客户端指定时间内返回，客户端主动关闭连接，客户端无数据返回(在Nginx中会记录499)。一般是<code>客户端超时</code></li>
 <li>500: 服务器内部错误。服务器遇到未知错误导致无法完成请求处理，通常由于后端业务逻辑异常导致(本身Bug)</li>
 <li>502: 网关错误。通常为网关未从上游服务中获取期望的响应(<code>上游未返回数据或未按照协议约定返回数据</code>)，网关感觉自己没用了，返回了网关错误。一般是<code>后端服务器宕机</code>或<code>业务逻辑超时</code></li>
-
-<li><p>504: 网关超时。表示网关没有及时从上游获取响应数据。一般是Nginx网关作为客户端去向上游服务请求响应的过程中，Nginx网关超时导致，但此时对于上游服务器来将，它会继续执行，直到结束。(<code>Nginx网关作为客户端时的超时</code>)</p>
+<li>504: 网关超时。表示网关没有及时从上游获取响应数据。一般是Nginx网关作为客户端去向上游服务请求响应的过程中，Nginx网关超时导致，但此时对于上游服务器来将，它会继续执行，直到结束。(<code>Nginx网关作为客户端时的超时</code>)</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -561,9 +547,11 @@ if (!doNotTrack) {
 </span><span class="lnt">28
 </span><span class="lnt">29
 </span><span class="lnt">30
-</span></pre></td>
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 499 的实际情况就是，客户端指定超时时间为N秒，但是该请求在服务端实际需要执行M秒(M&gt;N秒)，客户端等的不耐烦了就关闭了
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 499 的实际情况就是，客户端指定超时时间为N秒，但是该请求在服务端实际需要执行M秒(M&gt;N秒)，客户端等的不耐烦了就关闭了
 # 对于499状态来讲，解决方式是优化后端代码逻辑或者修改nginx参数
 $ cat nginx.conf
 proxy_ignore_client_abort    on;
@@ -573,9 +561,9 @@ $ curl -i -m 3 http://127.0.0.1/hello.php
 # 502的实际情况通常是Nginx网关后端的服务器直接宕机了(所以就拿不到上游的响应了)
 # 当然也有可能是上游服务器真正的执行逻辑超过了上游服务器的超时时间限制(比如php-fpm.conf设置request_terminate_timeout5s，但是实际的业务逻辑需要7s才能完成)，此时上游服务器端出现`业务逻辑超时`，给Nginx网关返回了异常的数据造成的
 # 502时后端的几种错误日志
-recv() failed (104: Connection reset by peer) while reading response header from upstream
-upstream prematurely closed connection while reading response header from upstream
-connect() failed (111: Connection refused) while connecting to upstream
+ recv() failed (104: Connection reset by peer) while reading response header from upstream
+ upstream prematurely closed connection while reading response header from upstream
+ connect() failed (111: Connection refused) while connecting to upstream
 # 整体来说502出现的问题通常是因为后端挂了，或者因为后端负载太高，暂时不可响应
 # 可以在nginx侧增加proxy_read_timeout来暂时缓解
 $ cat nginx.conf
@@ -592,19 +580,17 @@ fastcgi_read_timeout 5;
 fastcgi_send_timeout 5;
 proxy_connect_timeout      90;
 proxy_send_timeout         90;
-proxy_read_timeout         90;</pre></td></tr></table>
+proxy_read_timeout         90;
+
+
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<h3 id="二-traefik中诡异的500和502">二、traefik中诡异的500和502</h3>
-
+</div><h3 id="二traefik中诡异的500和502">二、traefik中诡异的500和502</h3>
 <h4 id="traefik在kubernetes集群中的部署配置">traefik在Kubernetes集群中的部署配置</h4>
-
 <p>我们当前集群的traefik的配置如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -721,9 +707,11 @@ proxy_read_timeout         90;</pre></td></tr></table>
 </span><span class="lnt">115
 </span><span class="lnt">116
 </span><span class="lnt">117
-</span></pre></td>
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># traefik的configmap配置文件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># traefik的configmap配置文件
 $ cat traefik-config.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -839,13 +827,15 @@ spec:
       name: web
     - protocol: TCP
       port: 8080
-      name: admin</pre></td></tr></table>
+      name: admin
+
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="python的对外api接口">Python的对外API接口</h4>
+</div><h4 id="python的对外api接口">Python的对外API接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -870,9 +860,10 @@ spec:
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
-</span></pre></td>
+</span><span class="lnt">26
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 接口对外的ingress
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 接口对外的ingress
 $ kubectl  get ingress -n s-data
 NAME                     HOSTS                    ADDRESS   PORTS   AGE
 data-api.bgbiao.cn   data-api.bgbiao.cn             80      236d
@@ -896,15 +887,15 @@ Access-Control-Allow-Origin: *
 Content-Length: 250
 Content-Type: application/json
 Vary: Accept-Encoding
-Date: Sun, 28 Jun 2020 14:56:33 GMT</pre></td></tr></table>
-</div>
-</div>
-<h4 id="诡异的500和502">诡异的500和502</h4>
+Date: Sun, 28 Jun 2020 14:56:33 GMT
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="诡异的500和502">诡异的500和502</h4>
 <p>在服务部署完成后，一切皆正常，但是简单压测后发现服务出现部分请求失败。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -965,9 +956,11 @@ Date: Sun, 28 Jun 2020 14:56:33 GMT</pre></td></tr></table>
 </span><span class="lnt">59
 </span><span class="lnt">60
 </span><span class="lnt">61
-</span></pre></td>
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 使用ab工具进行压测
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 使用ab工具进行压测
 # 由压测结果可以发现，20个并发共压测200个请求，期间出现了7次失败请求
 $ ab -c 20 -n 200   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
 ...
@@ -1027,19 +1020,18 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
     196 HTTP/1.0 200 OK
       2 HTTP/1.0 500 Internal Server Error
       2 HTTP/1.0 502 Bad Gateway
-      1 POST /account/users/login/ HTTP/1.0</pre></td></tr></table>
-</div>
-</div>
-<h4 id="traefik中500和502问题排查">traefik中500和502问题排查</h4>
+      1 POST /account/users/login/ HTTP/1.0
 
+
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="traefik中500和502问题排查">traefik中500和502问题排查</h4>
 <p>前面我们提到了在Nginx的场景中的500和502状态码的原因以及相关的解决方式，那么在Kubernetes集群中，traefik起到的作用和Nginx的作用也是相似的。</p>
-
 <p>在开始的时候，我们提到了集群内的traefik的配置信息，对于SRE来讲，任何生产的服务都必须有相关的可观测性数据，因此，我们也默认将traefik的访问日志和进程日志进行了持久化(分别对应<code>access.log和traefik.log</code>)，同时也暴露了traefik的prometheus的metrics接口。</p>
-
 <p>对于上面的压测请求，我们在访问日志里抓到了如下的异常日志:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1051,9 +1043,10 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span></pre></td>
+</span><span class="lnt">13
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ tail -f access.log | grep data-api.bgbiao.cn | grep -v &#39;HTTP/1.0&#34; 200&#39;
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ tail -f access.log | grep data-api.bgbiao.cn | grep -v &#39;HTTP/1.0&#34; 200&#39;
 192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267376 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
 192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267385 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
 192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267410 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
@@ -1064,80 +1057,76 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272696 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 2ms
 192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272711 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
 192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272836 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 0ms
-192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272837 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms</pre></td></tr></table>
-</div>
-</div>
-<p>可以看到，和我们压测结果里失败请求的状态码相同，都是<code>500</code>和<code>502</code>，虽然数量上不止4个，但这暂时不太重要。</p>
+192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272837 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
 
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到，和我们压测结果里失败请求的状态码相同，都是<code>500</code>和<code>502</code>，虽然数量上不止4个，但这暂时不太重要。</p>
 <p>通常对于大多数人来讲，在代理层看到500或者502都会下意识的想，肯定是上游服务的问题，不过这种猜测也能很快进行排除，排除的方法基本如下:</p>
-
 <ul>
 <li>在压测出现500和502期间，持续去访问上游服务器</li>
 <li>使用同样的压测参数直接压上游服务器</li>
 <li>将上游服务部署在独立的ECS上并使用同样参数进行压测</li>
 </ul>
-
 <p>经过上述三种方式的测试后，我们基本排除了上游服务的问题，因此正式怀疑traefik本身是否有性能或者其他参数上的问题。</p>
-
 <p>修改traefki中的日志级别为<code>DEBUG</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat traefik-ds-v1.7.6.yaml
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat traefik-ds-v1.7.6.yaml
 ....
         args:
         - --api
         - --kubernetes
         - --logLevel=DEBUG
-....</pre></td></tr></table>
+....
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>然后在日志中看到如下相关信息:</p>
+</div><p>然后在日志中看到如下相关信息:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 500相关的日志
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 500相关的日志
 time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;&#39;500 Internal Server Error&#39; caused by: http: server closed idle connection&#34;
 time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 500, Length: 21, duration: 1.486276ms&#34;
 
 # 502相关的日志
 time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;&#39;502 Bad Gateway&#39; caused by: EOF&#34;
-time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 502, Length: 11, duration: 1.530677ms&#34;</pre></td></tr></table>
-</div>
-</div>
-<p>上面的500信息，大概可以看出来是traefik的服务进程主动关闭了空闲链接导致的，而下面的502是因为EOF，感觉像是没有读取完响应数据，就被断开了，导致traefik返回502。通常这种情况在Nginx中很常见，也很容易调整相关的配置参数(文章开始有提到)，但是traefik的部署模式以及参数调整，还是需要花心思去看相关文档的。</p>
+time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 502, Length: 11, duration: 1.530677ms&#34;
 
+</code></pre></td></tr></table>
+</div>
+</div><p>上面的500信息，大概可以看出来是traefik的服务进程主动关闭了空闲链接导致的，而下面的502是因为EOF，感觉像是没有读取完响应数据，就被断开了，导致traefik返回502。通常这种情况在Nginx中很常见，也很容易调整相关的配置参数(文章开始有提到)，但是traefik的部署模式以及参数调整，还是需要花心思去看相关文档的。</p>
 <p>然后在github上去翻traefik相关的issues，发现该问题曾经出现过很多次。</p>
-
 <ul>
 <li><a href="https://github.com/containous/traefik/issues/4481">Traefik return 500 internal error - no 500 on backend</a></li>
 <li><a href="https://github.com/containous/traefik/issues/3237">Sporadic 502 response only when running through traefik</a></li>
 </ul>
-
 <p>一个是500的issues，一个是502的issues，但通常这两个问题都是成双出现的。</p>
-
 <h4 id="500和502问题解决方案">500和502问题解决方案</h4>
-
 <p>在上面第一个issue中提到，traefik在http的反向代理功能中默认开启了http的keep-alive功能，但是python的应用中未开启http的keep-alive，因为我们上面的测试程序其实也是使用的python开发的，先对该参数进行调整。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1189,9 +1178,9 @@ time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/htt
 </span><span class="lnt">50
 </span><span class="lnt">51
 </span><span class="lnt">52
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 在uwsgi.ini中增加keep-alive参数即可
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 在uwsgi.ini中增加keep-alive参数即可
 $ cat uwsgi.ini
 [uwsgi]
 http = 0.0.0.0:8080
@@ -1242,15 +1231,14 @@ Percentage of the requests served within a certain time (ms)
   95%   2281
   98%   4209
   99%   7399
- 100%  32685 (longest request)</pre></td></tr></table>
+ 100%  32685 (longest request)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>通过对业务层的http的keep-alive参数的开启，来暂时解决了500和502的问题，那能否通过traefik层的参数来优化该问题呢，上面第二个issue中其实也提到了。</p>
-
+</div><p>通过对业务层的http的keep-alive参数的开启，来暂时解决了500和502的问题，那能否通过traefik层的参数来优化该问题呢，上面第二个issue中其实也提到了。</p>
 <p>即，通过修改traefik的如下几个参数，并重新部署整个traefik集群即可:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1278,9 +1266,9 @@ Percentage of the requests served within a certain time (ms)
 </span><span class="lnt">26
 </span><span class="lnt">27
 </span><span class="lnt">28
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 关闭traefik的keep-alive参数，参数默认为200，如果参数为0，则使用go标准库中的DefaultMaxIdleConnsPerHost参数
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 关闭traefik的keep-alive参数，参数默认为200，如果参数为0，则使用go标准库中的DefaultMaxIdleConnsPerHost参数
 # keep-alive主要是用来复用链接来减少open files的，但是对于大量的短连接来将这种链接复用就可能出现上述情况
 --maxidleconnsperhost=-1 
 # 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间,默认是0次
@@ -1307,13 +1295,13 @@ $ ./traefik --help | grep idletimeout
 $ ./traefik --help | grep forwardingtimeouts
     --forwardingtimeouts                          Timeouts for requests forwarded to the backend servers                           (default &#34;true&#34;)
     --forwardingtimeouts.dialtimeout              The amount of time to wait until a connection to a backend server can be         (default &#34;30s&#34;)
-    --forwardingtimeouts.responseheadertimeout    The amount of time to wait for a server&#39;s response headers after fully writing   (default &#34;0s&#34;)</pre></td></tr></table>
+    --forwardingtimeouts.responseheadertimeout    The amount of time to wait for a server&#39;s response headers after fully writing   (default &#34;0s&#34;)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>最终修改后的traefik的参数如下:</p>
+</div><p>最终修改后的traefik的参数如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1325,9 +1313,9 @@ $ ./traefik --help | grep forwardingtimeouts
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 可以根据实际情况考虑是否要关闭keep-alive 即增加参数: --maxidleconnsperhost=-1
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 可以根据实际情况考虑是否要关闭keep-alive 即增加参数: --maxidleconnsperhost=-1
         - --api
         - --kubernetes
         - --logLevel=INFO
@@ -1338,17 +1326,15 @@ $ ./traefik --help | grep forwardingtimeouts
         - --forwardingtimeouts.responseheadertimeout=60s
         - --respondingtimeouts.idletimeout=180s
         - --retry.attempts=10
-        - --idletimeout=180s</pre></td></tr></table>
+        - --idletimeout=180s
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="三-slb中诡异的503">三、SLB中诡异的503</h3>
-
+</div><h3 id="三slb中诡异的503">三、SLB中诡异的503</h3>
 <p>在发现域名直接解析到traefik节点上不再出现502和500后，我们将traefik的节点挂载到阿里云的内网slb中，但是又开始出现了诡异的503问题。</p>
-
 <p>接入slb后的简单压测情况(内网使用的是免费低配的slb😹)</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1372,9 +1358,9 @@ $ ./traefik --help | grep forwardingtimeouts
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># client-&gt;ali-slb-&gt;traefik-&gt;pods
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># client-&gt;ali-slb-&gt;traefik-&gt;pods
 $ ab -v 10 -c 200 -n 2000   -T &#39;application/json&#39; -p postfile.json http://data-api.soulapp.cn/get_doc &gt; slb-log.txt
 $ cat slb-log.txt | grep  &#39;HTTP/1.1 200&#39; | wc -l
 1322
@@ -1397,16 +1383,13 @@ Completed 2000 requests
 Finished 2000 requests
 
 $ cat traefik-log.txt  | grep  &#39;HTTP/1.0 200&#39; | wc -l
-2000</pre></td></tr></table>
+2000
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>后来在阿里云文档中看到如下文档，基本上就是在阿里云的SLB侧对不同规格的SLB做了一定的限流策略，此时会向客户端返回503。</p>
-
+</div><p>后来在阿里云文档中看到如下文档，基本上就是在阿里云的SLB侧对不同规格的SLB做了一定的限流策略，此时会向客户端返回503。</p>
 <p><a href="https://help.aliyun.com/knowledge_detail/102765.html?spm=5176.2000002.0.0.1f9641e8ymfAas">阿里云TPS-503</a></p>
-
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

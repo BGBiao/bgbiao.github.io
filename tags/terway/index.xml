@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>terway on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in terway on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 27 Oct 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/terway/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 27 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/terway/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>基于阿里云Terway网络的Kubernetes集群实践</title>
       <link>https://bgbiao.top/post/k8s-ali-terway/</link>

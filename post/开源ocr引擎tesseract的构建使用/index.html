@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -64,9 +64,7 @@
 
 <meta property="og:title" content="开源OCR引擎tesseract的构建使用" />
 <meta property="og:description" content="简介
-
 OCR
-
 光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" />
@@ -74,15 +72,11 @@ OCR
 <meta property="article:modified_time" content="2017-12-09T15:59:29+00:00" />
 <meta itemprop="name" content="开源OCR引擎tesseract的构建使用">
 <meta itemprop="description" content="简介
-
 OCR
-
 光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。">
-
-
-<meta itemprop="datePublished" content="2017-12-09T15:59:29&#43;00:00" />
-<meta itemprop="dateModified" content="2017-12-09T15:59:29&#43;00:00" />
-<meta itemprop="wordCount" content="3144">
+<meta itemprop="datePublished" content="2017-12-09T15:59:29+00:00" />
+<meta itemprop="dateModified" content="2017-12-09T15:59:29+00:00" />
+<meta itemprop="wordCount" content="3153">
 
 
 
@@ -90,9 +84,7 @@ OCR
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="开源OCR引擎tesseract的构建使用"/>
 <meta name="twitter:description" content="简介
-
 OCR
-
 光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。"/>
 
 <!--[if lte IE 9]>
@@ -480,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 3144 words </span>
+        <span class="more-meta"> 3153 words </span>
           <span class="more-meta"> 7 min read </span>
 
         
@@ -497,28 +489,17 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#简介">简介</a>
-<ul>
-<li><a href="#ocr">OCR</a></li>
-<li><a href="#tesseract">tesseract</a></li>
-<li><a href="#场景">场景</a></li>
-</ul></li>
-<li><a href="#部署安装">部署安装</a>
-<ul>
-<li><a href="#使用yum安装">使用yum安装</a></li>
-<li><a href="#2-源码编译最新版本-4-00-00alpha版本">2.源码编译最新版本(4.00.00alpha版本)</a></li>
-</ul></li>
-<li><a href="#简单使用">简单使用</a></li>
-<li><a href="#可能遇到的问题">可能遇到的问题</a></li>
-<li><a href="#福利">福利</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#简介">简介</a></li>
+        <li><a href="#部署安装">部署安装</a></li>
+        <li><a href="#简单使用">简单使用</a></li>
+        <li><a href="#可能遇到的问题">可能遇到的问题</a></li>
+        <li><a href="#福利">福利</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -526,36 +507,23 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h3 id="简介">简介</h3>
-
 <h4 id="ocr">OCR</h4>
-
 <p>光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。</p>
-
 <h4 id="tesseract">tesseract</h4>
-
 <p>Tesseract的OCR引擎最先由HP实验室于1985年开始研发，至1995年时已经成为OCR业内最准确的三款识别引擎之一。然而，HP不久便决定放弃OCR业务，Tesseract也从此尘封。
 数年以后，HP意识到，与其将Tesseract束之高阁，不如贡献给开源软件业，让其重焕新生－－2005年，Tesseract由美国内华达州信息技术研究所获得，并求诸于Google对Tesseract进行改进、消除Bug、优化工作。</p>
-
 <p><a href="https://github.com/tesseract-ocr/tesseract">tesseract官方地址</a></p>
-
 <p>需要注意的是，tesseract3.0以上才支持中文，而且从官方文档上看4.0版本（2017年1月左右发布）显著的提高了识别率，同时也加大了性能的消耗。</p>
-
 <h4 id="场景">场景</h4>
-
 <p>一个亲身经历的场景就是以前去开户可能需要带上身份证资料各种去打印复印件进行物理备份，而使用OCR等相关人工智能技术后就可以通过手机摄像头快速识别身份证相关信息来存储个人资料，整个开户体验相当高效简单。</p>
-
 <p>另外一个常见的场景可能就是我们手写的文章需要扫描成电子版，在以前我们可能需要专业的打印机设备才能够进行电子扫描，而当OCR相关技术普及到普通业务场景后，我们就可以使用手持设备进行纸质版的文件进行电子扫描。[个人之前尝试使用有道云笔记中的电子扫描功能还是相当不错的]</p>
-
 <h3 id="部署安装">部署安装</h3>
-
 <p>tesseract需要<a href="http://www.leptonica.org/download.html">Leptonica</a>的支持，leptonica是一个开源的面向教学的软件，通常被用来作为图像处理和图像分析的一个底层库支持。</p>
-
 <h4 id="使用yum安装">使用yum安装</h4>
-
 <p>Centos7中的epel源中包含了tesseract的3.05版本的包，可以直接安装使用。而在tesseract的github官方项目中最新版本也只到<a href="https://github.com/tesseract-ocr/tesseract/releases">3.05.01</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -604,9 +572,10 @@ if (!doNotTrack) {
 </span><span class="lnt">47
 </span><span class="lnt">48
 </span><span class="lnt">49
-</span></pre></td>
+</span><span class="lnt">50
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ sudo yum install epel-release
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ sudo yum install epel-release
  -y
 # 查看epel源
 $ cat /etc/yum.repos.d/epel.repo 
@@ -654,17 +623,16 @@ $ tesseract --list-langs
 List of available languages (3):
 eng
 chi_sim
-chi_tra</pre></td></tr></table>
-</div>
-</div>
-<h4 id="2-源码编译最新版本-4-00-00alpha版本">2.源码编译最新版本(4.00.00alpha版本)</h4>
+chi_tra
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="2源码编译最新版本40000alpha版本">2.源码编译最新版本(4.00.00alpha版本)</h4>
 <p>从官网上看，4.0版本在识别率以及性能等各方面上要比3.0版本高好多，但是官方又没有提供4.0的release版本，因此接下来使用github上的源码来手动编译<a href="https://github.com/tesseract-ocr/tesseract/tree/4.00.00alpha">tesseract4.00.00alpha</a>版本。同时由于对底层Leptonica的依赖，需要优先编译该库的依赖。</p>
-
 <p><code>注意：宿主操作系统仍然是一个纯净的Centos7.3.1611的OS</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -803,9 +771,11 @@ chi_tra</pre></td></tr></table>
 </span><span class="lnt">137
 </span><span class="lnt">138
 </span><span class="lnt">139
-</span></pre></td>
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 安装基础依赖
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 安装基础依赖
 # sudo yum install gcc git gcc-c++ make automake libtool libpng-devel libjpeg-devel libtiff-devel zlib-devel -y
 
 # 安装leptonica-1.74.4
@@ -943,40 +913,17 @@ Could not initialize tesseract.
 List of available languages (3):
 chi_sim
 eng
-chi_tra</pre></td></tr></table>
-</div>
-</div>
-<p>至此，环境中已经能够正常使用<code>tesseract</code>命令了，基本上可以认为tesseract环境已经编译完成，接下来就是具体看看如何去使用tesseract了</p>
+chi_tra
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p>至此，环境中已经能够正常使用<code>tesseract</code>命令了，基本上可以认为tesseract环境已经编译完成，接下来就是具体看看如何去使用tesseract了</p>
 <h3 id="简单使用">简单使用</h3>
-
-<p><img src="https://img.alicdn.com/simba/img/TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg" alt="" /></p>
+<p><img src="https://img.alicdn.com/simba/img/TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg" alt=""></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
-Tesseract Open Source OCR Engine v3.04.00 with Leptonica
-
-
-$ cat test.txt 
-走心特惠
-不玩套路</pre></td></tr></table>
-</div>
-</div>
-<p>可以看出来对比较规范的字体还是可以正常识别的。</p>
-
-<h3 id="可能遇到的问题">可能遇到的问题</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -986,52 +933,25 @@ $ cat test.txt
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 测试使用
-# tesseract 5a0178d2N01754832.jpg test -l chi_sim 
-Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
-pixReadStreamJpeg: function not present
-Error in fopenReadStream: file not found
-Error in findFileFormat: image file not found
-Error during processing.
-
-# 以上提示是因为Leptonica不支持某些图片格式
-# yum install ImageMagick -y 
-# 重新编译Leptonica(增加--with-libpng参数)
-# cd /export/servers/leptonica-1.74 ;./configure --with-libpng &amp;&amp; make &amp;&amp; make install 
-
- 
-# 再次测试
-$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
 Tesseract Open Source OCR Engine v3.04.00 with Leptonica
 
 
 $ cat test.txt 
 走心特惠
-不玩套路</pre></td></tr></table>
-</div>
-</div>
-<h3 id="福利">福利</h3>
+不玩套路
 
-<p>由于目前tesseract官方并未直接提供4.0的软件包，并且tesseract环境的构建也是稍微比较复杂，为了秉承造福群众的理念，我将以上环境封装成Docker image供各位网友使用。具体使用方式如下：</p>
 
-<p><code>前提：需要有一个可用的Docker环境，任何版本都可以</code></p>
+
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看出来对比较规范的字体还是可以正常识别的。</p>
+<h3 id="可能遇到的问题">可能遇到的问题</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1055,9 +975,67 @@ $ cat test.txt
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 下载镜像(稍微有点大1.6G)
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 测试使用
+# tesseract 5a0178d2N01754832.jpg test -l chi_sim 
+Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
+pixReadStreamJpeg: function not present
+Error in fopenReadStream: file not found
+Error in findFileFormat: image file not found
+Error during processing.
+
+# 以上提示是因为Leptonica不支持某些图片格式
+# yum install ImageMagick -y 
+# 重新编译Leptonica(增加--with-libpng参数)
+# cd /export/servers/leptonica-1.74 ;./configure --with-libpng &amp;&amp; make &amp;&amp; make install 
+
+ 
+# 再次测试
+$ tesseract TB1L8SKhwnH8KJjSspcSuv3QFXa.jpg test -l chi_sim
+Tesseract Open Source OCR Engine v3.04.00 with Leptonica
+
+
+$ cat test.txt 
+走心特惠
+不玩套路
+
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="福利">福利</h3>
+<p>由于目前tesseract官方并未直接提供4.0的软件包，并且tesseract环境的构建也是稍微比较复杂，为了秉承造福群众的理念，我将以上环境封装成Docker image供各位网友使用。具体使用方式如下：</p>
+<p><code>前提：需要有一个可用的Docker环境，任何版本都可以</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 下载镜像(稍微有点大1.6G)
 # docker pull xxbandy123/tesseract-ocr4.00.00alpha:17-12-05
 
 # 运行tesseract环境
@@ -1080,11 +1058,11 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
 [root@2b4df1a1e9d2 /]# cat test.txt
 一天猫电器全新服务保障
 
-胁 售后无忧</pre></td></tr></table>
-</div>
-</div>
-<p>测试原图<img src="https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg" alt="" /></p>
+胁 售后无忧
 
+</code></pre></td></tr></table>
+</div>
+</div><p>测试原图<img src="https://img.alicdn.com/tfs/TB16FK4SXXXXXXUXXXXXXXXXXXX-790-180.jpg" alt=""></p>
 <p>由此可见，开源的tesseract目前并不能完全识别所有的图片文字，如果需要借助于开源去做业务场景，可能还需要更多的二次改造才能够有所应用。</p>
     </div>
 

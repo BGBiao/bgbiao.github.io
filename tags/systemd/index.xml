@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Systemd on BGBiao的SRE人生</title>
@@ -6,10 +6,15 @@
     <description>Recent content in Systemd on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 03 Nov 2017 09:11:57 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/systemd/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/systemd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>如何更加优雅的使用 Systemd 管理服务</title>
+      <link>https://bgbiao.top/post/systemd-doc/</link>
+      <pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/systemd-doc/</guid>
+      <description>如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do</description>
+    </item>
     
     <item>
       <title>使用Docker镜像快速启动Etcd集群</title>

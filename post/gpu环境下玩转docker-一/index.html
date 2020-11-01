@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -65,9 +65,7 @@
 
 <meta property="og:title" content="GPU环境下玩转Docker(一)" />
 <meta property="og:description" content="背景：
-
 随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。
-
 从GPU到GPGPU
 CPU与GPU" />
 <meta property="og:type" content="article" />
@@ -76,16 +74,12 @@ CPU与GPU" />
 <meta property="article:modified_time" content="2017-10-26T10:07:34+00:00" />
 <meta itemprop="name" content="GPU环境下玩转Docker(一)">
 <meta itemprop="description" content="背景：
-
 随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。
-
 从GPU到GPGPU
 CPU与GPU">
-
-
-<meta itemprop="datePublished" content="2017-10-26T10:07:34&#43;00:00" />
-<meta itemprop="dateModified" content="2017-10-26T10:07:34&#43;00:00" />
-<meta itemprop="wordCount" content="6321">
+<meta itemprop="datePublished" content="2017-10-26T10:07:34+00:00" />
+<meta itemprop="dateModified" content="2017-10-26T10:07:34+00:00" />
+<meta itemprop="wordCount" content="6315">
 
 
 
@@ -93,9 +87,7 @@ CPU与GPU">
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="GPU环境下玩转Docker(一)"/>
 <meta name="twitter:description" content="背景：
-
 随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。
-
 从GPU到GPGPU
 CPU与GPU"/>
 
@@ -484,7 +476,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 6321 words </span>
+        <span class="more-meta"> 6315 words </span>
           <span class="more-meta"> 13 min read </span>
 
         
@@ -501,23 +493,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#背景">背景：</a></li>
-<li><a href="#gpu准备">GPU准备</a></li>
-<li><a href="#gpu驱动安装">GPU驱动安装</a>
-<ul>
-<li><a href="#系统需求">系统需求</a></li>
-<li><a href="#安装前准备">安装前准备</a></li>
-<li><a href="#安装包管理程序-package-manager">安装包管理程序(Package Manager)</a></li>
-<li><a href="#安装后操作">安装后操作</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景：</a></li>
+        <li><a href="#gpu准备">GPU准备</a></li>
+        <li><a href="#gpu驱动安装">GPU驱动安装</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -525,35 +509,24 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h3 id="背景">背景：</h3>
-
 <p>随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。</p>
-
 <p><a href="http://www.jianshu.com/p/e72a352a2bd7">从GPU到GPGPU</a>
 <a href="http://www.jianshu.com/p/609e0530a19c">CPU与GPU</a></p>
-
 <h3 id="gpu准备">GPU准备</h3>
-
 <p><a href="http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#redhat-installation">CUDA安装部署</a></p>
-
 <p><a href="https://developer.nvidia.com/cuda-downloads?target_os=Linux&amp;target_arch=x86_64&amp;target_distro=CentOS&amp;target_version=7&amp;target_type=rpmlocal">CUDA Toolkit下载页面</a></p>
-
 <p><a href="http://www.nvidia.cn/page/home.html">英伟达中文官网</a></p>
-
 <h3 id="gpu驱动安装">GPU驱动安装</h3>
-
 <p><code>注意：由于GPU需要在宿主机上安装相关驱动才能够被用户态的程序所识别，所以需要先安装CUDA</code></p>
-
 <p>参考上述的<code>CUDA安装部署</code></p>
-
 <h4 id="系统需求">系统需求</h4>
-
-<p>想要在系统上使用<code>CUDA</code>，必须安装如下依赖：
-- CUDA-capable CPU
-- 一个特定版本的gcc编译器以及相关工具链
-- <a href="http://developer.nvidia.com/cuda-downloads">NVIDIA CUDA Toolkit</a></p>
-
+<p>想要在系统上使用<code>CUDA</code>，必须安装如下依赖：</p>
+<ul>
+<li>CUDA-capable CPU</li>
+<li>一个特定版本的gcc编译器以及相关工具链</li>
+<li><a href="http://developer.nvidia.com/cuda-downloads">NVIDIA CUDA Toolkit</a></li>
+</ul>
 <p>在linux X86_64架构平台上建议的配置：</p>
-
 <table>
 <thead>
 <tr>
@@ -567,7 +540,6 @@ if (!doNotTrack) {
 <th>CLANG</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>RHEL 7.X</td>
@@ -579,7 +551,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>Centos 7.X</td>
 <td>3.10</td>
@@ -590,7 +561,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>RHEL 6.X</td>
 <td>2.6.32</td>
@@ -601,7 +571,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>Centos 6.X</td>
 <td>2.6.32</td>
@@ -612,7 +581,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>Fedora 25</td>
 <td>4.8.8</td>
@@ -623,7 +591,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>OpenSUSE Leap 42.2</td>
 <td>4.4.27</td>
@@ -634,7 +601,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>SLES 12 SP2</td>
 <td>4.4.21</td>
@@ -645,7 +611,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>Ubuntu 17.04</td>
 <td>4.9.0</td>
@@ -656,7 +621,6 @@ if (!doNotTrack) {
 <td>NO</td>
 <td>3.9</td>
 </tr>
-
 <tr>
 <td>Ubuntu 16.04</td>
 <td>4.4</td>
@@ -669,43 +633,44 @@ if (!doNotTrack) {
 </tr>
 </tbody>
 </table>
-
 <h4 id="安装前准备">安装前准备</h4>
-
-<p>在安装CUDA Toolkit和驱动之前，需要在GPU主机上执行相关的操作：
-- 检测系统中有CUDA-capable GPU卡
-- 检测系统是否是上述列表中支持的linux发行版本
-- 检测系统中是否安装了依赖的gcc编译器
-- 检测系统中是否安装了正确的内核头文件以及开发包
-- 下载NVIDIA CUDA Toolkit
-- 处理一些安装过程中的冲突问题</p>
-
+<p>在安装CUDA Toolkit和驱动之前，需要在GPU主机上执行相关的操作：</p>
+<ul>
+<li>检测系统中有CUDA-capable GPU卡</li>
+<li>检测系统是否是上述列表中支持的linux发行版本</li>
+<li>检测系统中是否安装了依赖的gcc编译器</li>
+<li>检测系统中是否安装了正确的内核头文件以及开发包</li>
+<li>下载NVIDIA CUDA Toolkit</li>
+<li>处理一些安装过程中的冲突问题</li>
+</ul>
 <p><strong>2.1 检测是否有一个CUDA-Capable GPU</strong></p>
-
 <p>如下显示当前主机上支持并有四个GPU设备</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">sh-4.2# lspci | grep -i nvidia
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# lspci | grep -i nvidia
 04:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
 05:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
 06:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-07:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)</pre></td></tr></table>
-</div>
-</div>
-<p><code>注意：如果使用上述命令没有任何输出，那需要更新你的PCI 硬件数据库，然后再次执行；</code></p>
+07:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><code>注意：如果使用上述命令没有任何输出，那需要更新你的PCI 硬件数据库，然后再次执行；</code></p>
 <p>安装nvidia-linux驱动:
 <code>注意:</code> 用户可以在<a href="https://www.nvidia.cn/Download/index.aspx?lang=cn">nvidia-driver</a>页面选择相应型号相应环境的nvidia驱动，并下载rpm格式的驱动程序。同时用户也可以在<a href="https://www.nvidia.com/object/linux-amd64-display-archive.html">nvidia-driver-run</a>页面下载指定版本的二进制驱动程序。通常情况下，推荐使用后者安装nvidia的驱动，但是前者的rpm包中默认也包含了对应的cuda版本，因此rpm包方式更适合傻瓜式安装，而使用二进制方式用户可以自行安装cuda版本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -743,9 +708,10 @@ if (!doNotTrack) {
 </span><span class="lnt">36
 </span><span class="lnt">37
 </span><span class="lnt">38
-</span></pre></td>
+</span><span class="lnt">39
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">sh-4.2# wget -O NVIDIA-Linux-x86_64-375.39.run https://www.nvidia.com/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# wget -O NVIDIA-Linux-x86_64-375.39.run https://www.nvidia.com/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
 sh-4.2# chmod a+x NVIDIA-Linux-x86_64-375.39.run
 # 选择安静模式安装
 sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
@@ -782,13 +748,14 @@ wmi                    19070  2 mxm_wmi,nouveau
 
 # 临时卸载该模块
 sh-4.2# rmmod nouveau
-sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s</pre></td></tr></table>
+sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>查看GPU显卡信息:</p>
+</div><p>查看GPU显卡信息:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -819,9 +786,9 @@ sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s</pre></td></tr></table>
 </span><span class="lnt">29
 </span><span class="lnt">30
 </span><span class="lnt">31
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">sh-4.2# nvidia-smi
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# nvidia-smi
 Wed Oct 18 11:58:03 2017
 +-----------------------------------------------------------------------------+
 | NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
@@ -851,239 +818,220 @@ Wed Oct 18 11:58:03 2017
 
 # Temp 标识GPU设备的温度
 # Memory-Usage 表示内存使用率
-# GPU-Util 表示GPU使用率</pre></td></tr></table>
+# GPU-Util 表示GPU使用率
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意：上述输出也可以看出该系统上有4块GPU设备，使用Tesla M40型号。其中分别有两块卡24G内存，两块是12G内存，分别处于两个PCIE总线上</code></p>
-
+</div><p><code>注意：上述输出也可以看出该系统上有4块GPU设备，使用Tesla M40型号。其中分别有两块卡24G内存，两块是12G内存，分别处于两个PCIE总线上</code></p>
 <p><code>注意：宿主机内存为256G，cpu为Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz 开启超线程后为24颗逻辑cpu(两颗6核心的cpu开启了超线程)</code></p>
-
 <p><code>注意：如果你的GPU卡是NVIDIA的，并且是在http://developer.nvidia.com/cuda-gpus中可用查看到的，那么你的GPU就是 CUDA-capable</code></p>
-
 <p><a href="http://developer.nvidia.com/cuda-gpus">点击</a>查看不同型号的GPU的算力。</p>
-
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-type.png" alt="" /></p>
-
+<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-type.png" alt=""></p>
 <p><strong>2.2 检测Linux的架构和操作系统版本</strong></p>
-
 <p>因为CUDA开发工具只支持一些指定发行版本的linux，需要用户查看操作系统的架构以及发行版本。可以在CUDA Toolkit发布版本的中查看支持的linux版本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span><span class="lnt">4
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># uname -m &amp;&amp; cat /etc/redhat-release
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># uname -m &amp;&amp; cat /etc/redhat-release
 x86_64
-CentOS Linux release 7.2.1511 (Core)</pre></td></tr></table>
-</div>
-</div>
-<p><strong>2.3 检测系统是否安装了gcc</strong></p>
+CentOS Linux release 7.2.1511 (Core)
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>2.3 检测系统是否安装了gcc</strong></p>
 <p>当使用CUDA Toolkit进行开发的时候，gcc编译器是必须需要的。一般情况下linux主机都会安装了gcc编译器，但是为确保之后的操作不会出现大问题，建议检查下gcc以及版本是否为对应的版本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span><span class="lnt">3
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># gcc --version
-gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)</pre></td></tr></table>
-</div>
-</div>
-<p><strong>2.4 检测系统是否有正确的内核头文件以及一些开发包是否安装</strong></p>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># gcc --version
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>2.4 检测系统是否有正确的内核头文件以及一些开发包是否安装</strong></p>
 <p>CUDA驱动需要内核头文件和开发工具包来保证驱动程序的安装以及rebuilt，比如你的内核版本为<code>3.17.4-301</code>，那么<code>3.17.4-301</code>的内核头文件以及相关的开发包也必须安装。</p>
-
 <p>当驱动程序的安装过程没有进行包的验证，在使用RPM或者DEB包安装驱动的时候如果系统上没有安装正确的软件包，它将会尝试去安装内核头文件以及开发工具包。但是通常情况下，这种安装会默认去寻找仓库中最新版本的软件包，可能会导致内核版本的不匹配等问题。因此，在安装CUDA驱动之前，最好手动确认内核头文件的版本以及开发工具包的安装。</p>
-
 <p>在centos系统上可以执行如下命令：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># uname -r
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># uname -r
 3.10.0-327.el7.x86_64
 
-# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y</pre></td></tr></table>
+# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>2.5 选择安装方式</strong></p>
-
+</div><p><strong>2.5 选择安装方式</strong></p>
 <p>官方有两种方式去安装： distribution-specific packages (RPM and Deb packages)和distribution-independent package (runfile packages)。其中前者对接了linux发行版原生的包管理系统，是强烈建议的一种安装方式。</p>
-
 <p><strong>2.6 下载NVIDIA CUDA Toolkit</strong></p>
-
 <p><a href="http://developer.nvidia.com/cuda-downloads">下载地址</a>
 根据当前系统的基础状况来选择相对应的版本。
-<img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/nvidia-toolkit.png" alt="NVIDIA CUDA Toolkit" /></p>
-
+<img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/nvidia-toolkit.png" alt="NVIDIA CUDA Toolkit"></p>
 <p>可以看到安装类型支持两种方式<code>runfile</code>和<code>rpm</code>,其中rpm方式又分为<code>local</code>和<code>network</code>方式，由于我们的宿主机不能直接访问外网，先使用rpm（local）方式进行安装下载。</p>
-
 <p>下载完成之后需要使用<code>md5sum</code>进行文件验证，以保证最终的包一致性。官方提供的checksums文件被损坏，暂时无法检验。</p>
-
 <p><strong>2.7 处理安装冲突的一些方法</strong></p>
-
 <p>在安装CUDA之前，任何可能冲突的安装包都需要被卸载。
 以下为相关细节。</p>
-
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/conflict-specifics.png" alt="" /></p>
-
+<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/conflict-specifics.png" alt=""></p>
 <p>使用如下方式去卸载相关的冲突包。</p>
-
 <p>卸载runfile方式的Toolkit :</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">/usr/local/cuda-X.Y/bin/uninstall_cuda_X.Y.pl</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/usr/local/cuda-X.Y/bin/uninstall_cuda_X.Y.pl
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>卸载runfile方式的Driver：</p>
+</div><p>卸载runfile方式的Driver：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">/usr/bin/nvidia-uninstall</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/usr/bin/nvidia-uninstall
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>卸载RPM/Deb方式安装的包：</p>
+</div><p>卸载RPM/Deb方式安装的包：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span><span class="lnt">5
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ yum remove &lt;package_name&gt;                      # Redhat/CentOS
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ yum remove &lt;package_name&gt;                      # Redhat/CentOS
 $ dnf remove &lt;package_name&gt;                      # Fedora
 $ zypper remove &lt;package_name&gt;                   # OpenSUSE/SLES
-$ apt-get --purge remove &lt;package_name&gt;          # Ubuntu</pre></td></tr></table>
-</div>
-</div>
-<h4 id="安装包管理程序-package-manager">安装包管理程序(Package Manager)</h4>
+$ apt-get --purge remove &lt;package_name&gt;          # Ubuntu
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="安装包管理程序package-manager">安装包管理程序(Package Manager)</h4>
 <p><a href="http://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html#redhat-x86_64">快速安装指南</a></p>
-
 <p><strong>3.1 在Redhat/CentOS上安装</strong></p>
-
 <ul>
-<li>1.执行2中的操作</li>
-<li>2.确认DKMS依赖
-NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和<code>libvdpau</code>,这些包在系统默认的仓库中是不包含的，只存在与第三方镜像仓库，比如<a href="http://fedoraproject.org/wiki/EPEL">EPEL</a>,因此在安装驱动之前，必须将第三方源添加到本地的仓库中，否则缺失依赖会阻止安装继续进行。</li>
-
-<li><p>3.如果需要，自定义xorg.conf文件
-驱动会依赖一个自动生成的xorg.conf文件<code>/etc/X11/xorg.conf</code>，该文件可能会影响驱动的正常工作，可以删除该文件，或者添加<code>/etc/X11/xorg.conf.d/00-nvidia.conf</code>的内容到xorg.conf文件中。</p></li>
-
-<li><p>4.安装meta-data仓库</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># rpm --install cuda-repo-&lt;distro&gt;-&lt;version&gt;.&lt;architecture&gt;.rpm</pre></td></tr></table>
-</div>
-</div></li>
-
-<li><p>5.清除仓库缓存</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># yum clean expire-cache</pre></td></tr></table>
-</div>
-</div></li>
-
-<li><p>6.安装CUDA</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># yum install cuda</pre></td></tr></table>
-</div>
-</div></li>
+<li>
+<p>1.执行2中的操作</p>
+</li>
+<li>
+<p>2.确认DKMS依赖
+NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和<code>libvdpau</code>,这些包在系统默认的仓库中是不包含的，只存在与第三方镜像仓库，比如<a href="http://fedoraproject.org/wiki/EPEL">EPEL</a>,因此在安装驱动之前，必须将第三方源添加到本地的仓库中，否则缺失依赖会阻止安装继续进行。</p>
+</li>
+<li>
+<p>3.如果需要，自定义xorg.conf文件
+驱动会依赖一个自动生成的xorg.conf文件<code> /etc/X11/xorg.conf</code>，该文件可能会影响驱动的正常工作，可以删除该文件，或者添加<code>/etc/X11/xorg.conf.d/00-nvidia.conf</code>的内容到xorg.conf文件中。</p>
+</li>
+<li>
+<p>4.安装meta-data仓库</p>
+</li>
 </ul>
-
-<p>如果i686的libvdpau包安装失败，可以尝试以下步骤来修复该问题。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">yumdownloader</span> <span class="nx">libvdpau</span><span class="p">.</span><span class="nx">i686</span>
-<span class="err">#</span> <span class="nx">sudo</span> <span class="nx">rpm</span> <span class="o">-</span><span class="nx">U</span> <span class="o">--</span><span class="nx">oldpackage</span> <span class="nx">libvdpau</span><span class="o">*</span><span class="p">.</span><span class="nx">rpm</span></pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># rpm --install cuda-repo-&lt;distro&gt;-&lt;version&gt;.&lt;architecture&gt;.rpm
+</code></pre></td></tr></table>
 </div>
+</div><ul>
+<li>5.清除仓库缓存</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># yum clean expire-cache
+</code></pre></td></tr></table>
 </div>
-<ul>
+</div><ul>
+<li>6.安装CUDA</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># yum install cuda
+
+</code></pre></td></tr></table>
+</div>
+</div><p>如果i686的libvdpau包安装失败，可以尝试以下步骤来修复该问题。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">yumdownloader</span> <span class="nx">libvdpau</span><span class="p">.</span><span class="nx">i686</span>
+<span class="err">#</span> <span class="nx">sudo</span> <span class="nx">rpm</span> <span class="o">-</span><span class="nx">U</span> <span class="o">--</span><span class="nx">oldpackage</span> <span class="nx">libvdpau</span><span class="o">*</span><span class="p">.</span><span class="nx">rpm</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
 <li>7.如果需要，添加libcuda.so的软连接</li>
 </ul>
-
 <p>libcuda.so库文件被安装在<code>/usr/lib{,64}/nvidia</code>目录，如果已运行的项目需要使用libcuda.so文件，可以添加一个软连接到<code>/usr/lib{,64}</code>目录。</p>
-
 <ul>
 <li>8.执行<a href="http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#post-installation-actions">安装后操作</a></li>
 </ul>
-
 <p><strong>3.2 包管理器的额外功能</strong></p>
-
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/meta-packages.png" alt="cuda核心包" /></p>
-
+<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/meta-packages.png" alt="cuda核心包"></p>
 <h4 id="安装后操作">安装后操作</h4>
-
 <p><strong>4.1 必须执行的操作</strong></p>
-
 <p>一些操作行为必须在安装后并且在使用CUDA Toolkit和Driver之前去执行。</p>
-
 <p>4.1.1 环境设置</p>
-
 <p><code>PATH</code>环境变量必须包含<code>/usr/local/cuda-8.0/bin</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意：</code>在使用runfile方式安装的时候，动态链接库<code>LD_LIBRARY_PATH</code>的环境变量需要包含<code>/usr/local/cuda-8.0/lib64</code>.</p>
+</div><p><code>注意：</code>在使用runfile方式安装的时候，动态链接库<code>LD_LIBRARY_PATH</code>的环境变量需要包含<code>/usr/local/cuda-8.0/lib64</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64\
-                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64\
+                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>4.2 强烈推荐的操作</strong></p>
-
+</div><p><strong>4.2 强烈推荐的操作</strong></p>
 <p>4.2.1 安装可写的示例程序</p>
-
 <p>为了修改，编译以及运行样品，样品程序必须也可写权限进行安装，安装脚本如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># cuda-install-samples-8.0.sh &lt;dir&gt;</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cuda-install-samples-8.0.sh &lt;dir&gt;
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>该脚本会创建一个<code>/usr/local/cuda/samples</code>的只读拷贝，需要将拷贝的内容改为可写。</p>
+</div><p>该脚本会创建一个<code>/usr/local/cuda/samples</code>的只读拷贝，需要将拷贝的内容改为可写。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1101,9 +1049,10 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span><span class="lnt">19
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># cuda-install-samples-8.0.sh /export/biaoge/cuda-samples
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cuda-install-samples-8.0.sh /export/biaoge/cuda-samples
 
 # tree -L 2 /export/biaoge/cuda-samples/
 /export/biaoge/cuda-samples/
@@ -1120,51 +1069,49 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
     ├── common
     ├── EULA.txt
     ├── Makefile
-    └── uninstall_cuda_samples_8.0.pl</pre></td></tr></table>
-</div>
-</div>
-<p>4.2.2 验证所有的安装</p>
+    └── uninstall_cuda_samples_8.0.pl
 
+</code></pre></td></tr></table>
+</div>
+</div><p>4.2.2 验证所有的安装</p>
 <p>在继续操作之前，验证一下<code>CUDA Toolkit</code>能够识别到正确的GPU硬件设备是非常重要的。因此这里需要编译一些样品程序来进行检验。</p>
-
 <p>(1)验证驱动版本
 如果安装了确定，需要验证下加载驱动的版本是否正确，如果没有安装驱动或者没有用过内核模块来加载，可以暂时跳过该步骤。</p>
-
 <p>当驱动被加载后，可以通过如下命令查看到驱动的版本</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># cat /proc/driver/nvidia/version
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cat /proc/driver/nvidia/version
 NVRM version: NVIDIA UNIX x86_64 Kernel Module  375.39  Tue Jan 31 20:47:00 PST 2017
-GCC version:  gcc version 4.8.5 20150623 (Red Hat 4.8.5-4) (GCC)</pre></td></tr></table>
+GCC version:  gcc version 4.8.5 20150623 (Red Hat 4.8.5-4) (GCC)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>(2) 编译样品程序
-CUDA Toolkit的版本可以使用<code>nvcc --version/-V</code>查看，该命令运行编译驱动来编译CUDA程序，底层其实调用了gcc编译器来编译c代码，使用<code>NVIDIA PTX</code>编译器来调用CUDA代码。</p>
+</div><p>(2) 编译样品程序
+CUDA Toolkit的版本可以使用<code>nvcc --version/-V</code>查看，该命令运行编译驱动来编译CUDA程序，底层其实调用了gcc编译器来编译c代码，使用<code> NVIDIA PTX</code>编译器来调用CUDA代码。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># nvcc -V
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># nvcc -V
 nvcc: NVIDIA (R) Cuda compiler driver
 Copyright (c) 2005-2016 NVIDIA Corporation
 Built on Tue_Jan_10_13:22:03_CST_2017
-Cuda compilation tools, release 8.0, V8.0.61</pre></td></tr></table>
+Cuda compilation tools, release 8.0, V8.0.61
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>NVIDIA CUDA Toolkit在源文件中包含了一些示例程序，用户可以通过修改<code>~/NVIDIA_CUDA-8.0_Samples</code>并执行<code>make</code>来编译这些示例程序。编译的二进制文件将存放在<code>~/NVIDIA_CUDA-8.0_Samples/bin</code></p>
+</div><p>NVIDIA CUDA Toolkit在源文件中包含了一些示例程序，用户可以通过修改<code>~/NVIDIA_CUDA-8.0_Samples</code>并执行<code>make</code>来编译这些示例程序。编译的二进制文件将存放在<code>~/NVIDIA_CUDA-8.0_Samples/bin</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1178,9 +1125,9 @@ Cuda compilation tools, release 8.0, V8.0.61</pre></td></tr></table>
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/deviceQuery
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/deviceQuery
 
 #编译生成deviceQuery二进制文件，在(3)中需要验证环境
 # make
@@ -1193,15 +1140,14 @@ Cuda compilation tools, release 8.0, V8.0.61</pre></td></tr></table>
 # ll ../bandwidthTest/bandwidthTest
 -rwxr-xr-x 1 root root 603420 Oct 18 16:05 ../bandwidthTest/bandwidthTest
 # ll ../deviceQuery/deviceQuery
--rwxr-xr-x 1 root root 582882 Oct 18 16:44 ../deviceQuery/deviceQuery</pre></td></tr></table>
+-rwxr-xr-x 1 root root 582882 Oct 18 16:44 ../deviceQuery/deviceQuery
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>(3) 运行二进制文件</p>
-
+</div><p>(3) 运行二进制文件</p>
 <p>编译完成之后，在<code>~/NVIDIA_CUDA-8.0_Samples</code>下对应目录下运行<code>deviceQuery</code>.如果CUDA程序被正确安装和配置，<code>deviceQuery</code>的输出应该看起来如下所示。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1354,9 +1300,9 @@ Cuda compilation tools, release 8.0, V8.0.61</pre></td></tr></table>
 </span><span class="lnt">151
 </span><span class="lnt">152
 </span><span class="lnt">153
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># ./deviceQuery
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># ./deviceQuery
 ./deviceQuery Starting...
 
  CUDA Device Query (Runtime API) version (CUDART static linking)
@@ -1508,19 +1454,16 @@ Device 3: &#34;Tesla M40&#34;
 &gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 24GB (GPU2) : Yes
 
 deviceQuery, CUDA Driver = CUDART, CUDA Driver Version = 8.0, CUDA Runtime Version = 8.0, NumDevs = 4, Device0 = Tesla M40 24GB, Device1 = Tesla M40, Device2 = Tesla M40 24GB, Device3 = Tesla M40
-Result = PASS</pre></td></tr></table>
+Result = PASS
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample.png" alt="官方文档中的示例程序" /></p>
-
+</div><p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample.png" alt="官方文档中的示例程序"></p>
 <p><code>注意：</code>如果CUDA-capable设备和CUDA 驱动都已经成功安装，但是<code>deviceQuery</code>程序报告没有<code>CUDA-capable</code>设备在线，这个可能是<code>/dev/nvidia*</code>相关文件丢失或者没有相应的权限。</p>
-
 <p>可以使用<code>setenforce 0</code>关闭SELinux后再进行测试。</p>
-
 <p>运行<code>bandwidthTest</code>程序来确认系统和CUDA-capable设备可以正常通信，输出结果如下所示：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1545,9 +1488,9 @@ Result = PASS</pre></td></tr></table>
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># ./bandwidthTest
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># ./bandwidthTest
 [CUDA Bandwidth Test] - Starting...
 Running on...
 
@@ -1571,44 +1514,37 @@ Running on...
 
 Result = PASS
 
-NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.</pre></td></tr></table>
+NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample-1.png" alt="官方文档中的示例程序" /></p>
-
+</div><p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample-1.png" alt="官方文档中的示例程序"></p>
 <p>上图表示测试通过，如果测试没有通过，可以确认下系统上CUDA-capable NVIDIA GPU是否正确安装。</p>
-
 <p><code>注意：如果上述两个示例程序都可以正常输出，name恭喜您，GPU环境目前已经可用了！</code></p>
-
 <p>4.2.3  安装Nsight Eclipse plugins</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># /usr/local/cuda-9.0/bin/nsight_ee_plugins_manage.sh install &lt;eclipse-dir&gt;</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># /usr/local/cuda-9.0/bin/nsight_ee_plugins_manage.sh install &lt;eclipse-dir&gt;
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>4.3 可选的操作</strong></p>
-
+</div><p><strong>4.3 可选的操作</strong></p>
 <p>在使用CUDA Toolkit中，有很多可选操作但是不是必须的但是可以提供额外的功能。</p>
-
 <p>4.3.1 安装第三方库文件</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># yum install freeglut-devel libX11-devel libXi-devel libXmu-devel \
-    make mesa-libGLU-devel</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># yum install freeglut-devel libX11-devel libXi-devel libXmu-devel \
+    make mesa-libGLU-devel
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>4.3.2 为cuda-gdb安装源代码
+</div><p>4.3.2 为cuda-gdb安装源代码
 使用<code>runfile</code>方式安装后<code>cuda-gdb</code>源代码会自动安装。</p>
-
 <p>使用RPM或者Deb方式安装，需要为cuda-gbd拷贝一份源代码。<code>cuda-gdb-src</code>包必须被安装。源码包会被以一个tar包的方式安装在<code>/usr/local/cuda-9.0/extras</code>目录。</p>
-
 <p><a href="http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html">原文地址</a></p>
     </div>
 

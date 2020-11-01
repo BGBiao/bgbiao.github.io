@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>运维 on BGBiao的SRE人生</title>
@@ -6,10 +6,15 @@
     <description>Recent content in 运维 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 04 Jul 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>如何更加优雅的使用 Systemd 管理服务</title>
+      <link>https://bgbiao.top/post/systemd-doc/</link>
+      <pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/systemd-doc/</guid>
+      <description>如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do</description>
+    </item>
     
     <item>
       <title>ElasticSearch容量管理实践</title>
@@ -40,7 +45,6 @@
       
       <guid>https://bgbiao.top/post/gokafka/</guid>
       <description>&lt;h2 id=&#34;kafka运维神器&#34;&gt;Kafka运维神器&lt;/h2&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -55,11 +59,8 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在&lt;a href=&#34;https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum&#34;&gt;KIP-500&lt;/a&gt;中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;h3 id=&#34;前言&#34;&gt;前言&lt;/h3&gt;
-
 &lt;p&gt;在kafka集群中，ZooKeeper集群用于&lt;code&gt;存放集群元数据&lt;/code&gt;、&lt;code&gt;成员管理&lt;/code&gt;、&lt;code&gt;Controller 选举&lt;/code&gt;，以及其他一些&lt;code&gt;管理类任务&lt;/code&gt;。&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;存放元数据&lt;/code&gt;: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;成员管理&lt;/code&gt;: 是指 Broker 节点的注册、注销以及属性变更。&lt;/li&gt;
@@ -114,7 +115,7 @@
       
       <guid>https://bgbiao.top/post/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%9F%BA%E7%A1%80%E5%9B%9E%E9%A1%BE/</guid>
       <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 在日常工作中，我们经常会使用正则表达式来快速匹配和过滤一些我们期望的字符串来处理一些简单又繁琐的文字统计和过滤操作；而作为一名技术从业者，我们也经常会在程序中或者配置文件中使用正则表达式来处理字符或进行批量配置项的查询和更改，但通常情况下，我们需要对编写的正则表达式进行不断测试才能满足我们的需求，本篇文章带你重新回顾正则表达式，并分享一个在线的正则表达式工具(&lt;a href=&#34;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&#34;&gt;https://regex101.com/)，帮你在工作中快速测试你的正则表达式。&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;背景: 在日常工作中，我们经常会使用正则表达式来快速匹配和过滤一些我们期望的字符串来处理一些简单又繁琐的文字统计和过滤操作；而作为一名技术从业者，我们也经常会在程序中或者配置文件中使用正则表达式来处理字符或进行批量配置项的查询和更改，但通常情况下，我们需要对编写的正则表达式进行不断测试才能满足我们的需求，本篇文章带你重新回顾正则表达式，并分享一个在线的正则表达式工具(&lt;a href=&#34;https://regex101.com/&#34;&gt;https://regex101.com/&lt;/a&gt;)，帮你在工作中快速测试你的正则表达式。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
     </item>
     
@@ -136,7 +137,6 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;前言: 在大规模的使用kafka过程中，我们通常会遇到各种各样的问题，比如说，通常会有一些大数据集群中的Job发现总有几个task会比较慢，导致整体的任务迟迟不能完成运行，这种情况通常问题会比较复杂，想要知道具体延迟在哪里，我们需要知道在Kafka集群中哪些点可能会增加端到端的延迟。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;接下来的内容翻译自&lt;code&gt;confluent&lt;/code&gt;官网博客中的一篇文章，希望能够帮助大家理解kafka使用过程中端到端的延迟。&lt;a href=&#34;https://www.confluent.io/blog/configure-kafka-to-minimize-latency/&#34;&gt;99th Percentile Latency at Scale with Apache Kafka&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
@@ -149,9 +149,7 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。&lt;/p&gt;
-
 &lt;p&gt;以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。&lt;/p&gt;</description>
     </item>
     
@@ -175,9 +173,7 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有&lt;code&gt;Redis集群&lt;/code&gt;，&lt;code&gt;ElasticSearch&lt;/code&gt;集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为&lt;code&gt;日志收集&lt;/code&gt;、&lt;code&gt;数据管道&lt;/code&gt;、&lt;code&gt;流式计算&lt;/code&gt;、&lt;code&gt;业务事件存储&lt;/code&gt;几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的&lt;code&gt;可用性&lt;/code&gt;，&lt;code&gt;可靠性&lt;/code&gt;，&lt;code&gt;数据一致性&lt;/code&gt;要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。&lt;/p&gt;
-
 &lt;p&gt;鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.&lt;/p&gt;</description>
     </item>
     
@@ -196,7 +192,7 @@
       <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
-      <description>背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;rdquo;裸奔&amp;rdquo;上线的，除了一些传统的主机级别的监控之外，很</description>
+      <description>背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;quot;裸奔&amp;quot;上线的，除了一些传统的主机级别的监控之外，很难有</description>
     </item>
     
     <item>
@@ -206,11 +202,8 @@
       
       <guid>https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
       <description>&lt;h2 id=&#34;traefik的可观测性支持&#34;&gt;Traefik的可观测性支持&lt;/h2&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/observability/logs/&#34;&gt;traefik-observability&lt;/a&gt;&lt;/p&gt;
-
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;服务日志: Traefik进程本身相关的操作日志&lt;/li&gt;
 &lt;li&gt;访问日志: 由Traefik接管的代理服务的访问日志(access.log)&lt;/li&gt;
@@ -226,7 +219,6 @@
       
       <guid>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</guid>
       <description>&lt;h2 id=&#34;基于dcgm和prometheus的gpu监控方案&#34;&gt;基于DCGM和Prometheus的GPU监控方案&lt;/h2&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过&lt;code&gt;nvidia-smi&lt;/code&gt;这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于&lt;a href=&#34;https://developer.nvidia.com/dcgm&#34;&gt;DCGM&lt;/a&gt;相关的监控解决方案。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -240,17 +232,6 @@
       <guid>https://bgbiao.top/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用&lt;code&gt;RUN&lt;/code&gt;指令，执行了一次&lt;code&gt;chmod a+x tomcat&lt;/code&gt;，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。&lt;/p&gt;
-&lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>开源分布式对象存储服务-MinIO</title>
-      <link>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</link>
-      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/</guid>
-      <description>&lt;blockquote&gt;
-&lt;p&gt;背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的数据，这部分数据较为敏感，因此对于敏感数据的存储我们选择了使用兼容S3协议的开源分布式对象存储-&lt;a href=&#34;https://github.com/minio/minio&#34;&gt;Minio&lt;/a&gt;来进行自建服务。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
     </item>
     

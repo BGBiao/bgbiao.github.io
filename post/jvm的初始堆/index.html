@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,11 +69,9 @@
 <meta property="article:modified_time" content="2020-04-21T00:00:00+00:00" />
 <meta itemprop="name" content="你还记得你JVM的的初始堆大小吗">
 <meta itemprop="description" content="通常对于很多java应用来说，当打成jar包后会下意识的使用java -jar xxx.jar来运行应用，而不是根据自己业务或实际debug的一些需求">
-
-
-<meta itemprop="datePublished" content="2020-04-21T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-04-21T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="525">
+<meta itemprop="datePublished" content="2020-04-21T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-04-21T00:00:00+00:00" />
+<meta itemprop="wordCount" content="527">
 
 
 
@@ -467,7 +465,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 525 words </span>
+        <span class="more-meta"> 527 words </span>
           <span class="more-meta"> 2 min read </span>
 
         
@@ -483,46 +481,44 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
 
     
     <div class="post-content">
       <p>通常对于很多java应用来说，当打成jar包后会下意识的使用<code>java -jar xxx.jar</code>来运行应用，而不是根据自己业务或实际debug的一些需求来增加一些JVM的辅助参数，这样导致的问题就是，后续出了问题之后不容易进行管理以及相关故障追踪和排查。</p>
-
 <p>那么问题来了，当你在<code>jar -jar</code>的时候，默认的JVM堆内存是多少呢?</p>
-
 <p>其实，JVM在不同架构(配置)的OS下回体现出不同的JVM配置，比如在一个<code>8c16g</code>的ECS上，默认的Heap值如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ java -XX:+PrintFlagsFinal -version | grep HeapSize
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ java -XX:+PrintFlagsFinal -version | grep HeapSize
     uintx ErgoHeapSizeLimit                         = 0                                   {product}
     uintx HeapSizePerGCThread                       = 87241520                            {product}
     uintx InitialHeapSize                          := 264241152                           {product}
     uintx LargePageHeapSizeThreshold                = 134217728                           {product}
     uintx MaxHeapSize                              := 4206886912                          {product}
-java version &#34;1.8.0_141&#34;</pre></td></tr></table>
-</div>
-</div>
-<p>由上述的输出可知，初始的堆内存为<code>264241152/1024/1024=252M</code>，而堆内存最大为<code>4206886912/1024/1024/1024=3G</code></p>
+java version &#34;1.8.0_141&#34;
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p>由上述的输出可知，初始的堆内存为<code>264241152/1024/1024=252M</code>，而堆内存最大为<code>4206886912/1024/1024/1024=3G</code></p>
 <p>这个时候可能就会有一个问题就是，该ECS上跑多少个<code>java -jar xxx.jar</code>这类的服务会比较好呢？如果按照每个服务都能使用3G的堆内存来算，该机器上做多跑4个这类的服务是一个比较合理的规划，但是考虑实际的业务使用需求，单纯这样考虑可能会有点唐突了，因此还是建议每个应用在部署时指定一些基础的参数，比如初始堆和最大堆，并且这两个参数一般建议设置成一致，以免在运行过程中堆的扩容造成的损耗。</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg" alt="" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg" alt=""></p>
 
     </div>
 

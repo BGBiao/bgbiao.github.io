@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E6%9E%84%E5%BB%BA%E6%9B%B4%E5%B0%8Fdocker%E9%95%9C%E5%83%8F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -74,10 +74,8 @@
 <meta itemprop="description" content="
 背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用RUN指令，执行了一次chmod a&#43;x tomcat，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。
 ">
-
-
-<meta itemprop="datePublished" content="2020-03-22T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-03-22T00:00:00&#43;00:00" />
+<meta itemprop="datePublished" content="2020-03-22T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-03-22T00:00:00+00:00" />
 <meta itemprop="wordCount" content="1909">
 
 
@@ -492,7 +490,7 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
 
@@ -501,21 +499,15 @@ if (!doNotTrack) {
       <blockquote>
 <p>背景: 前两天在群里看到有人提到说，自己构建了一个镜像，明明就只往base镜像中增加了tomcat，但是构建好的镜像大小最终却是两倍的tomcat包的大小，最后看到Dockerfile后才发现作者在把tomcat包拷贝进去之后，又使用<code>RUN</code>指令，执行了一次<code>chmod a+x tomcat</code>，我想说，这么搞镜像不大那是不可能的。另外一件事就是前段时间，同事说让搞一个公司级别的base镜像，要稳定并且尽量小，借着这两个事，和大家分享几点Docker镜像相关的事情。</p>
 </blockquote>
-
 <p>首先，镜像的大小最终取决于如下几点:</p>
-
 <ul>
 <li>1.业务需求和debug的便利性(比如科学计算和普通的java或者golang程序)</li>
 <li>2.业务镜像构建的依赖特性(构建过程和交付物的依赖关系)</li>
 <li>3.交付物的定义过程(Dockerfile分层过程中的变更层)</li>
 </ul>
-
 <p>接下来，从三个点来谈谈我个人的想法。</p>
-
 <p><strong>一、单从镜像大小的角度考虑</strong></p>
-
 <p>如果仅从镜像的大小角度来讲，为了镜像尽可能的小，有如下的base镜像可供选择:</p>
-
 <ul>
 <li>alpine: 专为容器而生的基础镜像，缺点是默认使用的<code>musl libc</code>，但是大多数运行在Linux下的程序几乎都是<code>glibc</code></li>
 <li>scratch: 没有任何<code>杂念</code>的基础镜像，优点就是没有杂念，缺点也明显就是各种动态链接库，shell等等都没有(所以对应静态依赖的程序还是可以的)</li>
@@ -523,36 +515,25 @@ if (!doNotTrack) {
 <li>centos: centos发行版的mini镜像，基础的库和工具包基本都有，base稍微大了点(200M左右吧,不过也可以精简)</li>
 <li>ubuntu: ubuntu发现版的mini镜像，同上，base大概在120M左右，不过两者的稳定性和包的管理有差异</li>
 </ul>
-
 <p>但以上几种的base均有利弊，而且企业内部通常业务场景也会有一定的变化，因此我们在维护内部的基础base镜像时一般不会为了<code>镜像小</code>这个伪目标而使用多种base来构建不同镜像，主要是考虑到后期的维护成本较高(稳定性，可操作性).</p>
-
 <p><strong>二、考虑业务的需求和debug的便利性</strong></p>
-
 <ul>
 <li>java: 程序依赖基本包含在程序中，仅对java依赖</li>
 <li>c: 可能需要指定的libc库以及动态链接库的依赖</li>
 <li>golang: 编译好的程序几乎不需要依赖</li>
 <li>python: 需要依赖python以及各个库的支持，同时库可能依赖系统的动态链接库</li>
 </ul>
-
 <p>通常在企业环境中，系统不可能长期只有一种语言来开发，因此不同语言生态下也就诞生了不同的需求。</p>
-
 <p>比如，当下不论是<code>DL(Deep Learning)</code>还是<code>ML(Machine Learning)</code>大部分对外的库基本都是使用Python开发的，因此在这种场景下，通常业务所需要的基础库是相当大，几个G的竟像也是司空见惯的。</p>
-
 <p>同时，还有一个比较常见的情况，就是我们的技术人员都有可能去容器内部进行简单的debug操作(比如使用curl,netstat等工具)，此时不同的base镜像会包含不同的生态工具，无疑也会增加大家的学习成本，如果对外推广可能会遭遇一定障碍。</p>
-
 <p>最后，还有一个点就是业务上层的base竟像的精简化。</p>
-
 <p>很多时候base环境内部可能存在一些基本工具，仅是程序构建时需要的工具，比如c程序的gcc,golang程序的go,java程序的jdk(其实仅jre就可以)，因此为了进一步减少空间，可以将构建过程相关的工具阉割掉。</p>
-
 <p><strong>三、交付物的定义过程</strong></p>
-
 <p>在传统的CI/CD流水线中，交付物通常是一个静态的压缩包，而在引入以Docker为代表的容器技术之后，交付物就是包含业务代码和其运行时环境的镜像，因此在交付物的定义过程中也可以做一些镜像精简的优化。</p>
-
 <p>这里主要是Docker的分层思想，在开源的容器市场中，基于<code>overlay</code>的存储引擎已经是不争的事实，所以，我们可以在分层过程中进行一些优化，对overlay不太了解的可以阅读以前的一篇文章<a href="https://www.jianshu.com/p/959e8e3da4b2">overlayfs的探究以及在docker的使用</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -561,9 +542,9 @@ if (!doNotTrack) {
 </span><span class="lnt">7
 </span><span class="lnt">8
 </span><span class="lnt">9
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM golang as golang-build
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM golang as golang-build
 WORKDIR /
 COPY hello.go .
 RUN go build -ldflags &#34;-s -w&#34; -o hello hello.go
@@ -571,18 +552,14 @@ RUN go build -ldflags &#34;-s -w&#34; -o hello hello.go
 FROM alpine
 COPY --from=golang-build hello .
 RUN chmod a-x hello &amp;&amp; chmod a+x hello
-CMD [&#34;./hello&#34;]</pre></td></tr></table>
+CMD [&#34;./hello&#34;]
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>我们知道，在分层的思想中，每一层都是上一层的可写叠加，而在最新层变更的文件才是整个镜像或者容器增加的数据，所以如上的Dockerfile中，我们在<code>RUN</code>指令中增加了权限的操作(仅用来说明问题)，你会发现，最终的镜像会比不加<code>RUN</code>指令整整大了一个<code>hello</code>程序的空间，这其实就是镜像分层中的一个优化点。</p>
-
+</div><p>我们知道，在分层的思想中，每一层都是上一层的可写叠加，而在最新层变更的文件才是整个镜像或者容器增加的数据，所以如上的Dockerfile中，我们在<code>RUN</code>指令中增加了权限的操作(仅用来说明问题)，你会发现，最终的镜像会比不加<code>RUN</code>指令整整大了一个<code>hello</code>程序的空间，这其实就是镜像分层中的一个优化点。</p>
 <p>所以，在企业内部进行容器化改造和上线时，除了需要考虑各个适用方的场景问题和操作便利性，同时在构建过程中也需要进行一定的把控。</p>
-
 <p>当然啦，尽可能的将镜像压缩到最小，不仅可以减少磁盘的使用，同时在大规模分发镜像时也会表现的相对有效率，但在实际使用过程中，并不是所有的镜像越小越好，同时我们需要在镜像的通用性和可维护性上进行一定权重的考量。</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

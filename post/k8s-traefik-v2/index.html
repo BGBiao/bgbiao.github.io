@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/k8s-traefik-v2/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -65,21 +65,17 @@
 
 <meta property="og:title" content="Traefik-v2.0快速入门" />
 <meta property="og:description" content="traefik官方文档
-
 注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/k8s-traefik-v2/" />
 <meta property="article:published_time" content="2019-09-27T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-15T16:53:30+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Traefik-v2.0快速入门">
 <meta itemprop="description" content="traefik官方文档
-
 注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面">
-
-
-<meta itemprop="datePublished" content="2019-09-27T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-15T16:53:30&#43;08:00" />
-<meta itemprop="wordCount" content="1445">
+<meta itemprop="datePublished" content="2019-09-27T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="1450">
 
 
 
@@ -87,7 +83,6 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Traefik-v2.0快速入门"/>
 <meta name="twitter:description" content="traefik官方文档
-
 注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面"/>
 
 <!--[if lte IE 9]>
@@ -475,7 +470,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
             
           </div>
-        <span class="more-meta"> 1445 words </span>
+        <span class="more-meta"> 1450 words </span>
           <span class="more-meta"> 3 min read </span>
 
         
@@ -492,22 +487,13 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#使用-docker-compose-来快速启动traefki实例">使用<code>docker-compose</code>来快速启动traefki实例.</a></li>
-<li><a href="#traefik来检测新服务并为你创建一个路由">Traefik来检测新服务并为你创建一个路由</a></li>
-<li><a href="#测试traefik相关功能">测试traefik相关功能</a></li>
-<li><a href="#traefik配置介绍">Traefik配置介绍</a></li>
-<li><a href="#在k8s集群中部署traefik-v2-0-1">在k8s集群中部署traefik-v2.0.1</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -515,13 +501,11 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <p><a href="https://docs.traefik.io/">traefik官方文档</a></p>
-
 <p><code>注意:Traefikv2.0之后的版本在修改了很多bug之后也增加了新的特性，比如增加了TCP的支持，并且更换了新的WEB UI界面</code></p>
-
-<h4 id="使用-docker-compose-来快速启动traefki实例">使用<code>docker-compose</code>来快速启动traefki实例.</h4>
+<h4 id="使用docker-compose来快速启动traefki实例">使用<code>docker-compose</code>来快速启动traefki实例.</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -584,9 +568,11 @@ if (!doNotTrack) {
 </span><span class="lnt">61
 </span><span class="lnt">62
 </span><span class="lnt">63
-</span></pre></td>
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 查看编辑好的docker-compose配置文件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看编辑好的docker-compose配置文件
 $ cat traefik-v2.0.yaml
 version: &#39;3&#39;
 services:
@@ -648,17 +634,17 @@ curl -s   &#34;http://localhost:8080/api/rawdata&#34; | python -m json.tool
             ]
         }
     }
-}</pre></td></tr></table>
-</div>
-</div>
-<p>查看Traefik官方Dashboard:</p>
+}
 
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-7be3032760e90e6a.jpeg" alt="" /></p>
 
+</code></pre></td></tr></table>
+</div>
+</div><p>查看Traefik官方Dashboard:</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-7be3032760e90e6a.jpeg" alt=""></p>
 <h4 id="traefik来检测新服务并为你创建一个路由">Traefik来检测新服务并为你创建一个路由</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -740,9 +726,12 @@ curl -s   &#34;http://localhost:8080/api/rawdata&#34; | python -m json.tool
 </span><span class="lnt">80
 </span><span class="lnt">81
 </span><span class="lnt">82
-</span></pre></td>
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 创建一个新服务
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 创建一个新服务
 $ cat test-service.yaml
 version: &#39;3&#39;
 services:
@@ -823,17 +812,18 @@ $ curl -s   &#34;http://localhost:8080/api/rawdata&#34; | python -m json.tool
             ]
         }
     }
-}</pre></td></tr></table>
-</div>
-</div>
-<p>查看Traefik中的http反向代理记录:</p>
+}
 
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-4742e0c7c39822ae.jpeg" alt="" /></p>
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p>查看Traefik中的http反向代理记录:</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-4742e0c7c39822ae.jpeg" alt=""></p>
 <h4 id="测试traefik相关功能">测试traefik相关功能</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -871,9 +861,10 @@ $ curl -s   &#34;http://localhost:8080/api/rawdata&#34; | python -m json.tool
 </span><span class="lnt">36
 </span><span class="lnt">37
 </span><span class="lnt">38
-</span></pre></td>
+</span><span class="lnt">39
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 测试访问
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 测试访问
 $ curl -H Host:whoami.docker.localhost http://localhost
 Hostname: f1b280a61fa7
 IP: 127.0.0.1
@@ -910,29 +901,25 @@ X-Forwarded-Host: whoami.docker.localhost
 X-Forwarded-Port: 80
 X-Forwarded-Proto: http
 X-Forwarded-Server: bf98c245d265
-X-Real-Ip: 172.21.0.1</pre></td></tr></table>
-</div>
-</div>
-<p>查看Traefike后端每个service的详情信息:</p>
+X-Real-Ip: 172.21.0.1
 
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-2c2bf1835e797e63.jpeg" alt="" /></p>
-
+</code></pre></td></tr></table>
+</div>
+</div><p>查看Traefike后端每个service的详情信息:</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-2c2bf1835e797e63.jpeg" alt=""></p>
 <h4 id="traefik配置介绍">Traefik配置介绍</h4>
-
 <p>traefik配置结构图:</p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-5d5922c185e0515a.jpeg" alt="" /></p>
-
-<p>在traefik中的配置，会涉及到两方面内容:
-- 动态的路由配置(即由k8s-api或docker相关api来自动发现服务的endpoint而进行路由的配置描述)
-- 静态的启动配置(即traefik标准的启动配置参数)</p>
-
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-5d5922c185e0515a.jpeg" alt=""></p>
+<p>在traefik中的配置，会涉及到两方面内容:</p>
+<ul>
+<li>动态的路由配置(即由k8s-api或docker相关api来自动发现服务的endpoint而进行路由的配置描述)</li>
+<li>静态的启动配置(即traefik标准的启动配置参数)</li>
+</ul>
 <p><code>注意:使用docker run traefik[:version] --help可查看traefik的配置参数</code></p>
-
-<h4 id="在k8s集群中部署traefik-v2-0-1">在k8s集群中部署traefik-v2.0.1</h4>
+<h4 id="在k8s集群中部署traefik-v201">在k8s集群中部署traefik-v2.0.1</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -942,9 +929,10 @@ X-Real-Ip: 172.21.0.1</pre></td></tr></table>
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span></pre></td>
+</span><span class="lnt">11
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ kubectl apply -f https://github.com/BGBiao/k8s-ansible-playbooks/blob/master/manifest/traefik/traefik-ds-v2.0.1.yaml
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f https://github.com/BGBiao/k8s-ansible-playbooks/blob/master/manifest/traefik/traefik-ds-v2.0.1.yaml
 
 $ kubectl get pods  -n kube-system   | grep traefik-ingress-controller-v2
 traefik-ingress-controller-v2-54h54   1/1     Running   0          29m
@@ -953,18 +941,15 @@ traefik-ingress-controller-v2-tqbvd   1/1     Running   0          29m
 traefik-ingress-controller-v2-ww449   1/1     Running   0          29m
 
 $ kubectl --kubeconfig ../../files/kubelet.kubeconfig get svc -n kube-system  | grep v2
-traefik-ingress-service-v2   ClusterIP   10.253.86.121   &lt;none&gt;        81/TCP,8081/TCP          30m</pre></td></tr></table>
-</div>
-</div>
-<p>查看traefik-v2.0.1的dashboard:</p>
+traefik-ingress-service-v2   ClusterIP   10.253.86.121   &lt;none&gt;        81/TCP,8081/TCP          30m
 
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-cb6dfb4835fb3aff.jpeg" alt="" /></p>
-
+</code></pre></td></tr></table>
+</div>
+</div><p>查看traefik-v2.0.1的dashboard:</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-cb6dfb4835fb3aff.jpeg" alt=""></p>
 <p><code>注意:虽然traefikv2.x改动了很多，但是还是向下兼容一些内容的，比如我重新创建traefik-v2.0.1之后，之前创建的ingress规则会自动导入</code></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -977,7 +962,7 @@ traefik-ingress-service-v2   ClusterIP   10.253.86.121   &lt;none&gt;        81/
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-01-15
+      2020-11-01
       
         
         

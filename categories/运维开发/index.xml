@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>运维开发 on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in 运维开发 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang中处理版本信息</title>
       <link>https://bgbiao.top/post/golang-version/</link>
@@ -18,17 +14,14 @@
       
       <guid>https://bgbiao.top/post/golang-version/</guid>
       <description>&lt;h2 id=&#34;golang中的版本信息管理&#34;&gt;Golang中的版本信息管理&lt;/h2&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;我们都知道在一些Golang写的程序中，默认会有&lt;code&gt;version&lt;/code&gt;或&lt;code&gt;-v&lt;/code&gt;相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;&lt;/p&gt;
-
 &lt;p&gt;比如我们常用的Golang开发的程序是这样输出版本相关信息的:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
@@ -58,9 +51,10 @@
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;# k8s的客户端程序版本
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# k8s的客户端程序版本
 $ kubectl version -o json --client
 {
   &amp;#34;clientVersion&amp;#34;: {
@@ -89,7 +83,9 @@ Client: Docker Engine - Community
 
 # minio的客户端程序版本
 $ minio --version
-minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+minio version RELEASE.2020-04-10T03-34-42Z
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
     </item>
@@ -101,7 +97,6 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       
       <guid>https://bgbiao.top/post/gokafka/</guid>
       <description>&lt;h2 id=&#34;kafka运维神器&#34;&gt;Kafka运维神器&lt;/h2&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -125,9 +120,7 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       
       <guid>https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/</guid>
       <description>&lt;h3 id=&#34;gin框架介绍&#34;&gt;Gin框架介绍&lt;/h3&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://github.com/gin-gonic/gin&#34;&gt;Gin&lt;/a&gt;是一个用 Go (Golang) 编写的 web 框架。它是一个类似于&lt;a href=&#34;https://github.com/go-martini/martini&#34;&gt;martini&lt;/a&gt;但性能更好的API框架，不同于谢大主导的&lt;a href=&#34;https://beego.me/&#34;&gt;Beego&lt;/a&gt;web框架，后者更像是Python语言中的&lt;code&gt;Django&lt;/code&gt;框架，内部包含了开发一个web程序所需的各种组件。&lt;/p&gt;
-
 &lt;p&gt;如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。&lt;/p&gt;</description>
     </item>
     
@@ -138,17 +131,12 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       
       <guid>https://bgbiao.top/post/golang%E7%9A%84elasticsearch6%E7%9A%84sdk%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/</guid>
       <description>&lt;h2 id=&#34;es6-版本的golang-sdk问题处理&#34;&gt;es6 版本的golang-sdk问题处理&lt;/h2&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;ElasticSearch6版本的Golang SDK问题处理.&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://olivere.github.io/elastic/&#34;&gt;golang-sdk&lt;/a&gt;&lt;/p&gt;
-
 &lt;p&gt;es_version: 6.4.3&lt;/p&gt;
-
-&lt;p&gt;官方建议的sdk版本:     &lt;a href=&#34;https://github.com/olivere/elastic&#34;&gt;https://github.com/olivere/elastic&lt;/a&gt;&lt;/p&gt;
-
+&lt;p&gt;官方建议的sdk版本: 	https://github.com/olivere/elastic&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;注意:很好奇,作者其他版本都采用vN来标记版本，但是在v6的时候直接采用github版本&lt;/code&gt;&lt;/p&gt;</description>
     </item>
     
@@ -159,15 +147,12 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       
       <guid>https://bgbiao.top/post/golang-expect/</guid>
       <description>&lt;h2 id=&#34;golang的异常处理和单元测试&#34;&gt;Golang的异常处理和单元测试&lt;/h2&gt;
-
 &lt;ul&gt;
 &lt;li&gt;1.Golang语言中没有其他语言中的&lt;code&gt;try...catch...&lt;/code&gt;语句来捕获异常和异常恢复&lt;/li&gt;
 &lt;li&gt;2.在Golang中我们通常会使用&lt;code&gt;panic&lt;/code&gt;关键字来抛出异常，在&lt;code&gt;defer&lt;/code&gt;中使用&lt;code&gt;recover&lt;/code&gt;来捕获异常进行具体逻辑处理&lt;/li&gt;
 &lt;li&gt;3.Golang中我们通常会在函数或方法中返回&lt;code&gt;error&lt;/code&gt;结构对象来判断是否有异常出现&lt;/li&gt;
 &lt;/ul&gt;
-
 &lt;p&gt;&lt;code&gt;注意事项&lt;/code&gt;&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;1.利用&lt;code&gt;recover&lt;/code&gt;和&lt;code&gt;panic&lt;/code&gt;指令，&lt;code&gt;defer&lt;/code&gt;必须放在panic之前定义(&lt;code&gt;panic会终止其后要执行的代码&lt;/code&gt;).&lt;/li&gt;
 &lt;li&gt;2.&lt;code&gt;recover&lt;/code&gt;只有在&lt;code&gt;defer&lt;/code&gt;调用的函数中才有效，否则&lt;code&gt;recover&lt;/code&gt;无法捕获到&lt;code&gt;panic&lt;/code&gt;.&lt;/li&gt;
@@ -186,7 +171,6 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       <description>&lt;blockquote&gt;
 &lt;p&gt;背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了&lt;a href=&#34;http://hive.apache.org/&#34;&gt;Hive&lt;/a&gt;作为数据仓库工具，同时使用&lt;a href=&#34;https://github.com/cloudera/hue&#34;&gt;Hue&lt;/a&gt;来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;本篇简单记录下使用Python操作Hive。&lt;/p&gt;</description>
     </item>
     
@@ -208,11 +192,10 @@ minio version RELEASE.2020-04-10T03-34-42Z&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;
       
       <guid>https://bgbiao.top/post/golang%E4%B8%8B%E7%9A%84protobuf%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
       <description>&lt;h3 id=&#34;protpbuf简介&#34;&gt;protpbuf简介&lt;/h3&gt;
-
 &lt;blockquote&gt;
-&lt;p&gt;protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。&lt;br /&gt;
-google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。&lt;br /&gt;
-可以把它用于分布式应用之间的数据通信或者异构环境下的&lt;code&gt;数据交换&lt;/code&gt;。&lt;br /&gt;
+&lt;p&gt;protobuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。 &lt;br&gt;
+google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml、json等 进行数据交换快许多。 &lt;br&gt;
+可以把它用于分布式应用之间的数据通信或者异构环境下的&lt;code&gt;数据交换&lt;/code&gt;。&lt;br&gt;
 作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
     </item>

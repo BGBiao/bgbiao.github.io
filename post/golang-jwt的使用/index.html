@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,11 +69,9 @@
 <meta property="article:modified_time" content="2020-03-15T00:00:00+00:00" />
 <meta itemprop="name" content="使用jwt-go验证API">
 <meta itemprop="description" content="背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行">
-
-
-<meta itemprop="datePublished" content="2020-03-15T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-03-15T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6600">
+<meta itemprop="datePublished" content="2020-03-15T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-03-15T00:00:00+00:00" />
+<meta itemprop="wordCount" content="6598">
 
 
 
@@ -467,7 +465,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> golang </a>
             
           </div>
-        <span class="more-meta"> 6600 words </span>
+        <span class="more-meta"> 6598 words </span>
           <span class="more-meta"> 14 min read </span>
 
         
@@ -484,247 +482,165 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#token-cookie-session的区别">token、cookie、session的区别</a></li>
-<li><a href="#json-web-token-jwt-介绍">Json-Web-Token(JWT)介绍</a>
-<ul>
-<li><a href="#jwt-token组成部分">JWT Token组成部分</a></li>
-<li><a href="#什么时候用jwt">什么时候用JWT</a></li>
-<li><a href="#jwt-json-web-tokens-是如何工作的">JWT(Json Web Tokens)是如何工作的</a></li>
-<li><a href="#基于token的身份认证和基于服务器的身份认证">基于Token的身份认证和基于服务器的身份认证</a></li>
-</ul></li>
-<li><a href="#使用gin框架集成jwt">使用Gin框架集成JWT</a>
-<ul>
-<li><a href="#自定义中间件">自定义中间件</a></li>
-<li><a href="#定义jwt编码和解码逻辑">定义jwt编码和解码逻辑</a></li>
-<li><a href="#定义登陆验证逻辑">定义登陆验证逻辑</a></li>
-<li><a href="#定义普通待验证接口">定义普通待验证接口</a></li>
-<li><a href="#验证使用jwt后的接口">验证使用JWT后的接口</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#tokencookiesession的区别">token、cookie、session的区别</a></li>
+        <li><a href="#json-web-tokenjwt介绍">Json-Web-Token(JWT)介绍</a></li>
+        <li><a href="#使用gin框架集成jwt">使用Gin框架集成JWT</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<blockquote>
+      <blockquote>
 <p>背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行实现。本篇文章主要分享下在Golang语言下使用<a href="https://github.com/dgrijalva/jwt-go">jwt-go</a>来实现后端的token认证逻辑。</p>
 </blockquote>
-
 <p><code>JSON Web Token(JWT)</code>是一个常用语HTTP的客户端和服务端间进行身份认证和鉴权的标准规范，使用JWT可以允许我们在用户和服务器之间传递安全可靠的信息。</p>
-
 <p>在开始学习<a href="https://jwt.io/">JWT</a>之前，我们可以先了解下早期的几种方案。</p>
-
-<h3 id="token-cookie-session的区别">token、cookie、session的区别</h3>
-
+<h3 id="tokencookiesession的区别">token、cookie、session的区别</h3>
 <p><strong>Cookie</strong></p>
-
 <p>Cookie总是保存在客户端中，按在客户端中的存储位置，可分为<code>内存Cookie</code>和<code>硬盘Cookie</code>。</p>
-
 <p>内存Cookie由浏览器维护，保存在内存中，浏览器关闭后就消失了，其存在时间是短暂的。硬盘Cookie保存在硬盘里，有一个过期时间，除非用户手工清理或到了过期时间，硬盘Cookie不会被删除，其存在时间是长期的。所以，按存在时间，可分为<code>非持久Cookie和持久Cookie</code>。</p>
-
 <p>cookie 是一个非常具体的东西，指的就是浏览器里面能永久存储的一种数据，仅仅是浏览器实现的一种数据存储功能。</p>
-
 <p><code>cookie由服务器生成，发送给浏览器</code>，浏览器把cookie以key-value形式保存到某个目录下的文本文件内，下一次请求同一网站时会把该cookie发送给服务器。由于cookie是存在客户端上的，所以浏览器加入了一些限制确保cookie不会被恶意使用，同时不会占据太多磁盘空间，所以每个域的cookie数量是有限的。</p>
-
 <p><strong>Session</strong></p>
-
 <p>Session字面意思是会话，主要用来标识自己的身份。比如在无状态的api服务在多次请求数据库时，如何知道是同一个用户，这个就可以通过session的机制，服务器要知道当前发请求给自己的是谁</p>
-
 <p>为了区分客户端请求，<code>服务端会给具体的客户端生成身份标识session</code>，然后客户端每次向服务器发请求的时候，都带上这个“身份标识”，服务器就知道这个请求来自于谁了。</p>
-
 <p>至于客户端如何保存该标识，可以有很多方式，对于浏览器而言，一般都是使用<code>cookie</code>的方式</p>
-
 <p>服务器使用session把用户信息临时保存了服务器上，用户离开网站就会销毁，这种凭证存储方式相对于cookie来说更加安全，但是session会有一个缺陷: 如果web服务器做了负载均衡，那么下一个操作请求到了另一台服务器的时候session会丢失。</p>
-
 <p>因此，通常企业里会使用<code>redis,memcached</code>缓存中间件来实现session的共享，此时web服务器就是一个完全无状态的存在，所有的用户凭证可以通过共享session的方式存取，当前session的过期和销毁机制需要用户做控制。</p>
-
 <p><strong>Token</strong></p>
-
 <p>token的意思是“令牌”，是用户身份的验证方式，最简单的token组成: <code>uid(用户唯一标识)</code>+<code>time(当前时间戳)</code>+<code>sign(签名,由token的前几位+盐以哈希算法压缩成一定长度的十六进制字符串)</code>，同时还可以将不变的参数也放进token</p>
-
 <p>这里我们主要想讲的就是<code>Json Web Token</code>，也就是本篇的主题:JWT</p>
-
-<h3 id="json-web-token-jwt-介绍">Json-Web-Token(JWT)介绍</h3>
-
+<h3 id="json-web-tokenjwt介绍">Json-Web-Token(JWT)介绍</h3>
 <p>一般而言，用户注册登陆后会生成一个jwt token返回给浏览器，浏览器向服务端请求数据时携带<code>token</code>，服务器端使用<code>signature</code>中定义的方式进行解码，进而对token进行解析和验证。</p>
-
 <h4 id="jwt-token组成部分">JWT Token组成部分</h4>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpwngvonhj30hx03xwf0.jpg" alt="JWT-Token组成部分" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpwngvonhj30hx03xwf0.jpg" alt="JWT-Token组成部分"></p>
 <ul>
 <li>header: 用来指定使用的算法(HMAC SHA256 RSA)和token类型(如JWT)</li>
 <li>payload: 包含声明(要求)，声明通常是用户信息或其他数据的声明，比如用户id，名称，邮箱等. 声明可分为三种: registered,public,private</li>
 <li>signature: 用来保证JWT的真实性，可以使用不同的算法</li>
 </ul>
-
 <p><strong>header</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">{
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">{
     &#34;alg&#34;: &#34;HS256&#34;,
     &#34;typ&#34;: &#34;JWT&#34;
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>对上面的json进行base64编码即可得到JWT的第一个部分</p>
-
+</div><p>对上面的json进行base64编码即可得到JWT的第一个部分</p>
 <p><strong>payload</strong></p>
-
 <ul>
 <li>registered claims: 预定义的声明，通常会放置一些预定义字段，比如过期时间，主题等(iss:issuer,exp:expiration time,sub:subject,aud:audience)</li>
 <li>public claims: 可以设置公开定义的字段</li>
-
-<li><p>private claims: 用于统一使用他们的各方之间的共享信息</p>
+<li>private claims: 用于统一使用他们的各方之间的共享信息</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">{
-&#34;sub&#34;: &#34;xxx-api&#34;,
-&#34;name&#34;: &#34;bgbiao.top&#34;,
-&#34;admin&#34;: true
-}</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">{
+    &#34;sub&#34;: &#34;xxx-api&#34;,
+    &#34;name&#34;: &#34;bgbiao.top&#34;,
+    &#34;admin&#34;: true
+}
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p>对payload部分的json进行base64编码后即可得到JWT的第二个部分</p>
-
+</div><p>对payload部分的json进行base64编码后即可得到JWT的第二个部分</p>
 <p><code>注意:</code> 不要在header和payload中放置敏感信息，除非信息本身已经做过脱敏处理</p>
-
 <p><strong>signature</strong></p>
-
 <p>为了得到签名部分，必须有编码过的header和payload，以及一个秘钥，签名算法使用header中指定的那个，然后对其进行签名即可</p>
-
 <p><code>HMACSHA256(base64UrlEncode(header)+&quot;.&quot;+base64UrlEncode(payload),secret)</code></p>
-
 <p>签名是<code>用于验证消息在传递过程中有没有被更改</code>，并且，对于使用私钥签名的token，它还可以验证JWT的发送方是否为它所称的发送方。</p>
-
 <p>在<a href="https://jwt.io">jwt.io</a>网站中，提供了一些JWT token的编码，验证以及生成jwt的工具。</p>
-
 <p>下图就是一个典型的jwt-token的组成部分。</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpxe1ungej30wq0mygo8.jpg" alt="jwt官方签名结构" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpxe1ungej30wq0mygo8.jpg" alt="jwt官方签名结构"></p>
 <h4 id="什么时候用jwt">什么时候用JWT</h4>
-
 <ul>
 <li>Authorization(授权): 典型场景，用户请求的token中包含了该令牌允许的路由，服务和资源。单点登录其实就是现在广泛使用JWT的一个特性</li>
 <li>Information Exchange(信息交换):  对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式.因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改</li>
 </ul>
-
-<h4 id="jwt-json-web-tokens-是如何工作的">JWT(Json Web Tokens)是如何工作的</h4>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcptxpqcrxj30ct0bsq3h.jpg" alt="JWT认证过程" /></p>
-
+<h4 id="jwtjson-web-tokens是如何工作的">JWT(Json Web Tokens)是如何工作的</h4>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcptxpqcrxj30ct0bsq3h.jpg" alt="JWT认证过程"></p>
 <p>所以，基本上整个过程分为两个阶段，第一个阶段，客户端向服务端获取token，第二阶段，客户端带着该token去请求相关的资源.</p>
-
 <p>通常比较重要的是，服务端如何根据指定的规则进行token的生成。</p>
-
 <p>在认证的时候，当用户用他们的凭证成功登录以后，一个JSON Web Token将会被返回。</p>
-
 <p>此后，token就是用户凭证了，你必须非常小心以防止出现安全问题。</p>
-
 <p>一般而言，你保存令牌的时候不应该超过你所需要它的时间。</p>
-
 <p>无论何时用户想要访问受保护的路由或者资源的时候，用户代理（通常是浏览器）都应该带上JWT，典型的，通常放在Authorization header中，用Bearer schema:
 <code>Authorization: Bearer &lt;token&gt;</code></p>
-
 <p>服务器上的受保护的路由将会检查Authorization header中的JWT是否有效，如果有效，则用户可以访问受保护的资源。如果JWT包含足够多的必需的数据，那么就可以减少对某些操作的数据库查询的需要，尽管可能并不总是如此。</p>
-
 <p>如果token是在授权头（Authorization header）中发送的，那么跨源资源共享(CORS)将不会成为问题，因为它不使用cookie.</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpxi6z1dmj315o0fvab0.jpg" alt="获取JWT以及访问APIs以及资源" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpxi6z1dmj315o0fvab0.jpg" alt="获取JWT以及访问APIs以及资源"></p>
 <ul>
 <li>客户端向授权接口请求授权</li>
 <li>服务端授权后返回一个access token给客户端</li>
 <li>客户端使用access token访问受保护的资源</li>
 </ul>
-
 <h4 id="基于token的身份认证和基于服务器的身份认证">基于Token的身份认证和基于服务器的身份认证</h4>
-
 <p><strong>1.基于服务器的认证</strong></p>
-
-<p>前面说到过session，cookie以及token的区别，在之前传统的做法就是基于存储在服务器上的session来做用户的身份认证，但是通常会有如下问题:
-- Sessions: 认证通过后需要将用户的session数据保存在内存中，随着认证用户的增加，内存开销会大
-- 扩展性: 由于session存储在内存中，扩展性会受限，虽然后期可以使用redis,memcached来缓存数据
-- CORS: 当多个终端访问同一份数据时，可能会遇到禁止请求的问题
-- CSRF: 用户容易受到CSRF攻击</p>
-
+<p>前面说到过session，cookie以及token的区别，在之前传统的做法就是基于存储在服务器上的session来做用户的身份认证，但是通常会有如下问题:</p>
+<ul>
+<li>Sessions: 认证通过后需要将用户的session数据保存在内存中，随着认证用户的增加，内存开销会大</li>
+<li>扩展性: 由于session存储在内存中，扩展性会受限，虽然后期可以使用redis,memcached来缓存数据</li>
+<li>CORS: 当多个终端访问同一份数据时，可能会遇到禁止请求的问题</li>
+<li>CSRF: 用户容易受到CSRF攻击</li>
+</ul>
 <p><strong>2.Session和JWT Token的异同</strong></p>
-
 <p>都可以存储用户相关信息，但是session存储在服务端，JWT存储在客户端</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpxunv5qcj30dd0gfgmp.jpg" alt="session和jwt数据存储位置" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gcpxunv5qcj30dd0gfgmp.jpg" alt="session和jwt数据存储位置"></p>
 <p><strong>3.基于Token的身份认证如何工作</strong></p>
-
 <p>基于Token的身份认证是无状态的，服务器或者session中不会存储任何用户信息.(很好的解决了共享session的问题)</p>
-
 <ul>
 <li>用户携带用户名和密码请求获取token(接口数据中可使用appId,appKey)</li>
 <li>服务端校验用户凭证，并返回用户或客户端一个Token</li>
 <li>客户端存储token,并在请求头中携带Token</li>
 <li>服务端校验token并返回数据</li>
 </ul>
-
-<p><code>注意:</code>
-- 随后客户端的每次请求都需要使用token
-- token应该放在header中
-- 需要将服务器设置为接收所有域的请求: <code>Access-Control-Allow-Origin: *</code></p>
-
+<p><code>注意:</code></p>
+<ul>
+<li>随后客户端的每次请求都需要使用token</li>
+<li>token应该放在header中</li>
+<li>需要将服务器设置为接收所有域的请求: <code>Access-Control-Allow-Origin: *</code></li>
+</ul>
 <p><strong>4.用Token的好处</strong></p>
-
 <ul>
 <li>无状态和可扩展性</li>
 <li>安全: 防止CSRF攻击;token过期重新认证</li>
 </ul>
-
 <p><strong>5.JWT和OAuth的区别</strong></p>
-
 <ul>
 <li>1.OAuth2是一种授权框架 ，JWT是一种认证协议</li>
 <li>2.无论使用哪种方式切记用HTTPS来保证数据的安全性</li>
 <li>3.OAuth2用在<code>使用第三方账号登录的情况</code>(比如使用weibo, qq, github登录某个app)，而<code>JWT是用在前后端分离</code>, 需要简单的对后台API进行保护时使用</li>
 </ul>
-
 <h3 id="使用gin框架集成jwt">使用Gin框架集成JWT</h3>
-
 <p>在Golang语言中，<a href="https://github.com/dgrijalva/jwt-go">jwt-go</a>库提供了一些jwt编码和验证的工具，因此我们很容易使用该库来实现token认证。</p>
-
 <p>另外，我们也知道<a href="https://github.com/gin-gonic/gin">gin</a>框架中支持用户自定义middleware，我们可以很好的将jwt相关的逻辑封装在middleware中，然后对具体的接口进行认证。</p>
-
 <h4 id="自定义中间件">自定义中间件</h4>
-
 <p>在gin框架中，自定义中间件比较容易，只要返回一个<code>gin.HandlerFunc</code>即完成一个中间件定义。</p>
-
 <p>接下来，我们先定义一个用于jwt认证的中间件.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -772,9 +688,11 @@ if (!doNotTrack) {
 </span><span class="lnt">46
 </span><span class="lnt">47
 </span><span class="lnt">48
-</span></pre></td>
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// 定义一个JWTAuth的中间件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义一个JWTAuth的中间件
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 通过http header中的token解析来认证
@@ -821,15 +739,16 @@ func JWTAuth() gin.HandlerFunc {
 		c.Set(&#34;claims&#34;, claims)
 
 	}
-}</pre></td></tr></table>
-</div>
-</div>
-<h4 id="定义jwt编码和解码逻辑">定义jwt编码和解码逻辑</h4>
+}
 
+
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="定义jwt编码和解码逻辑">定义jwt编码和解码逻辑</h4>
 <p>根据前面提到的jwt-token的组成部分，以及<code>jwt-go</code>中相关的定义，我们可以使用如下方法进行生成token.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -899,9 +818,10 @@ func JWTAuth() gin.HandlerFunc {
 </span><span class="lnt">68
 </span><span class="lnt">69
 </span><span class="lnt">70
-</span></pre></td>
+</span><span class="lnt">71
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// 定义一个jwt对象
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义一个jwt对象
 type JWT struct {
 	// 声明签名信息
 	SigningKey []byte
@@ -970,15 +890,15 @@ func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
 
 	return nil, fmt.Errorf(&#34;token无效&#34;)
 
-}</pre></td></tr></table>
-</div>
-</div>
-<h4 id="定义登陆验证逻辑">定义登陆验证逻辑</h4>
+}
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="定义登陆验证逻辑">定义登陆验证逻辑</h4>
 <p>接下来的部分就是普通api的具体逻辑了，比如可以在登陆时进行用户校验，成功后未该次认证请求生成token。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1048,9 +968,9 @@ func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
 </span><span class="lnt">68
 </span><span class="lnt">69
 </span><span class="lnt">70
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// 定义登陆逻辑
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义登陆逻辑
 // model.LoginReq中定义了登陆的请求体(name,passwd)
 func Login(c *gin.Context) {
 	var loginReq model.LoginReq
@@ -1119,13 +1039,13 @@ func generateToken(c *gin.Context, user model.User) {
 	})
 	return
 
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="定义普通待验证接口">定义普通待验证接口</h4>
+</div><h4 id="定义普通待验证接口">定义普通待验证接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1156,9 +1076,10 @@ func generateToken(c *gin.Context, user model.User) {
 </span><span class="lnt">29
 </span><span class="lnt">30
 </span><span class="lnt">31
-</span></pre></td>
+</span><span class="lnt">32
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// 定义一个普通controller函数，作为一个验证接口逻辑
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义一个普通controller函数，作为一个验证接口逻辑
 func GetDataByTime(c *gin.Context) {
 	// 上面我们在JWTAuth()中间中将&#39;claims&#39;写入到gin.Context的指针对象中，因此在这里可以将之解析出来
 	claims := c.MustGet(&#34;claims&#34;).(*md.CustomClaims)
@@ -1188,13 +1109,14 @@ func GetDataByTime(c *gin.Context) {
 		sv1.GET(&#34;/time&#34;, controller.GetDataByTime)
 
 	}
-	router.Run(&#34;:8081&#34;)</pre></td></tr></table>
+	router.Run(&#34;:8081&#34;)
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="验证使用jwt后的接口">验证使用JWT后的接口</h4>
+</div><h4 id="验证使用jwt后的接口">验证使用JWT后的接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1254,9 +1176,10 @@ func GetDataByTime(c *gin.Context) {
 </span><span class="lnt">58
 </span><span class="lnt">59
 </span><span class="lnt">60
-</span></pre></td>
+</span><span class="lnt">61
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 运行项目
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 运行项目
 $ go run main.go
 127.0.0.1
 13306
@@ -1315,16 +1238,14 @@ $ curl http://localhost:8081/apis/v1/auth/time
 
 # 使用token认证
 $ curl http://localhost:8081/apis/v1/auth/time -H &#39;token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&#39;
-{&#34;data&#34;:{&#34;userName&#34;:&#34;hahaha1&#34;,&#34;email&#34;:&#34;hahaha1@bgbiao.top&#34;,&#34;exp&#34;:1584259841,&#34;iss&#34;:&#34;bgbiao.top&#34;,&#34;nbf&#34;:1584255241},&#34;msg&#34;:&#34;token有效&#34;,&#34;status&#34;:0}%</pre></td></tr></table>
+{&#34;data&#34;:{&#34;userName&#34;:&#34;hahaha1&#34;,&#34;email&#34;:&#34;hahaha1@bgbiao.top&#34;,&#34;exp&#34;:1584259841,&#34;iss&#34;:&#34;bgbiao.top&#34;,&#34;nbf&#34;:1584255241},&#34;msg&#34;:&#34;token有效&#34;,&#34;status&#34;:0}%
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><a href="https://github.com/BGBiao/gin-jwt-token">gin-jwt-go源码</a></p>
-
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</div><p><a href="https://github.com/BGBiao/gin-jwt-token">gin-jwt-go源码</a></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
 
     </div>
 

@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -72,11 +72,9 @@
 <meta itemprop="name" content="CPU虚拟化技术探究">
 <meta itemprop="description" content="KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
 内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。">
-
-
-<meta itemprop="datePublished" content="2017-11-09T21:57:45&#43;00:00" />
-<meta itemprop="dateModified" content="2017-11-09T21:57:45&#43;00:00" />
-<meta itemprop="wordCount" content="2448">
+<meta itemprop="datePublished" content="2017-11-09T21:57:45+00:00" />
+<meta itemprop="dateModified" content="2017-11-09T21:57:45+00:00" />
+<meta itemprop="wordCount" content="2452">
 
 
 
@@ -471,7 +469,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2448 words </span>
+        <span class="more-meta"> 2452 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -488,21 +486,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#numa技术与应用">NUMA技术与应用</a></li>
-<li><a href="#kvm虚拟机numa调优">KVM虚拟机NUMA调优</a>
-<ul>
-<li><a href="#宿主机的numa信息查看和配置">宿主机的NUMA信息查看和配置：</a></li>
-<li><a href="#虚拟机numa信息查看与配置">虚拟机NUMA信息查看与配置</a></li>
-<li><a href="#透明大页技术与应用">透明大页技术与应用</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#numa技术与应用">NUMA技术与应用</a></li>
+        <li><a href="#kvm虚拟机numa调优">KVM虚拟机NUMA调优</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -511,31 +502,24 @@ if (!doNotTrack) {
     <div class="post-content">
       <p>KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
 内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。</p>
-
 <p><a href="http://blog.csdn.net/ustc_dylan/article/details/45667227">NUMA架构理解</a></p>
-
 <h3 id="numa技术与应用">NUMA技术与应用</h3>
-
 <p><strong>多CPU共同工作技术的架构：SMP,MPP,NUMA</strong></p>
-
 <p>1.1 SMP技术：
 多个cpu通过一个总线访问存储器，因此SMP系统有时也被称为一致性内存访问(UMA)结构体系。一致性指无论在什么时候，处理器只能为内存的每个数据保持或共享唯一一个数值。(多个cpu通过总线访问共同的内存)。缺点是扩展性有限，存储器接口达到饱和的时候，增加处理器不能获得更高的性能，因此SMP方式支持的CPU个数有限啊</p>
-
 <p>1.2 MPP模式：
 一种分布式存储器模式，能够将更多的处理器纳入一个系统的存储器,一个分布式存储器模式具有多个节点，每个节点都有自己的存储器，可以配置为SMP模式。单个节点相互连接起来形成一个总系统。MPP可以近似理解成一个SMP的横向扩展集群。MPP一般依靠软件实现。</p>
-
 <p>1.3 NUMA技术：
 每个处理器都有自己的存储器，每个处理器也可以访问别的处理器的存储器。
 多核NUMA CPU架构：
-NUMA node1:                     NUMA node2:
-Core1 Core2                     Core1 Core2
-   CPU0                               CPU1
-Core3 Core4                     Core3 Core4</p>
-
+NUMA node1:						NUMA node2:
+Core1 Core2						Core1 Core2
+CPU0							      CPU1
+Core3 Core4 					Core3 Core4</p>
 <p>查看cpu详情</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -561,9 +545,9 @@ Core3 Core4                     Core3 Core4</p>
 </span><span class="lnt">24
 </span><span class="lnt">25
 </span><span class="lnt">26
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># lscpu
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># lscpu
 Architecture:          x86_64
 CPU op-mode(s):        32-bit, 64-bit
 Byte Order:            Little Endian
@@ -588,18 +572,16 @@ NUMA node0 CPU(s):     0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
 NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
 
 # 2(node/socket)*8(8cores/socket)*2(2threads/core)
-2 Sockets 2 CPUs ,1Socket 1 numa node,1 numa node 8 cores,1 core 2 threads</pre></td></tr></table>
+2 Sockets 2 CPUs ,1Socket 1 numa node,1 numa node 8 cores,1 core 2 threads
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="kvm虚拟机numa调优">KVM虚拟机NUMA调优</h3>
-
+</div><h3 id="kvm虚拟机numa调优">KVM虚拟机NUMA调优</h3>
 <h4 id="宿主机的numa信息查看和配置">宿主机的NUMA信息查看和配置：</h4>
-
 <p>因为NUMA架构每个处理器都可以访问自己和别的处理器的存储器，访问自己的存储器要比访问别的存储器快很多，相差10~100倍，所以NUMA调优的目标就是让处理器尽量访问自己的存储器。
-<img src="http://oyep1jupk.bkt.clouddn.com/kvm/cpu/CPU-numa.jpg" alt="" /></p>
+<img src="http://oyep1jupk.bkt.clouddn.com/kvm/cpu/CPU-numa.jpg" alt=""></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -683,9 +665,11 @@ NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
 </span><span class="lnt">82
 </span><span class="lnt">83
 </span><span class="lnt">84
-</span></pre></td>
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># sh getcpuinfo.sh
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># sh getcpuinfo.sh
 ===== CPU Topology Table =====
 
 +--------------+---------+-----------+
@@ -768,13 +752,15 @@ Cores in one socket:  8
 Cores in total: 16
 Hyper-Threading: on
 
-===== END =====</pre></td></tr></table>
+===== END =====
+
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>查看numa架构模式</p>
+</div><p>查看numa架构模式</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -792,9 +778,9 @@ Hyper-Threading: on
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># cat /sys/bus/pci/devices/0000\:07\:00.0/numa_node
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cat /sys/bus/pci/devices/0000\:07\:00.0/numa_node
 0
 
 使用numactl --hardware查看当前CPU硬件的情况：
@@ -811,13 +797,13 @@ node 1 free: 185 MB
 node distances:
 node   0   1
   0:  10  20
-  1:  20  10</pre></td></tr></table>
+  1:  20  10
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>查看每个node的内存情况</p>
+</div><p>查看每个node的内存情况</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -852,9 +838,10 @@ node   0   1
 </span><span class="lnt">33
 </span><span class="lnt">34
 </span><span class="lnt">35
-</span></pre></td>
+</span><span class="lnt">36
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">使用numastat命令可以查看每个节点的内存情况：
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">使用numastat命令可以查看每个节点的内存情况：
 # numastat
                            node0           node1
 numa_hit             11541910709      7342897046		#使用本节点内存次数
@@ -888,15 +875,15 @@ PID              Node 0 Node 1  Total
 Total             57632  42519 100151
 
 Liunx系统默认是自动NUMA平衡策略，如果需要关闭Linux系统的自动平衡，可以使用如下命令：
-echo 0 &gt; /proc/sys/kernel/numa_balancing</pre></td></tr></table>
-</div>
-</div>
-<h4 id="虚拟机numa信息查看与配置">虚拟机NUMA信息查看与配置</h4>
+echo 0 &gt; /proc/sys/kernel/numa_balancing
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="虚拟机numa信息查看与配置">虚拟机NUMA信息查看与配置</h4>
 <p>查看虚拟机VCPU和物理CPU的对应关系：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -921,9 +908,9 @@ echo 0 &gt; /proc/sys/kernel/numa_balancing</pre></td></tr></table>
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># virsh vcpuinfo xxbandy.github.io
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># virsh vcpuinfo xxbandy.github.io
 VCPU:           0
 CPU:            12
 State:          running
@@ -947,22 +934,20 @@ CPU:            31
 State:          running
 CPU time:       389255.3s
 CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-最后一行CPU亲和性：</pre></td></tr></table>
+最后一行CPU亲和性：
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="透明大页技术与应用">透明大页技术与应用</h4>
-
+</div><h4 id="透明大页技术与应用">透明大页技术与应用</h4>
 <p>X86默认的内存页大小是4KB，也可以使用2MB或者1GB的巨型页，系统的巨型页可以传输过虚拟机，kvm虚拟机可以通过分配巨型页提高性能。
 使用巨型页可以提高内存的分配效率，提升系统性能。</p>
-
 <p>使用透明大页的好处：
-    可以使用swap，内存页默认2MB，需要使用swap的时候，内存被分割为4KB。
-    对用户透明，不需要用户做特殊配置。
-    不需要root权限
-    不需要依赖某种库文件</p>
+可以使用swap，内存页默认2MB，需要使用swap的时候，内存被分割为4KB。
+对用户透明，不需要用户做特殊配置。
+不需要root权限
+不需要依赖某种库文件</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -995,9 +980,10 @@ CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
-</span></pre></td>
+</span><span class="lnt">34
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">透明大页内存配置：
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">透明大页内存配置：
 # cat /sys/kernel/mm/transparent_hugepage/enabled
 [always] madvise never
 修改配置：
@@ -1029,7 +1015,9 @@ $ cat /proc/sys/vm/nr_hugepages
 巨型页默认大小是2MB，可以修改使用的巨型页数量：
 echo 25000 &gt; /proc/sys/vm/nr_hugepages
 或者：
-sysctl vm.nr_hugepages = N</pre></td></tr></table>
+sysctl vm.nr_hugepages = N
+
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>

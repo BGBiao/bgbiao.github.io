@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -64,7 +64,6 @@
 
 <meta property="og:title" content="Overlayfs技术探究以及Docker环境中的使用" />
 <meta property="og:description" content="overlayfs 基本概念
-
 一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。" />
 <meta property="og:type" content="article" />
@@ -73,14 +72,11 @@
 <meta property="article:modified_time" content="2017-11-09T21:36:58+00:00" />
 <meta itemprop="name" content="Overlayfs技术探究以及Docker环境中的使用">
 <meta itemprop="description" content="overlayfs 基本概念
-
 一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。">
-
-
-<meta itemprop="datePublished" content="2017-11-09T21:36:58&#43;00:00" />
-<meta itemprop="dateModified" content="2017-11-09T21:36:58&#43;00:00" />
-<meta itemprop="wordCount" content="2966">
+<meta itemprop="datePublished" content="2017-11-09T21:36:58+00:00" />
+<meta itemprop="dateModified" content="2017-11-09T21:36:58+00:00" />
+<meta itemprop="wordCount" content="2969">
 
 
 
@@ -88,7 +84,6 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Overlayfs技术探究以及Docker环境中的使用"/>
 <meta name="twitter:description" content="overlayfs 基本概念
-
 一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。"/>
 
@@ -477,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2966 words </span>
+        <span class="more-meta"> 2969 words </span>
           <span class="more-meta"> 6 min read </span>
 
         
@@ -494,24 +489,16 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#overlayfs-基本概念">overlayfs 基本概念</a></li>
-<li><a href="#优势劣势">优势劣势</a></li>
-<li><a href="#overlay中的读写">overlay中的读写</a>
-<ul>
-<li><a href="#在容器中读取文件">在容器中读取文件</a></li>
-<li><a href="#在容器中修改文件">在容器中修改文件</a></li>
-<li><a href="#在容器中删除文件和目录">在容器中删除文件和目录</a></li>
-<li><a href="#overlayfs的原理测试">overlayfs的原理测试</a></li>
-</ul></li>
-<li><a href="#overlayfs在docker中的使用">overlayfs在docker中的使用</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#overlayfs-基本概念">overlayfs 基本概念</a></li>
+        <li><a href="#优势劣势">优势劣势</a></li>
+        <li><a href="#overlay中的读写">overlay中的读写</a></li>
+        <li><a href="#overlayfs在docker中的使用">overlayfs在docker中的使用</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -519,59 +506,50 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h3 id="overlayfs-基本概念">overlayfs 基本概念</h3>
-
 <p>一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。</p>
-
-<p><img src="http://upload-images.jianshu.io/upload_images/2577135-efb7ae4b8b44c1c1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="overlayfs存储架构" />
+<p><img src="http://upload-images.jianshu.io/upload_images/2577135-efb7ae4b8b44c1c1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="overlayfs存储架构">
 <code>可以看到镜像层和容器层可以保存相同的文件，容器层的文件会覆盖镜像层的文件</code></p>
-
 <ul>
 <li>在overlayfs中每个镜像层都会在<code>/var/lib/docker/overlay</code>有对应的目录，使用硬链接与底层数据进行关联。</li>
 </ul>
-
 <h3 id="优势劣势">优势劣势</h3>
-
 <ul>
 <li><strong>1.OverlayFS支持页缓存共享，多个容器访问同一个文件能共享一个页缓存，以此提高内存使用</strong></li>
 <li><strong>2.OverlayFS消耗inode，随着镜像和容器增加，inode会遇到瓶颈。Overlay2能解决这个问题。在Overlay下，为了解决inode问题，可以考虑将/var/lib/docker挂在单独的文件系统上，或者增加系统inode设置。</strong></li>
 </ul>
-
 <h3 id="overlay中的读写">overlay中的读写</h3>
-
 <h4 id="在容器中读取文件">在容器中读取文件</h4>
-
 <ul>
-<li><p>(1)目标文件不在容器层内，overlay会从镜像层读取文件，此时，对容器性能的影响很小。</p></li>
-
-<li><p>(2)目标文件在容器层内，overlay直接从容器层读取。</p></li>
-
-<li><p>(3)目标文件在容器层和镜像层同时存在，overlay读入容器层中的文件，此时容器层的文件会覆盖镜像层的文件。</p></li>
+<li>
+<p>(1)目标文件不在容器层内，overlay会从镜像层读取文件，此时，对容器性能的影响很小。</p>
+</li>
+<li>
+<p>(2)目标文件在容器层内，overlay直接从容器层读取。</p>
+</li>
+<li>
+<p>(3)目标文件在容器层和镜像层同时存在，overlay读入容器层中的文件，此时容器层的文件会覆盖镜像层的文件。</p>
+</li>
 </ul>
-
 <h4 id="在容器中修改文件">在容器中修改文件</h4>
-
 <p>在容器中第一次修改文件，此时文件不在容器层中。overlay会把文件从镜像层复制到容器层，所有该文件中的修改都保存在容器层中。</p>
-
 <p><code>注意：</code>overlay工作文件系统层(devicemapper工作再块层面)，因此复制文件会复制整个文件，因此在频繁读写会很消耗资源</p>
-
 <ul>
-<li><p>(1)只是在第一次修改文件时，需要把文件从镜像层复制到容器层，后续操作都是在容器层中完成。</p></li>
-
-<li><p>(2)overlayfs只有两层，lowerdir和upperdir，因此在很深的目录树中，搜索文件会相对比较快</p></li>
+<li>
+<p>(1)只是在第一次修改文件时，需要把文件从镜像层复制到容器层，后续操作都是在容器层中完成。</p>
+</li>
+<li>
+<p>(2)overlayfs只有两层，lowerdir和upperdir，因此在很深的目录树中，搜索文件会相对比较快</p>
+</li>
 </ul>
-
 <h4 id="在容器中删除文件和目录">在容器中删除文件和目录</h4>
-
 <p>在容器中删除文件时，overlay存储驱动在容器层中新建一个without文件，该文件用语隐藏镜像层中的目标文件。在容器层删除目录时，overlay存储驱动在容器层新建一个opaque目录，该目录用于隐藏镜像层中的目标目录。
 需要明白的一点是，任何存储驱动都不会删除底层image中的目标文件和目录的。</p>
-
 <h4 id="overlayfs的原理测试">overlayfs的原理测试</h4>
-
 <p>overlayfs挂载后系统文件的page cache是全部共享的。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -652,9 +630,10 @@ if (!doNotTrack) {
 </span><span class="lnt">79
 </span><span class="lnt">80
 </span><span class="lnt">81
-</span></pre></td>
+</span><span class="lnt">82
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># mkdir low upper work
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># mkdir low upper work
 # ls
 low  upper  work
 # echo &#39;abs&#39; &gt; low/11.txt
@@ -734,44 +713,45 @@ cat: ../upper/11.txt~: No such device or address
 c---------. 1 root root 0, 0 Mar 27 19:08 ../upper/11.txt
 
 删除文件后发现文件无法访问，底层变成了一个大小为0，且没有任何人有权限的一个空文件。
-overlayfs用这种删除标记的方式标识文件被删除，（如果upper中没有该文件的话，则底层low中的同名文件又恢复出来显示了，因此需要有这个空文件来标识删除，并且覆盖底层的文件）</pre></td></tr></table>
-</div>
-</div>
-<h3 id="overlayfs在docker中的使用">overlayfs在docker中的使用</h3>
+overlayfs用这种删除标记的方式标识文件被删除，（如果upper中没有该文件的话，则底层low中的同名文件又恢复出来显示了，因此需要有这个空文件来标识删除，并且覆盖底层的文件）
 
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="overlayfs在docker中的使用">overlayfs在docker中的使用</h3>
 <blockquote>
 <p>首先，overlayfs是在高版本的内核上才支持的存储驱动，因此不管使用的官方内核，还是自己patch的内核，首先需要检查overlayfs是否被加载</p>
 </blockquote>
-
 <p><a href="https://mp.weixin.qq.com/s?__biz=MzA4OTMxODQwNA==&amp;mid=2650978252&amp;idx=1&amp;sn=4e5040d70d5656d9b937eb7e9dbc672a&amp;mpshare=1&amp;scene=1&amp;srcid=0327J9rVlXF0m4VU4b0raAJQ&amp;key=7601aed56c2d62eb663f9c44acf41d0f3071fe13b7a35bd0e12641eef7aa201e53e5b9c680e04104a3c41e77eb9d2507aa4613cfac95837e6ae6a7e52710866fd11284eb8814fcf5ab872552099d0a8c&amp;ascene=0&amp;uin=MjUxNzI2NjE2Mg%3D%3D&amp;devicetype=iMac+MacBookAir7%2C2+OSX+OSX+10.10.5+build(14F1021)&amp;version=11020201&amp;pass_ticket=gNSbIAbFM0u3hxIEr27nbXmZMTLnAbzlRuhwjwSUx8jm0iwFbqx9VvM799FvRrSB">overlayfs</a></p>
-
 <p>并且同样重要的是，对于aufs和overlay的实现，用来读取或执行共享库的共享内存也在所有运行的容器之间共享，大大的减少了通用库如’libc’的内存占用。这是一个分层策略的巨大优势，同时也是Docker的graphdriver是引擎中相当重要的一部分的原因之一。graphdriver的功能作用。</p>
-
 <ul>
-<li><p>1.检查overlay是否被加载</p>
+<li>1.检查overlay是否被加载</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span><span class="lnt">7
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">查看overlay是否被加载
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">查看overlay是否被加载
 $ lsmod | grep overlay
 查看内核是否支持overlay模块
 $ modinfo overlayfs
 加载内核模块
-$ modprobe overlayfs</pre></td></tr></table>
-</div>
-</div></li>
+$ modprobe overlayfs
 
-<li><p>2.docker启动参数修改</p>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>2.docker启动参数修改</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -780,9 +760,9 @@ $ modprobe overlayfs</pre></td></tr></table>
 </span><span class="lnt">7
 </span><span class="lnt">8
 </span><span class="lnt">9
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">检测overlayfs释放被识别，成功启动后修改参数到默认的配置文件中
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">检测overlayfs释放被识别，成功启动后修改参数到默认的配置文件中
 $ docker daemon(dockerd) -s overlay(--storage-driver=overlay) 
 
 修改配置文件
@@ -790,14 +770,15 @@ $ cat /etc/sysconfig/docker.conf
 DOCKER_OPTS=&#34;--storage-driver=overlay&#34;
 
 模拟配置:
-other_args=&#34;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.sock --bip 10.0.0.1/24 -H 0.0.0.0:5256  --api-enable-cors=true&#34;</pre></td></tr></table>
+other_args=&#34;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.sock --bip 10.0.0.1/24 -H 0.0.0.0:5256  --api-enable-cors=true&#34;
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>3.检验overlayfs是否成功启动</p>
+</div><ul>
+<li>3.检验overlayfs是否成功启动</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -815,16 +796,16 @@ other_args=&#34;-s overlay --graph=/export/lib/docker -H unix:///var/run/docker.
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ sudo /etc/init.d/docker restart
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ sudo /etc/init.d/docker restart
 成功启动，查看存储信息：
 $ sudo docker info
 Containers: 11
 Images: 5
 Server Version: 1.9.1
 Storage Driver: overlay
-Backing Filesystem: extfs
+ Backing Filesystem: extfs
 Execution Driver: native-0.2
 Logging Driver: json-file
 Kernel Version: 2.6.32-431.wy38.el6.x86_64
@@ -834,17 +815,16 @@ Total Memory: 126 GiB
 Name: －－－－－
 ID: 2IER:NO5S:4NKX:ULDJ:THGQ:GBNR:NIN6:SCXG:SMFX:PG72:JAQF:GRZW
 
-可用看到相关存储驱动是overlay，文件系统是extfs</pre></td></tr></table>
+可用看到相关存储驱动是overlay，文件系统是extfs
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>4.overlay在docker上面的使用</p></li>
+</div><ul>
+<li>4.overlay在docker上面的使用</li>
 </ul>
-
 <p><code>默认docker会将容器以及镜像相关的文件存储在/var/lib/docker/overlay目录下</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -888,9 +868,10 @@ ID: 2IER:NO5S:4NKX:ULDJ:THGQ:GBNR:NIN6:SCXG:SMFX:PG72:JAQF:GRZW
 </span><span class="lnt">42
 </span><span class="lnt">43
 </span><span class="lnt">44
-</span></pre></td>
+</span><span class="lnt">45
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">sh-4.1# docker  images
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.1# docker  images
 REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 xxbandy123/centos6.8-sshd   latest              42c75e16533e        12 weeks ago        402 MB
 sh-4.1# pwd  （这里我们是配置了存储路径）
@@ -933,7 +914,9 @@ sh-4.1#
 查看容器内部的存储结构：
 sh-4.1# ls 8ab8690b0769d07cc0b546112cfc40068d99298ed7e1857272c98a522cede527/
 lower-id  merged/   upper/
-容器的存储里面默认会存放三个文件，lower-id纪录的是image的id，也就是上面提到的LowerDir,其次存在merged和upper目录，分别为容器层，和容器最终看到的merged层。overlayfs中的lower,upper,merged三者的关系看文首。</pre></td></tr></table>
+容器的存储里面默认会存放三个文件，lower-id纪录的是image的id，也就是上面提到的LowerDir,其次存在merged和upper目录，分别为容器层，和容器最终看到的merged层。overlayfs中的lower,upper,merged三者的关系看文首。
+
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>

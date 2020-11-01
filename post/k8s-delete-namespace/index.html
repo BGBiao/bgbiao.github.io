@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/k8s-delete-namespace/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,16 +69,14 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/k8s-delete-namespace/" />
 <meta property="article:published_time" content="2019-10-21T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-15T16:53:30+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="k8s删除Terminating状态的命名空间">
 <meta itemprop="description" content="
 背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.
 ">
-
-
-<meta itemprop="datePublished" content="2019-10-21T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-15T16:53:30&#43;08:00" />
-<meta itemprop="wordCount" content="799">
+<meta itemprop="datePublished" content="2019-10-21T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="803">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
             
           </div>
-        <span class="more-meta"> 799 words </span>
+        <span class="more-meta"> 803 words </span>
           <span class="more-meta"> 2 min read </span>
 
         
@@ -490,7 +488,7 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
 
@@ -499,11 +497,10 @@ if (!doNotTrack) {
       <blockquote>
 <p>背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.</p>
 </blockquote>
-
 <p><strong>查看命名空间详情</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -524,9 +521,10 @@ if (!doNotTrack) {
 </span><span class="lnt">19
 </span><span class="lnt">20
 </span><span class="lnt">21
-</span></pre></td>
+</span><span class="lnt">22
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ kubectl  get ns  | grep rdb
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ kubectl  get ns  | grep rdb
 rdbms                  Terminating   6d21h
 
 $ kubectl  get ns rdbms -o yaml
@@ -546,28 +544,29 @@ spec:
   finalizers:
   - kubernetes
 status:
-  phase: Terminating</pre></td></tr></table>
+  phase: Terminating
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>查看该命名空间下的资源</strong></p>
+</div><p><strong>查看该命名空间下的资源</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 查看k8s集群中可以使用命名空间隔离的资源
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看k8s集群中可以使用命名空间隔离的资源
 $ kubectl api-resources -o name --verbs=list --namespaced | xargs -n 1 kubectl get --show-kind --ignore-not-found -n rdbms
 
-# 发现rdbms命名空间下并无资源占用</pre></td></tr></table>
+# 发现rdbms命名空间下并无资源占用
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>尝试对命名空间进行删除</strong></p>
+</div><p><strong>尝试对命名空间进行删除</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -577,9 +576,11 @@ $ kubectl api-resources -o name --verbs=list --namespaced | xargs -n 1 kubectl g
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span></pre></td>
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 直接删除命名空间rdbms
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 直接删除命名空间rdbms
 ## 提示删除操作未能完成，说系统会在确定没用没用资源后将会被自动删除
 $ kubectl  delete ns rdbms
 Error from server (Conflict): Operation cannot be fulfilled on namespaces &#34;rdbms&#34;: The system is ensuring all content is removed from this namespace.  Upon completion, this namespace will automatically be purged by the system.
@@ -588,13 +589,15 @@ Error from server (Conflict): Operation cannot be fulfilled on namespaces &#34;r
 # 使用强制删除(依然无法删除该命名空间)
 $ kubectl  delete ns rdbms --force --grace-period=0
 warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
-Error from server (Conflict): Operation cannot be fulfilled on namespaces &#34;rdbms&#34;: The system is ensuring all content is removed from this namespace.  Upon completion, this namespace will automatically be purged by the system.</pre></td></tr></table>
+Error from server (Conflict): Operation cannot be fulfilled on namespaces &#34;rdbms&#34;: The system is ensuring all content is removed from this namespace.  Upon completion, this namespace will automatically be purged by the system.
+
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>使用原生接口删除</strong></p>
+</div><p><strong>使用原生接口删除</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -649,9 +652,10 @@ Error from server (Conflict): Operation cannot be fulfilled on namespaces &#34;r
 </span><span class="lnt">53
 </span><span class="lnt">54
 </span><span class="lnt">55
-</span></pre></td>
+</span><span class="lnt">56
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 获取namespace的详情信息
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 获取namespace的详情信息
 $ kubectl  get ns rdbms  -o json &gt; rdbms.json
 
 # 查看napespace定义的json配置
@@ -705,12 +709,12 @@ $ curl -k -H &#34;Content-Type:application/json&#34; -X PUT --data-binary @rdbms
   }
 
 # 再次查看namespace发现已经被删除了
-$ kubectl  get ns  | grep rdb</pre></td></tr></table>
-</div>
-</div>
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+$ kubectl  get ns  | grep rdb
 
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -723,7 +727,7 @@ $ kubectl  get ns  | grep rdb</pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-01-15
+      2020-11-01
       
         
         

@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -70,11 +70,9 @@
 <meta property="article:modified_time" content="2017-12-24T16:39:14+00:00" />
 <meta itemprop="name" content="Golang正则模块使用">
 <meta itemprop="description" content="最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的regexp模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为string类型的方法。">
-
-
-<meta itemprop="datePublished" content="2017-12-24T16:39:14&#43;00:00" />
-<meta itemprop="dateModified" content="2017-12-24T16:39:14&#43;00:00" />
-<meta itemprop="wordCount" content="743">
+<meta itemprop="datePublished" content="2017-12-24T16:39:14+00:00" />
+<meta itemprop="dateModified" content="2017-12-24T16:39:14+00:00" />
+<meta itemprop="wordCount" content="744">
 
 
 
@@ -469,7 +467,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        <span class="more-meta"> 743 words </span>
+        <span class="more-meta"> 744 words </span>
           <span class="more-meta"> 2 min read </span>
 
         
@@ -485,18 +483,17 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
 
     
     <div class="post-content">
       <p>最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的<code>regexp</code>模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为<code>string</code>类型的方法。</p>
-
 <p><strong><code>regexp</code>模块的结构体和方法定义</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -524,9 +521,10 @@ if (!doNotTrack) {
 </span><span class="lnt">26
 </span><span class="lnt">27
 </span><span class="lnt">28
-</span></pre></td>
+</span><span class="lnt">29
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">//正则结构体
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">//正则结构体
 type Regexp struct {
         // contains filtered or unexported fields
 }
@@ -553,13 +551,14 @@ func (re *Regexp) ReplaceAllLiteralString(src, repl string) string
  
  
 //在字符串中是否匹配到re定义的字符串，匹配返回true
-func (re *Regexp) MatchString(s string) bool</pre></td></tr></table>
+func (re *Regexp) MatchString(s string) bool
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>简单示例</strong></p>
+</div><p><strong>简单示例</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -598,9 +597,9 @@ func (re *Regexp) MatchString(s string) bool</pre></td></tr></table>
 </span><span class="lnt">37
 </span><span class="lnt">38
 </span><span class="lnt">39
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">regexp</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="k">go</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">regexp</span><span class="o">-</span><span class="nx">test</span><span class="p">.</span><span class="k">go</span>
 <span class="cm">/**
 </span><span class="cm"> * @File Name: test.go
 </span><span class="cm"> * @Author:
@@ -638,17 +637,14 @@ func (re *Regexp) MatchString(s string) bool</pre></td></tr></table>
 <span class="nx">FindString</span><span class="p">:</span> <span class="nx">k8s</span>
 <span class="nx">ReplaceAllString</span><span class="p">:</span> <span class="nx">biaoge</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">pod</span><span class="o">-</span><span class="mi">12343</span><span class="nx">biaoge11sadsxsakxz</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">biaoge</span><span class="o">-</span><span class="nx">container</span><span class="p">.</span><span class="nx">biaoge</span><span class="o">-</span><span class="err">@</span><span class="nx">xxbandy</span><span class="p">.</span><span class="nx">github</span><span class="p">.</span><span class="nx">io</span>
 <span class="nx">ReplaceAllLiteralString</span><span class="p">:</span> <span class="nx">BIAOGE</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">pod</span><span class="o">-</span><span class="mi">12343</span><span class="nx">BIAOGE11sadsxsakxz</span><span class="o">-</span><span class="nx">test</span><span class="o">-</span><span class="nx">BIAOGE</span><span class="o">-</span><span class="nx">container</span><span class="p">.</span><span class="nx">BIAOGE</span><span class="o">-</span><span class="err">@</span><span class="nx">xxbandy</span><span class="p">.</span><span class="nx">github</span><span class="p">.</span><span class="nx">io</span>
-<span class="nx">Match</span> <span class="nx">String</span><span class="p">:</span> <span class="kc">true</span></pre></td></tr></table>
+<span class="nx">Match</span> <span class="nx">String</span><span class="p">:</span> <span class="kc">true</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>不论是哪种语言的正则模块，个人认为语法都不是最重要的，最重要我认为还是正则表达式本身，如果对正则表达式本身认识比较深的话，不论用哪种语言工具都可以很灵活的处理各种业务场景。这里附上一篇当年写的正则表达式相关的<a href="https://my.oschina.net/xxbAndy/blog/370806">文章</a></p>
-
+</div><p>不论是哪种语言的正则模块，个人认为语法都不是最重要的，最重要我认为还是正则表达式本身，如果对正则表达式本身认识比较深的话，不论用哪种语言工具都可以很灵活的处理各种业务场景。这里附上一篇当年写的正则表达式相关的<a href="https://my.oschina.net/xxbAndy/blog/370806">文章</a></p>
 <p>看到另外一篇文章的正则总结的挺好，分享下来.
 <a href="http://blog.csdn.net/zfy1355/article/details/52959803">http://blog.csdn.net/zfy1355/article/details/52959803</a></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

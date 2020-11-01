@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%952/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -74,11 +74,9 @@
 <meta itemprop="description" content="
 在上一篇文章深入gin框架内幕(一)中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个Context引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。
 ">
-
-
-<meta itemprop="datePublished" content="2020-01-12T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-12T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6713">
+<meta itemprop="datePublished" content="2020-01-12T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-01-12T00:00:00+00:00" />
+<meta itemprop="wordCount" content="6696">
 
 
 
@@ -475,7 +473,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        <span class="more-meta"> 6713 words </span>
+        <span class="more-meta"> 6696 words </span>
           <span class="more-meta"> 14 min read </span>
 
         
@@ -492,20 +490,13 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#gin框架中的几个核心结构">Gin框架中的几个核心结构</a>
-<ul>
-<li><a href="#1-gin框架对http响应数据的处理">1.Gin框架对HTTP响应数据的处理</a></li>
-<li><a href="#2-gin框架中的context结构体">2.Gin框架中的Context结构体</a></li>
-<li><a href="#3-gin实例示例">3.Gin实例示例</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#gin框架中的几个核心结构">Gin框架中的几个核心结构</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -515,13 +506,9 @@ if (!doNotTrack) {
       <blockquote>
 <p>在上一篇文章<a href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/">深入gin框架内幕(一)</a>中，主要介绍了Gin框架中是如何创建一个HTTP服务以及内部的核心结构和常用的一些结构体方法，并在最后以一个简单的示例来详细讲解Gin框架内部具体是如何运行的，但是在最后我们会发现使用了一个<code>Context</code>引用对象的一些方法来返回具体的HTTP响应数据，在本篇文章中，我们将继续学习和分析Gin框架内幕。</p>
 </blockquote>
-
 <p>在开始分析之前，我们先简单回顾一下上一个章节中讲到的Gin框架中的几个核心的结构.</p>
-
 <h3 id="gin框架中的几个核心结构">Gin框架中的几个核心结构</h3>
-
 <p>Gin框架中的几个重要的模型:</p>
-
 <ul>
 <li><code>Engine</code>: 用来初始化一个<code>gin</code>对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L54">源码文件</a></li>
 <li><code>Router</code>: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中</li>
@@ -529,13 +516,11 @@ if (!doNotTrack) {
 <li>Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化
 数据来处理底层的业务逻辑，就需要使用<code>Bind</code>相关的结构方法来解析context中的HTTP数据</li>
 </ul>
-
-<h4 id="1-gin框架对http响应数据的处理">1.Gin框架对HTTP响应数据的处理</h4>
-
+<h4 id="1gin框架对http响应数据的处理">1.Gin框架对HTTP响应数据的处理</h4>
 <p>我们在<a href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%95/">深入Gin框架内幕(一)</a>中，以一个简单的Gin实例来具体讲解它内部是如何创建一个Http服务，并且注册一个路由来接收用户的请求，在示例程序中我们使用了<code>Context</code>引用对象的<code>String</code>方法来处理HTTP服务的数据响应，所以在整个Gin框架中紧跟<code>Router</code>模型结构的就要属<code>Context</code>结构了，该结构体主要用来处理整个HTTP请求的上下文数据，也是我们在开发HTTP服务中相对比较重要的一个结构体了。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -566,19 +551,16 @@ func main() {
         c.String(http.StatusOK,&#34;Hello BGBiao.&#34;)
     })
     ginObj.Run(&#34;localhost:8080&#34;)
-}</code></pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>我们可以看到，在使用Gin框架后，我们只需要很简单的代码，即可以快速运行一个返回<code>Hello BGBiao.</code>的HTTP服务，而在<code>ginObj.Any</code>方法中，我们传入了一个参数为<code>Context</code>引用类型的匿名函数，并在该函数内部采用<code>String(code,data)</code>方法来处理HTTP服务的响应数据(返回Hello BGBiao字符串)，这个时候，你可能会想，我们在企业内部都是前后端分离，通常情况下后端仅会提供<code>RESTful API</code>，并通过<code>JSON</code>格式的数据和前端进行交互，那么Gin是如何处理其他非字符串类型的数据响应呢，这也是我们接下来要主要讲的<code>Context</code>结构模型。</p>
-
-<h4 id="2-gin框架中的context结构体">2.Gin框架中的Context结构体</h4>
-
+</div><p>我们可以看到，在使用Gin框架后，我们只需要很简单的代码，即可以快速运行一个返回<code>Hello BGBiao.</code>的HTTP服务，而在<code>ginObj.Any</code>方法中，我们传入了一个参数为<code>Context</code>引用类型的匿名函数，并在该函数内部采用<code>String(code,data)</code>方法来处理HTTP服务的响应数据(返回Hello BGBiao字符串)，这个时候，你可能会想，我们在企业内部都是前后端分离，通常情况下后端仅会提供<code>RESTful API</code>，并通过<code>JSON</code>格式的数据和前端进行交互，那么Gin是如何处理其他非字符串类型的数据响应呢，这也是我们接下来要主要讲的<code>Context</code>结构模型。</p>
+<h4 id="2gin框架中的context结构体">2.Gin框架中的Context结构体</h4>
 <p><code>注意:</code> 在Gin框架中由<code>Router</code>结构体来负责路由和方法(URL和HTTP方法)的绑定，内的Handler采用<code>Context</code>结构体来处理具体的HTTP数据传输方式，比如HTTP头部，请求体参数，状态码以及响应体和其他的一些常见HTTP行为。</p>
-
 <p><code>Context结构体</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -633,45 +615,38 @@ func main() {
     queryCache url.Values
     // formCache 使用url.ParseQuery来缓存PostForm包含的表单数据(来自POST,PATCH,PUT请求体参数)
     formCache url.Values
-}</code></pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Context结构体常用的一些方法</strong></p>
-
+</div><p><strong>Context结构体常用的一些方法</strong></p>
 <p><code>基本方法</code>:</p>
-
 <ul>
 <li>Copy(): 返回当前正在使用的context的拷贝(context指针)，当这个context必须在goroutine中用时，该方法比较有用</li>
-<li>HandlerName(): 返回当前主handler的名称(比如:handler为handleGetUsers(),该方法将返回&rdquo;main.handleGetUsers&rdquo;)</li>
+<li>HandlerName(): 返回当前主handler的名称(比如:handler为handleGetUsers(),该方法将返回&quot;main.handleGetUsers&quot;)</li>
 <li>HandlerNames(): 返回所有注册的handler的名称</li>
 <li><code>Handler()</code>: 返回当前的主handler(<code>func (c *Context) Handler() HandlerFunc</code>)</li>
 <li>FullPath(): 返回一个匹配路由的全路径(uri: &ldquo;/user/:id&rdquo;,c.FullPath() == &ldquo;/user/:id&rdquo; )</li>
 </ul>
-
 <p><code>http常用方法</code>:</p>
-
 <ul>
 <li>ClientIP() string: 返回客户端ip(该方法会解析<code>X-Real-IP</code>,<code>X-Forwarded-For</code>)</li>
 <li>ContentType() string: 返回HTTP的Content-Type头</li>
 <li>IsWebsocket() bool: 返回是否为ws链接</li>
 </ul>
-
-<p><code>流控相关的方法:</code>
-- Next(): 该方法仅被使用在middleware中，它会在被调用的handler链内部执行pending handler
-- IsAborted(): 如果当前的context被终止了，该方法返回true
-- Abort(): 该函数可以从正在被调用中保护pending handler. 该方法停止后不会停止当前正在执行的handler. 比如我们有一个鉴权的中间件来验证请求是否有权限，如果认证失败了(用户信息异常等)，此时调用Abort()来确保后面的handler不再被调用
-- AbortWithStatus(code int): 同上，在会写入状态码。context.AbortWithStatus(401)即可表示上述的鉴权失败
-- AbortWithStatusJSON(code int, jsonObj interface{}): 同上，会再加响应数据.该方法会停止整个handler链，再写入状态码和json的响应体，同时也会设置Content-Type=&ldquo;application/json&rdquo;
-- AbortWithError(code int, err error) *Error: 同上返回错误信息</p>
-
+<p><code>流控相关的方法:</code></p>
+<ul>
+<li>Next(): 该方法仅被使用在middleware中，它会在被调用的handler链内部执行pending handler</li>
+<li>IsAborted(): 如果当前的context被终止了，该方法返回true</li>
+<li>Abort(): 该函数可以从正在被调用中保护pending handler. 该方法停止后不会停止当前正在执行的handler. 比如我们有一个鉴权的中间件来验证请求是否有权限，如果认证失败了(用户信息异常等)，此时调用Abort()来确保后面的handler不再被调用</li>
+<li>AbortWithStatus(code int): 同上，在会写入状态码。context.AbortWithStatus(401)即可表示上述的鉴权失败</li>
+<li>AbortWithStatusJSON(code int, jsonObj interface{}): 同上，会再加响应数据.该方法会停止整个handler链，再写入状态码和json的响应体，同时也会设置Content-Type=&ldquo;application/json&rdquo;</li>
+<li>AbortWithError(code int, err error) *Error: 同上返回错误信息</li>
+</ul>
 <p><code>错误管理</code>:</p>
-
 <ul>
 <li>Error(err error) *Error: 返回一些错误对象</li>
 </ul>
-
 <p><code>元数据管理</code>:</p>
-
 <ul>
 <li>Set(key string, value interface{}): 给当前这个context设置一个新的键值对</li>
 <li>Get(key string) (value interface{}, exists bool): 返回指定的key的值,以及是否存在</li>
@@ -684,14 +659,12 @@ func main() {
 <li>GetStringMapString(key string) (sms map[string]string): 返回string类型的map结构</li>
 <li>GetStringMapStringSlice(key string) (smss map[string][]string): 同理</li>
 </ul>
-
 <p><code>输入数据</code>:</p>
-
 <ul>
 <li>Param(key string) string: 返回URL的参数值(uri_patten: &ldquo;/user/:id&rdquo;,url: &ldquo;/user/john&rdquo;,c.Param(&ldquo;id&rdquo;) = &ldquo;john&rdquo;)</li>
-<li>Query(key string) string: 返回url中的查询参数值(url: &ldquo;/path?id=1234&amp;name=Manu&amp;value=&ldquo;,c.Query(&ldquo;id&rdquo;)为1234,c.Query(&ldquo;name&rdquo;)为Manu,c.Query(&ldquo;value&rdquo;)为空)</li>
+<li>Query(key string) string: 返回url中的查询参数值(url: &ldquo;/path?id=1234&amp;name=Manu&amp;value=&quot;,c.Query(&ldquo;id&rdquo;)为1234,c.Query(&ldquo;name&rdquo;)为Manu,c.Query(&ldquo;value&rdquo;)为空)</li>
 <li>DefaultQuery(key, defaultValue string) string: 返回url中的查询参数的默认值(同上，但是c.Query(&ldquo;value&rdquo;)就没有值，该方法可以设置默认值)</li>
-<li>GetQuery(key string) (string, bool): 同Query()方法，并且会返回状态，如果对应的key不存在，返回(&ldquo;&rdquo;,false)</li>
+<li>GetQuery(key string) (string, bool): 同Query()方法，并且会返回状态，如果对应的key不存在，返回(&quot;&quot;,false)</li>
 <li>QueryArray(key string) []string: 返回指定key的对应的array(slice的长度取决于给定key的参数的数量)</li>
 <li>GetQueryArray(key string) ([]string, bool): 同上，会返回状态</li>
 <li>QueryMap(key string) map[string]string: 返回指定key对应map类型</li>
@@ -707,9 +680,7 @@ func main() {
 <li>MultipartForm() (*multipart.Form, error): 该方法解析multipart表单，包含file文件上传</li>
 <li>SaveUploadedFile(file *multipart.FileHeader, dst string) error: 该方法用来上传指定的文件头到目标路径(dst)</li>
 </ul>
-
 <p><code>Bind家族相关方法</code>:</p>
-
 <ul>
 <li>Bind(obj interface{}) error: 自动解析<code>Content-Type</code>并绑定到指定的binding引擎</li>
 <li>BindJSON(obj interface{}) error: 同上，binding引擎为<code>binding.JSON</code></li>
@@ -720,9 +691,7 @@ func main() {
 <li>BindUri(obj interface{}) error: 使用<code>binding.Uri</code>来绑定传递的结构体指针</li>
 <li>MustBindWith(obj interface{}, b binding.Binding) error: 使用指定的binding引擎来绑定传递的结构体指针(当有任何错误时，终止请求并返回400)</li>
 </ul>
-
 <p><code>ShouldBind家族相关方法</code>:</p>
-
 <ul>
 <li>ShouldBind(obj interface{}) error: 同上述的Bind()方法，但是该方法在json结构无效时不会返回400</li>
 <li>ShouldBindJSON(obj interface{}) error:</li>
@@ -734,9 +703,7 @@ func main() {
 <li>ShouldBindWith(obj interface{}, b binding.Binding) error: 等同于MustBindWith()方法</li>
 <li>ShouldBindBodyWith(obj interface{}, bb binding.BindingBody) (err error): 和ShouldBindWith()方法相似，但是他会存储请求体到context中，当下次调用时可以重用(因为该方法是在binding之前读取body，因此在你只使用一次时，为了更好的性能还是使用ShouldBindWith会比较好)</li>
 </ul>
-
 <p><code>HTTP响应相关的方法</code>:</p>
-
 <ul>
 <li>Status(code int): 设置http的响应码</li>
 <li>Header(key, value string): 是<code>c.Writer.Header().Set(key, value)</code>的简单实现，在响应体重写入一个header，如果value为空，则相当于调用了<code>c.Writer.Header().Del(key)</code></li>
@@ -747,9 +714,9 @@ func main() {
 <li>Render(code int, r render.Render): 该方法写入响应头并调用render.Render去渲染数据</li>
 <li>HTML(code int, name string, obj interface{}): 该方法使用指定文件模板名称去渲染http模板(同时会更新状态码并设置Content-Type as &ldquo;text/html&rdquo;.)</li>
 <li>IndentedJSON(code int, obj interface{}): 该方法会序列化对象obj为一个pretty JSON 数据到响应体中，同时设置Content-Type as &ldquo;application/json&rdquo;(pretty JSON需要消耗cpu和带宽，强烈建议生产使用<code>Context.JSON()</code>)</li>
-<li>SecureJSON(code int, obj interface{}): 同上，会序列化成<code>Secure Json</code></li>
+<li>SecureJSON(code int, obj interface{}): 同上，会序列化成<code> Secure Json</code></li>
 <li>JSONP(code int, obj interface{}):</li>
-<li>JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&ldquo;application/json&rdquo;头</li>
+<li>JSON(code int, obj interface{}): 序列化为JSON,并写Content-Type:&ldquo;application/json&quot;头</li>
 <li>AsciiJSON(code int, obj interface{}):</li>
 <li>PureJSON(code int, obj interface{}):</li>
 <li>XML(code int, obj interface{}): 序列化成<code>xml</code>格式,并写Content-Type:&ldquo;application/xml&rdquo;</li>
@@ -764,15 +731,12 @@ func main() {
 <li>SSEvent(name string, message interface{}): 写Server-Sent Event到响应数据中</li>
 <li>Stream(step func(w io.Writer) bool) bool: 发送一个流式的响应数据并返回状态</li>
 </ul>
-
-<h4 id="3-gin实例示例">3.Gin实例示例</h4>
-
+<h4 id="3gin实例示例">3.Gin实例示例</h4>
 <p><strong>3.1返回json格式的数据</strong></p>
-
 <p>为了解决我们在开头提到的问题，我们将使用context引用对象的JSON家族方法来处理该需求</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -854,8 +818,8 @@ type restData struct {
 
 func main() {
     // mock一个http响应数据
-    restdata := &amp;restData{&#34;Hello,BGBiao&#34;,&#34;&#34;,true}
-    restdata1 := &amp;restData{map[string]string{&#34;name&#34;:&#34;BGBiao&#34;,&#34;website&#34;:&#34;https://bgbiao.top&#34;},&#34;&#34;,true}
+    restdata := <span class="err">&amp;</span>restData{&#34;Hello,BGBiao&#34;,&#34;&#34;,true}
+    restdata1 := <span class="err">&amp;</span>restData{map[string]string{&#34;name&#34;:&#34;BGBiao&#34;,&#34;website&#34;:&#34;https://bgbiao.top&#34;},&#34;&#34;,true}
 
     // 使用Gin框架启动一个http接口服务
     ginObj := gin.Default()
@@ -897,17 +861,15 @@ $ curl localhost:8080/api/test1
     },
     &#34;message&#34;: &#34;&#34;,
     &#34;status&#34;: true
-}% </code></pre></td></tr></table>
+}% 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>当然上面我们仅以JSON格式来示例，类似的方式我们可以使用<code>XML</code>,<code>YAML</code>,<code>ProtoBuf</code>等方法来输出指定格式化后的数据。</p>
-
+</div><p>当然上面我们仅以JSON格式来示例，类似的方式我们可以使用<code>XML</code>,<code>YAML</code>,<code>ProtoBuf</code>等方法来输出指定格式化后的数据。</p>
 <p><strong>3.2其他常用的基本方法</strong></p>
-
 <p><code>注意:</code>在其他基本方法中我们仍然使用上述示例代码中的主逻辑，主要用来测试基本的方法.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -942,23 +904,20 @@ Content-Type: application/json; charset=utf-8
 Date: Sun, 12 Jan 2020 14:41:01 GMT
 Content-Length: 66
 
-{&#34;data&#34;:&#34;Hello,BGBiao&#34;,&#34;message&#34;:&#34;token:xxxxxxxx 当前有效，客户端ip:127.0.0.1&#34;,&#34;status&#34;:true}</code></pre></td></tr></table>
+{&#34;data&#34;:&#34;Hello,BGBiao&#34;,&#34;message&#34;:&#34;token:xxxxxxxx 当前有效，客户端ip:127.0.0.1&#34;,&#34;status&#34;:true}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>3.3用户数据输入</strong></p>
-
+</div><p><strong>3.3用户数据输入</strong></p>
 <p>当然到这里后，你可能还会有新的疑问，就是通常情况下，我们开发后端接口会提供一些具体的参数，通过一些具体数据提交来实现具体的业务逻辑处理，这些参数通常会分为如下三类:</p>
-
 <ul>
 <li>使用HTTP GET方法获取到的url中的一些查询参数来执行更具体的业务逻辑(比如我们查询数据的指定条数之类的)</li>
 <li>使用HTTP POST GET等其他方式以form表单方式提交的数据来验证和处理用户数据</li>
-<li>在URL中获取一些可变参数(比如通常我们的url会定义为&rdquo;/api/uid/:id&rdquo;来表示用户id相关的接口，这个时候通常需要获取到url中的id字段)</li>
+<li>在URL中获取一些可变参数(比如通常我们的url会定义为&rdquo;/api/uid/:id&quot;来表示用户id相关的接口，这个时候通常需要获取到url中的id字段)</li>
 </ul>
-
 <p>以上的基本需求，几乎都可以在Context结构体的<code>输入数据</code>中找到响应的方法.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-markdown" data-lang="markdown"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1075,6 +1034,7 @@ Content-Length: 66
 </span><span class="lnt">115
 </span><span class="lnt">116
 </span><span class="lnt">117
+</span><span class="lnt">118
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-markdown" data-lang="markdown"><span class="gh"># 接下来，我们依然在上述的代码中进行修改，增加如下路由
@@ -1193,12 +1153,12 @@ $ curl &#34;localhost:8080/api/testdata/Java&#34;
     &#34;data&#34;: &#34;&#34;,
     &#34;message&#34;: &#34;Java 不存在&#34;,
     &#34;status&#34;: false
-}%</code></pre></td></tr></table>
-</div>
-</div>
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+}%
 
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

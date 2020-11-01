@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Epcie%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E7%9A%84%E5%A4%84%E7%90%86%E5%99%A8%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -64,7 +64,6 @@
 
 <meta property="og:title" content="基于PCIe体系结构的处理器结构组成" />
 <meta property="og:description" content="PCIe体系结构的组成部件
-
 PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
 在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。" />
 <meta property="og:type" content="article" />
@@ -73,14 +72,11 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
 <meta property="article:modified_time" content="2017-11-09T21:27:07+00:00" />
 <meta itemprop="name" content="基于PCIe体系结构的处理器结构组成">
 <meta itemprop="description" content="PCIe体系结构的组成部件
-
 PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
 在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。">
-
-
-<meta itemprop="datePublished" content="2017-11-09T21:27:07&#43;00:00" />
-<meta itemprop="dateModified" content="2017-11-09T21:27:07&#43;00:00" />
-<meta itemprop="wordCount" content="1395">
+<meta itemprop="datePublished" content="2017-11-09T21:27:07+00:00" />
+<meta itemprop="dateModified" content="2017-11-09T21:27:07+00:00" />
+<meta itemprop="wordCount" content="1391">
 
 
 
@@ -88,7 +84,6 @@ PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，�
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="基于PCIe体系结构的处理器结构组成"/>
 <meta name="twitter:description" content="PCIe体系结构的组成部件
-
 PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
 在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。"/>
 
@@ -477,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 1395 words </span>
+        <span class="more-meta"> 1391 words </span>
           <span class="more-meta"> 3 min read </span>
 
         
@@ -494,13 +489,10 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#pcie体系结构的组成部件">PCIe体系结构的组成部件</a></li>
-<li><a href="#基于pcie总线的通用处理器结构">基于PCIe总线的通用处理器结构</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#pcie体系结构的组成部件">PCIe体系结构的组成部件</a></li>
+    <li><a href="#基于pcie总线的通用处理器结构">基于PCIe总线的通用处理器结构</a></li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -508,26 +500,18 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h2 id="pcie体系结构的组成部件">PCIe体系结构的组成部件</h2>
-
 <p>PCIe总线作为处理器系统的局部总线，其作用与PCI总线类似，主要目的是为了连接处理器系统中的外部设备，当然PCIe总线也可以连接其他处理器系统。
 在大多数处理器系统中，都使用了RC、Switch和PCIe-to-PCI桥这些基本模块连接PCIe和PCI设备。在PCIe总线中，基于PCIe总线的设备，也被称为EP(Endpoint)。</p>
-
 <h2 id="基于pcie总线的通用处理器结构">基于PCIe总线的通用处理器结构</h2>
-
 <p>PCIe总线控制器即为RC(Root Complex).如果该处理器需要连接更多的PCIe设备时，需要使用Switch扩展PCIe链路。</p>
-
 <p>在不同的处理器系统中，RC的实现有较大差异。PCIe总线规范并没有规定RC的实现细则。在有些处理器系统中，RC相当于PCIe主桥，也有的处理器系统也将PCIe主桥称为PCIe总线控制器。而在x86处理器系统中，RC除了包含PCIe总线控制器之外，还包含一些其他组成部件，因此RC并不等同于PCIe总线控制器。</p>
-
 <p>如果一个RC中可以提供多个PCIe端口，这种RC也被称为多端口RC。如MPC8572处理器的RC可以直接提供3条PCIe链路，因此可以直接连接3个EP。如果MPC8572处理器需要连接更多EP时，需要使用Switch进行链路扩展。</p>
-
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/%E5%9F%BA%E4%BA%8EPCIe%E7%9A%84%E9%80%9A%E7%94%A8%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84.jpg" alt="" /></p>
-
+<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/%E5%9F%BA%E4%BA%8EPCIe%E7%9A%84%E9%80%9A%E7%94%A8%E5%A4%84%E7%90%86%E5%99%A8%E6%9E%B6%E6%9E%84.jpg" alt=""></p>
 <p>上图所示的结构将PCIe总线端口、存储器控制器等一系列与外部设备有关的接口都集成在一起，并统称为RC。RC具有一个或者多个PCIe端口，可以连接各类PCIe设备。PCIe设备包括EP(如网卡、显卡等设备)、Switch和PCIe桥。PCIe总线采用端到端的连接方式，每一个PCIe端口只能连接一个EP，当然PCIe端口也可以连接Switch进行链路扩展。通过Switch扩展出的PCIe链路可以继续挂接EP或者其他Switch。所谓的PCIe Bridge，用以将PCIe总线转换成PCI总线</p>
-
 <p>当前4颗GPU环境的架构：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -540,9 +524,9 @@ if (!doNotTrack) {
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$  nvidia-smi topo -m
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$  nvidia-smi topo -m
 	GPU0	GPU1	GPU2	GPU3	CPU Affinity
 GPU0	 X 	PIX	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
 GPU1	PIX	 X 	PIX	PIX	0-0,2-2,4-4,6-6,8-8,10-10,12-12,14-14,16-16,18-18,20-20,22-22
@@ -554,13 +538,13 @@ Legend:
   PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
   PXB  = Connection traversing multiple PCIe switches (without traversing the PCIe Host Bridge)
   PIX  = Connection traversing a single PCIe switch
-  NV#  = Connection traversing a bonded set of # NVLinks</pre></td></tr></table>
+  NV#  = Connection traversing a bonded set of # NVLinks
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-topo.png" alt="" /></p>
+</div><p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/gpu-topo.png" alt=""></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -576,9 +560,9 @@ Legend:
 </span><span class="lnt">14
 </span><span class="lnt">15
 </span><span class="lnt">16
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ nvidia-smi topo --matrix
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ nvidia-smi topo --matrix
 
         GPU0    GPU1    GPU2    GPU3    mlx4_0  CPU Affinity
 GPU0     X      PIX     PHB     PHB     PHB     0-11
@@ -593,19 +577,18 @@ Legend:
   SOC = Path traverses a socket-level link (e.g. QPI)(CPU插槽之间直连,跨物理CPU)
   PHB = Path traverses a PCIe host bridge(跨PCIe host bridge设备)
   PXB = Path traverses multiple PCIe internal switches (通过内部多个Switch上进行互联的EP)
-  PIX = Path traverses a PCIe internal switch(同一个Switch上的EP)</pre></td></tr></table>
+  PIX = Path traverses a PCIe internal switch(同一个Switch上的EP)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>上面的GPU拓扑可以看出来GPU0和GPU1以及GPU2和GPU3分别处于一个<code>switch</code>和<code>PCIe host bridge</code>上，也即GPU0和GPU1(GPU2和GPU3)可以通过直连的<code>switch</code>相互通信，而GPU0和GPU2(GPU3)通信均需要经过一个<code>PCIe Host Bridge</code></p>
-
-<p>个人理解:
-- SOC相当于是通过物理CPU之间的SMP Link通信的(该种方式跨了CPU核心);
-- PHB相当于是通过PCIe host bridge 的PCIe设备下的EP和Switch下的EP进行互联的结构
-- PXB相当于是同一颗物理CPU下的多个Switch下的EP互联
-- PIX相当于是一个Switch内部的多个EP互相连接(效率最高)</p>
-
+</div><p>上面的GPU拓扑可以看出来GPU0和GPU1以及GPU2和GPU3分别处于一个<code>switch</code>和<code>PCIe host bridge</code>上，也即GPU0和GPU1(GPU2和GPU3)可以通过直连的<code>switch</code>相互通信，而GPU0和GPU2(GPU3)通信均需要经过一个<code>PCIe Host Bridge</code></p>
+<p>个人理解:</p>
+<ul>
+<li>SOC相当于是通过物理CPU之间的SMP Link通信的(该种方式跨了CPU核心);</li>
+<li>PHB相当于是通过PCIe host bridge 的PCIe设备下的EP和Switch下的EP进行互联的结构</li>
+<li>PXB相当于是同一颗物理CPU下的多个Switch下的EP互联</li>
+<li>PIX相当于是一个Switch内部的多个EP互相连接(效率最高)</li>
+</ul>
 <p><strong>参考文章</strong></p>
-
 <p><a href="https://www.mianbaoban.cn/blog/post/193694">PCIe体系结构组成部件</a>
 <a href="http://www.ssdfans.com/%E8%80%81%E7%94%B7%E5%AD%A9%E8%AF%BBpcie%E4%B9%8B%E4%BA%8C%EF%BC%9Apcie%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/">PCIe拓扑结构</a></p>
     </div>

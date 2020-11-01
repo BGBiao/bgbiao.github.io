@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -64,7 +64,6 @@
 
 <meta property="og:title" content="Prometheus入门实践" />
 <meta property="og:description" content="Prometheus入门实践
-
 Prometheus下载地址
 Prometheus相关文档
 Prometheus官方文档" />
@@ -74,15 +73,12 @@ Prometheus官方文档" />
 <meta property="article:modified_time" content="2019-06-20T17:33:14+00:00" />
 <meta itemprop="name" content="Prometheus入门实践">
 <meta itemprop="description" content="Prometheus入门实践
-
 Prometheus下载地址
 Prometheus相关文档
 Prometheus官方文档">
-
-
-<meta itemprop="datePublished" content="2019-06-20T17:33:14&#43;00:00" />
-<meta itemprop="dateModified" content="2019-06-20T17:33:14&#43;00:00" />
-<meta itemprop="wordCount" content="6177">
+<meta itemprop="datePublished" content="2019-06-20T17:33:14+00:00" />
+<meta itemprop="dateModified" content="2019-06-20T17:33:14+00:00" />
+<meta itemprop="wordCount" content="6167">
 
 
 
@@ -90,7 +86,6 @@ Prometheus官方文档">
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Prometheus入门实践"/>
 <meta name="twitter:description" content="Prometheus入门实践
-
 Prometheus下载地址
 Prometheus相关文档
 Prometheus官方文档"/>
@@ -480,7 +475,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 6177 words </span>
+        <span class="more-meta"> 6167 words </span>
           <span class="more-meta"> 13 min read </span>
 
         
@@ -497,22 +492,20 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#prometheus入门实践">Prometheus入门实践</a>
-<ul>
-<li><a href="#一-基本原理">一、基本原理</a></li>
-<li><a href="#二-组件介绍">二、组件介绍</a></li>
-<li><a href="#三-服务过程">三、服务过程</a></li>
-<li><a href="#四-pronetheus服务构建使用">四、pronetheus服务构建使用</a></li>
-<li><a href="#五-安装pushgateway">五、安装pushgateway</a></li>
-<li><a href="#六-安装grafana进行图标展示">六、安装Grafana进行图标展示</a></li>
-<li><a href="#七-安装altermanager">七、安装AlterManager</a></li>
-<li><a href="#八-后续优化">八、后续优化</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#prometheus入门实践">Prometheus入门实践</a>
+      <ul>
+        <li><a href="#一基本原理">一、基本原理</a></li>
+        <li><a href="#二组件介绍">二、组件介绍</a></li>
+        <li><a href="#三服务过程">三、服务过程</a></li>
+        <li><a href="#四pronetheus服务构建使用">四、pronetheus服务构建使用</a></li>
+        <li><a href="#五安装pushgateway">五、安装pushgateway</a></li>
+        <li><a href="#六安装grafana进行图标展示">六、安装Grafana进行图标展示</a></li>
+        <li><a href="#七安装altermanager">七、安装AlterManager</a></li>
+        <li><a href="#八后续优化">八、后续优化</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -520,76 +513,100 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h2 id="prometheus入门实践">Prometheus入门实践</h2>
-
 <p><a href="https://prometheus.io/download/">Prometheus下载地址</a>
 <a href="https://www.kubernetes.org.cn/tags/prometheus">Prometheus相关文档</a>
 <a href="https://prometheus.io/docs/introduction/overview/">Prometheus官方文档</a></p>
-
-<h3 id="一-基本原理">一、基本原理</h3>
-
+<h3 id="一基本原理">一、基本原理</h3>
 <p>通过<code>HTTP协议周期性抓取被监控组件的状态</code>,任意组件只要提供对应的HTTP接口就可以接入监控。</p>
-
 <p>输出被监控组件信息的HTTP接口被叫做<code>exporter</code>,也就是数据采集端，通常来说，最需要接入改造的就是expoter. 当前互联网上已经有很多成熟的<code>exporter</code>组件，当然用户也可用根据官方提供的sdk自行编写exporter.</p>
-
 <ul>
 <li><a href="https://www.bookstack.cn/read/prometheus-manual/instrumenting-exporters.md">开箱即用的exporter</a></li>
 <li><a href="https://prometheus.io/docs/instrumenting/clientlibs/">官方的sdk</a></li>
 <li><a href="https://github.com/oliver006/redis_exporter">redis-exporter</a></li>
 </ul>
-
-<p><code>注意:prometheus的时间序列数据分为四种类型</code>
-- Counter: 收集的数据是按照某个趋势（增加／减少）一直变化的，我们往往用它记录服务请求总量，错误总数等
-- Gauge: 搜集的数据是一个瞬时的，与时间没有关系，可以任意变高变低，往往可以用来记录内存使用率、磁盘使用率等
-- Histogram: 用于表示一段时间范围内对数据进行采样,并能够对其指定区间以及总数进行统计，通常我们用它计算分位数的直方图。
-- Summary: 和Histogram类似，用于表示一段时间内数据采样结果。它直接存储了 quantile 数据，而不是根据统计区间计算出来的</p>
-
-<h3 id="二-组件介绍">二、组件介绍</h3>
-
+<p><code>注意:prometheus的时间序列数据分为四种类型</code></p>
 <ul>
-<li>1. Prometheus-server: 负责<code>数据采集和存储(TSDB)</code>,提供PromQL查询语言的支持</li>
-<li>2. Alertmanager: 警告管理器，用来进行报警</li>
-<li>3. Push Gateway: 支持临时性Job主动推送指标的中间网关(通常对应于短声明周期的任务监控)</li>
+<li>Counter: 收集的数据是按照某个趋势（增加／减少）一直变化的，我们往往用它记录服务请求总量，错误总数等</li>
+<li>Gauge: 搜集的数据是一个瞬时的，与时间没有关系，可以任意变高变低，往往可以用来记录内存使用率、磁盘使用率等</li>
+<li>Histogram: 用于表示一段时间范围内对数据进行采样,并能够对其指定区间以及总数进行统计，通常我们用它计算分位数的直方图。</li>
+<li>Summary: 和Histogram类似，用于表示一段时间内数据采样结果。它直接存储了 quantile 数据，而不是根据统计区间计算出来的</li>
 </ul>
-
-<h3 id="三-服务过程">三、服务过程</h3>
-
+<h3 id="二组件介绍">二、组件介绍</h3>
 <ul>
-<li>1. <code>Prometheus Daemon</code>定时去目标上抓取<code>metrics(指标)数据</code>,每个抓取目标需要暴露一个http服务的接口给server进行定时获取。支持配置文件、文本文件、Zookeeper、Consul、DNS SRV Lookup方式抓取目标；对于长生命周期的服务，采用Pull模式定期拉取数据，对于段生命周期的任务，通过push-gateway来主动推送数据</li>
-<li>2. <code>Prometheus</code>本地存储抓取的所有数据，并通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。</li>
-<li>3. Prometheus通过PromQL和其他API可视化地展示收集的数据. 可以作为<code>Grafana</code>的数据源进行图标输出，也可通过API对外提供数据展示</li>
-<li>4. <code>PushGateway</code>支持client主动推送metrics到push-gateway(相当于是一个常驻的exporter服务),prometheus定期去push-gateway中获取数据</li>
-<li>5. <code>Alertmanager</code>是独立于prometheus的一个组件，支持PromQL查询语句，提供灵活的报警功能</li>
+<li>
+<ol>
+<li>Prometheus-server: 负责<code>数据采集和存储(TSDB)</code>,提供PromQL查询语言的支持</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>Alertmanager: 警告管理器，用来进行报警</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>Push Gateway: 支持临时性Job主动推送指标的中间网关(通常对应于短声明周期的任务监控)</li>
+</ol>
+</li>
 </ul>
-
-<h3 id="四-pronetheus服务构建使用">四、pronetheus服务构建使用</h3>
-
+<h3 id="三服务过程">三、服务过程</h3>
+<ul>
+<li>
+<ol>
+<li><code>Prometheus Daemon</code>定时去目标上抓取<code>metrics(指标)数据</code>,每个抓取目标需要暴露一个http服务的接口给server进行定时获取。支持配置文件、文本文件、Zookeeper、Consul、DNS SRV Lookup方式抓取目标；对于长生命周期的服务，采用Pull模式定期拉取数据，对于段生命周期的任务，通过push-gateway来主动推送数据</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li><code>Prometheus</code>本地存储抓取的所有数据，并通过一定规则进行清理和整理数据，并把得到的结果存储到新的时间序列中。</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>Prometheus通过PromQL和其他API可视化地展示收集的数据. 可以作为<code>Grafana</code>的数据源进行图标输出，也可通过API对外提供数据展示</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li><code>PushGateway</code>支持client主动推送metrics到push-gateway(相当于是一个常驻的exporter服务),prometheus定期去push-gateway中获取数据</li>
+</ol>
+</li>
+<li>
+<ol start="5">
+<li><code>Alertmanager</code>是独立于prometheus的一个组件，支持PromQL查询语句，提供灵活的报警功能</li>
+</ol>
+</li>
+</ul>
+<h3 id="四pronetheus服务构建使用">四、pronetheus服务构建使用</h3>
 <p><a href="https://prometheus.io/download/">下载地址</a></p>
-
 <p><strong>源码安装</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 三个组件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 三个组件
 $ wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz -O node_exporter-0.18.1.tar.gz
 
 $ wget https://github.com/prometheus/prometheus/releases/download/v2.10.0/prometheus-2.10.0.linux-amd64.tar.gz -O prometheus-2.10.0.linux-amd64.tar.gz
 
-$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz</pre></td></tr></table>
-</div>
-</div>
-<p><strong>docker方式安装</strong></p>
+$ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushgateway-0.8.0.linux-amd64.tar.gz -O pushgateway-0.8.0.linux-amd64.tar.gz
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>docker方式安装</strong></p>
 <p><code>注意:prometheus默认使用yaml格式来定义配置文件</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -611,9 +628,11 @@ $ wget https://github.com/prometheus/pushgateway/releases/download/v0.8.0/pushga
 </span><span class="lnt">20
 </span><span class="lnt">21
 </span><span class="lnt">22
-</span></pre></td>
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 编写prometheus默认配置文件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 编写prometheus默认配置文件
 $ cat prometheus.yml
 global:
   scrape_interval:     15s
@@ -634,27 +653,22 @@ $ docker run --name=prometheus -d -p 9090:9090  -v /Users/xuxuebiao/Desktop/prom
 
 $ docker ps -l
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-5e1698a320b2        prom/prometheus     &#34;/bin/prometheus -...&#34;   3 days ago          Up 2 minutes        0.0.0.0:9090-&gt;9090/tcp   prometheus</pre></td></tr></table>
-</div>
-</div>
-<p><code>注意:</code> prometheus为golang编写的程序，因此只有一个二进制文件，使用&ndash;config.file来制定配置文件，使用&ndash;web.enable-lifecycle来启用远程热加载配置文件. 调用指令<code>curl -X POST http://localhost:9090/-/reload</code></p>
+5e1698a320b2        prom/prometheus     &#34;/bin/prometheus -...&#34;   3 days ago          Up 2 minutes        0.0.0.0:9090-&gt;9090/tcp   prometheus
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><code>注意:</code> prometheus为golang编写的程序，因此只有一个二进制文件，使用&ndash;config.file来制定配置文件，使用&ndash;web.enable-lifecycle来启用远程热加载配置文件. 调用指令<code>curl -X POST http://localhost:9090/-/reload</code></p>
 <p>此时可以访问<a href="http://localhost:9090">prometheus-web</a>即可查看prometheus的状态页面。此时它会每30s对自己暴露的http metrics数据进行采集。可以访问prometheus本身的<a href="http://localhost:9090/metrics">metrics数据</a></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e6e1d386fcd43a0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-graph" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-64dcaa81e432aa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-metrics" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-746ef7f040089d80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-当前收集上来的指标项" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-5d97ef27b313ef6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="go-info指标" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-943befcf74a6d6a0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="单metrics指标数据" /></p>
-
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e6e1d386fcd43a0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-graph"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-64dcaa81e432aa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-metrics"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-746ef7f040089d80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus-当前收集上来的指标项"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-5d97ef27b313ef6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="go-info指标"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-943befcf74a6d6a0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="单metrics指标数据"></p>
 <p><strong>通过node exporter提供metrics</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -685,9 +699,10 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 </span><span class="lnt">29
 </span><span class="lnt">30
 </span><span class="lnt">31
-</span></pre></td>
+</span><span class="lnt">32
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 启动node-exporter
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 启动node-exporter
 $ docker run -d --name=node-exporter -p 9100:9100  prom/node-exporter
 $ docker ps -l
 CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                    NAMES
@@ -717,21 +732,18 @@ scrape_configs:
 
 
 # prometheus服务重载
-$ curl -X POST http://localhost:9090/-/reload</pre></td></tr></table>
-</div>
-</div>
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-0daae077328b80f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter数据采集到prometheus" /></p>
+$ curl -X POST http://localhost:9090/-/reload
 
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-4461cc2d08501e1f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter采集的15分钟平均负载" /></p>
-
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://upload-images.jianshu.io/upload_images/2577135-0daae077328b80f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter数据采集到prometheus"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-4461cc2d08501e1f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="node-exporter采集的15分钟平均负载"></p>
 <p><code>注意:如果需要同时查找多个项，其实需要熟悉prometheus的表达式编写</code></p>
-
-<h3 id="五-安装pushgateway">五、安装pushgateway</h3>
-
+<h3 id="五安装pushgateway">五、安装pushgateway</h3>
 <p><code>注意:push-gateway服务启动后也需要将endpoint加入prometheus中</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -747,9 +759,10 @@ $ curl -X POST http://localhost:9090/-/reload</pre></td></tr></table>
 </span><span class="lnt">14
 </span><span class="lnt">15
 </span><span class="lnt">16
-</span></pre></td>
+</span><span class="lnt">17
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 启动push-gateway服务
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 启动push-gateway服务
 docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
 
 # 查看push-gateway服务
@@ -764,71 +777,85 @@ tps{label=&#34;xxb&#34;} 8800
 tps1 100
 tps2 160
 tps3 160
-EOF</pre></td></tr></table>
+EOF
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e7a94dd04483137d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway服务" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1956a56a26dda95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus增加push-gateway" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1b3319b62dfd036d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway采集上来的数据" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e2e614fc197f2a50.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus上查看push-gateway上报的数据" /></p>
-
-<h3 id="六-安装grafana进行图标展示">六、安装Grafana进行图标展示</h3>
+</div><p><img src="https://upload-images.jianshu.io/upload_images/2577135-e7a94dd04483137d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway服务"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1956a56a26dda95f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus增加push-gateway"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1b3319b62dfd036d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="push-gateway采集上来的数据"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e2e614fc197f2a50.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus上查看push-gateway上报的数据"></p>
+<h3 id="六安装grafana进行图标展示">六、安装Grafana进行图标展示</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 创建grafana服务
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 创建grafana服务
 $ docker run -d -p 3000:3000 --name grafana grafana/grafana
 
-$ curl localhost:3000</pre></td></tr></table>
+$ curl localhost:3000
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>添加数据源，以及基本数据验证</p>
+</div><p>添加数据源，以及基本数据验证</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 向prometheus的push-gateway上主动push数据模拟数据上报
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 向prometheus的push-gateway上主动push数据模拟数据上报
 ➜  Desktop echo &#34;tps 10&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
 ➜  Desktop echo &#34;tps 9&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
 ➜  Desktop echo &#34;tps 20&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
 ➜  Desktop echo &#34;tps 30&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
 ➜  Desktop echo &#34;tps 310&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
-➜  Desktop echo &#34;tps 222&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb</pre></td></tr></table>
+➜  Desktop echo &#34;tps 222&#34; | curl --data-binary @- http://localhost:9091/metrics/job/xxb
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-d442c89b5796b2da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana数据源配置" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-6f234d69ad8ff8e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana查看prometheus中收集的metrics数据" /></p>
-
-<h3 id="七-安装altermanager">七、安装AlterManager</h3>
-
-<p><code>Prometheus</code>中的告警由独立的两部分组成
-- 1. Prometheus服务中的警告规则发送警告到Alertmanager
-- 2. Alertmanager管理这些警告.包含:silencing, inhibition, aggregation 并通过一些方式发送通知</p>
-
-<p>建立告警和通知的基本步骤:
-- 1. 创建和配置alertmanager
-- 2. 启动prometheus服务时，通过alertmanager.url 配置报警服务alertmanager服务，prometheus和alertmanager通信连接</p>
-
+</div><p><img src="https://upload-images.jianshu.io/upload_images/2577135-d442c89b5796b2da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana数据源配置"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-6f234d69ad8ff8e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="grafana查看prometheus中收集的metrics数据"></p>
+<h3 id="七安装altermanager">七、安装AlterManager</h3>
+<p><code>Prometheus</code>中的告警由独立的两部分组成</p>
+<ul>
+<li>
+<ol>
+<li>Prometheus服务中的警告规则发送警告到Alertmanager</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>Alertmanager管理这些警告.包含:silencing, inhibition, aggregation 并通过一些方式发送通知</li>
+</ol>
+</li>
+</ul>
+<p>建立告警和通知的基本步骤:</p>
+<ul>
+<li>
+<ol>
+<li>创建和配置alertmanager</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>启动prometheus服务时，通过alertmanager.url 配置报警服务alertmanager服务，prometheus和alertmanager通信连接</li>
+</ol>
+</li>
+</ul>
 <p><strong>启动altermanager服务</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -855,9 +882,10 @@ $ curl localhost:3000</pre></td></tr></table>
 </span><span class="lnt">25
 </span><span class="lnt">26
 </span><span class="lnt">27
-</span></pre></td>
+</span><span class="lnt">28
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 编辑alertmanager配置文件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 编辑alertmanager配置文件
 $cat alertmanager.yml
 global:
   resolve_timeout: 5m
@@ -883,15 +911,15 @@ $ docker run -d -p 9093:9093 --name alertmanager -v /Users/xuxuebiao/Desktop/ale
 
 $ docker ps -l
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-c6ba74bfd03b        prom/alertmanager   &#34;/bin/alertmanager...&#34;   3 days ago          Up 7 seconds        0.0.0.0:9093-&gt;9093/tcp   alertmanager</pre></td></tr></table>
-</div>
-</div>
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-f2e6dec465c35f4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager服务" /></p>
+c6ba74bfd03b        prom/alertmanager   &#34;/bin/alertmanager...&#34;   3 days ago          Up 7 seconds        0.0.0.0:9093-&gt;9093/tcp   alertmanager
 
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://upload-images.jianshu.io/upload_images/2577135-f2e6dec465c35f4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager服务"></p>
 <p><strong>在prometheus中配置altermanager服务</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -945,9 +973,10 @@ c6ba74bfd03b        prom/alertmanager   &#34;/bin/alertmanager...&#34;   3 days 
 </span><span class="lnt">52
 </span><span class="lnt">53
 </span><span class="lnt">54
-</span></pre></td>
+</span><span class="lnt">55
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 编辑rule配置
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 编辑rule配置
 $ cat rules.yml
 groups:
   # tps 超过150 并且持续10s就报警告通知
@@ -1000,22 +1029,25 @@ scrape_configs:
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: [&#34;10.13.118.71:9093&#34;]</pre></td></tr></table>
+        - targets: [&#34;10.13.118.71:9093&#34;]
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>重载prometheus服务</strong></p>
+</div><p><strong>重载prometheus服务</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">curl -X POST http://localhost:9090/-/reload</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">curl -X POST http://localhost:9090/-/reload
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>重新导入数据测试</strong></p>
+</div><p><strong>重新导入数据测试</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -1023,32 +1055,27 @@ alerting:
 </span><span class="lnt">6
 </span><span class="lnt">7
 </span><span class="lnt">8
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="c1"># 循环向push-gateway推送数据</span>
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># 循环向push-gateway推送数据</span>
 $ cat test-abc.sh
 <span class="c1">#!/bin/bash</span>
 <span class="c1">#Author_by:Andy_xu @JR-OPS</span>
 <span class="nv">num</span><span class="o">=</span><span class="sb">`</span>date +%s <span class="p">|</span> cut -c10-13<span class="sb">`</span>
 <span class="nv">metrics</span><span class="o">=</span><span class="sb">`</span>date +%s <span class="p">|</span> cut -c<span class="si">${</span><span class="nv">num</span><span class="si">}</span>-13<span class="sb">`</span>
 <span class="nb">echo</span> <span class="nv">$metrics</span>
-<span class="nb">echo</span> <span class="s2">&#34;tps </span><span class="nv">$metrics</span><span class="s2">&#34;</span> <span class="p">|</span> curl --data-binary @- http://localhost:9091/metrics/job/xxb</pre></td></tr></table>
+<span class="nb">echo</span> <span class="s2">&#34;tps </span><span class="nv">$metrics</span><span class="s2">&#34;</span> <span class="p">|</span> curl --data-binary @- http://localhost:9091/metrics/job/xxb
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-b710723c6e4f9e9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="模拟报警数据" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-2e90930e7db5d1e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager中显示的报警规则" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e3fb656620be40e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus中已出现红色报警" /></p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1e0a57bafbb71e5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus报警详细内容" /></p>
-
-<h3 id="八-后续优化">八、后续优化</h3>
-
+</div><p><img src="https://upload-images.jianshu.io/upload_images/2577135-b710723c6e4f9e9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="模拟报警数据"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-2e90930e7db5d1e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="alertmanager中显示的报警规则"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-e3fb656620be40e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus中已出现红色报警"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1e0a57bafbb71e5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="prometheus报警详细内容"></p>
+<h3 id="八后续优化">八、后续优化</h3>
 <p><code>注意:</code> 此时使用prometheus可以监控到基础服务的资源使用情况，并且也可用借用<code>alertmanager</code>服务对相关报警规则进行检测和报警，那么需要如何把相关报警及时的通知到相关负责人呢。我们前面在<code>alertmanager</code>服务中配置了一个web-hook,即<code>http://10.13.118.71:8889/open/test</code>，可以在alertmanager服务的<code>status</code>中找到。我们可以很好的借助这个web-hook来对相关的报警发送。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1109,9 +1136,9 @@ $ cat test-abc.sh
 </span><span class="lnt">59
 </span><span class="lnt">60
 </span><span class="lnt">61
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">一个临时用来测试的web</span><span class="o">-</span><span class="nx">hook服务</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">一个临时用来测试的web</span><span class="o">-</span><span class="nx">hook服务</span>
 <span class="err">$</span> <span class="nx">cat</span> <span class="nx">test</span><span class="o">-</span><span class="nx">web</span><span class="o">-</span><span class="nx">hook</span><span class="p">.</span><span class="k">go</span>
 <span class="cm">/**
 </span><span class="cm"> * @File Name: test-web-hook.go
@@ -1171,10 +1198,10 @@ $ cat test-abc.sh
 <span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2019</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="mi">19</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">10</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>     <span class="mf">727.873</span><span class="nx">µs</span> <span class="p">|</span>    <span class="mf">10.13.118.71</span> <span class="p">|</span> <span class="nx">POST</span>     <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span>
 <span class="p">{</span><span class="s">&#34;receiver&#34;</span><span class="p">:</span><span class="s">&#34;web\\.hook&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;firing&#34;</span><span class="p">,</span><span class="s">&#34;alerts&#34;</span><span class="p">:[{</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;firing&#34;</span><span class="p">,</span><span class="s">&#34;labels&#34;</span><span class="p">:{</span><span class="s">&#34;alertname&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao测试&#34;</span><span class="p">,</span><span class="s">&#34;exported_job&#34;</span><span class="p">:</span><span class="s">&#34;xxb&#34;</span><span class="p">,</span><span class="s">&#34;group&#34;</span><span class="p">:</span><span class="s">&#34;push-gateway&#34;</span><span class="p">,</span><span class="s">&#34;instance&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091&#34;</span><span class="p">,</span><span class="s">&#34;job&#34;</span><span class="p">:</span><span class="s">&#34;prometheus&#34;</span><span class="p">,</span><span class="s">&#34;monitor&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao-monitor&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;warning&#34;</span><span class="p">},</span><span class="s">&#34;annotations&#34;</span><span class="p">:{</span><span class="s">&#34;description&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&#34;</span><span class="p">,</span><span class="s">&#34;summary&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值150.&#34;</span><span class="p">},</span><span class="s">&#34;startsAt&#34;</span><span class="p">:</span><span class="s">&#34;2019-06-19T06:17:19.247257311Z&#34;</span><span class="p">,</span><span class="s">&#34;endsAt&#34;</span><span class="p">:</span><span class="s">&#34;0001-01-01T00:00:00Z&#34;</span><span class="p">,</span><span class="s">&#34;generatorURL&#34;</span><span class="p">:</span><span class="s">&#34;http://5e1698a320b2:9090/graph?g0.expr=tps+%3E+150\u0026g0.tab=1&#34;</span><span class="p">}],</span><span class="s">&#34;groupLabels&#34;</span><span class="p">:{},</span><span class="s">&#34;commonLabels&#34;</span><span class="p">:{</span><span class="s">&#34;alertname&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao测试&#34;</span><span class="p">,</span><span class="s">&#34;exported_job&#34;</span><span class="p">:</span><span class="s">&#34;xxb&#34;</span><span class="p">,</span><span class="s">&#34;group&#34;</span><span class="p">:</span><span class="s">&#34;push-gateway&#34;</span><span class="p">,</span><span class="s">&#34;instance&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091&#34;</span><span class="p">,</span><span class="s">&#34;job&#34;</span><span class="p">:</span><span class="s">&#34;prometheus&#34;</span><span class="p">,</span><span class="s">&#34;monitor&#34;</span><span class="p">:</span><span class="s">&#34;bgbiao-monitor&#34;</span><span class="p">,</span><span class="s">&#34;status&#34;</span><span class="p">:</span><span class="s">&#34;warning&#34;</span><span class="p">},</span><span class="s">&#34;commonAnnotations&#34;</span><span class="p">:{</span><span class="s">&#34;description&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值!. 当前值: 26986&#34;</span><span class="p">,</span><span class="s">&#34;summary&#34;</span><span class="p">:</span><span class="s">&#34;10.13.118.71:9091:tps 超过阈值150.&#34;</span><span class="p">},</span><span class="s">&#34;externalURL&#34;</span><span class="p">:</span><span class="s">&#34;http://c6ba74bfd03b:9093&#34;</span><span class="p">,</span><span class="s">&#34;version&#34;</span><span class="p">:</span><span class="s">&#34;4&#34;</span><span class="p">,</span><span class="s">&#34;groupKey&#34;</span><span class="p">:</span><span class="s">&#34;{}:{}&#34;</span><span class="p">}</span>
 
-<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2019</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="mi">19</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">25</span><span class="p">:</span><span class="mi">20</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>     <span class="mf">129.897</span><span class="nx">µs</span> <span class="p">|</span>    <span class="mf">10.13.118.71</span> <span class="p">|</span> <span class="nx">POST</span>     <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span></pre></td></tr></table>
+<span class="p">[</span><span class="nx">GIN</span><span class="p">]</span> <span class="mi">2019</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="mi">19</span> <span class="o">-</span> <span class="mi">15</span><span class="p">:</span><span class="mi">25</span><span class="p">:</span><span class="mi">20</span> <span class="p">|</span> <span class="mi">200</span> <span class="p">|</span>     <span class="mf">129.897</span><span class="nx">µs</span> <span class="p">|</span>    <span class="mf">10.13.118.71</span> <span class="p">|</span> <span class="nx">POST</span>     <span class="o">/</span><span class="nx">open</span><span class="o">/</span><span class="nx">test</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意:我们这里的web-hook服务其实是将报警信息临时全部打印出来了，其实可以根据用户关心程度，将相关值取出来直接发送至用户终端，比如钉钉，微信，或者短信</code></p>
+</div><p><code>注意:我们这里的web-hook服务其实是将报警信息临时全部打印出来了，其实可以根据用户关心程度，将相关值取出来直接发送至用户终端，比如钉钉，微信，或者短信</code></p>
     </div>
 
     

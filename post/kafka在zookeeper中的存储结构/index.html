@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,11 +67,8 @@
 <meta property="og:description" content="
 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
 
-
 前言
-
 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
-
 
 存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
 成员管理: 是指 Broker 节点的注册、注销以及属性变更。
@@ -85,21 +82,16 @@ Controller 选举: 是指选举集群 Controller，而其他管理类任务包�
 <meta itemprop="description" content="
 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
 
-
 前言
-
 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
-
 
 存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
 成员管理: 是指 Broker 节点的注册、注销以及属性变更。
 Controller 选举: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。
 ">
-
-
-<meta itemprop="datePublished" content="2020-06-21T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-06-21T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="2769">
+<meta itemprop="datePublished" content="2020-06-21T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-06-21T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2765">
 
 
 
@@ -109,11 +101,8 @@ Controller 选举: 是指选举集群 Controller，而其他管理类任务包�
 <meta name="twitter:description" content="
 我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在KIP-500中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。
 
-
 前言
-
 在kafka集群中，ZooKeeper集群用于存放集群元数据、成员管理、Controller 选举，以及其他一些管理类任务。
-
 
 存放元数据: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。
 成员管理: 是指 Broker 节点的注册、注销以及属性变更。
@@ -505,7 +494,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2769 words </span>
+        <span class="more-meta"> 2765 words </span>
           <span class="more-meta"> 6 min read </span>
 
         
@@ -522,17 +511,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#前言">前言</a></li>
-<li><a href="#zookeeper服务">Zookeeper服务</a></li>
-<li><a href="#kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前言">前言</a></li>
+        <li><a href="#zookeeper服务">Zookeeper服务</a></li>
+        <li><a href="#kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -542,126 +529,112 @@ if (!doNotTrack) {
       <blockquote>
 <p>我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在<a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum">KIP-500</a>中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。</p>
 </blockquote>
-
 <h3 id="前言">前言</h3>
-
 <p>在kafka集群中，ZooKeeper集群用于<code>存放集群元数据</code>、<code>成员管理</code>、<code>Controller 选举</code>，以及其他一些<code>管理类任务</code>。</p>
-
 <ul>
 <li><code>存放元数据</code>: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。</li>
 <li><code>成员管理</code>: 是指 Broker 节点的注册、注销以及属性变更。</li>
 <li><code>Controller 选举</code>: 是指选举集群 Controller，而其他管理类任务包括但不限于主题删除、参数配置。</li>
 </ul>
-
 <h3 id="zookeeper服务">Zookeeper服务</h3>
-
 <p>在开始之前，我们首先需要对Zookeeper服务有一定的了解。在官方文档中，Zookeeper有如下能力:</p>
-
 <ul>
 <li>配置管理: 其实就是单纯的K/V存储，可以用来配置的存储和管理，实现对分布式系统组件的集中式的配置管理</li>
 <li>命名: 命令空间管理，在zookeeper中配置可通过不同的根路径来实现简单的命名空间隔离(简单的chroot隔离)</li>
 <li>分布式的同步服务: 可保证分布式的同步</li>
 <li>分组服务: 可以将一组服务配置进行分组管理，其实在Dubbo的注册中心中，就是使用分组和命名来统一进行生产者的注册和发现</li>
 </ul>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg095r9zy2j30go0553z6.jpg" alt="Zookeeper架构" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg095r9zy2j30go0553z6.jpg" alt="Zookeeper架构"></p>
 <p>在Zookeeper中所有的命名空间和文件系统比较类似，每个节点都有一个唯一的<code>路径</code>，如下图:</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg09dvjkrnj30ca071mxh.jpg" alt="zookeeper内部存储结构" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg09dvjkrnj30ca071mxh.jpg" alt="zookeeper内部存储结构"></p>
 <p>为什么Zookeeper服务可以满足配置管理和协调服务呢？主要是因为它的节点属性，通常也是经常可能会忽略的问题，即在Zookeeper中存在两种节点: <code>持久节点</code>和<code>临时节点</code>，节点也称之为<code>znode</code>，而znode本身除了数据之外，还会存储一些额外的信息:</p>
-
 <ul>
 <li>数据变更的版本号</li>
 <li>ACL变更的版本号</li>
 <li>时间戳</li>
 </ul>
-
 <p>每次znode中的数据有变更，版本号都会递增，并且client在向znode获取数据时，不仅会获取实际数据，而且会获取到数据的版本，这在整个配置管理领域会相当有用。</p>
-
 <p>前面说到的<code>持久节点</code>只要znode创建后，便一直会存在，这种节点主要用于配置的持久化存储，只要zookeeper集群整体可用，那该节点也一直可用(及时集群异常后恢复，该节点依旧存在)；而<code>临时节点</code> 随着某个创建 znode 的会话的开始，被创建，而一旦这个会话被撤除掉，这个 znode 就会自动被 ZooKeeper 删除。</p>
-
 <p>对于<code>临时节点</code>来讲，经常会被用在如下场景:</p>
-
 <ul>
 <li>dubbo中的服务注册</li>
 <li>其他分布式服务中的leader选举</li>
 </ul>
-
 <p>而真正使得Zookeeper在Java语言生态中有如此大影响还依赖于另外一个功能: <code>watches</code>，Client 可以对某个 znode 设置<code>watch</code> 当这个 znode 有变更的时候，就会产生<code>watch</code> 事件，这个事件会由 ZooKeeper 通知至 Client, 即是 Client 会收到来自 Server 的通知，可以实现数据的动态变更。(之所以说是Java语言生态，是因为在云原生领域，Etcd几乎是Zookeeper的替代品，不同的是它是Golang语言生态体系中的)</p>
-
 <h3 id="kafka集群数据在zookeeper的存储">kafka集群数据在zookeeper的存储</h3>
-
 <p>前面对Zookeeper服务进行了大概的说明,接下来我们一起看看kafka的集群数据在zookeeper中是如何存储和分布的。</p>
-
 <p>链接zk:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span><span class="lnt">8
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 前面说到zookeeper支持命名空间，因此我们可以使用一个zookeeper集群来管理多个kafka集群
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 前面说到zookeeper支持命名空间，因此我们可以使用一个zookeeper集群来管理多个kafka集群
 # 只需要在启动kafka时指定zk的chroot环境，比如/kafka 在zookeeper中将存储名称为`kafka`的集群的相关数据
 sh-4.2# sh zkCli.sh -server 127.0.0.1:2181
 Connecting to 127.0.0.1:2181
 ....
 [zk: 127.0.0.1:2181(CONNECTED) 0] ls /
-[kafka, zookeeper]</pre></td></tr></table>
+[kafka, zookeeper]
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>查看kafka数据存储结构:</p>
+</div><p>查看kafka数据存储结构:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span><span class="lnt">3
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 1] ls /kafka
-[admin, brokers, cluster, config, consumers, controller, controller_epoch, isr_change_notification, latest_producer_id_block, log_dir_event_notification]</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">
+[zk: 127.0.0.1:2181(CONNECTED) 1] ls /kafka
+[admin, brokers, cluster, config, consumers, controller, controller_epoch, isr_change_notification, latest_producer_id_block, log_dir_event_notification]
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>kafka元数据存储目录</strong>
-- admin: 存储管理员接口操作的相关信息，主要为topic删除事件，分区迁移事件，优先副本选举，信息(一般为临时节点)
-- brokers: 主要存储broker相关的信息，broker节点以及节点上的topic相关信息
-- cluster: 存储kafka集群信息
-- config: 存储broker，client，topic，user以及changer相关的配置信息
-- consumers: 存放消费者相关信息(一般为空)
-- controller: 用于存放控制节点信息(注意: 该节点是一个临时节点，用于controller节点注册)
-- controller_epoch: 用于存放controller节点当前的年龄
-- isr_change_notification: 用于存储isr的变更通知(临时节点，当有isr进行变动时，会用于事件通知，可进行watch获取集群isr状态变更)
-- latest_producer_id_block:  该节点用于存储处理事务相关的pid范围
-- log_dir_event_notification: 日志目录事件通知</p>
-
+</div><p><strong>kafka元数据存储目录</strong></p>
+<ul>
+<li>admin: 存储管理员接口操作的相关信息，主要为topic删除事件，分区迁移事件，优先副本选举，信息(一般为临时节点)</li>
+<li>brokers: 主要存储broker相关的信息，broker节点以及节点上的topic相关信息</li>
+<li>cluster: 存储kafka集群信息</li>
+<li>config: 存储broker，client，topic，user以及changer相关的配置信息</li>
+<li>consumers: 存放消费者相关信息(一般为空)</li>
+<li>controller: 用于存放控制节点信息(注意: 该节点是一个临时节点，用于controller节点注册)</li>
+<li>controller_epoch: 用于存放controller节点当前的年龄</li>
+<li>isr_change_notification: 用于存储isr的变更通知(临时节点，当有isr进行变动时，会用于事件通知，可进行watch获取集群isr状态变更)</li>
+<li>latest_producer_id_block:  该节点用于存储处理事务相关的pid范围</li>
+<li>log_dir_event_notification: 日志目录事件通知</li>
+</ul>
 <p><strong>admin目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 2] ls /kafka/admin
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[zk: 127.0.0.1:2181(CONNECTED) 2] ls /kafka/admin
 [delete_topics]
 [zk: 127.0.0.1:2181(CONNECTED) 3] ls /kafka/admin/delete_topics
 []
 [zk: 127.0.0.1:2181(CONNECTED) 4] get  /kafka/admin/delete_topics
-null</pre></td></tr></table>
+null
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>brokers目录结构</strong></p>
+</div><p><strong>brokers目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -695,9 +668,10 @@ null</pre></td></tr></table>
 </span><span class="lnt">32
 </span><span class="lnt">33
 </span><span class="lnt">34
-</span></pre></td>
+</span><span class="lnt">35
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># broker和topic列表数据
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># broker和topic列表数据
 [zk: 127.0.0.1:2181(CONNECTED) 5] ls /kafka/brokers
 [ids, seqid, topics]
 
@@ -730,13 +704,14 @@ null</pre></td></tr></table>
 [zk: localhost:2181(CONNECTED) 7] ls /brokers/topics/__consumer_offsets/partitions/1/state
 []
 [zk: localhost:2181(CONNECTED) 8] get  /brokers/topics/__consumer_offsets/partitions/1/state
-{&#34;controller_epoch&#34;:3,&#34;leader&#34;:1,&#34;version&#34;:1,&#34;leader_epoch&#34;:12,&#34;isr&#34;:[3,1]}</pre></td></tr></table>
+{&#34;controller_epoch&#34;:3,&#34;leader&#34;:1,&#34;version&#34;:1,&#34;leader_epoch&#34;:12,&#34;isr&#34;:[3,1]}
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>cluster目录结构</strong></p>
+</div><p><strong>cluster目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -749,9 +724,10 @@ null</pre></td></tr></table>
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span></pre></td>
+</span><span class="lnt">14
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 5] get   /kafka/cluster/id
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[zk: 127.0.0.1:2181(CONNECTED) 5] get   /kafka/cluster/id
 {&#34;version&#34;:&#34;1&#34;,&#34;id&#34;:&#34;5C-JZf4vRdqKzlca7Lv7pA&#34;}
 cZxid = 0x100000018
 ctime = Fri Mar 30 22:21:07 CST 2018
@@ -763,13 +739,14 @@ dataVersion = 0
 aclVersion = 0
 ephemeralOwner = 0x0
 dataLength = 45
-numChildren = 0</pre></td></tr></table>
+numChildren = 0
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>config目录结构</strong></p>
+</div><p><strong>config目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -790,9 +767,9 @@ numChildren = 0</pre></td></tr></table>
 </span><span class="lnt">19
 </span><span class="lnt">20
 </span><span class="lnt">21
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[zk: 127.0.0.1:2181(CONNECTED) 12] ls /kafka/config
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[zk: 127.0.0.1:2181(CONNECTED) 12] ls /kafka/config
 [brokers, changes, clients, topics, users]
 
 # 需要注意的是，config目录用来存放各种实体的配置，用于使用kafka相关工具对实体进行的配置变更存储
@@ -812,39 +789,41 @@ numChildren = 0</pre></td></tr></table>
 # 是因为该topic有一些额外的topic级别参数
 # 如果我们对topic参数有过动态变更，将会在这里存储
 [zk: 127.0.0.1:2181(CONNECTED) 24] get /kafka/config/topics/__consumer_offsets
-{&#34;version&#34;:1,&#34;config&#34;:{&#34;segment.bytes&#34;:&#34;104857600&#34;,&#34;compression.type&#34;:&#34;producer&#34;,&#34;cleanup.policy&#34;:&#34;compact&#34;}}</pre></td></tr></table>
+{&#34;version&#34;:1,&#34;config&#34;:{&#34;segment.bytes&#34;:&#34;104857600&#34;,&#34;compression.type&#34;:&#34;producer&#34;,&#34;cleanup.policy&#34;:&#34;compact&#34;}}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>controller目录结构</strong></p>
+</div><p><strong>controller目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 可以看到当前broker-1为集群的controller节点
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 可以看到当前broker-1为集群的controller节点
 [zk: 127.0.0.1:2181(CONNECTED) 30] get  /kafka/controller
-{&#34;version&#34;:1,&#34;brokerid&#34;:1,&#34;timestamp&#34;:&#34;1588833869354&#34;}</pre></td></tr></table>
+{&#34;version&#34;:1,&#34;brokerid&#34;:1,&#34;timestamp&#34;:&#34;1588833869354&#34;}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>controller_epoch 目录结构</strong></p>
+</div><p><strong>controller_epoch 目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span><span class="lnt">4
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 可以看到controller的年龄是2，说明controller经历过2次变更了
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 可以看到controller的年龄是2，说明controller经历过2次变更了
 [zk: 127.0.0.1:2181(CONNECTED) 32] get  /kafka/controller_epoch
-2</pre></td></tr></table>
+2
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>其他几个目录结构</strong></p>
+</div><p><strong>其他几个目录结构</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -862,9 +841,10 @@ numChildren = 0</pre></td></tr></table>
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span></pre></td>
+</span><span class="lnt">19
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 存储事务相关的pid范围数据
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 存储事务相关的pid范围数据
 # broker启动时提前预分配一段 PID，当前是 0~999，即提前分配出 1000 个 PID 来
 # 一旦 PID 超过了 999，则目前会按照 1000 的步长重新分配
 # 集群中所有 broker 启动时都会启动一个叫 TransactionCoordinator 的组件，该组件能够执行预分配 PID 块和分配 PID 的工作，而所有 broker 都使用 /latest_producer_id_block 节点来保存 PID 块
@@ -881,18 +861,15 @@ null
 [zk: 127.0.0.1:2181(CONNECTED) 41] ls /kafka/log_dir_event_notification
 []
 [zk: 127.0.0.1:2181(CONNECTED) 42] get  /kafka/log_dir_event_notification
-null</pre></td></tr></table>
-</div>
-</div>
-<p>以上就是整个kafka元数据在zookeeper集群中的整体存储结构，下面附上一张kafka的元数据存储结构图。</p>
+null
 
+</code></pre></td></tr></table>
+</div>
+</div><p>以上就是整个kafka元数据在zookeeper集群中的整体存储结构，下面附上一张kafka的元数据存储结构图。</p>
 <p><strong>kafka元数据在zk中的分布</strong></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg0a21u6coj31am0u0tlf.jpg" alt="kafka在zookeeper中的存储结构" /></p>
-
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg0a21u6coj31am0u0tlf.jpg" alt="kafka在zookeeper中的存储结构"></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

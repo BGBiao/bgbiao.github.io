@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -65,9 +65,7 @@
 
 <meta property="og:title" content="深入Gin框架内幕1" />
 <meta property="og:description" content="Gin框架介绍
-
 Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini但性能更好的API框架，不同于谢大主导的Beegoweb框架，后者更像是Python语言中的Django框架，内部包含了开发一个web程序所需的各种组件。
-
 如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/" />
@@ -75,15 +73,11 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 <meta property="article:modified_time" content="2020-01-11T00:00:00+00:00" />
 <meta itemprop="name" content="深入Gin框架内幕1">
 <meta itemprop="description" content="Gin框架介绍
-
 Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini但性能更好的API框架，不同于谢大主导的Beegoweb框架，后者更像是Python语言中的Django框架，内部包含了开发一个web程序所需的各种组件。
-
 如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。">
-
-
-<meta itemprop="datePublished" content="2020-01-11T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5825">
+<meta itemprop="datePublished" content="2020-01-11T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-01-11T00:00:00+00:00" />
+<meta itemprop="wordCount" content="5824">
 
 
 
@@ -91,9 +85,7 @@ Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini�
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="深入Gin框架内幕1"/>
 <meta name="twitter:description" content="Gin框架介绍
-
 Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini但性能更好的API框架，不同于谢大主导的Beegoweb框架，后者更像是Python语言中的Django框架，内部包含了开发一个web程序所需的各种组件。
-
 如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。"/>
 
 <!--[if lte IE 9]>
@@ -482,7 +474,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        <span class="more-meta"> 5825 words </span>
+        <span class="more-meta"> 5824 words </span>
           <span class="more-meta"> 12 min read </span>
 
         
@@ -499,21 +491,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#gin框架介绍">Gin框架介绍</a></li>
-<li><a href="#gin框架中的几个核心结构">Gin框架中的几个核心结构</a>
-<ul>
-<li><a href="#1-gin框架中的engine结构体">1.Gin框架中的Engine结构体</a></li>
-<li><a href="#2-gin框架中的router">2.Gin框架中的Router</a></li>
-<li><a href="#3-gin实例示例">3.Gin实例示例</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#gin框架介绍">Gin框架介绍</a></li>
+        <li><a href="#gin框架中的几个核心结构">Gin框架中的几个核心结构</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -521,40 +506,27 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h3 id="gin框架介绍">Gin框架介绍</h3>
-
 <p><a href="https://github.com/gin-gonic/gin">Gin</a>是一个用 Go (Golang) 编写的 web 框架。它是一个类似于<a href="https://github.com/go-martini/martini">martini</a>但性能更好的API框架，不同于谢大主导的<a href="https://beego.me/">Beego</a>web框架，后者更像是Python语言中的<code>Django</code>框架，内部包含了开发一个web程序所需的各种组件。</p>
-
 <p>如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。</p>
-
 <p>同时，不同于其他Golang语言的API框架，该框架社区十分活跃，并且主程仍然在不断更新和改进，我们知道通常情况下在选择一个开源的软件或者相关库时，社区的活跃度以及项目的更新情况会非常重要(考虑到后期的维护和性能和特性问题)。</p>
-
 <p>另外一方面，该框架官方提供了很多简单的示例来供我们快速运行一个期望的http服务，这对于一个刚转入Golang进行业务开发的同学来说是一个非常好的开始。</p>
-
 <p><a href="https://github.com/gin-gonic/gin#api-examples">Gin官方提供的各种HTTP服务示例</a></p>
-
 <p>当然我在很长一段时间也仅是去看官方示例来快速熟悉并实现自己的业务需求，但当有一些特殊的需求时通常去查看官方的具体实现来满足需求，长期如此，不仅耗时且效率极低，因此我产生了将核心源码探究一番的兴趣，希望能通过源码方式来对Gin框架有个深入的学习。</p>
-
 <h3 id="gin框架中的几个核心结构">Gin框架中的几个核心结构</h3>
-
 <p>我们都知道开发一个HTTP服务，首先需要启动一个TCP监听，然后需要有一些列的handler来处理具体的业务逻辑，最后在再将具体的业务逻辑通过HTTP协议约定和相关的Method和URL进行绑定，以此来对外提供具体功能的HTTP服务。那么在Gin框架对应的就是如下几个模型，我们将一起学习Gin的实现。</p>
-
 <p>Gin框架中的几个重要的模型:</p>
-
 <ul>
 <li>Engine: 用来初始化一个<code>gin</code>对象实例，在该对象实例中主要包含了一些框架的基础功能，比如日志，中间件设置，路由控制(组)，以及handlercontext等相关方法.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L54">源码文件</a></li>
 <li>Router: 用来定义各种路由规则和条件，并通过HTTP服务将具体的路由注册到一个由context实现的handler中</li>
 <li>Context: <code>Context</code>是框架中非常重要的一点，它允许我们在中间件间共享变量，管理整个流程，验证请求的json以及提供一个json的响应体. 通常情况下我们的业务逻辑处理也是在整个Context引用对象中进行实现的.</li>
 <li>Bind: 在Context中我们已经可以获取到请求的详细信息，比如HTTP请求头和请求体，但是我们需要根据不同的HTTP协议参数来获取相应的格式化数据来处理底层的业务逻辑，就需要使用<code>Bind</code>相关的结构方法来解析context中的HTTP数据</li>
 </ul>
-
-<h4 id="1-gin框架中的engine结构体">1.Gin框架中的Engine结构体</h4>
-
+<h4 id="1gin框架中的engine结构体">1.Gin框架中的Engine结构体</h4>
 <p>当我们在使用框架<code>[Gin](https://github.com/gin-gonic/gin)</code>来创建一个HTTP服务时，首先我们需要初始化一个实例，在<code>Engine</code>结构体中就包含了实例的一些基本属性和实例化的一些方法。</p>
-
 <p><code>Engine结构体</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -596,9 +568,10 @@ if (!doNotTrack) {
 </span><span class="lnt">40
 </span><span class="lnt">41
 </span><span class="lnt">42
-</span></pre></td>
+</span><span class="lnt">43
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">type Engine struct {
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">type Engine struct {
     // 路由组，在实际开发过程中我们通常会使用路由组来组织和管理一些列的路由. 比如: /apis/,/v1/等分组路由
     RouterGroup
     // 开启自动重定向。如果当前路由没有匹配到，但是存在不带/开头的handler就会重定向. 比如: 用户输入/foo/但是存在一个/foo 就会自动重定向到该handler，并且会向客户端返回301或者307状态码(区别在于GET方法和其他方法)
@@ -639,29 +612,27 @@ if (!doNotTrack) {
     pool             sync.Pool
     // methodTrees是methodTree的切片(methodTree是一个包含请求方法和node指针的结构体,node是一个管理path的节点树)
     trees            methodTrees
-}</pre></td></tr></table>
+}
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>HandlerFunc定义</code>:</p>
+</div><p><code>HandlerFunc定义</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// 定义了一个可以被中间件使用的handler
-type HandlerFunc func(*Context)</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义了一个可以被中间件使用的handler
+type HandlerFunc func(*Context)
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>初始化Engine的方式</code>:</p>
-
+</div><p><code>初始化Engine的方式</code>:</p>
 <ul>
 <li><code>New()</code>: 该函数返回一个默认的Engine引用实例(开启了自动重定向,转发客户端ip和禁止请求路径转义)</li>
 <li><code>Default()</code>: 内部调用<code>New()</code>函数，但是增加了Logger和Recovery两个中间件</li>
 </ul>
-
 <p><code>Engine对外常用的方法</code>:</p>
-
 <ul>
 <li><code>Delims(left, right string) *Engine</code>: 给创建好的gin实例指定模板引擎的左右分割符</li>
 <li><code>SecureJsonPrefix(prefix string) *Engine</code>: 给创建好的gin实例设置secureJsonPrefixi</li>
@@ -681,23 +652,18 @@ type HandlerFunc func(*Context)</pre></td></tr></table>
 <li><code>ServeHTTP(w http.ResponseWriter, req *http.Request)</code>: 该方法遵循了<code>http.Handler</code>的接口规范，可使gin内部调用<code>http.ListenAndServe</code>来启动一个http服务</li>
 <li><code>HandleContext(c *Context)</code>: 该方法会重新确认一个被重写的context(可以通过c.Request.URL.Path来实现). 需要注意的是该方法可能造成context的循环使用(会绕死你,谨慎使用)</li>
 </ul>
-
-<h4 id="2-gin框架中的router">2.Gin框架中的Router</h4>
-
+<h4 id="2gin框架中的router">2.Gin框架中的Router</h4>
 <p>使用<code>Engine</code>结构体中提供的相关方法，我们就可以快速的启动一个HTTP服务了，但是如何对外暴露一个URL来简单实现一个HTTP的数据传输呢，这个时候就需要使用Router中的方法了。</p>
-
 <p><code>Gin框架中Router相关的结构体</code>:</p>
-
 <ul>
 <li><code>RouterGroup</code>: 该结构体被用来在Gin内部配置一个路由，一个RouterGroup被用来关联URL前缀和一组具体的handler业务逻辑</li>
 <li><code>IRoutes</code>: IRoutes是一个定了了所有路由处理的接口(包含一些常用的HTTP方法)</li>
 <li><code>IRouter</code>: IRouter则是一个包含单个路由和路由组的所有路由处理的接口</li>
 </ul>
-
 <p><code>RouterGroup相关结构定义</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -729,9 +695,10 @@ type HandlerFunc func(*Context)</pre></td></tr></table>
 </span><span class="lnt">30
 </span><span class="lnt">31
 </span><span class="lnt">32
-</span></pre></td>
+</span><span class="lnt">33
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// RouterGroup 结构体
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// RouterGroup 结构体
 type RouterGroup struct {
 	Handlers HandlersChain
 	basePath string
@@ -762,41 +729,40 @@ type IRoutes interface {
 type IRouter interface {
 	IRoutes
 	Group(string, ...HandlerFunc) *RouterGroup
-}</pre></td></tr></table>
-</div>
-</div>
-<p>还记得在上一节中我们的<code>Engine</code>结构体中有一个<code>RouterGroup</code>字段吗，该字段会在我们创建一个<code>Engine</code>的gin实例后帮助我们初始化一个默认的<code>RouterGroup</code>实例。</p>
+}
 
+</code></pre></td></tr></table>
+</div>
+</div><p>还记得在上一节中我们的<code>Engine</code>结构体中有一个<code>RouterGroup</code>字段吗，该字段会在我们创建一个<code>Engine</code>的gin实例后帮助我们初始化一个默认的<code>RouterGroup</code>实例。</p>
 <p>比如在<code>Engine</code>结构体的中的<code>New()</code>函数，会初始化一个带有如下<code>RouterGroup</code>的gin实例，并将gin实例注册到RouterGroup的<code>engine</code>字段.<a href="https://github.com/gin-gonic/gin/blob/master/gin.go#L126">源码文件</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">// https://github.com/gin-gonic/gin/blob/master/gin.go#L129
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">// https://github.com/gin-gonic/gin/blob/master/gin.go#L129
 		RouterGroup: RouterGroup{
 			Handlers: nil,
 			basePath: &#34;/&#34;,
 			root:     true,
-		},</pre></td></tr></table>
+		},
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>RouterGroup结构体对外暴露的常用方法</code>:</p>
-
+</div><p><code>RouterGroup结构体对外暴露的常用方法</code>:</p>
 <ul>
 <li><code>Use(middleware ...HandlerFunc) IRoutes</code>: 注册一个中间件并返回Iroutes接口</li>
 <li><code>Group(relativePath string, handlers ...HandlerFunc) *RouterGroup</code>: Group方法会创建一个新的路由组。通常我们会创建一个公共的中间件或者是具有相同前缀的路由，来归并到一个路由组</li>
-<li><code>BasePath() string</code>: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&ldquo;/rest/n/v1/api&rdquo;)，则v.BasePath()就是&rdquo;/rest/n/v1/api&rdquo;)</li>
+<li><code>BasePath() string</code>: 该方法用来返回一个路由组初始路径(比如 v := router.Group(&quot;/rest/n/v1/api&quot;)，则v.BasePath()就是&quot;/rest/n/v1/api&quot;)</li>
 <li><code>Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes</code>: 该方法会使用给定的HTTP方法和URL来注册一个新的handler。(最后一个handler应该是真正的处理程序，其他的应该是在不同的路由之间共享的中间件)。<code>注意:内部调用了一个handle(httpMethod, relativePath string, handlers HandlersChain)的私有方法来处理核心逻辑</code></li>
 <li><code>POST(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 该方法是<code>router.Handle(&quot;POST&quot;, path, handle)</code>的快速实现，</li>
 <li><code>GET(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
 <li><code>DELETE(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
-<li><code>PATCH(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
+<li><code>PATCH(relativePath string, handlers ...HandlerFunc) IRoutes </code>: 同上</li>
 <li><code>PUT(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
 <li><code>OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
 <li><code>HEAD(relativePath string, handlers ...HandlerFunc) IRoutes</code>: 同上</li>
@@ -805,15 +771,12 @@ type IRouter interface {
 <li><code>Static(relativePath, root string) IRoutes</code>: 该方法用来提供一个指定文件系统根路径的的路由，内部调用<code>group.StaticFS(path,Dir(root,false))</code>来提供服务</li>
 <li><code>StaticFS(relativePath string, fs http.FileSystem) IRoutes</code>: 指定文件系统(http.FileSystem)来创建一个服务</li>
 </ul>
-
-<h4 id="3-gin实例示例">3.Gin实例示例</h4>
-
+<h4 id="3gin实例示例">3.Gin实例示例</h4>
 <p>有了上面两个核心模型<code>Engine</code>和<code>RouteGroup</code>的了解，此时我们就可以通过Gin框架快速来创建一个简单HTTP服务了。</p>
-
 <p><strong>1.默认路由</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -877,9 +840,9 @@ type IRouter interface {
 </span><span class="lnt">62
 </span><span class="lnt">63
 </span><span class="lnt">64
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">测试示例</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">测试示例</span>
 <span class="err">$</span> <span class="nx">cat</span> <span class="nx">case1</span><span class="p">.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">main</span>
 
@@ -942,12 +905,11 @@ type IRouter interface {
 <span class="err">$</span> <span class="nx">curl</span> <span class="o">-</span><span class="nx">X</span> <span class="nx">DELETE</span>   <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="nx">hello</span>
 <span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span>                                                                                        
 <span class="err">$</span> <span class="nx">curl</span> <span class="o">-</span><span class="nx">X</span> <span class="nx">TRACE</span>   <span class="nx">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="nx">hello</span>
-<span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span></pre></td></tr></table>
+<span class="nx">Hello</span> <span class="nx">BGBiao</span><span class="p">.</span><span class="o">%</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</div><p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     

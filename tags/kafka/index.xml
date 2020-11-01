@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Kafka on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in Kafka on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/kafka/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/kafka/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Kafka运维神器之gokafka</title>
       <link>https://bgbiao.top/post/gokafka/</link>
@@ -18,7 +14,6 @@
       
       <guid>https://bgbiao.top/post/gokafka/</guid>
       <description>&lt;h2 id=&#34;kafka运维神器&#34;&gt;Kafka运维神器&lt;/h2&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -33,11 +28,8 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;我们都知道，自从Kafka诞生之际，就一直使用Zookeeper服务来进行kafka集群的元数据和状态管理，虽然在&lt;a href=&#34;https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum&#34;&gt;KIP-500&lt;/a&gt;中有提议未来将移除Zookeeper的依赖，使用Raft协议来实现新的元数据和状态管理，但在这之前，我们仍然需要对kafka集群的整个元数据和状态有一定理解，才能更好的维护和保障kafka集群。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;h3 id=&#34;前言&#34;&gt;前言&lt;/h3&gt;
-
 &lt;p&gt;在kafka集群中，ZooKeeper集群用于&lt;code&gt;存放集群元数据&lt;/code&gt;、&lt;code&gt;成员管理&lt;/code&gt;、&lt;code&gt;Controller 选举&lt;/code&gt;，以及其他一些&lt;code&gt;管理类任务&lt;/code&gt;。&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;存放元数据&lt;/code&gt;: 是指主题分区的所有数据都保存在 ZooKeeper 中，且以它保存的数据为权威，其他“人” 都要与它保持对齐。&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;成员管理&lt;/code&gt;: 是指 Broker 节点的注册、注销以及属性变更。&lt;/li&gt;
@@ -76,7 +68,6 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;前言: 在大规模的使用kafka过程中，我们通常会遇到各种各样的问题，比如说，通常会有一些大数据集群中的Job发现总有几个task会比较慢，导致整体的任务迟迟不能完成运行，这种情况通常问题会比较复杂，想要知道具体延迟在哪里，我们需要知道在Kafka集群中哪些点可能会增加端到端的延迟。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;接下来的内容翻译自&lt;code&gt;confluent&lt;/code&gt;官网博客中的一篇文章，希望能够帮助大家理解kafka使用过程中端到端的延迟。&lt;a href=&#34;https://www.confluent.io/blog/configure-kafka-to-minimize-latency/&#34;&gt;99th Percentile Latency at Scale with Apache Kafka&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
@@ -89,9 +80,7 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;背景: 如同其他分布式系统一样，在kafka集群中，单Topic的partition也并不是越多越好，但通常对于业务方来说，可能会简单的根据生产者或消费者的处理能力来提出扩partition的需求，此时就需要根据具体的场景进行分析以确定partition的数量。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;对于Kafka集群承载的业务Topic来说，分区的数量，可以体现出整个业务的量级同时能够尽可能的提供更高的吞吐，但并不是越多的分区就意味着越高的吞吐和处理能力，通常情况下需要业务方和基础服务方一起来进行分析。&lt;/p&gt;
-
 &lt;p&gt;以下为多分区Topic的优缺点，可以适当根据需求和场景进行规划分区数量。&lt;/p&gt;</description>
     </item>
     
@@ -115,9 +104,7 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有&lt;code&gt;Redis集群&lt;/code&gt;，&lt;code&gt;ElasticSearch&lt;/code&gt;集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。&lt;/p&gt;
 &lt;/blockquote&gt;
-
 &lt;p&gt;笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为&lt;code&gt;日志收集&lt;/code&gt;、&lt;code&gt;数据管道&lt;/code&gt;、&lt;code&gt;流式计算&lt;/code&gt;、&lt;code&gt;业务事件存储&lt;/code&gt;几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的&lt;code&gt;可用性&lt;/code&gt;，&lt;code&gt;可靠性&lt;/code&gt;，&lt;code&gt;数据一致性&lt;/code&gt;要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。&lt;/p&gt;
-
 &lt;p&gt;鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.&lt;/p&gt;</description>
     </item>
     

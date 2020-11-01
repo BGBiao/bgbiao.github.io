@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -74,11 +74,9 @@
 <meta itemprop="description" content="
 前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。
 ">
-
-
-<meta itemprop="datePublished" content="2020-05-04T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-05-04T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="5203">
+<meta itemprop="datePublished" content="2020-05-04T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-05-04T00:00:00+00:00" />
+<meta itemprop="wordCount" content="5213">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 5203 words </span>
+        <span class="more-meta"> 5213 words </span>
           <span class="more-meta"> 11 min read </span>
 
         
@@ -490,7 +488,7 @@ if (!doNotTrack) {
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents"></nav>
   </div>
 </div>
 
@@ -499,160 +497,137 @@ if (!doNotTrack) {
       <blockquote>
 <p>前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。</p>
 </blockquote>
-
 <p><code>要想kafka跑的好，如下几点要知晓。</code></p>
-
 <p><strong>Graceful shutdown</strong></p>
-
 <p>建议开启如下参数:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">controlled.shutdown.enable=true</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">controlled.shutdown.enable=true
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意:</code> 只有在broker上承载的分区都具有副本时(副本大于1，且副本存活)，controller节点才会成功关闭</p>
-
+</div><p><code>注意:</code> 只有在broker上承载的分区都具有副本时(副本大于1，且副本存活)，controller节点才会成功关闭</p>
 <p><strong>Balancing leadership</strong></p>
-
 <p>每当Broker停止或崩溃时，该broker的分区的领导权就转移到其他副本。</p>
-
 <p>这意味着，默认情况下，当broker重新启动时，它将只是所有分区的关注者，这意味着它不会用于客户端读写，这对于整个集群来说吞吐会受到1/N的降低(N表示集群节点数)</p>
-
 <p>为了避免这种不平衡，kafka提供了一种优先副本的概念<code>preferred replicas</code>.</p>
-
 <p>如果一个分区的副本列表是1、5、9，那么节点1比节点5或节点9更适合作为leader，因为它位于副本列表的前面。</p>
-
 <p>可以使用如下命令来恢复已恢复副本的领导权:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 老版本工具
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 老版本工具
 bin/kafka-preferred-replica-election.sh --zookeeper zk_host:port/chroot
 
-# 新版本工具</pre></td></tr></table>
+# 新版本工具
+
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>当然每次在服务器启动后执行该操作，可能很无聊，因此可以设置如下参数来自动执行:</p>
+</div><p>当然每次在服务器启动后执行该操作，可能很无聊，因此可以设置如下参数来自动执行:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">auto.leader.rebalance.enable=true</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">auto.leader.rebalance.enable=true
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Balancing Replicas Across Racks</strong></p>
-
+</div><p><strong>Balancing Replicas Across Racks</strong></p>
 <p>机架层面的副本均衡。</p>
-
 <p>机架感知特性将相同分区的副本分散到不同的机架上，这扩展了Kafka为broker失败提供的覆盖机架失败的保证，如果机架上的所有broker同时失败，就限制了数据丢失的风险。</p>
-
 <p>该特性还可以应用于其他broker分组，如EC2中的可用性区域。</p>
-
 <p>您可以通过向broker配置添加属性来指定broker属于特定的机架：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">broker.rack=my-rack-id</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">broker.rack=my-rack-id
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>当创建、修改或重新分发一个主题时，将遵循机架约束，确保副本尽可能多地跨越多个机架(一个分区将跨越最小(#机架，复制因子)不同的机架)。</p>
-
+</div><p>当创建、修改或重新分发一个主题时，将遵循机架约束，确保副本尽可能多地跨越多个机架(一个分区将跨越最小(#机架，复制因子)不同的机架)。</p>
 <p>用于将副本副本分配给broker的算法，会确保每个broker的leader数量是恒定的，而不管broker是如何分布在机架上的。这确保了平衡的吞吐量。</p>
-
 <p><code>注意:</code> 明智的做法是为每个机架配置相同数量的broker</p>
-
 <p><strong>Mirroring data between clusters</strong></p>
-
 <p>我们将在Kafka集群之间复制数据的过程称为“镜像”，以避免与单个集群中节点之间的复制混淆。</p>
-
 <p>Kafka附带一个用于在Kafka集群之间镜像数据的工具，即<code>MirrorMaker</code>，该工具可以从源集群进行消费，并生产到目标集群。</p>
-
 <p>常用的场景就是在另外一个数据中心提供副本。</p>
-
 <p>您可以运行许多这样的镜像进程来提高吞吐量和容错能力。</p>
-
 <p>使用mirrormaker进行迁移topic到另外的集群:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span><span class="lnt">4
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">bin/kafka-mirror-maker.sh
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">bin/kafka-mirror-maker.sh
       --consumer.config consumer.properties
-      --producer.config producer.properties --whitelist my-topic</pre></td></tr></table>
-</div>
-</div>
-<p>需要注意，我们必须使用<code>--whitelist</code>参数指定topic，该参数支持java的正则表达式结构，比如<code>--whitelist 'A|B'</code>，或者<code>--whitelist '*'</code> .</p>
+      --producer.config producer.properties --whitelist my-topic
 
+</code></pre></td></tr></table>
+</div>
+</div><p>需要注意，我们必须使用<code>--whitelist</code>参数指定topic，该参数支持java的正则表达式结构，比如<code>--whitelist 'A|B'</code>，或者<code>--whitelist '*'</code> .</p>
 <p>通常在使用kafka-mirror-maker时，建议配合<code>auto.create.topics.enable=true</code>使用，可以大批量的进行topic迁移。</p>
-
 <p><strong>Checking consumer position</strong></p>
-
 <p>检查消费者的位移，有时候了解消费者当前的位置时很有必要的。</p>
-
 <p>kafka有一个工具，它将显示所有消费者在一个消费者组中的位置，以及他们与日志结束的距离</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 在my-group的消费者上消费my-topic的主题
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 在my-group的消费者上消费my-topic的主题
 # 可以查看整个消费者组的消费情况
-$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group</pre></td></tr></table>
+$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Managing Consumer Groups</strong></p>
-
+</div><p><strong>Managing Consumer Groups</strong></p>
 <p>ConsumerGroupCommand工具可以<code>list, describe, or delete</code>一个消费组，消费者组可以手动删除，也可以在该组最后提交的偏移量过期时自动删除。</p>
-
 <p>只有在组中没有任何活动成员时，手动删除才有效。</p>
-
 <p>如下命令可以列出所有主题的所有消费者组:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>查看指定消费者组</p>
+</div><p>查看指定消费者组</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>当然可用试用一些额外的参数来查看更多的消费者信息：</p>
-
+</div><p>当然可用试用一些额外的参数来查看更多的消费者信息：</p>
 <ul>
 <li>&ndash;members: 查看消费者组中活跃的消费者</li>
 <li>&ndash;members &ndash;verbose: 该参数还可以查看分配给每个成员的分区</li>
 <li>&ndash;offsets: 该参数实际上可以被<code>--describe</code>参数中的内容覆盖掉</li>
 <li>&ndash;state: 该参数可以提供组级别的信息</li>
 <li>&ndash;delete: 该参数可以手动删除一个或多个消费者组</li>
-
-<li><p>-reset-offsets: 该参数用于重置消费者组的偏移量，此选项在同一时间支持一个消费者组，同时需要使用<code>--all-topics或--topic</code>指定范围</p>
+<li>-reset-offsets: 该参数用于重置消费者组的偏移量，此选项在同一时间支持一个消费者组，同时需要使用<code>--all-topics或--topic</code>指定范围</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -681,9 +656,10 @@ $ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --gr
 </span><span class="lnt">27
 </span><span class="lnt">28
 </span><span class="lnt">29
-</span></pre></td>
+</span><span class="lnt">30
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 查看消费者组成员
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看消费者组成员
 $ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members
 
 CONSUMER-ID                                    HOST            CLIENT-ID       #PARTITIONS
@@ -711,21 +687,17 @@ localhost:9092 (0)        range                     Stable               4
 # 删除消费者组
 $ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my-group --group my-other-group
 
-Deletion of requested consumer groups (&#39;my-group&#39;, &#39;my-other-group&#39;) was successful.</pre></td></tr></table>
+Deletion of requested consumer groups (&#39;my-group&#39;, &#39;my-other-group&#39;) was successful.
+
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p><code>注意:</code> <code>--reset-offsets</code>选项支持如下三个执行选项:</p>
-
+</div><p><code>注意:</code> <code>--reset-offsets</code>选项支持如下三个执行选项:</p>
 <ul>
 <li>显示要重置的偏移量</li>
 <li>&ndash;execute: 执行<code>--reset-offsets</code>进程</li>
 <li>&ndash;export: 以csv格式导出执行结果</li>
 </ul>
-
 <p><code>--reset-offsets</code>参数还有如下方案可供选择:</p>
-
 <ul>
 <li>&ndash;to-datetime: 重置offset到另外一个offset (format:YYYY-MM-DDTHH:mm:SS.sss)</li>
 <li>&ndash;to-earliest: 重置offset到最早的offset</li>
@@ -734,72 +706,57 @@ Deletion of requested consumer groups (&#39;my-group&#39;, &#39;my-other-group&#
 <li>&ndash;from-file: 重置到csv中定义的offset</li>
 <li>&ndash;to-current: 重置offset到当前</li>
 <li>&ndash;by-duration: 重置offset为当前时间( Format: &lsquo;PnDTnHnMnS&rsquo;)</li>
-
-<li><p>&ndash;to-offset: 重置offset为指定的值</p>
+<li>&ndash;to-offset: 重置offset为指定的值</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span><span class="lnt">6
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 设置消费者组的offset为最新
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 设置消费者组的offset为最新
 $ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --to-latest
 
 TOPIC                          PARTITION  NEW-OFFSET
-topic1                         0          0</pre></td></tr></table>
-</div>
-</div></li>
-</ul>
+topic1                         0          0
 
-<p>如果你还是使用老的<code>high-level</code>消费者，并且将组的元数据存储在zk中(<code>offsets.storage=zookeeper</code>)，可以使用<code>--zookeeper</code>来代替<code>bootstrap-server</code>参数:</p>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果你还是使用老的<code>high-level</code>消费者，并且将组的元数据存储在zk中(<code>offsets.storage=zookeeper</code>)，可以使用<code>--zookeeper</code>来代替<code>bootstrap-server</code>参数:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Expanding your cluster</strong></p>
-
+</div><p><strong>Expanding your cluster</strong></p>
 <p>集群的扩展.</p>
-
 <p>将服务器添加到Kafka集群很容易，只需为它们分配一个惟一的brokerid，并在新服务器上启动Kafka.</p>
-
 <p>然而，这些新服务器不会自动分配任何数据分区，因此，除非将分区移动到它们，否则在创建新主题之前，它们不会做任何工作。</p>
-
 <p>因此，通常在向集群中添加机器时，您会希望将一些现有数据迁移到这些机器上。</p>
-
 <p>迁移数据的过程是手动启动的，但是完全自动化。</p>
-
 <p>实际上，Kafka将添加新服务器作为它正在迁移的分区的追随者，并允许它完全复制该分区中的现有数据。</p>
-
 <p>当新服务器完全复制了该分区的内容并加入同步副本时，现有副本中的一个将删除其分区的数据。</p>
-
 <p>可以使用分区重新分配工具在broker之间移动分区。</p>
-
 <p>理想的分区分布应该确保所有broker之间的数据负载和分区大小是一致的。</p>
-
 <p>分区重新分配工具不具备自动研究Kafka集群中的数据分布并移动分区以获得均匀的负载分布的能力，因此，管理员必须确定应该移动哪些主题或分区。</p>
-
 <p>分区迁移工具可以运行在三种互斥模式下:</p>
-
 <ul>
 <li><code>--generate</code>: 给定主题列表和broker列表，该工具生成一个候选重新分配，将指定主题的所有分区移动到新的broker，该参数仅帮助管理员方便的来生成给定主题和目标broker列表的分区重新分配计划</li>
 <li><code>--execute</code>: 该工具根据用户提供的重新分配计划开始重新分配分区(使用<code>--reassignment-json-file</code>指定生成的迁移配置)，- <code>--verify</code>: 该工具将验证列出的所有分区的重新分配状态，可以是成功完成、失败或正在进行</li>
 </ul>
-
 <p><code>1.自动迁移数据到新的服务器</code></p>
-
 <p>分区重新分配工具可用于将某些主题从当前broker集移到新添加的broker。 这在扩展现有集群时通常很有用，因为与一次移动一个分区相比，将整个主题移至新的broker集更容易。 用于执行此操作时，用户应提供应移至新的一组broker的主题列表和新broker的目标列表。 然后，该工具将给定主题列表中的所有分区平均分配到新的一组broker中。 在此过程中，主题的复制因子保持不变。 有效地，将输入主题列表的所有分区的副本从旧的broker集移至新添加的broker。</p>
-
 <p>如下示例(topic:foo1和foo2的全部分区移动到broker 5和6上，迁移完成后，该topic的全部分区将在Broker5和6上):</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -865,9 +822,10 @@ topic1                         0          0</pre></td></tr></table>
 </span><span class="lnt">64
 </span><span class="lnt">65
 </span><span class="lnt">66
-</span></pre></td>
+</span><span class="lnt">67
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat topics-to-move.json
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat topics-to-move.json
 {&#34;topics&#34;: [{&#34;topic&#34;: &#34;foo1&#34;},
             {&#34;topic&#34;: &#34;foo2&#34;}],
 &#34;version&#34;:1
@@ -932,19 +890,17 @@ Reassignment of partition [foo1,1] is in progress
 Reassignment of partition [foo1,2] is in progress
 Reassignment of partition [foo2,0] completed successfully
 Reassignment of partition [foo2,1] completed successfully
-Reassignment of partition [foo2,2] completed successfully</pre></td></tr></table>
-</div>
-</div>
-<p><code>2.自定义分区分配和迁移</code></p>
+Reassignment of partition [foo2,2] completed successfully
 
+</code></pre></td></tr></table>
+</div>
+</div><p><code>2.自定义分区分配和迁移</code></p>
 <p>分区重分配工具还可以用于有选择地将分区的副本移动到一组特定的broker。</p>
-
 <p>当我们以这种方式使用时，假设用户知道重新分配计划，并且不需要该工具来生成候选的重新分配，即直接使用用户的分配策略进行数据迁移。</p>
-
 <p>示例: 迁移topic<code>foo1</code>的partition-0到broker5和6，partition-1到broker2和3</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -970,9 +926,9 @@ Reassignment of partition [foo2,2] completed successfully</pre></td></tr></table
 </span><span class="lnt">24
 </span><span class="lnt">25
 </span><span class="lnt">26
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 自定义迁移计划
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 自定义迁移计划
 $ cat custom-reassignment.json
 {&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;foo1&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[5,6]},{&#34;topic&#34;:&#34;foo2&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[2,3]}]}
 
@@ -997,23 +953,18 @@ Successfully started reassignment of partitions
 $ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file custom-reassignment.json --verify
 Status of partition reassignment:
 Reassignment of partition [foo1,0] completed successfully
-Reassignment of partition [foo2,1] completed successfully</pre></td></tr></table>
+Reassignment of partition [foo2,1] completed successfully
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>Decommissioning brokers</strong></p>
-
+</div><p><strong>Decommissioning brokers</strong></p>
 <p>分区重新分配工具还不能自动生成用于退役broker的重新分配计划，因此，管理员必须制定一个重新分配计划，将托管在代理上的所有分区的副本迁移到代理的其余部分。</p>
-
 <p>这可能比较繁琐，因为重新分配需要确保所有副本不会从已退役的代理移动到另一个代理。为了简化这个过程，我们计划在将来为退役代理添加工具支持。</p>
-
 <p><strong>Increasing replication factor</strong></p>
-
 <p>增加现有分区的复制因子很容易，只需在定制的重新分配json文件中指定额外的副本，并使用—execute选项来增加指定分区的复制因子。</p>
-
 <p>示例: 将主题foo的partition-0的副本从1增加到3。在增加复制因子之前，代理5上只存在分区的副本，作为增加复制因子的一部分，我们将在代理6和代理7上添加更多的副本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1039,9 +990,10 @@ Reassignment of partition [foo2,1] completed successfully</pre></td></tr></table
 </span><span class="lnt">24
 </span><span class="lnt">25
 </span><span class="lnt">26
-</span></pre></td>
+</span><span class="lnt">27
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 自定义迁移配置
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 自定义迁移配置
 $ cat increase-replication-factor.json
 {&#34;version&#34;:1,
 &#34;partitions&#34;:[{&#34;topic&#34;:&#34;foo&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[5,6,7]}]}
@@ -1066,19 +1018,17 @@ Reassignment of partition [foo,0] completed successfully
 # 查看副本数
 $ bin/kafka-topics.sh --bootstrap-server localhost:9092 --topic foo --describe
 Topic:foo   PartitionCount:1    ReplicationFactor:3 Configs:
-  Topic: foo    Partition: 0    Leader: 5   Replicas: 5,6,7 Isr: 5,6,7</pre></td></tr></table>
-</div>
-</div>
-<p><strong>Limiting Bandwidth Usage during Data Migration</strong></p>
+  Topic: foo    Partition: 0    Leader: 5   Replicas: 5,6,7 Isr: 5,6,7
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>Limiting Bandwidth Usage during Data Migration</strong></p>
 <p>Kafka允许您对复制流量施加限制，设置用于将副本从一台机器移动到另一台机器的带宽上限。</p>
-
 <p>这在重新平衡集群、引导新代理或添加或删除代理时非常有用，因为它限制了这些数据密集型操作对用户的影响</p>
-
 <p>最简单的方式就是在使用<code>kafka-reassign-partitions.sh</code>脚本时，使用限流功能，不过<code>kafka-configs.sh</code>脚本也具有该功能。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1093,9 +1043,10 @@ Topic:foo   PartitionCount:1    ReplicationFactor:3 Configs:
 </span><span class="lnt">13
 </span><span class="lnt">14
 </span><span class="lnt">15
-</span></pre></td>
+</span><span class="lnt">16
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 限制在执行重平衡时，迁移速度不能超过50MB/s.
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 限制在执行重平衡时，迁移速度不能超过50MB/s.
 $ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --execute --reassignment-json-file bigger-cluster.json —throttle 50000000
 
 # 当然，如果要改变速率的限制，可以重新运行
@@ -1109,43 +1060,44 @@ $ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181  --verify --reassi
 Status of partition reassignment:
 Reassignment of partition [my-topic,1] completed successfully
 Reassignment of partition [mytopic,0] completed successfully
-Throttle was removed.</pre></td></tr></table>
+Throttle was removed.
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>查看broker的限流配置:</p>
+</div><p>查看broker的限流配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ bin/kafka-configs.sh --describe --zookeeper localhost:2181 --entity-type brokers
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ bin/kafka-configs.sh --describe --zookeeper localhost:2181 --entity-type brokers
 Configs for brokers &#39;2&#39; are leader.replication.throttled.rate=700000000,follower.replication.throttled.rate=700000000
-Configs for brokers &#39;1&#39; are leader.replication.throttled.rate=700000000,follower.replication.throttled.rate=700000000</pre></td></tr></table>
+Configs for brokers &#39;1&#39; are leader.replication.throttled.rate=700000000,follower.replication.throttled.rate=700000000
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>这显示了应用于复制协议的leader和follower端上的节流。默认情况下，两边分配相同的节流吞吐量值。</p>
-
+</div><p>这显示了应用于复制协议的leader和follower端上的节流。默认情况下，两边分配相同的节流吞吐量值。</p>
 <p>查看限流的副本:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span><span class="lnt">4
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ bin/kafka-configs.sh --describe --zookeeper localhost:2181 --entity-type topics
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ bin/kafka-configs.sh --describe --zookeeper localhost:2181 --entity-type topics
 Configs for topic &#39;my-topic&#39; are leader.replication.throttled.replicas=1:102,0:101,
-    follower.replication.throttled.replicas=1:101,0:102</pre></td></tr></table>
-</div>
-</div>
-<p><strong>Setting quotas</strong></p>
+    follower.replication.throttled.replicas=1:101,0:102
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>Setting quotas</strong></p>
 <p>配额设置。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1187,9 +1139,10 @@ Configs for topic &#39;my-topic&#39; are leader.replication.throttled.replicas=1
 </span><span class="lnt">40
 </span><span class="lnt">41
 </span><span class="lnt">42
-</span></pre></td>
+</span><span class="lnt">43
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 为user=user1, client-id=clientA配置自定义配额
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 为user=user1, client-id=clientA配置自定义配额
 $ bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&#39; --entity-type users --entity-name user1 --entity-type clients --entity-name clientA
 Updated config for entity: user-principal &#39;user1&#39;, client-id &#39;clientA&#39;.
 
@@ -1230,29 +1183,27 @@ Configs for default user-principal are producer_byte_rate=1024,consumer_byte_rat
 
 $ bin/kafka-configs.sh  --zookeeper localhost:2181 --describe --entity-type users --entity-type clients
 Configs for user-principal &#39;user1&#39;, default client-id are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-Configs for user-principal &#39;user1&#39;, client-id &#39;clientA&#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200</pre></td></tr></table>
+Configs for user-principal &#39;user1&#39;, client-id &#39;clientA&#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意</code>: 在broker的配置中增加如下配置，会默认为全部的生产者和消费者进行配额限制.</p>
+</div><p><code>注意</code>: 在broker的配置中增加如下配置，会默认为全部的生产者和消费者进行配额限制.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 生产者和消费者10MB/s
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 生产者和消费者10MB/s
 quota.producer.default=10485760
-quota.consumer.default=10485760</pre></td></tr></table>
+quota.consumer.default=10485760
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><a href="http://kafka.apache.org/24/documentation.html#operations">kafka-operations</a></p>
-
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf9xu0tzj30p00angou.jpg" alt="交流群" /></p>
+</div><p><a href="http://kafka.apache.org/24/documentation.html#operations">kafka-operations</a></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gehf9xu0tzj30p00angou.jpg" alt="交流群"></p>
     </div>
 
     

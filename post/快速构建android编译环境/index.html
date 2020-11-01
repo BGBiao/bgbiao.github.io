@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -74,11 +74,9 @@
 <meta itemprop="description" content="
 背景: 在移动互联网时代，大多数的企业内部都有移动客户端，而移动客户端又因为OS的不同产生了两个派系，即安卓(Android)和苹果(IOS)，而对于互联网技术从业者来说，这两者最直接的区别就是开源和闭源，因而也导致了在构建移动客户端时，为了整体的稳定性和可靠性的考虑(甚至有成本的考虑)，需要进行分别编译，本篇文章记录下如何在Linux环境下构建Android编译环境.
 ">
-
-
-<meta itemprop="datePublished" content="2019-12-11T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2019-12-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3226">
+<meta itemprop="datePublished" content="2019-12-11T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2019-12-11T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3227">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 3226 words </span>
+        <span class="more-meta"> 3227 words </span>
           <span class="more-meta"> 7 min read </span>
 
         
@@ -491,16 +489,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#介绍">介绍</a></li>
-<li><a href="#linux下安卓-android-编译环境的搭建">Linux下安卓(Android)编译环境的搭建</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#介绍">介绍</a></li>
+        <li><a href="#linux下安卓android编译环境的搭建">Linux下安卓(Android)编译环境的搭建</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -510,37 +506,27 @@ if (!doNotTrack) {
       <blockquote>
 <p>背景: 在移动互联网时代，大多数的企业内部都有移动客户端，而移动客户端又因为OS的不同产生了两个派系，即<code>安卓(Android)</code>和<code>苹果(IOS)</code>，而对于互联网技术从业者来说，这两者最直接的区别就是<code>开源</code>和<code>闭源</code>，因而也导致了在构建移动客户端时，为了整体的稳定性和可靠性的考虑(甚至有成本的考虑)，需要进行分别编译，本篇文章记录下如何在Linux环境下构建<code>Android</code>编译环境.</p>
 </blockquote>
-
 <h3 id="介绍">介绍</h3>
-
 <p>通常，开发<code>苹果</code>系列的软件均需要使用一些专有开发工具，比如<a href="https://developer.apple.com/xcode/">xcode</a>,而此工具必须运行在<code>Mac OS X</code>设备上(当然你也可以尝试各种黑苹果的方式)，所以不论是对于个人开发者还是企业构建服务器来说，都需要购买更多的<code>Mac</code>设备，通常，我知道的企业内部会使用<code>Mac Mini</code>来作为苹果系列的构建环境。</p>
-
 <p>而作为<code>安卓(Android)</code>系列的软件，由于本身是谷歌开源的移动端操作系统，因此对于底层开发环境和构建环境没有太高的要求。一般而言，开发者会使用<a href="https://developer.android.com/studio/">Android Studio</a>来开发安卓系列的软件，而内置的命令行工具<a href="https://developer.android.com/studio/command-line/">command-line</a>则默认提供了安卓软件的编译工具和环境。值得一提的是，由于<code>Android Studio</code>是开源的，因此该工具也提供了多个平台的支持(Windows,Mac,Linux,Chrome OS)。而这也极大的降低了企业的整体成本，通常开发环境可以在任意的OS环境中进行开发，而企业内部也可以使用<code>Linux</code>环境进行安卓软件的持续集成和交付.</p>
-
 <p>接下来主要讲解下如何在Linux环境下构建安卓的编译环境。</p>
-
-<h3 id="linux下安卓-android-编译环境的搭建">Linux下安卓(Android)编译环境的搭建</h3>
-
+<h3 id="linux下安卓android编译环境的搭建">Linux下安卓(Android)编译环境的搭建</h3>
 <p><strong>前提条件</strong></p>
-
 <p>需要注意的是，对于<code>安卓(Android)</code>应用来说，一些依赖包的管理主要依靠<code>sdkmanager</code>这个命令行工具，该工具可以在<a href="https://developer.android.com/studio/">Android Studio</a>页面找到，并且支持<code>Windows</code>,<code>Mac</code>,<code>Linux</code>三个不同平台的版本。</p>
-
 <p>同时，<code>安卓(Android)</code>应用的开发工具<code>Android Studio</code>使用<code>[Gradle](https://github.com/gradle/gradle)</code>来进行编译和打包，因此对于<code>安卓(Android)</code>应用而言，也将使用<code>gradle</code>来进行编译和打包操作，该软件可以在<a href="https://services.gradle.org/distributions/">Gradle</a>页面找到。</p>
-
 <p>其次，<code>[NDK(原生开发套件)](https://developer.android.google.cn/ndk/guides/)</code>是一套工具，可以使开发者能够在 Android 应用中使用 C 和 C++ 代码，并提供众多平台库，开发者可使用这些平台库管理原生 Activity 和访问物理设备组件，例如传感器和轻触输入。该开发套件可以在<a href="https://developer.android.google.cn/ndk/downloads">NDK</a>页面找到.</p>
-
 <p>最后，如上几个组件的底层语言均使用<code>java</code>进行开发，因此需要安装<code>JDK</code>相关环境。</p>
-
-<p>综上所述，在Linux环境下编译安卓(Android)环境需要如下几个组件:
-- <a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">JDK</a>: java语言的基础编译和运行环境
-- <a href="https://developer.android.com/studio/">sdkmanager</a>: 安卓(Android)应用下的依赖包管理器
-- <a href="https://developer.android.google.cn/ndk/downloads">NDK</a>: 安卓原生开发套件，可调用底层<code>C</code>和<code>C++</code>代码
-- <a href="https://github.com/gradle/gradle">Gradle</a>: 安卓系列软件编译工具(类似<code>maven</code>之类的工具)</p>
-
+<p>综上所述，在Linux环境下编译安卓(Android)环境需要如下几个组件:</p>
+<ul>
+<li><a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">JDK</a>: java语言的基础编译和运行环境</li>
+<li><a href="https://developer.android.com/studio/">sdkmanager</a>: 安卓(Android)应用下的依赖包管理器</li>
+<li><a href="https://developer.android.google.cn/ndk/downloads">NDK</a>: 安卓原生开发套件，可调用底层<code>C</code>和<code>C++</code>代码</li>
+<li><a href="https://github.com/gradle/gradle">Gradle</a>: 安卓系列软件编译工具(类似<code>maven</code>之类的工具)</li>
+</ul>
 <p><strong>快速安装基本环境</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -618,9 +604,11 @@ if (!doNotTrack) {
 </span><span class="lnt">76
 </span><span class="lnt">77
 </span><span class="lnt">78
-</span></pre></td>
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 下载基础软件包
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 下载基础软件包
 $ mkdir -p /opt/servers/ &amp;&amp; cd /opt/servers/
 # JDK(可以选择openjdk)
 $ wget http://dl.bgbiao.top/dav/jdk1.8.0_191.tar.gz
@@ -697,34 +685,37 @@ Kotlin:       1.2.61
 Groovy:       2.4.15
 Ant:          Apache Ant(TM) version 1.9.11 compiled on March 23 2018
 JVM:          1.8.0_191 (Oracle Corporation 25.191-b12)
-OS:           Linux 3.10.0-862.el7.x86_64 amd64</pre></td></tr></table>
-</div>
-</div>
-<p><strong>安装Android基础依赖</strong></p>
+OS:           Linux 3.10.0-862.el7.x86_64 amd64
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>安装Android基础依赖</strong></p>
 <p><code>注意:</code> 正式编译之前先生成license，并将<code>licenses</code>目录移动到<code>/opt/sdk/</code>下,和<code>sdkmanager</code>的tools目录平级</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span><span class="lnt">7
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 安装android基础依赖包
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 安装android基础依赖包
 $ sdkmanager &#39;build-tools;28.0.3&#39; &#39;platforms;android-28&#39; &#39;cmake;3.6.4111459&#39;
 
 # 生成licences
 $ sdkmanager --licenses
-$ cp -rp licenses /opt/sdk/</pre></td></tr></table>
+$ cp -rp licenses /opt/sdk/
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>编译Android包</strong></p>
+</div><p><strong>编译Android包</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -777,9 +768,10 @@ $ cp -rp licenses /opt/sdk/</pre></td></tr></table>
 </span><span class="lnt">51
 </span><span class="lnt">52
 </span><span class="lnt">53
-</span></pre></td>
+</span><span class="lnt">54
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 加载下整体环境变量
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 加载下整体环境变量
 $ cat /etc/profile
 ....
 ....
@@ -831,19 +823,17 @@ $ curl -T app/build/outputs/apk/fNormal/release/app-fNormal-release.apk http://d
 $ qrencode -o test-android.png &#34;http://dl.bgbiao.top/dav/app-fNormal-release.apk&#34;
 
 # 上传二维码
-$ curl -T test-android.png http://dl.bgbiao.top/dav/</pre></td></tr></table>
-</div>
-</div>
-<p>接下来，开发者用户即可以使用<code>http://dl.bgbiao.top/dav/test-android.png</code>二维码地址进行扫描安装，对该版本的app功能进行测试验证了。</p>
+$ curl -T test-android.png http://dl.bgbiao.top/dav/
 
+</code></pre></td></tr></table>
+</div>
+</div><p>接下来，开发者用户即可以使用<code>http://dl.bgbiao.top/dav/test-android.png</code>二维码地址进行扫描安装，对该版本的app功能进行测试验证了。</p>
 <p>需要注意的是，通常情况下，开发者如果使用<code>Mac OSX</code>来编写代码，可能会在代码里使用类似<code>#include 'MD5.h'</code>之类的代码，看起来好像没有什么问题，但是因为<code>Mac OSX</code>或<code>Windows</code>系统中对大小写不敏感，所以那样写不会有什么太大影响，因为编译器可以找到系统中的<code>md5.h</code>，但是在<code>Linux</code>环境下，系统对大小写很敏感，如果代码里写死了<code>MD5.h</code>，而系统库中是<code>md5.h</code>，那肯定会编译失败，而且一般人看到该异常情况不会想到是大小写的问题。</p>
-
 <p>好了，趟坑算是趟完了，接下来提供一个福利，我自己基于以上构建历史环境打包了一个docker镜像，用以封装<code>Android</code>编译的基本环境.</p>
-
 <p><strong>docker镜像</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -895,9 +885,10 @@ $ curl -T test-android.png http://dl.bgbiao.top/dav/</pre></td></tr></table>
 </span><span class="lnt">50
 </span><span class="lnt">51
 </span><span class="lnt">52
-</span></pre></td>
+</span><span class="lnt">53
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat Dockerfile
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat Dockerfile
 FROM centos:7.5.1804
 MAINTAINER &#34;BGBiao &lt;https://bgbiao.top/&gt;&#34;
 ENV TZ &#34;Asia/Shanghai&#34;
@@ -948,38 +939,38 @@ $ docker run -itd --name android-build-env:19-12-12 bash
 [root@4c05d4ded28d /]# ls ${ANDROID_HOME}
 build-tools  cmake  licenses  platforms  platform-tools  tools
 # 开始执行编译(之后就是漫长的等待了)
-[root@4c05d4ded28d /]# cd your-android-app &amp;&amp; gradle clean assembleRelease</pre></td></tr></table>
-</div>
-</div>
-<p><strong>注意事项</strong></p>
+[root@4c05d4ded28d /]# cd your-android-app &amp;&amp; gradle clean assembleRelease
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>注意事项</strong></p>
 <ul>
 <li>1.通常持续集成会使用<code>Jenkins</code>来进行编译打包，因此以上环境再接入Jenkins-salve之前需要安装<code>git</code>客户端名</li>
 <li>2.通常客户端在测试包时会通过二维码扫描来下载包，因此环境上需要安装<code>qrencode</code>软件，用于生成二维码</li>
 <li>3.需要注意<code>gradle</code>在编译过程中会启动一个守护进程，如果编译异常结束，该守护进程可能不会立即释放，此时立即再次编译将有可能导致OOM</li>
-
-<li><p>4.虽然使用该环境可以正常打包，但是在jenkins上打包后，可能遇到如下异常，通常是无法识别环境变量，在jenkins任务中显式声明<code>ANDROID_HOME=/opt/sdkmanager</code>或者<code>ANDROID_SDK_ROOT=/opt/sdkmanager</code>即可</p>
+<li>4.虽然使用该环境可以正常打包，但是在jenkins上打包后，可能遇到如下异常，通常是无法识别环境变量，在jenkins任务中显式声明<code>ANDROID_HOME=/opt/sdkmanager</code>或者<code>ANDROID_SDK_ROOT=/opt/sdkmanager</code>即可</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">SDK location not found. Define location with sdk.dir in the local.properties file or with an ANDROID_HOME environment variable.
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">SDK location not found. Define location with sdk.dir in the local.properties file or with an ANDROID_HOME environment variable.
 
 # or 
 * What went wrong:
 Could not determine the dependencies of task &#39;:app:lintVitalFNormalRelease&#39;.
 &gt; Could not resolve all artifacts for configuration &#39;:app:fNormalSamsungDebugCompileClasspath&#39;.
-&gt; SDK location not found. Define location with an ANDROID_SDK_ROOT environment variable or by setting the sdk.dir path in your project&#39;s local properties file at &#39;/opt/data/jenkins/workspace/test-andorid-build/local.properties&#39;.</pre></td></tr></table>
+   &gt; SDK location not found. Define location with an ANDROID_SDK_ROOT environment variable or by setting the sdk.dir path in your project&#39;s local properties file at &#39;/opt/data/jenkins/workspace/test-andorid-build/local.properties&#39;.
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
+</div>
     </div>
 
     

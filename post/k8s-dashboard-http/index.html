@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/k8s-dashboard-http/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,16 +69,14 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/k8s-dashboard-http/" />
 <meta property="article:published_time" content="2019-09-18T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-15T16:53:30+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="k8s dashboard的http接口改造">
 <meta itemprop="description" content="
 背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件dashboard,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了https并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).
 ">
-
-
-<meta itemprop="datePublished" content="2019-09-18T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-15T16:53:30&#43;08:00" />
-<meta itemprop="wordCount" content="1733">
+<meta itemprop="datePublished" content="2019-09-18T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="1737">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
             
           </div>
-        <span class="more-meta"> 1733 words </span>
+        <span class="more-meta"> 1737 words </span>
           <span class="more-meta"> 4 min read </span>
 
         
@@ -491,17 +489,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#官方dashboard搭建">官方Dashboard搭建</a></li>
-<li><a href="#dashboard的http方式改造">Dashboard的HTTP方式改造</a></li>
-<li><a href="#后续问题">后续问题</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#官方dashboard搭建">官方Dashboard搭建</a></li>
+        <li><a href="#dashboard的http方式改造">Dashboard的HTTP方式改造</a></li>
+        <li><a href="#后续问题">后续问题</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -511,17 +507,13 @@ if (!doNotTrack) {
       <blockquote>
 <p>背景: 玩过Kubernetes的人都知道，官方提供了一种集群web插件<a href="https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/">dashboard</a>,使用官方示例可以快速的部署一套dashboard,可以方便相关人员进行集群概况预览.但是官方的实例默认使用了<code>https</code>并且需要通过证书或Token来进行统一认证,而dashboard这种内部基础工具增加了https和证书认证后不仅使得使用的成本高了起来，而且和内部的统一管理入口也不太好集成(通常内部系统都会统一使用nginx之类的代理工具进行统一代理).</p>
 </blockquote>
-
 <p>本篇文章主要介绍下如何改造官方<code>dashboard</code>集群运行参数,将<code>dashboard</code>使用HTTP方式对外暴露.</p>
-
 <h3 id="官方dashboard搭建">官方Dashboard搭建</h3>
-
 <p><code>注意:当前官方版本是基于k8s 1.15的版本</code></p>
-
 <p>官方已经给了在k8s集群运行的基础示例，直接运行即可:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -550,9 +542,10 @@ if (!doNotTrack) {
 </span><span class="lnt">27
 </span><span class="lnt">28
 </span><span class="lnt">29
-</span></pre></td>
+</span><span class="lnt">30
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
 
 $ kubectl apply -f recommended.yaml
 
@@ -580,48 +573,44 @@ Cache-Control: no-store
 Content-Length: 1262
 Content-Type: text/html; charset=utf-8
 Last-Modified: Thu, 29 Aug 2019 09:14:59 GMT
-Date: Sun, 08 Sep 2019 04:27:08 GMT</pre></td></tr></table>
-</div>
-</div>
-<p>如上，我们可以看到<code>kubernetes-dashboard</code>暴露了一个443端口，测试访问返回<code>200</code>，即证明dashboard暂时启动成功，至于如何去访问，你可以选择使用<code>NodePort</code>类型的<code>Service</code>将服务端口映射在<code>node</code>节点的随机端口，也可以选择使用<code>Ingress</code>之类的入口服务进行代理访问。</p>
+Date: Sun, 08 Sep 2019 04:27:08 GMT
 
+</code></pre></td></tr></table>
+</div>
+</div><p>如上，我们可以看到<code>kubernetes-dashboard</code>暴露了一个443端口，测试访问返回<code>200</code>，即证明dashboard暂时启动成功，至于如何去访问，你可以选择使用<code>NodePort</code>类型的<code>Service</code>将服务端口映射在<code>node</code>节点的随机端口，也可以选择使用<code>Ingress</code>之类的入口服务进行代理访问。</p>
 <h3 id="dashboard的http方式改造">Dashboard的HTTP方式改造</h3>
-
 <p><a href="https://github.com/kubernetes/dashboard">k8s-dashboard</a>项目是使用<code>Golang</code>语言开发的一个简单的k8s集群的web ui.
 我们查看到官方的<code>Dockerfile</code>核心配置如下:</p>
-
 <p><a href="https://github.com/kubernetes/dashboard/blob/master/aio/Dockerfile">dashboard-dockerfile</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 核心内容如下
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 核心内容如下
 $ cat Dockerfile
 FROM scratch
 ADD . /
 EXPOSE 9090 8443
-ENTRYPOINT [&#34;/dashboard&#34;, &#34;--insecure-bind-address=0.0.0.0&#34;, &#34;--bind-address=0.0.0.0&#34;]</pre></td></tr></table>
+ENTRYPOINT [&#34;/dashboard&#34;, &#34;--insecure-bind-address=0.0.0.0&#34;, &#34;--bind-address=0.0.0.0&#34;]
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>可以看到，Dashboard项目其实暴露了一个非安全端口<code>9090</code>，因为该项目是前后端分离的，非安全端口主要用于前端项目去调用后端接口数据使用，但由于通常我们的dashboard都只是用作内部系统访问，安全风险会相对比较低，因此在考虑便捷性上面，我们可以将非安全端口对外使用.</p>
-
+</div><p>可以看到，Dashboard项目其实暴露了一个非安全端口<code>9090</code>，因为该项目是前后端分离的，非安全端口主要用于前端项目去调用后端接口数据使用，但由于通常我们的dashboard都只是用作内部系统访问，安全风险会相对比较低，因此在考虑便捷性上面，我们可以将非安全端口对外使用.</p>
 <p><strong>修改recommended.yaml文件</strong></p>
-
 <ul>
 <li>1.容器组暴露9090端口</li>
 <li>2.增加9090端口的http探针检测</li>
 <li>3.Service暴露9090端口</li>
-
-<li><p>4.Service采用<code>NodePort</code>类型</p>
+<li>4.Service采用<code>NodePort</code>类型</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -697,49 +686,50 @@ ENTRYPOINT [&#34;/dashboard&#34;, &#34;--insecure-bind-address=0.0.0.0&#34;, &#3
 </span><span class="lnt">74
 </span><span class="lnt">75
 </span><span class="lnt">76
-</span></pre></td>
+</span><span class="lnt">77
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># service处的核心配置
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># service处的核心配置
 kind: Service
 apiVersion: v1
 metadata:
-labels:
-k8s-app: kubernetes-dashboard
-name: kubernetes-dashboard
-namespace: kubernetes-dashboard
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
 spec:
-ports:
-- port: 443
-  name: https
-  targetPort: 8443
-- port: 9090
-  name: http
-  targetPort: 9090
-type: NodePort
-selector:
-k8s-app: kubernetes-dashboard
+  ports:
+    - port: 443
+      name: https
+      targetPort: 8443
+    - port: 9090
+      name: http
+      targetPort: 9090
+  type: NodePort
+  selector:
+    k8s-app: kubernetes-dashboard
 
 # deploy处的核心配置
-  containers:
-    - name: kubernetes-dashboard
-      image: kubernetesui/dashboard:v2.0.0-beta4
-      imagePullPolicy: Always
-      ports:
-        - containerPort: 8443
-          protocol: TCP
-        - containerPort: 9090
-          protocol: TCP
+      containers:
+        - name: kubernetes-dashboard
+          image: kubernetesui/dashboard:v2.0.0-beta4
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
 
-      livenessProbe:
-        httpGet:
-          scheme: HTTPS
-          path: /
-          port: 8443
-        httpGet:
-          scheme: HTTP
-          port: 9090
-        initialDelaySeconds: 30
-        timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            httpGet:
+              scheme: HTTP
+              port: 9090
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
 
 # 再次更新配置
 $ kubectl apply -f recommended.yaml
@@ -774,34 +764,30 @@ Cache-Control: no-store
 Content-Length: 1262
 Content-Type: text/html; charset=utf-8
 Last-Modified: Thu, 29 Aug 2019 09:14:59 GMT
-Date: Sun, 08 Sep 2019 04:58:54 GMT</pre></td></tr></table>
+Date: Sun, 08 Sep 2019 04:58:54 GMT
+
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ul>
-
-<p>接下来就可以直接访问<code>dashboard</code>的页面了。</p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1ca3a663b2bdc710.jpeg" alt="" /></p>
-
+</div><p>接下来就可以直接访问<code>dashboard</code>的页面了。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-1ca3a663b2bdc710.jpeg" alt=""></p>
 <h3 id="后续问题">后续问题</h3>
-
 <p>此时，会发现一个问题，就是没有默认显示集群已有的资源，查看右上角的通知可以看到相关信息。</p>
-
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-8ae86953dbec80fd.jpeg" alt="" /></p>
-
+<p><img src="https://upload-images.jianshu.io/upload_images/2577135-8ae86953dbec80fd.jpeg" alt=""></p>
 <p>大概异常通知信息如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">secrets is forbidden: User &#34;system:serviceaccount:kubernetes-dashboard:kubernetes-dashboard&#34; cannot list resource &#34;secrets&#34; in API group &#34;&#34; in the namespace &#34;default&#34;</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">secrets is forbidden: User &#34;system:serviceaccount:kubernetes-dashboard:kubernetes-dashboard&#34; cannot list resource &#34;secrets&#34; in API group &#34;&#34; in the namespace &#34;default&#34;
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>其实很明显就是用户<code>system:serviceaccount:kubernetes-dashboard:kubernetes-dashboard</code>没有相关权限，在<code>recommended.yaml</code>增加想要dashboard去查看的资源即可.</p>
+</div><p>其实很明显就是用户<code>system:serviceaccount:kubernetes-dashboard:kubernetes-dashboard</code>没有相关权限，在<code>recommended.yaml</code>增加想要dashboard去查看的资源即可.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -816,9 +802,10 @@ Date: Sun, 08 Sep 2019 04:58:54 GMT</pre></td></tr></table>
 </span><span class="lnt">13
 </span><span class="lnt">14
 </span><span class="lnt">15
-</span></pre></td>
+</span><span class="lnt">16
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 增加一些想要在dashboard上操作的资源
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 增加一些想要在dashboard上操作的资源
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -832,16 +819,14 @@ rules:
     verbs: [&#34;get&#34;, &#34;list&#34;, &#34;watch&#34;]
   - apiGroups: [&#34;&#34;,&#34;apps&#34;]
     resources: [&#34;pods&#34;, &#34;nodes&#34;,&#34;namespaces&#34;,&#34;secrets&#34;,&#34;persistentvolumeclaims&#34;,&#34;replicasets&#34;,&#34;deployments&#34;,&#34;events&#34;]
-    verbs: [&#34;get&#34;, &#34;list&#34;, &#34;watch&#34;]</pre></td></tr></table>
-</div>
-</div>
-<p><img src="https://upload-images.jianshu.io/upload_images/2577135-05b153b0ab85daa9.jpeg" alt="" /></p>
+    verbs: [&#34;get&#34;, &#34;list&#34;, &#34;watch&#34;]
 
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://upload-images.jianshu.io/upload_images/2577135-05b153b0ab85daa9.jpeg" alt=""></p>
 <p>使用Http方式可以访问服务后，就可以直接将dashboard代理到<code>Ingress</code>或者其他内部的API网关中直接使用了。</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -854,7 +839,7 @@ rules:
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-01-15
+      2020-11-01
       
         
         

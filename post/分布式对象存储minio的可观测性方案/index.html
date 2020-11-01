@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;rdquo;裸奔&amp;rdquo;上线的，除了一些传统的主机级别的监控之外，很" />
+  <meta name="description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;quot;裸奔&amp;quot;上线的，除了一些传统的主机级别的监控之外，很难有" />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -62,25 +62,23 @@
 
 
 <meta property="og:title" content="分布式对象存储Minio的可观测性方案" />
-<meta property="og:description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&rdquo;裸奔&rdquo;上线的，除了一些传统的主机级别的监控之外，很" />
+<meta property="og:description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&quot;裸奔&quot;上线的，除了一些传统的主机级别的监控之外，很难有" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/" />
 <meta property="article:published_time" content="2020-04-12T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-04-12T00:00:00+00:00" />
 <meta itemprop="name" content="分布式对象存储Minio的可观测性方案">
-<meta itemprop="description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&rdquo;裸奔&rdquo;上线的，除了一些传统的主机级别的监控之外，很">
-
-
-<meta itemprop="datePublished" content="2020-04-12T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-04-12T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="2317">
+<meta itemprop="description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&quot;裸奔&quot;上线的，除了一些传统的主机级别的监控之外，很难有">
+<meta itemprop="datePublished" content="2020-04-12T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-04-12T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2311">
 
 
 
 <meta itemprop="keywords" content="运维,minio,prometheus,grafana," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="分布式对象存储Minio的可观测性方案"/>
-<meta name="twitter:description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&rdquo;裸奔&rdquo;上线的，除了一些传统的主机级别的监控之外，很"/>
+<meta name="twitter:description" content="背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&quot;裸奔&quot;上线的，除了一些传统的主机级别的监控之外，很难有"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -467,7 +465,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2317 words </span>
+        <span class="more-meta"> 2311 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -484,44 +482,36 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#开源组件的可观测性现状">开源组件的可观测性现状</a></li>
-<li><a href="#minio集群的可观测性">Minio集群的可观测性</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#开源组件的可观测性现状">开源组件的可观测性现状</a></li>
+        <li><a href="#minio集群的可观测性">Minio集群的可观测性</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<blockquote>
-<p>背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&rdquo;裸奔&rdquo;上线的，除了一些传统的主机级别的监控之外，很难有一些额外的性能指标来描述该服务的整体性能情况。因此，在我们的<a href="https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/">Minio对象存储服务</a>上线到最近一直也是裸奔的，虽然暂时也没出现过故障，但是作为一名专业搞笑的SRE来讲，服务的可观测性一定得跟上，不然后期铁锅是妥妥的背定了，这篇文章就主要介绍下<code>Minio</code>的可观测性方案。</p>
+      <blockquote>
+<p>背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&quot;裸奔&quot;上线的，除了一些传统的主机级别的监控之外，很难有一些额外的性能指标来描述该服务的整体性能情况。因此，在我们的<a href="https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/">Minio对象存储服务</a>上线到最近一直也是裸奔的，虽然暂时也没出现过故障，但是作为一名专业搞笑的SRE来讲，服务的可观测性一定得跟上，不然后期铁锅是妥妥的背定了，这篇文章就主要介绍下<code>Minio</code>的可观测性方案。</p>
 </blockquote>
-
 <h3 id="开源组件的可观测性现状">开源组件的可观测性现状</h3>
-
 <p>在开头提到了，初创企业的开源服务初期大多都是裸奔上线的，出现这种情况我认为一般分为内因和外因:</p>
-
 <ul>
-<li><p>内因是开源的基础中间件性能指标通常很多，不容易抽象，因此这些服务的性能指标数据通常可以通过内部的api或cli来获取，不太容易直接和开源的监控系统进行集成;</p></li>
-
-<li><p>外因是对于初创企业来说，人力有限并且对于众多开源组件的理解不够深入导致前面说的&rdquo;裸奔&rdquo;上线的现象。</p></li>
+<li>
+<p>内因是开源的基础中间件性能指标通常很多，不容易抽象，因此这些服务的性能指标数据通常可以通过内部的api或cli来获取，不太容易直接和开源的监控系统进行集成;</p>
+</li>
+<li>
+<p>外因是对于初创企业来说，人力有限并且对于众多开源组件的理解不够深入导致前面说的&quot;裸奔&quot;上线的现象。</p>
+</li>
 </ul>
-
 <p>不过随着以<code>Kubernetes</code>，<code>Prometheus</code>为代表的CloudNative理念不断发展，越来越多的开源中间件也支持了兼容<code>Prometheus Metrics</code>格式的性能指标，这对于初创企业的技术团队来说可谓是一个福音。</p>
-
 <p>截止目前，我们所熟知的很多开源软件已经内置了兼容<code>Prometheus Metrics</code>的API接口，不再需要第三方的<code>exporter</code>来导出一些性能指标数据。</p>
-
 <p><code>[内置Metrics接口的开源软件](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics)</code></p>
-
 <ul>
 <li><a href="http://docs.ceph.com/docs/master/mgr/prometheus/">Ceph</a></li>
 <li><a href="https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-metrics">Docker</a></li>
@@ -538,31 +528,35 @@ if (!doNotTrack) {
 <li><a href="https://github.com/containous/traefik">Traefik</a></li>
 <li><a href="https://github.com/openzipkin/zipkin/tree/master/zipkin-server#metrics">Zipkin</a></li>
 </ul>
-
 <h3 id="minio集群的可观测性">Minio集群的可观测性</h3>
-
 <p>得益于<code>Minio</code>的云原生化，这款分布式的对象存储服务天然的支持了<code>Prometheus Metrics</code>格式的指标数据以及服务端点(API)，因此，如果想要在已有的Minio集群中增加性能指标的监控，将是一件很容易的事情。</p>
-
 <p><a href="https://docs.min.io/docs/how-to-monitor-minio-using-prometheus.html">使用Prometheus监控Minio服务</a></p>
-
 <p>Minio服务通过内置的服务端点暴露监控数据，用来监控服务整体的健康状态以及性能指标:</p>
-
 <ul>
 <li>Healthcheck 探针: 提供两个服务探活接口，一个用于检测服务是否启动，另外一个用于检测服务是否可以正常对外提供服务(服务就绪)</li>
-<li>- 探活接口: <code>/minio/health/live</code></li>
-<li>- 就绪接口: <code>/minio/health/ready</code></li>
-<li>Prometheus 探针: 提供了prometheus metrics格式的性能指标数据</li>
-<li>- Metrics接口: <code>/minio/prometheus/metrics</code></li>
+<li>
+<ul>
+<li>探活接口: <code>/minio/health/live</code></li>
 </ul>
-
+</li>
+<li>
+<ul>
+<li>就绪接口: <code>/minio/health/ready</code></li>
+</ul>
+</li>
+<li>Prometheus 探针: 提供了prometheus metrics格式的性能指标数据</li>
+<li>
+<ul>
+<li>Metrics接口: <code>/minio/prometheus/metrics</code></li>
+</ul>
+</li>
+</ul>
 <p><code>注意:</code> Healthcheck相关的探针默认是非认证的接口，服务启动后可直接访问; Prometheus探针的接口默认是基于<code>JWT认证</code>的接口，需要额外设置来访问其Metrics数据。</p>
-
 <p><strong>Minio的Metrics数据暴露</strong></p>
-
 <p>管理员可通过下述方式获取Metrics端点的jwt token:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -573,9 +567,10 @@ if (!doNotTrack) {
 </span><span class="lnt"> 9
 </span><span class="lnt">10
 </span><span class="lnt">11
-</span></pre></td>
+</span><span class="lnt">12
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 获取token
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 获取token
 $ mc admin prometheus generate  minio
 scrape_configs:
 - job_name: minio-job
@@ -585,22 +580,23 @@ scrape_configs:
   static_configs:
   - targets: [minio.bgbiao.top]
 
-# 在配置prometheus的scrape时配置如上相关参数</pre></td></tr></table>
+# 在配置prometheus的scrape时配置如上相关参数
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>通常对于内部系统间的调用来说，权限可能没那么重要，可以增加如下环境变量来开启metrics的非认证方式:</p>
+</div><p>通常对于内部系统间的调用来说，权限可能没那么重要，可以增加如下环境变量来开启metrics的非认证方式:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">MINIO_PROMETHEUS_AUTH_TYPE=&#34;public&#34;</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">MINIO_PROMETHEUS_AUTH_TYPE=&#34;public&#34;
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>此时，直接访问接口可以获取到如下的Metrics数据:</p>
+</div><p>此时，直接访问接口可以获取到如下的Metrics数据:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -611,9 +607,10 @@ scrape_configs:
 </span><span class="lnt"> 9
 </span><span class="lnt">10
 </span><span class="lnt">11
-</span></pre></td>
+</span><span class="lnt">12
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ curl -s  minio.bgbiao.top/minio/prometheus/metrics | head -10
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ curl -s  minio.bgbiao.top/minio/prometheus/metrics | head -10
 # HELP disk_storage_available Total available space left on the disk
 # TYPE disk_storage_available gauge
 disk_storage_available{disk=&#34;/data/minio&#34;} 2.78376280064e+11
@@ -623,11 +620,11 @@ disk_storage_total{disk=&#34;/data/minio&#34;} 3.00809048064e+11
 # HELP disk_storage_used Total disk storage used on the disk
 # TYPE disk_storage_used gauge
 disk_storage_used{disk=&#34;/data/minio&#34;} 2.2432768e+10
-# HELP go_gc_duration_seconds A summary of the GC invocation durations.</pre></td></tr></table>
-</div>
-</div>
-<p><strong>minio-metrics相关定义</strong></p>
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>minio-metrics相关定义</strong></p>
 <ul>
 <li>标准的运行时指标使用以<code>go_</code>开头</li>
 <li>进程级别的指标以<code>process_</code>开头</li>
@@ -645,17 +642,27 @@ disk_storage_used{disk=&#34;/data/minio&#34;} 2.2432768e+10
 <li><code>s3_rx_bytes_total</code>: 当前MinIO服务器实例接收的s3字节总数</li>
 <li><code>s3_tx_bytes_total</code>: 当前MinIO服务器实例发送的s3字节总数</li>
 <li><code>s3_ttfb_seconds_</code>: 统计s3请求的延迟信息</li>
-<li>- bucket: bucket操作相关的延迟</li>
-<li>- count: 延迟统计</li>
-<li>- sum: 总延迟</li>
+<li>
+<ul>
+<li>bucket: bucket操作相关的延迟</li>
 </ul>
-
+</li>
+<li>
+<ul>
+<li>count: 延迟统计</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>sum: 总延迟</li>
+</ul>
+</li>
+</ul>
 <p><code>注意:</code> Minio不同的版本的Metrics数据有区别，需要查看具体暴露的数据指标</p>
-
 <p><code>示例</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -672,9 +679,10 @@ disk_storage_used{disk=&#34;/data/minio&#34;} 2.2432768e+10
 </span><span class="lnt">15
 </span><span class="lnt">16
 </span><span class="lnt">17
-</span></pre></td>
+</span><span class="lnt">18
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 打开文件数
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 打开文件数
 process_open_fds{job=&#34;minio-metrics&#34;}
 
 # 启动时间(时间戳)
@@ -690,15 +698,15 @@ process_cpu_seconds_total{job=&#34;minio-metrics&#34;}
 promhttp_metric_handler_requests_total{job=&#34;minio-metrics&#34;}
 
 # 链接中的http请求
-promhttp_metric_handler_requests_in_flight{job=&#34;minio-metrics&#34;}</pre></td></tr></table>
-</div>
-</div>
-<p><strong>配置prometheus数据抓取</strong></p>
+promhttp_metric_handler_requests_in_flight{job=&#34;minio-metrics&#34;}
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>配置prometheus数据抓取</strong></p>
 <p><code>注意:</code> 我们的Prometheus是使用CRD方式部署在Kubernetes集群中的，因此抓取外部Metrics数据需要做如下的操作.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -756,9 +764,10 @@ promhttp_metric_handler_requests_in_flight{job=&#34;minio-metrics&#34;}</pre></t
 </span><span class="lnt">56
 </span><span class="lnt">57
 </span><span class="lnt">58
-</span></pre></td>
+</span><span class="lnt">59
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 暴露minio服务
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 暴露minio服务
 $ cat endpoint-minio.yaml
 apiVersion: v1
 kind: Endpoints
@@ -815,30 +824,21 @@ spec:
     - monitoring
   selector:
     matchLabels:
-      app: minio-metrics</pre></td></tr></table>
-</div>
-</div>
-<p><strong>查看prometheus监控的minio相关数据</strong></p>
+      app: minio-metrics
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>查看prometheus监控的minio相关数据</strong></p>
 <p>Prometheus成功抓取minio metrics数据后，即可在prometheus中查看到先关数据:</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdnrt82rfpj324a0t47at.jpg" alt="minio-prometheus-metrics" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdnrt82rfpj324a0t47at.jpg" alt="minio-prometheus-metrics"></p>
 <p>在Grafana中配置关心的指标以及相关图表:</p>
-
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdofcrk9bbj31gr0u04a4.jpg" alt="minio-grafana监控" /></p>
-
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdofcrk9bbj31gr0u04a4.jpg" alt="minio-grafana监控"></p>
 <p>为了方便其他运维小伙伴们，我将Minio的Grafana模板开源出来，有需求的可以直接使用如下模板:</p>
-
 <p><a href="https://grafana.com/grafana/dashboards/12063">minio-grafana模板</a></p>
-
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg" alt="" /></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg" alt=""></p>
 
     </div>
 

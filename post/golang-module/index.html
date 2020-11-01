@@ -24,8 +24,8 @@
 
 <meta name="author" content="BGBiao" />
   <meta name="description" content=" 前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用vendor或者glide的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为go modules的版本管理机制。
- 注意: - 在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module - 在Golang1.12之后默认开启了module
-" />
+ 注意:
+ 在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module 在Golang1.12之后默认开启了module " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-module/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,27 +67,27 @@
 <meta property="og:description" content="
 前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用vendor或者glide的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为go modules的版本管理机制。
 
-
 注意:
-- 在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module
-- 在Golang1.12之后默认开启了module" />
+
+在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module
+在Golang1.12之后默认开启了module
+" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/golang-module/" />
 <meta property="article:published_time" content="2019-09-18T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-15T16:53:30+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Golang module的使用">
 <meta itemprop="description" content="
 前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用vendor或者glide的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为go modules的版本管理机制。
 
-
 注意:
-- 在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module
-- 在Golang1.12之后默认开启了module">
 
-
-<meta itemprop="datePublished" content="2019-09-18T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-15T16:53:30&#43;08:00" />
-<meta itemprop="wordCount" content="2312">
+在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module
+在Golang1.12之后默认开启了module
+">
+<meta itemprop="datePublished" content="2019-09-18T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="2315">
 
 
 
@@ -97,10 +97,11 @@
 <meta name="twitter:description" content="
 前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用vendor或者glide的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为go modules的版本管理机制。
 
-
 注意:
-- 在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module
-- 在Golang1.12之后默认开启了module"/>
+
+在Golang1.11版本中需要使用export GO111MODULE=on来显式开启go module
+在Golang1.12之后默认开启了module
+"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -487,7 +488,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> golang </a>
             
           </div>
-        <span class="more-meta"> 2312 words </span>
+        <span class="more-meta"> 2315 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -504,17 +505,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#golang-module快速入门">Golang Module快速入门</a></li>
-<li><a href="#go-module的其他功能">Go Module的其他功能</a></li>
-<li><a href="#tips">Tips</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#golang-module快速入门">Golang Module快速入门</a></li>
+        <li><a href="#go-module的其他功能">Go Module的其他功能</a></li>
+        <li><a href="#tips">Tips</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -524,17 +523,16 @@ if (!doNotTrack) {
       <blockquote>
 <p>前言: 在Golang1.11之前的版本中，官方没有提供依赖和包管理工具。开发者通常会使用<code>vendor</code>或者<code>glide</code>的方式来管理依赖(也有直接使用GOPATH多环境方式)，而在Golang1.11之后官方终于出了名为<code>go modules</code>的版本管理机制。</p>
 </blockquote>
-
-<p><code>注意:</code>
-- 在Golang1.11版本中需要使用<code>export GO111MODULE=on</code>来显式开启go module
-- 在Golang1.12之后默认开启了module</p>
-
+<p><code>注意:</code></p>
+<ul>
+<li>在Golang1.11版本中需要使用<code>export GO111MODULE=on</code>来显式开启go module</li>
+<li>在Golang1.12之后默认开启了module</li>
+</ul>
 <h3 id="golang-module快速入门">Golang Module快速入门</h3>
-
 <p><strong>初始化项目</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -579,9 +577,9 @@ if (!doNotTrack) {
 </span><span class="lnt">43
 </span><span class="lnt">44
 </span><span class="lnt">45
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">在GOPATH之外创建一个项目目录</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">在GOPATH之外创建一个项目目录</span>
 <span class="err">➜</span>  <span class="nx">mkdir</span> <span class="nx">cmdb</span><span class="o">-</span><span class="nx">job</span>
 
 <span class="err">#</span> <span class="nx">进入目录后初始化一个module</span>
@@ -625,88 +623,13 @@ if (!doNotTrack) {
 <span class="p">.</span>
 <span class="err">├──</span> <span class="k">go</span><span class="p">.</span><span class="nx">mod</span>
 <span class="err">├──</span> <span class="k">go</span><span class="p">.</span><span class="nx">sum</span>
-<span class="err">└──</span> <span class="nx">main</span><span class="p">.</span><span class="k">go</span></pre></td></tr></table>
+<span class="err">└──</span> <span class="nx">main</span><span class="p">.</span><span class="k">go</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>测试运行项目</strong></p>
+</div><p><strong>测试运行项目</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># 测试运行
-# 第一次运行会自动检查代码里的第三方依赖包，并下载和接下项目依赖的包
-➜  go run main.go
-go: finding github.com/xxbandy/go-utils/crypto latest
-go: finding github.com/xxbandy/go-utils latest
-go: downloading github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2
-go: extracting github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2
-5d41402abc4b2a76b9719d911017c592
-f1b90b4efd0e5c7db52dfa0efd6521a3
-aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d
-79806c50bab4825a371e3c4fff80bae0c731d54e
-
-# 第二次运行
-➜  go run main.go
-5d41402abc4b2a76b9719d911017c592
-f1b90b4efd0e5c7db52dfa0efd6521a3
-aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d
-79806c50bab4825a371e3c4fff80bae0c731d54e
-
-# 查看管理mod的依赖配置
-## go.mod会记录项目所需依赖以及具体的版本号记录(go-utils这个库没有版本,所以会根据提交日期和commitid来唯一标识版本)
-➜  cat go.mod
-module cmdb-job
-
-go 1.12
-
-require github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2 // indirect
-
-## go.sum文件会记录依赖树的详细信息
-➜  cat go.sum
-github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2 h1:SD6OuR8EUvCmiBDoxItcFYXIMuse45HvuSh3ho0AAeU=
-github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2/go.mod h1:XhyyBI+KH4XEIbw3EhMFjZfJcV3kDK4iSAT7zZYd+Uc=</pre></td></tr></table>
-</div>
-</div>
-<h3 id="go-module的其他功能">Go Module的其他功能</h3>
-
-<p><code>注意:go mod 还有一些其他比较有意思的工具，比如可以打印依赖树，比如可以查看哪些模块在哪些包引用了</code></p>
-
-<p><strong>go mod的其他特性</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -739,9 +662,84 @@ github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2/go.mod h1:XhyyBI+
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 执行go help mod可以查看到以下子命令
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 测试运行
+# 第一次运行会自动检查代码里的第三方依赖包，并下载和接下项目依赖的包
+➜  go run main.go
+go: finding github.com/xxbandy/go-utils/crypto latest
+go: finding github.com/xxbandy/go-utils latest
+go: downloading github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2
+go: extracting github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2
+5d41402abc4b2a76b9719d911017c592
+f1b90b4efd0e5c7db52dfa0efd6521a3
+aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d
+79806c50bab4825a371e3c4fff80bae0c731d54e
+
+# 第二次运行
+➜  go run main.go
+5d41402abc4b2a76b9719d911017c592
+f1b90b4efd0e5c7db52dfa0efd6521a3
+aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d
+79806c50bab4825a371e3c4fff80bae0c731d54e
+
+# 查看管理mod的依赖配置
+## go.mod会记录项目所需依赖以及具体的版本号记录(go-utils这个库没有版本,所以会根据提交日期和commitid来唯一标识版本)
+➜  cat go.mod
+module cmdb-job
+
+go 1.12
+
+require github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2 // indirect
+
+## go.sum文件会记录依赖树的详细信息
+➜  cat go.sum
+github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2 h1:SD6OuR8EUvCmiBDoxItcFYXIMuse45HvuSh3ho0AAeU=
+github.com/xxbandy/go-utils v0.0.0-20190506113112-d88d469a26b2/go.mod h1:XhyyBI+KH4XEIbw3EhMFjZfJcV3kDK4iSAT7zZYd+Uc=
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="go-module的其他功能">Go Module的其他功能</h3>
+<p><code>注意:go mod 还有一些其他比较有意思的工具，比如可以打印依赖树，比如可以查看哪些模块在哪些包引用了</code></p>
+<p><strong>go mod的其他特性</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 执行go help mod可以查看到以下子命令
 ➜ go help mod
 	download    download modules to local cache       # 下载模块包到本地缓存
 	edit        edit go.mod from tools or scripts     # 从工具或脚本中修改go.md内容(暂时没觉得很好用)
@@ -773,38 +771,37 @@ github.com/xxbandy/go-utils/crypto
 └── vendor
     ├── github.com
     │   └── xxbandy
-    └── modules.txt</pre></td></tr></table>
+    └── modules.txt
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意:</code>这个时候可能会有人有疑问了，既然<code>go mod vendor</code>将依赖拷贝一份到项目家目录的<code>vendor</code>目录了，那原始的依赖存在哪里？比如我们之前没有依赖管理之前，默认的依赖都是在<code>$GOPATH/src/</code>下面的</p>
-
+</div><p><code>注意:</code>这个时候可能会有人有疑问了，既然<code>go mod vendor</code>将依赖拷贝一份到项目家目录的<code>vendor</code>目录了，那原始的依赖存在哪里？比如我们之前没有依赖管理之前，默认的依赖都是在<code>$GOPATH/src/</code>下面的</p>
 <p>其实，在使用了<code>go mod</code>之后，项目依赖的全部依赖包都会在<code>$GOPATH/pkg/mod/cache/download/</code>中统一缓存下来，而项目中的<code>go.md</code>中会记录真正的版本信息，去缓存中引用即可。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span><span class="lnt">7
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 查看go mod之后缓存的依赖包
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看go mod之后缓存的依赖包
 ➜  tree -L 3   ${GOPATH}/pkg/mod/cache/download/
 ${GOPATH}/pkg/mod/cache/download/
 └── github.com
     └── xxbandy
-        └── go-utils</pre></td></tr></table>
-</div>
-</div>
-<p><strong>一个开源项目示例</strong></p>
+        └── go-utils
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>一个开源项目示例</strong></p>
 <p>我们就以<a href="https://github.com/xxbandy/golang-gin-vue">golang-gin-vue</a>项目为例来看下<code>go mod</code>的一些功能吧.</p>
-
 <p><code>golang-gin-vue</code>是一个使用<a href="github.com/gin-gonic/gin">gin</a>框架编写后端接口，结合<a href="https://vuejs.org">vue</a>来渲染前端的一个示例项目.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -859,9 +856,10 @@ ${GOPATH}/pkg/mod/cache/download/
 </span><span class="lnt">53
 </span><span class="lnt">54
 </span><span class="lnt">55
-</span></pre></td>
+</span><span class="lnt">56
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 克隆项目到本地
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 克隆项目到本地
 ➜ git clone https://github.com/xxbandy/golang-gin-vue.git
 
 ➜  cd golang-gin-vue
@@ -915,27 +913,23 @@ golang.org/x/crypto@v0.0.0-20190308221718-c2843e01d9a2 golang.org/x/sys@v0.0.0-2
 ➜ go mod why github.com/gin-gonic/gin
 # github.com/gin-gonic/gin
 golang-gin-vue
-github.com/gin-gonic/gin</pre></td></tr></table>
-</div>
-</div>
-<h3 id="tips">Tips</h3>
+github.com/gin-gonic/gin
 
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="tips">Tips</h3>
 <p>我们在使用<code>Golang</code>进行开发过程中，通常会发现各种第三方库会依赖<code>golang.org/x</code>之类的原生库，或者一些其他国外大厂提供的共有库，由于政策原因，我们是无法直接访问国外网站来下载依赖库的(网速也有限制)，因此在开发过程中也是比较头疼的. 这个时候通常大家都会去采用科学上网，或者通过一些代理的方式来解决. 而在<code>Golang</code>高版本中,包含了<code>goproxy</code>特性，用户可以直接指定代理来下载依赖的第三方库，一方面解决了下载速度的问题，另外一方面也解决了无法访问的第三方库的下载。</p>
-
 <p><code>注意:goproxy必须在go1.11以上版本，并且开启了go module机制后才能使用的(因为我当前的环境都是1.12，大家可以验证下小版本是否支持)</code></p>
-
 <p>而在国内，质量比较好的几个<code>goproxy</code>代理大概有如下几个:</p>
-
 <ul>
 <li><a href="https://goproxy.cn">https://goproxy.cn</a> : 七牛云赞助支持的开源代理</li>
 <li><a href="https://mirrors.aliyun.com/goproxy/">https://mirrors.aliyun.com/goproxy/</a> : 阿里云官方维护的go代理</li>
 <li><a href="https://goproxy.io/">https://goproxy.io/</a> : 也是一个开源的go代理</li>
 </ul>
-
 <p><strong>go代理使用</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -951,9 +945,11 @@ github.com/gin-gonic/gin</pre></td></tr></table>
 </span><span class="lnt">14
 </span><span class="lnt">15
 </span><span class="lnt">16
-</span></pre></td>
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 开启go module支持
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 开启go module支持
 # golang1.11 需要手动开启，golang1.12之后默认会开启
 $ export GO111MODULE=on
 
@@ -968,14 +964,14 @@ Fetching https://goproxy.cn/golang.org/x/net/@v/list
 go: finding golang.org/x/net latest
 Fetching https://goproxy.cn/golang.org/x/net/@latest
 Fetching https://goproxy.cn/golang.org/x/net/@v/v0.0.0-20190827160401-ba9fcec4b297.mod
-golang.org/x/net/websocket</pre></td></tr></table>
-</div>
-</div>
-<p>自从使用了<code>goproxy</code>之后，妈妈再也不用担心无法下载第三方库拉，爽到不行.</p>
+golang.org/x/net/websocket
 
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
 
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</code></pre></td></tr></table>
+</div>
+</div><p>自从使用了<code>goproxy</code>之后，妈妈再也不用担心无法下载第三方库拉，爽到不行.</p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -988,7 +984,7 @@ golang.org/x/net/websocket</pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-01-15
+      2020-11-01
       
         
         

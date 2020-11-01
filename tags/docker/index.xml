@@ -1,15 +1,20 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Docker on BGBiao的SRE人生</title>
+    <title>docker on BGBiao的SRE人生</title>
     <link>https://bgbiao.top/tags/docker/</link>
-    <description>Recent content in Docker on BGBiao的SRE人生</description>
+    <description>Recent content in docker on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 22 Mar 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/docker/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>如何更加优雅的使用 Systemd 管理服务</title>
+      <link>https://bgbiao.top/post/systemd-doc/</link>
+      <pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/systemd-doc/</guid>
+      <description>如何优雅的使用 Systemd 管理服务 背景: 我们在构建Kubernetes容器化平台时，会在节点上部署各种 agent ，虽然容器化当道的今天很多程序可以直接采用do</description>
+    </item>
     
     <item>
       <title>构建更小Docker镜像的一些建议</title>
@@ -40,20 +45,6 @@
       
       <guid>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</guid>
       <description>&lt;h2 id=&#34;prometheus入门实践&#34;&gt;Prometheus入门实践&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
-&lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
-&lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Prometheus入门实践</title>
-      <link>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</link>
-      <pubDate>Thu, 20 Jun 2019 17:33:14 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/prometheus%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/</guid>
-      <description>&lt;h2 id=&#34;prometheus入门实践&#34;&gt;Prometheus入门实践&lt;/h2&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://prometheus.io/download/&#34;&gt;Prometheus下载地址&lt;/a&gt;
 &lt;a href=&#34;https://www.kubernetes.org.cn/tags/prometheus&#34;&gt;Prometheus相关文档&lt;/a&gt;
 &lt;a href=&#34;https://prometheus.io/docs/introduction/overview/&#34;&gt;Prometheus官方文档&lt;/a&gt;&lt;/p&gt;</description>
@@ -66,7 +57,6 @@
       
       <guid>https://bgbiao.top/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</guid>
       <description>&lt;h3 id=&#34;digits简介&#34;&gt;DIGITS简介&lt;/h3&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/DIGITS&#34;&gt;DIGITS&lt;/a&gt;: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司开发的第一个交互式深度学习GPU训练系统。目的在于整合现有的Deep Learning开发工具，实现深度神经网络（Deep Neural Network，DNN）设计、训练和可视化等任务变得简单化。DIGITS是基于浏览器的接口，因而通过实时的网络行为的可视化，可以快速设计最优的DNN。DIGITS是开源软件，可在GitHub上找到，因而开发人员可以扩展和自定义DIGITS。&lt;/p&gt;</description>
     </item>
     
@@ -77,9 +67,7 @@
       
       <guid>https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/</guid>
       <description>&lt;h3 id=&#34;简介&#34;&gt;简介&lt;/h3&gt;
-
 &lt;h4 id=&#34;ocr&#34;&gt;OCR&lt;/h4&gt;
-
 &lt;p&gt;光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。&lt;/p&gt;</description>
     </item>
     
@@ -101,12 +89,13 @@
       
       <guid>https://bgbiao.top/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/</guid>
       <description>&lt;p&gt;&lt;strong&gt;在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。&lt;/strong&gt;&lt;/p&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。&lt;/p&gt;
-
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
 &lt;p&gt;2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。&lt;/p&gt;
-
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
 &lt;p&gt;3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
     </item>
@@ -118,7 +107,6 @@
       
       <guid>https://bgbiao.top/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
       <description>&lt;h3 id=&#34;overlayfs-基本概念&#34;&gt;overlayfs 基本概念&lt;/h3&gt;
-
 &lt;p&gt;一种联合文件系统，设计简单，速度更快。overlayfs在linux主机上只有两层，一个目录在下层，用来保存镜像(docker)，另外一个目录在上层，用来存储容器信息。在overlayfs中，底层的目录叫做lowerdir，顶层的目录称之为upperdir，对外提供统一的文件系统为merged。
 当需要修改一个文件时，使用CoW将文件从只读的Lower复制到可写的Upper进行修改，结果也保存在Upper层。在Docker中，底下的只读层就是image，可写层就是Container。&lt;/p&gt;</description>
     </item>
@@ -171,7 +159,7 @@
       <guid>https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;前言:
-在一节中[](&lt;a href=&#34;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/),我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&#34;&gt;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/),我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&lt;/a&gt;&lt;/p&gt;
+在一节中&lt;a href=&#34;https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/&#34;&gt;&lt;/a&gt;,我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
     </item>
     
@@ -182,9 +170,7 @@
       
       <guid>https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/</guid>
       <description>&lt;h3 id=&#34;背景&#34;&gt;背景：&lt;/h3&gt;
-
 &lt;p&gt;随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。&lt;/p&gt;
-
 &lt;p&gt;&lt;a href=&#34;http://www.jianshu.com/p/e72a352a2bd7&#34;&gt;从GPU到GPGPU&lt;/a&gt;
 &lt;a href=&#34;http://www.jianshu.com/p/609e0530a19c&#34;&gt;CPU与GPU&lt;/a&gt;&lt;/p&gt;</description>
     </item>

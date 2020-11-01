@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>kubernetes on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in kubernetes on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Traefik中的502-500状态码异常排查</title>
       <link>https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/</link>
@@ -29,11 +25,8 @@
       
       <guid>https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
       <description>&lt;h2 id=&#34;traefik的可观测性支持&#34;&gt;Traefik的可观测性支持&lt;/h2&gt;
-
 &lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/observability/logs/&#34;&gt;traefik-observability&lt;/a&gt;&lt;/p&gt;
-
 &lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;服务日志: Traefik进程本身相关的操作日志&lt;/li&gt;
 &lt;li&gt;访问日志: 由Traefik接管的代理服务的访问日志(access.log)&lt;/li&gt;

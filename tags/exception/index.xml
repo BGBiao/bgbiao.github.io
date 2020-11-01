@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Exception on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in Exception on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 06 Mar 2019 16:01:23 +0800</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/exception/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 06 Mar 2019 16:01:23 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/exception/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang中的异常处理</title>
       <link>https://bgbiao.top/post/golang-expect/</link>
@@ -18,15 +14,12 @@
       
       <guid>https://bgbiao.top/post/golang-expect/</guid>
       <description>&lt;h2 id=&#34;golang的异常处理和单元测试&#34;&gt;Golang的异常处理和单元测试&lt;/h2&gt;
-
 &lt;ul&gt;
 &lt;li&gt;1.Golang语言中没有其他语言中的&lt;code&gt;try...catch...&lt;/code&gt;语句来捕获异常和异常恢复&lt;/li&gt;
 &lt;li&gt;2.在Golang中我们通常会使用&lt;code&gt;panic&lt;/code&gt;关键字来抛出异常，在&lt;code&gt;defer&lt;/code&gt;中使用&lt;code&gt;recover&lt;/code&gt;来捕获异常进行具体逻辑处理&lt;/li&gt;
 &lt;li&gt;3.Golang中我们通常会在函数或方法中返回&lt;code&gt;error&lt;/code&gt;结构对象来判断是否有异常出现&lt;/li&gt;
 &lt;/ul&gt;
-
 &lt;p&gt;&lt;code&gt;注意事项&lt;/code&gt;&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;1.利用&lt;code&gt;recover&lt;/code&gt;和&lt;code&gt;panic&lt;/code&gt;指令，&lt;code&gt;defer&lt;/code&gt;必须放在panic之前定义(&lt;code&gt;panic会终止其后要执行的代码&lt;/code&gt;).&lt;/li&gt;
 &lt;li&gt;2.&lt;code&gt;recover&lt;/code&gt;只有在&lt;code&gt;defer&lt;/code&gt;调用的函数中才有效，否则&lt;code&gt;recover&lt;/code&gt;无法捕获到&lt;code&gt;panic&lt;/code&gt;.&lt;/li&gt;

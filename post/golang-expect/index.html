@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-expect/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -65,14 +65,11 @@
 <meta property="og:title" content="Golang中的异常处理" />
 <meta property="og:description" content="Golang的异常处理和单元测试
 
-
 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复
 2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理
 3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现
 
-
 注意事项
-
 
 1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码).
 2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic.
@@ -83,18 +80,15 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/golang-expect/" />
 <meta property="article:published_time" content="2019-03-06T16:01:23+08:00" />
-<meta property="article:modified_time" content="2020-01-15T16:53:30+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Golang中的异常处理">
 <meta itemprop="description" content="Golang的异常处理和单元测试
-
 
 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复
 2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理
 3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现
 
-
 注意事项
-
 
 1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码).
 2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic.
@@ -102,11 +96,9 @@
 4.多个defer会形成defer栈
 5.panic会等到整个goroutine退出才会报告错误
 ">
-
-
-<meta itemprop="datePublished" content="2019-03-06T16:01:23&#43;08:00" />
-<meta itemprop="dateModified" content="2020-01-15T16:53:30&#43;08:00" />
-<meta itemprop="wordCount" content="1870">
+<meta itemprop="datePublished" content="2019-03-06T16:01:23+08:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="1872">
 
 
 
@@ -115,14 +107,11 @@
 <meta name="twitter:title" content="Golang中的异常处理"/>
 <meta name="twitter:description" content="Golang的异常处理和单元测试
 
-
 1.Golang语言中没有其他语言中的try...catch...语句来捕获异常和异常恢复
 2.在Golang中我们通常会使用panic关键字来抛出异常，在defer中使用recover来捕获异常进行具体逻辑处理
 3.Golang中我们通常会在函数或方法中返回error结构对象来判断是否有异常出现
 
-
 注意事项
-
 
 1.利用recover和panic指令，defer必须放在panic之前定义(panic会终止其后要执行的代码).
 2.recover只有在defer调用的函数中才有效，否则recover无法捕获到panic.
@@ -517,7 +506,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        <span class="more-meta"> 1870 words </span>
+        <span class="more-meta"> 1872 words </span>
           <span class="more-meta"> 4 min read </span>
 
         
@@ -534,12 +523,9 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#golang的异常处理和单元测试">Golang的异常处理和单元测试</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#golang的异常处理和单元测试">Golang的异常处理和单元测试</a></li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -547,15 +533,12 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h2 id="golang的异常处理和单元测试">Golang的异常处理和单元测试</h2>
-
 <ul>
 <li>1.Golang语言中没有其他语言中的<code>try...catch...</code>语句来捕获异常和异常恢复</li>
 <li>2.在Golang中我们通常会使用<code>panic</code>关键字来抛出异常，在<code>defer</code>中使用<code>recover</code>来捕获异常进行具体逻辑处理</li>
 <li>3.Golang中我们通常会在函数或方法中返回<code>error</code>结构对象来判断是否有异常出现</li>
 </ul>
-
 <p><code>注意事项</code></p>
-
 <ul>
 <li>1.利用<code>recover</code>和<code>panic</code>指令，<code>defer</code>必须放在panic之前定义(<code>panic会终止其后要执行的代码</code>).</li>
 <li>2.<code>recover</code>只有在<code>defer</code>调用的函数中才有效，否则<code>recover</code>无法捕获到<code>panic</code>.</li>
@@ -563,14 +546,13 @@ if (!doNotTrack) {
 <li>4.多个<code>defer</code>会形成<code>defer栈</code></li>
 <li>5.panic会等到整个<code>goroutine</code>退出才会报告错误</li>
 </ul>
-
 <p><strong>常规使用</strong></p>
-
 <ol>
-<li><p><code>panic</code>以及<code>recover</code>参数类型为空接口(可存储任何类型对象)<code>interface{}</code></p>
+<li><code>panic</code>以及<code>recover</code>参数类型为空接口(可存储任何类型对象)<code>interface{}</code></li>
+</ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -592,9 +574,9 @@ if (!doNotTrack) {
 </span><span class="lnt">20
 </span><span class="lnt">21
 </span><span class="lnt">22
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="cm">/*
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="cm">/*
 </span><span class="cm">func panic(v interface{})
 </span><span class="cm">func recover() interface{}
 </span><span class="cm">执行顺序:panic()-&gt;带recover的defer
@@ -606,77 +588,24 @@ if (!doNotTrack) {
 
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="p">(</span>
-<span class="s">&#34;fmt&#34;</span>
+    <span class="s">&#34;fmt&#34;</span>
 <span class="p">)</span>
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>    
-    <span class="p">}</span>
-<span class="p">}()</span>
-<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;oh my god!panic.&#34;</span><span class="p">)</span>
-<span class="p">}</span></pre></td></tr></table>
+    <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>    
+        <span class="p">}</span>
+    <span class="p">}()</span>
+    <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;oh my god!panic.&#34;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>延迟调用中引发的错误，可被后续延迟调用捕获(<code>仅最后一个错误被捕获</code>)</p>
+</div><ol start="2">
+<li>延迟调用中引发的错误，可被后续延迟调用捕获(<code>仅最后一个错误被捕获</code>)</li>
+</ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"><span class="o">/*</span>
-<span class="nx">执行顺序</span><span class="p">:</span><span class="nb">panic</span><span class="p">()</span><span class="o">-</span><span class="p">&gt;</span><span class="nx">带panic的defer匿名函数</span><span class="o">-</span><span class="p">&gt;</span><span class="nx">带recover</span><span class="p">()</span><span class="nx">的defer匿名函数</span>
-<span class="nx">输出结果</span><span class="p">:</span>
-<span class="nx">catch</span> <span class="nx">the</span> <span class="nx">panic</span>
-<span class="nx">解释</span><span class="p">:</span>
-<span class="nx">defer中的recover仅能捕获最后一个错误</span>
-<span class="kn">package</span> <span class="nx">main</span>
-<span class="kn">import</span> <span class="p">(</span>
-<span class="s">&#34;fmt&#34;</span>
-<span class="p">)</span>
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span><span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;catch the panic&#34;</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}()</span>
-<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;oh my god! panic.&#34;</span><span class="p">)</span>
-<span class="p">}()</span>
-
-<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;something panic!&#34;</span><span class="p">)</span>
-
-<span class="p">}</span></pre></td></tr></table>
-</div>
-</div></li>
-
-<li><p>捕获函数<code>recover()</code>只有在<code>defer</code>调用内直接调用才会终止，否则返回<code>nil</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -700,9 +629,66 @@ if (!doNotTrack) {
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="cm">/*
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="o">/*</span>
+<span class="nx">执行顺序</span><span class="p">:</span><span class="nb">panic</span><span class="p">()</span><span class="o">-</span><span class="p">&gt;</span><span class="nx">带panic的defer匿名函数</span><span class="o">-</span><span class="p">&gt;</span><span class="nx">带recover</span><span class="p">()</span><span class="nx">的defer匿名函数</span>
+<span class="nx">输出结果</span><span class="p">:</span>
+<span class="nx">catch</span> <span class="nx">the</span> <span class="nx">panic</span>
+<span class="nx">解释</span><span class="p">:</span>
+<span class="nx">defer中的recover仅能捕获最后一个错误</span>
+<span class="kn">package</span> <span class="nx">main</span>
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;fmt&#34;</span>
+<span class="p">)</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span><span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;catch the panic&#34;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}()</span>
+    <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;oh my god! panic.&#34;</span><span class="p">)</span>
+    <span class="p">}()</span>
+
+    <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;something panic!&#34;</span><span class="p">)</span>
+
+<span class="p">}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>捕获函数<code>recover()</code>只有在<code>defer</code>调用内直接调用才会终止，否则返回<code>nil</code></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="cm">/*
 </span><span class="cm">代码执行顺序:panic-&gt;在匿名函数中嵌套recover的defer函数-&gt;带fmt的defer-&gt;带recover的defer-&gt;在匿名函数中调用recover的defer
 </span><span class="cm">输出结果:
 </span><span class="cm">defer inner
@@ -713,26 +699,27 @@ if (!doNotTrack) {
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;defer recover&#34;</span><span class="p">,</span><span class="nb">recover</span><span class="p">())</span>
-<span class="p">}()</span>
-<span class="k">defer</span> <span class="nb">recover</span><span class="p">()</span>
-<span class="k">defer</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">recover</span><span class="p">())</span>
-<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">func</span><span class="p">(){</span>
-        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;defer inner&#34;</span><span class="p">)</span>
-        <span class="nb">recover</span><span class="p">()</span>
+    <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;defer recover&#34;</span><span class="p">,</span><span class="nb">recover</span><span class="p">())</span>
     <span class="p">}()</span>
-<span class="p">}()</span>
-<span class="nb">panic</span><span class="p">(</span><span class="s">&#34;panic error&#34;</span><span class="p">)</span>
-<span class="p">}</span>      </pre></td></tr></table>
+    <span class="k">defer</span> <span class="nb">recover</span><span class="p">()</span>
+    <span class="k">defer</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nb">recover</span><span class="p">())</span>
+    <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">func</span><span class="p">(){</span>
+            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;defer inner&#34;</span><span class="p">)</span>
+            <span class="nb">recover</span><span class="p">()</span>
+        <span class="p">}()</span>
+    <span class="p">}()</span>
+    <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;panic error&#34;</span><span class="p">)</span>
+<span class="p">}</span>      
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>将代码块放置在匿名函数中可实现在函数逻辑中进行异常恢复，而不影响主函数</p>
+</div><ol start="4">
+<li>将代码块放置在匿名函数中可实现在函数逻辑中进行异常恢复，而不影响主函数</li>
+</ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -757,9 +744,9 @@ if (!doNotTrack) {
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="cm">/*
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="cm">/*
 </span><span class="cm">代码执行顺序:匿名函数中的panic语句-&gt;匿名函数中i自加运算-&gt;匿名函数中的fmt-&gt;匿名函数中的defer-&gt;主函数中的fmt
 </span><span class="cm">输出结果:
 </span><span class="cm">i is: 2
@@ -768,32 +755,31 @@ if (!doNotTrack) {
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
 <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="nf">test</span><span class="p">()</span>
+    <span class="nf">test</span><span class="p">()</span>
 <span class="p">}</span>
 <span class="kd">func</span> <span class="nf">test</span><span class="p">()</span> <span class="p">{</span>
-<span class="kd">var</span> <span class="nx">i</span> <span class="kt">int</span>
-<span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">defer</span> <span class="kd">func</span><span class="p">(){</span>
-        <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span><span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-            <span class="nx">i</span> <span class="p">=</span> <span class="mi">2</span>
-        <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">i</span> <span class="kt">int</span>
+    <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">defer</span> <span class="kd">func</span><span class="p">(){</span>
+            <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span><span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">i</span> <span class="p">=</span> <span class="mi">2</span>
+            <span class="p">}</span>
+        <span class="p">}()</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;something panic!&#34;</span><span class="p">)</span>
+        <span class="nx">i</span> <span class="o">+=</span> <span class="mi">8</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;no panic, i is:&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
     <span class="p">}()</span>
-    <span class="nb">panic</span><span class="p">(</span><span class="s">&#34;something panic!&#34;</span><span class="p">)</span>
-    <span class="nx">i</span> <span class="o">+=</span> <span class="mi">8</span>
-    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;no panic, i is:&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
-<span class="p">}()</span>
-<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;i is:&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
-<span class="p">}</span></pre></td></tr></table>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;i is:&#34;</span><span class="p">,</span><span class="nx">i</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div></li>
-
-<li><p>goroutine中的recover</p></li>
+</div><ol start="5">
+<li>goroutine中的recover</li>
 </ol>
-
 <p><code>注意:</code>如果一个没有<code>recover</code>的<code>goroutine</code>发生了panic，那么整个进程都会挂掉</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -825,9 +811,10 @@ if (!doNotTrack) {
 </span><span class="lnt">30
 </span><span class="lnt">31
 </span><span class="lnt">32
-</span></pre></td>
+</span><span class="lnt">33
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="cm">/*
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="cm">/*
 </span><span class="cm">sync.WaitGroup用来等待一组goroutine的结束,Add方法用来设置等待的goroutine数量,Done方法表示一个goroutine运行结束,使用Wait方法将全部的goroutine阻塞住,直到全部goroutine执行完毕
 </span><span class="cm">
 </span><span class="cm">代码执行顺序:goroutine中的逻辑-&gt;wg.Wait()-&gt;fmt.Println
@@ -858,12 +845,12 @@ if (!doNotTrack) {
     <span class="p">}()</span>
     <span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
     <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;done&#34;</span><span class="p">)</span>
-<span class="p">}</span></pre></td></tr></table>
-</div>
-</div>
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
+<span class="p">}</span>
 
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -876,7 +863,7 @@ if (!doNotTrack) {
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-01-15
+      2020-11-01
       
         
         

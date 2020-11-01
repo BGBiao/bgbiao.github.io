@@ -25,8 +25,8 @@
 <meta name="author" content="BGBiao" />
   <meta name="description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
  1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。
-2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
-3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
+  2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
+  3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
@@ -36,7 +36,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" />
@@ -57,7 +57,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -68,10 +68,11 @@
 <meta property="og:title" content="Dockerfile最佳实践" />
 <meta property="og:description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
 
-
 1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。
 
+
 2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
+
 
 3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
 " />
@@ -82,18 +83,17 @@
 <meta itemprop="name" content="Dockerfile最佳实践">
 <meta itemprop="description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
 
-
 1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。
+
 
 2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
 
+
 3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
 ">
-
-
-<meta itemprop="datePublished" content="2017-11-09T21:40:51&#43;00:00" />
-<meta itemprop="dateModified" content="2017-11-09T21:40:51&#43;00:00" />
-<meta itemprop="wordCount" content="2906">
+<meta itemprop="datePublished" content="2017-11-09T21:40:51+00:00" />
+<meta itemprop="dateModified" content="2017-11-09T21:40:51+00:00" />
+<meta itemprop="wordCount" content="2911">
 
 
 
@@ -102,10 +102,11 @@
 <meta name="twitter:title" content="Dockerfile最佳实践"/>
 <meta name="twitter:description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
 
-
 1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。
 
+
 2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
+
 
 3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
 "/>
@@ -495,7 +496,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2906 words </span>
+        <span class="more-meta"> 2911 words </span>
           <span class="more-meta"> 6 min read </span>
 
         
@@ -512,25 +513,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#构建无需启动服务的pass层镜像">构建无需启动服务的pass层镜像</a>
-<ul>
-<li><a href="#构建符合实际业务场景的base镜像">构建符合实际业务场景的base镜像</a></li>
-<li><a href="#构建上层基本软件环境">构建上层基本软件环境</a></li>
-</ul></li>
-<li><a href="#构建开箱即用的saas层镜像-容器启动之后即可提供相应的服务-比如nginx-sshd等">构建开箱即用的SaaS层镜像(容器启动之后即可提供相应的服务。比如nginx，sshd等)</a>
-<ul>
-<li><a href="#首先使用base镜像构建一层的supervisord基本镜像">首先使用base镜像构建一层的supervisord基本镜像</a></li>
-<li><a href="#使用上面构建的supervisord镜像进行构建服务镜像">使用上面构建的supervisord镜像进行构建服务镜像</a></li>
-</ul></li>
-<li><a href="#构建基于paas层的其他基本镜像">构建基于PaaS层的其他基本镜像</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#构建无需启动服务的pass层镜像">构建无需启动服务的pass层镜像</a></li>
+        <li><a href="#构建开箱即用的saas层镜像容器启动之后即可提供相应的服务比如nginxsshd等">构建开箱即用的SaaS层镜像(容器启动之后即可提供相应的服务。比如nginx，sshd等)</a></li>
+        <li><a href="#构建基于paas层的其他基本镜像">构建基于PaaS层的其他基本镜像</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -538,29 +529,24 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <p><strong>在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。</strong></p>
-
 <blockquote>
 <p>1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。</p>
-
+</blockquote>
+<blockquote>
 <p>2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。</p>
-
+</blockquote>
+<blockquote>
 <p>3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。</p>
 </blockquote>
-
 <p><strong><code>问题：如果我们构建业务镜像中默认需要启动多个服务，比如需要启动sshd和tomcat或者是一个nginx，那么就不能通过构建镜像的时候去使用CMD命令，因为CMD命令会继承上层images的CMD命令，从而导致上层的CMD命令失效。那么想要既继承上层的sshd，又需要启动业务进程，普通的方式可以采用脚本定义，并在业务镜像层进行RUN脚本。</code></strong></p>
-
 <p><strong>所以比较好的方法：使用supervisord来管理images中的多个服务进程。可以在基本镜像层进行构建supervisord镜像，然后在上层业务层通过配置supervisord.conf来管理对个进程，实现一个容器中启动多个服务进程。</strong></p>
-
 <h3 id="构建无需启动服务的pass层镜像">构建无需启动服务的pass层镜像</h3>
-
 <p>该环节是提供给用户基本的软件运行环境，用户可以通过bash登录去启动业务程序。而根据业务的变化特征，以及基础服务的抽象程度，我们可以将该层的image镜像分成以下三个image进行叠加。</p>
-
 <h4 id="构建符合实际业务场景的base镜像">构建符合实际业务场景的base镜像</h4>
-
 <p><code>注意：</code>给image中打入sshd服务的主要原因还是想尽可能的满足用户当前的使用习惯，同时又能够充分利用docker image的特性</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -574,9 +560,9 @@ if (!doNotTrack) {
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM centos6.8-base
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-base
 MAINTAINER xuxuebiao
 RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
     ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
@@ -589,26 +575,24 @@ ENV LANG=zh_CN.UTF-8;\
     LC_ALL=zh_CN.UTF-8;\
     TZ &#34;Asia/Shanghai&#34;;\
     TERM xterm
-CMD /usr/sbin/sshd -D</pre></td></tr></table>
+CMD /usr/sbin/sshd -D
+</code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">#docker build -t centos6.8-sshd .</pre></td></tr></table>
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">#docker build -t centos6.8-sshd .
+</code></pre></td></tr></table>
 </div>
-</div>
-<hr />
-
+</div><hr>
 <h4 id="构建上层基本软件环境">构建上层基本软件环境</h4>
-
 <p><code>注意：上层SSHD镜像默认使用CMD启动了一个sshd服务，因此这层PAAS层无法直接启动nginx和tomcat，本层只是构建了一个基本环境，容器启动后需要登录bash中执行脚本进行启动。这样交付的环境其实就相当于PAAS层的环境</code></p>
-
 <p>构建一个基于jdk7tomcat6的基本镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -629,9 +613,10 @@ CMD /usr/sbin/sshd -D</pre></td></tr></table>
 </span><span class="lnt">19
 </span><span class="lnt">20
 </span><span class="lnt">21
-</span></pre></td>
+</span><span class="lnt">22
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM centos6.8-sshd
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-sshd
 MAINTAINER &#34;xuxuebiao&#34;
 ENV TZ &#34;Asia/Shanghai&#34;;\
     PATH $PATH:/export/data/
@@ -651,24 +636,26 @@ COPY start_nginx /etc/init.d/nginx
 COPY init_nginx.sh /export/Shell/
 RUN chmod a+x /etc/init.d/nginx;\
     chmod a+x /export/Shell/init_nginx.sh;\
-    chown admin.admin -R /export/ /home/admin/</pre></td></tr></table>
+    chown admin.admin -R /export/ /home/admin/
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>构建一个基于python27的基本环境，环境中本身已经安装各种第三方程序库：</p>
+</div><p>构建一个基于python27的基本环境，环境中本身已经安装各种第三方程序库：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></pre></td>
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM centos6.8-sshd
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-sshd
 MAINTAINER biaoge
 ADD python27 /usr/local/python27
 RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
@@ -676,21 +663,18 @@ RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
     ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;
 
 EXPOSE 8000
-EXPOSE 8081</pre></td></tr></table>
+EXPOSE 8081
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>构建本层的镜像Dockerfile中不能指定新的应用进程，否则基本镜像中的sshd就会失效</code></p>
-
-<hr />
-
-<h3 id="构建开箱即用的saas层镜像-容器启动之后即可提供相应的服务-比如nginx-sshd等">构建开箱即用的SaaS层镜像(容器启动之后即可提供相应的服务。比如nginx，sshd等)</h3>
-
+</div><p><code>构建本层的镜像Dockerfile中不能指定新的应用进程，否则基本镜像中的sshd就会失效</code></p>
+<hr>
+<h3 id="构建开箱即用的saas层镜像容器启动之后即可提供相应的服务比如nginxsshd等">构建开箱即用的SaaS层镜像(容器启动之后即可提供相应的服务。比如nginx，sshd等)</h3>
 <h4 id="首先使用base镜像构建一层的supervisord基本镜像">首先使用base镜像构建一层的supervisord基本镜像</h4>
-
 <p><code>由于supervisord是有python写的，所以可以直接在python模块包中使用</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -710,9 +694,9 @@ EXPOSE 8081</pre></td></tr></table>
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM centos6.8-base
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-base
 MAINTAINER biaoge
 ENV LANG=zh_CN.UTF-8;\
     LC_ALL=zh_CN.UTF-8;\
@@ -731,15 +715,14 @@ CMD [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.con
 #这里其实比较建议使用ENTRYPOINT
 #ENTRYPOINT通常情况下和CMD会一起使用，区别是CMD定义的执行命令会被container创建的时候的command取代。一般情况下ENTRYPOINT会定义命令执行的主体,CMD中增加默认的参数，而实际的参数可以通过创建container的时候用command进行优化选择
 #ENTRYPOINT  [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
-#文末会有演示一个ENTRYPOINT的例子</pre></td></tr></table>
+#文末会有演示一个ENTRYPOINT的例子
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>启动之后就会默认启动supervisord.conf中配的服务。</p>
-
+</div><p>启动之后就会默认启动supervisord.conf中配的服务。</p>
 <p>默认的supervisord.conf文件配置：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -759,9 +742,10 @@ CMD [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.con
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span></pre></td>
+</span><span class="lnt">21
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[supervisord]
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[supervisord]
 http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
 logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
 logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
@@ -780,15 +764,15 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 #[program:httpd]
 #command = /usr/sbin/httpd
 #[program:sshd]
-#command = /usr/sbin/sshd -D</pre></td></tr></table>
-</div>
-</div>
-<h4 id="使用上面构建的supervisord镜像进行构建服务镜像">使用上面构建的supervisord镜像进行构建服务镜像</h4>
+#command = /usr/sbin/sshd -D
 
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="使用上面构建的supervisord镜像进行构建服务镜像">使用上面构建的supervisord镜像进行构建服务镜像</h4>
 <p>镜像可自启动包含sshd和rabbitmq的服务</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -805,9 +789,10 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 </span><span class="lnt">15
 </span><span class="lnt">16
 </span><span class="lnt">17
-</span></pre></td>
+</span><span class="lnt">18
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM supversord
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM supversord
 MAINTAINER biaoge
 
 #需要如下相关的包
@@ -823,13 +808,14 @@ RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
 EXPOSE 52568 5672 4369 
 
 #这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf</pre></td></tr></table>
+ADD supervisord.conf /etc/supervisord.conf
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>用来启动sshd和rabbitmq服务的<code>supervisord.conf</code>配置文件。</p>
+</div><p>用来启动sshd和rabbitmq服务的<code>supervisord.conf</code>配置文件。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -849,9 +835,9 @@ ADD supervisord.conf /etc/supervisord.conf</pre></td></tr></table>
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">[supervisord]
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[supervisord]
 http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
 logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
 logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
@@ -870,21 +856,20 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 [program:rabbitmq]
 command = rabbitmq-server
 [program:sshd]
-command = /usr/sbin/sshd -D</pre></td></tr></table>
+command = /usr/sbin/sshd -D
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>测试访问：</strong>
-使用上面Dockerfile创建images进行构建容器：
-&gt;$docker run -itd &ndash;name test-ssh sshd-rabbitmq</p>
-
+</div><p><strong>测试访问：</strong>
+使用上面Dockerfile创建images进行构建容器：</p>
+<blockquote>
+<p>$docker run -itd &ndash;name test-ssh sshd-rabbitmq</p>
+</blockquote>
 <p>发现创建的容器，已经通过上面的supervisord.conf中定义好的，启动了rabbitmq和sshd服务。</p>
-
 <h3 id="构建基于paas层的其他基本镜像">构建基于PaaS层的其他基本镜像</h3>
-
 <p>基本sshd镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -897,9 +882,10 @@ command = /usr/sbin/sshd -D</pre></td></tr></table>
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span></pre></td>
+</span><span class="lnt">14
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM supervisord
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM supervisord
 MAINTAINER 371990778@qq.com
 #配置相关的ssh需要的文件，以及相关的用户密码
 RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
@@ -911,15 +897,15 @@ RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
 EXPOSE 52568
 
 #这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
-</div>
-</div>
-<p><code>相应的supervisord.conf文件中只需要增加相应的额服务启动命令</code></p>
+ADD supervisord.conf /etc/supervisord.conf 
 
+</code></pre></td></tr></table>
+</div>
+</div><p><code>相应的supervisord.conf文件中只需要增加相应的额服务启动命令</code></p>
 <p>基本redis镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -930,9 +916,9 @@ ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
 </span><span class="lnt"> 9
 </span><span class="lnt">10
 </span><span class="lnt">11
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM sshd-base
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM sshd-base
 MAINTAINER biaoge
 ADD redis-2.8.9 /usr/local/redis-2.8.9 
 #ADD redis.conf /etc/redis.conf
@@ -942,13 +928,13 @@ RUN ln -s /usr/local/redis-2.8.9/src/redis-cli /usr/local/bin/redis-cli ;\
 
 EXPOSE 3679 
 ADD supervisord.conf /etc/supervisord.conf
-#CMD /usr/local/bin/redis-server </pre></td></tr></table>
+#CMD /usr/local/bin/redis-server 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>基本rabbit镜像：</p>
+</div><p>基本rabbit镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -959,9 +945,9 @@ ADD supervisord.conf /etc/supervisord.conf
 </span><span class="lnt"> 9
 </span><span class="lnt">10
 </span><span class="lnt">11
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">FROM sshd-base
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM sshd-base
 MAINTAINER biaoge
 
 #需要如下相关的包
@@ -971,13 +957,13 @@ RUN yum localinstall /usr/local/*.rpm -y
 EXPOSE 5672 4369 
 
 #这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
+ADD supervisord.conf /etc/supervisord.conf 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>其他案例示范：</strong></p>
+</div><p><strong>其他案例示范：</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -986,9 +972,9 @@ ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
 </span><span class="lnt">7
 </span><span class="lnt">8
 </span><span class="lnt">9
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="nx">FROM</span> <span class="nx">centos</span><span class="p">:</span><span class="mf">6.8</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">FROM</span> <span class="nx">centos</span><span class="p">:</span><span class="mf">6.8</span>
 <span class="nx">MAINTAINER</span> <span class="s">&#34;Andy_xu&#34;</span>
 
 <span class="nx">ENV</span> <span class="nx">TZ</span> <span class="s">&#34;Asia/Shanghai&#34;</span>
@@ -996,15 +982,14 @@ ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
 <span class="nx">ENV</span> <span class="nx">TERM</span> <span class="nx">xterm</span>
 
 <span class="nx">RUN</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span>
-<span class="nx">COPY</span> <span class="o">*</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span> </pre></td></tr></table>
+<span class="nx">COPY</span> <span class="o">*</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span> 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意：上面dockerfile文件构建的环境没有默认的ps，需要加载export PS1='[\u@\h \W]\$'</code></p>
-
+</div><p><code>注意：上面dockerfile文件构建的环境没有默认的ps，需要加载export PS1='[\u@\h \W]\$'</code></p>
 <p>ENTRYPOINT 指令详解</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1033,9 +1018,9 @@ ADD supervisord.conf /etc/supervisord.conf </pre></td></tr></table>
 </span><span class="lnt">27
 </span><span class="lnt">28
 </span><span class="lnt">29
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat Dockerfile
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat Dockerfile
 FROM centos6.8
 ENTRYPOINT [&#34;curl&#34;,&#34;-s&#34;,&#34;10.0.0.1:2379/info&#34;]
 #cmd 可以只定义参数
@@ -1063,7 +1048,8 @@ $ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆�
 HTTP/1.1 404 Not Found
 Content-Type: text/plain; charset=utf-8
 Date: Fri, 19 May 2017 02:53:36 GMT
-Content-Length: 19</pre></td></tr></table>
+Content-Length: 19
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>

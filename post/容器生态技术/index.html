@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%AE%B9%E5%99%A8%E7%94%9F%E6%80%81%E6%8A%80%E6%9C%AF/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -70,10 +70,8 @@
 <meta property="article:modified_time" content="2017-11-05T22:30:59+00:00" />
 <meta itemprop="name" content="容器生态技术">
 <meta itemprop="description" content="2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。">
-
-
-<meta itemprop="datePublished" content="2017-11-05T22:30:59&#43;00:00" />
-<meta itemprop="dateModified" content="2017-11-05T22:30:59&#43;00:00" />
+<meta itemprop="datePublished" content="2017-11-05T22:30:59+00:00" />
+<meta itemprop="dateModified" content="2017-11-05T22:30:59+00:00" />
 <meta itemprop="wordCount" content="499">
 
 
@@ -485,38 +483,15 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#容器引擎">容器引擎</a></li>
-<li><a href="#编排调度">编排调度</a></li>
-<li><a href="#网络">网络</a>
-<ul>
-<li><a href="#cni">CNI</a></li>
-<li><a href="#cnm">CNM</a></li>
-</ul></li>
-<li><a href="#存储">存储</a></li>
-<li><a href="#日志">日志</a></li>
-<li><a href="#监控">监控</a>
-<ul>
-<li><a href="#数据采集">数据采集</a></li>
-</ul></li>
-<li><a href="#数据存储">数据存储</a></li>
-<li><a href="#数据展示">数据展示</a></li>
-</ul></li>
-<li><a href="#镜像存储和安全">镜像存储和安全</a>
-<ul>
-<li><a href="#镜像存储">镜像存储</a></li>
-<li><a href="#安全扫描">安全扫描</a></li>
-</ul></li>
-<li><a href="#域名解析">域名解析</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+        <li><a href="#镜像存储和安全">镜像存储和安全</a></li>
+        <li><a href="#域名解析">域名解析</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -524,136 +499,80 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <p>2017年可谓是容器云领域发展最火的一年，同时也是Kubernetes崛起的一年，那么随着容器行业的大发展，基于以Docker和Kubernetes为核心的容器生态系统也慢慢在将自己的软件体系进行解耦拆分，以实现核心功能的最优化实现。很明显的一点就是Docker在不断的拆分自己的项目，不再试图将所有容器相关技术都囊括在自己碗里，而Kubernetes则一直保持开放的态度，对接不同的第三方生态体系，也使得K8S在整个容器界内获得了良好的口碑。那么想要从事容器相关领域的技术研究或者工作，个人建议也可以将整个容器生态技术拆分，对某个要点进行深入探索，这样能够让自己更加了解容器的生态技术，也更容易在容器云生态中贡献自己的力量。</p>
-
 <p>容器云生态图谱
-<img src="http://oyep1jupk.bkt.clouddn.com/container/tech/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E7%94%9F%E6%80%81%E5%9B%BE%E8%B0%B1.png" alt="" /></p>
-
+<img src="http://oyep1jupk.bkt.clouddn.com/container/tech/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E7%94%9F%E6%80%81%E5%9B%BE%E8%B0%B1.png" alt=""></p>
 <h4 id="容器引擎">容器引擎</h4>
-
 <p><a href="https://www.docker.com/">Docker</a>
 <a href="https://github.com/moby/moby">Moby</a></p>
-
 <p><a href="https://github.com/rkt/rkt">Rkt</a></p>
-
 <p><a href="https://github.com/lxc/lxc">Lxc</a>
 <a href="https://github.com/lxc/lxd">Lxd</a></p>
-
 <p><a href="https://github.com/opencontainers/runc">OCI</a>
 <a href="https://www.opencontainers.org/">OCI官网</a></p>
-
 <p><a href="https://github.com/hyperhq/hyperd">Hyperd</a>
 <a href="http://www.hypercontainer.io">Hyper官网</a></p>
-
 <h4 id="编排调度">编排调度</h4>
-
 <p><a href="https://github.com/kubernetes/kubernetes">Kubernetes</a>
 <a href="http://kubernetes.io">k8s官网</a>
 <a href="k8smeetup.github.io">k8s官网翻译</a>
 <a href="https://www.kubernetes.org.cn/">k8s中文站</a></p>
-
 <p><a href="https://github.com/apache/mesos">Mesos</a>
 <a href="https://github.com/mesosphere/marathon">Marathon</a></p>
-
 <p><a href="https://github.com/docker/swarm">Swarm</a></p>
-
 <p><a href="https://github.com/rancher/rancher">Rancher</a></p>
-
 <h4 id="网络">网络</h4>
-
 <h5 id="cni">CNI</h5>
-
 <p><a href="https://github.com/containernetworking/cni">CNI</a></p>
-
 <p><a href="https://github.com/projectcalico/calico">Calico</a>
 <a href="https://www.projectcalico.org/">Calico官网</a></p>
-
 <p><a href="https://github.com/weaveworks/weave">Weave</a>
 <a href="https://www.weave.works">Weave官网</a></p>
-
 <p><a href="https://github.com/contiv/netplugin">Contiv</a>
 <a href="http://contiv.io">Contiv官网</a></p>
-
 <p><a href="https://github.com/openvswitch/ovs">ovs</a>
 <a href="http://openvswitch.org/">ovs官网</a></p>
-
 <h5 id="cnm">CNM</h5>
-
 <p><a href="https://github.com/docker/libnetwork">libnetwork</a></p>
-
 <p><a href="https://github.com/projectcalico/libnetwork-plugin">Calico-libnetwork</a></p>
-
 <p><a href="https://github.com/contiv/netplugin">Contiv</a></p>
-
 <p><a href="https://github.com/weaveworks/weave">Weave</a></p>
-
 <h4 id="存储">存储</h4>
-
 <p><a href="https://github.com/ceph/ceph">Ceph</a></p>
-
 <p><a href="https://github.com/gluster/glusterfs">GlusterFS</a></p>
-
 <p><a href="https://github.com/ipdcode/containerfs">ContainerFS</a></p>
-
 <p><a href="https://github.com/coreos/torus">Torus</a></p>
-
 <h4 id="日志">日志</h4>
-
 <p><a href="https://github.com/elastic/elasticsearch">ElasticSearch</a></p>
-
 <p><a href="https://github.com/elastic/beats">Filebeat</a></p>
-
 <p><a href="https://github.com/fluent/fluentd">Fluentd</a>
 <a href="http://www.fluentd.org/">Fluentd官网</a></p>
-
 <p><a href="https://github.com/elastic/logstash">Logstash</a></p>
-
 <p><a href="https://github.com/elastic/kibana">Kibana</a></p>
-
 <h4 id="监控">监控</h4>
-
 <h5 id="数据采集">数据采集</h5>
-
 <p><a href="https://github.com/influxdata/telegraf">Telegraf</a></p>
-
 <p><a href="https://github.com/firehol/netdata">Netdata</a>
 <a href="https://my-netdata.io/">Netdata官网</a></p>
-
 <p><a href="https://github.com/google/cadvisor">cAdivisor</a></p>
-
 <p><a href="https://github.com/kubernetes/heapster">Heapster</a></p>
-
 <p><a href="https://github.com/prometheus/prometheus">Prometheus</a></p>
-
 <h4 id="数据存储">数据存储</h4>
-
 <p><a href="https://github.com/influxdata/influxdb">Influxdb</a></p>
-
 <p><a href="https://github.com/OpenTSDB/opentsdb">OpenTSDB</a></p>
-
 <h4 id="数据展示">数据展示</h4>
-
 <p><a href="https://github.com/grafana/grafana">Grafana</a>
 <a href="https://grafana.com">Grafana官网</a></p>
-
 <h3 id="镜像存储和安全">镜像存储和安全</h3>
-
 <h4 id="镜像存储">镜像存储</h4>
-
 <p><a href="https://github.com/vmware/harbor">Harbor</a></p>
-
 <p><a href="https://github.com/jcloudpub/speedy">Speedy</a></p>
-
 <h4 id="安全扫描">安全扫描</h4>
-
 <p><a href="https://github.com/coreos/clair">Clair</a></p>
-
 <p><a href="https://github.com/future-architect/vuls">Vuls</a></p>
-
 <h3 id="域名解析">域名解析</h3>
-
-<p>[bind]()
+<p><a href="">bind</a>
 <a href="https://github.com/coredns/coredns">coredns</a>
-[skydns]()</p>
+<a href="">skydns</a></p>
     </div>
 
     

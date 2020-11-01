@@ -26,7 +26,7 @@
   <meta name="description" content="Golang中的版本信息管理  我们都知道在一些Golang写的程序中，默认会有version或-v相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.
  示例
 比如我们常用的Golang开发的程序是这样输出版本相关信息的:
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30  # k8s的客户端程序版本 $ kubectl version -o json --client { &amp;#34;clientVersion&amp;#34;: { &amp;#34;major&amp;#34;: &amp;#34;1&amp;#34;, &amp;#34;minor&amp;#34;: &amp;#34;10&amp;#34;, &amp;#34;gitVersion&amp;#34;: &amp;#34;v1.10.11&amp;#34;, &amp;#34;gitCommit&amp;#34;: &amp;#34;637c7e288581ee40ab4ca210618a89a555b6e7e9&amp;#34;, &amp;#34;gitTreeState&amp;#34;: &amp;#34;clean&amp;#34;, &amp;#34;buildDate&amp;#34;: &amp;#34;2018-11-26T14:38:32Z&amp;#34;, &amp;#34;goVersion&amp;#34;: &amp;#34;go1.9.3&amp;#34;, &amp;#34;compiler&amp;#34;: &amp;#34;gc&amp;#34;, &amp;#34;platform&amp;#34;: &amp;#34;darwin/amd64&amp;#34; } } # docker的客户端程序版本 $ docker version Client: Docker Engine - Community Version: 18.09.2 API version: 1.39 Go version: go1.10.8 Git commit: 6247962 Built: Sun Feb 10 04:12:39 2019 OS/Arch: darwin/amd64 Experimental: false # minio的客户端程序版本 $ minio --version minio version RELEASE.2020-04-10T03-34-42Z  " />
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31  # k8s的客户端程序版本 $ kubectl version -o json --client { &amp;#34;clientVersion&amp;#34;: { &amp;#34;major&amp;#34;: &amp;#34;1&amp;#34;, &amp;#34;minor&amp;#34;: &amp;#34;10&amp;#34;, &amp;#34;gitVersion&amp;#34;: &amp;#34;v1.10.11&amp;#34;, &amp;#34;gitCommit&amp;#34;: &amp;#34;637c7e288581ee40ab4ca210618a89a555b6e7e9&amp;#34;, &amp;#34;gitTreeState&amp;#34;: &amp;#34;clean&amp;#34;, &amp;#34;buildDate&amp;#34;: &amp;#34;2018-11-26T14:38:32Z&amp;#34;, &amp;#34;goVersion&amp;#34;: &amp;#34;go1.9.3&amp;#34;, &amp;#34;compiler&amp;#34;: &amp;#34;gc&amp;#34;, &amp;#34;platform&amp;#34;: &amp;#34;darwin/amd64&amp;#34; } } # docker的客户端程序版本 $ docker version Client: Docker Engine - Community Version: 18.09.2 API version: 1.39 Go version: go1.10.8 Git commit: 6247962 Built: Sun Feb 10 04:12:39 2019 OS/Arch: darwin/amd64 Experimental: false # minio的客户端程序版本 $ minio --version minio version RELEASE.2020-04-10T03-34-42Z   " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
@@ -35,7 +35,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-version/" />
@@ -56,7 +56,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,12 +67,9 @@
 <meta property="og:title" content="Golang中处理版本信息" />
 <meta property="og:description" content="Golang中的版本信息管理
 
-
 我们都知道在一些Golang写的程序中，默认会有version或-v相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.
 
-
 示例
-
 比如我们常用的Golang开发的程序是这样输出版本相关信息的:
 
 
@@ -106,6 +103,7 @@
 28
 29
 30
+31
 
 
 # k8s的客户端程序版本
@@ -138,21 +136,20 @@ Client: Docker Engine - Community
 # minio的客户端程序版本
 $ minio --version
 minio version RELEASE.2020-04-10T03-34-42Z
+
+
 
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/golang-version/" />
 <meta property="article:published_time" content="2020-06-26T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-06-27T15:19:36+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Golang中处理版本信息">
 <meta itemprop="description" content="Golang中的版本信息管理
 
-
 我们都知道在一些Golang写的程序中，默认会有version或-v相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.
 
-
 示例
-
 比如我们常用的Golang开发的程序是这样输出版本相关信息的:
 
 
@@ -186,6 +183,7 @@ minio version RELEASE.2020-04-10T03-34-42Z
 28
 29
 30
+31
 
 
 # k8s的客户端程序版本
@@ -219,12 +217,12 @@ Client: Docker Engine - Community
 $ minio --version
 minio version RELEASE.2020-04-10T03-34-42Z
 
+
+
 ">
-
-
-<meta itemprop="datePublished" content="2020-06-26T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-06-27T15:19:36&#43;08:00" />
-<meta itemprop="wordCount" content="1931">
+<meta itemprop="datePublished" content="2020-06-26T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="1934">
 
 
 
@@ -233,12 +231,9 @@ minio version RELEASE.2020-04-10T03-34-42Z
 <meta name="twitter:title" content="Golang中处理版本信息"/>
 <meta name="twitter:description" content="Golang中的版本信息管理
 
-
 我们都知道在一些Golang写的程序中，默认会有version或-v相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.
 
-
 示例
-
 比如我们常用的Golang开发的程序是这样输出版本相关信息的:
 
 
@@ -272,6 +267,7 @@ minio version RELEASE.2020-04-10T03-34-42Z
 28
 29
 30
+31
 
 
 # k8s的客户端程序版本
@@ -304,6 +300,8 @@ Client: Docker Engine - Community
 # minio的客户端程序版本
 $ minio --version
 minio version RELEASE.2020-04-10T03-34-42Z
+
+
 
 "/>
 
@@ -693,7 +691,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> Golang </a>
             
           </div>
-        <span class="more-meta"> 1931 words </span>
+        <span class="more-meta"> 1934 words </span>
           <span class="more-meta"> 4 min read </span>
 
         
@@ -710,12 +708,9 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#golang中的版本信息管理">Golang中的版本信息管理</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#golang中的版本信息管理">Golang中的版本信息管理</a></li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -723,111 +718,14 @@ if (!doNotTrack) {
     
     <div class="post-content">
       <h2 id="golang中的版本信息管理">Golang中的版本信息管理</h2>
-
 <blockquote>
 <p>我们都知道在一些Golang写的程序中，默认会有<code>version</code>或<code>-v</code>相关的参数来输出软件版本信息，这些版本信息里可能包含软件版本，git中的commit记录，构建时间、构建环境等信息，那么这些信息都是如何在Golang程序中进行维护和管理的呢？请看👇.</p>
 </blockquote>
-
 <p><strong>示例</strong></p>
-
 <p>比如我们常用的Golang开发的程序是这样输出版本相关信息的:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma"># k8s的客户端程序版本
-$ kubectl version -o json --client
-{
-  &#34;clientVersion&#34;: {
-    &#34;major&#34;: &#34;1&#34;,
-    &#34;minor&#34;: &#34;10&#34;,
-    &#34;gitVersion&#34;: &#34;v1.10.11&#34;,
-    &#34;gitCommit&#34;: &#34;637c7e288581ee40ab4ca210618a89a555b6e7e9&#34;,
-    &#34;gitTreeState&#34;: &#34;clean&#34;,
-    &#34;buildDate&#34;: &#34;2018-11-26T14:38:32Z&#34;,
-    &#34;goVersion&#34;: &#34;go1.9.3&#34;,
-    &#34;compiler&#34;: &#34;gc&#34;,
-    &#34;platform&#34;: &#34;darwin/amd64&#34;
-  }
-}
-
-# docker的客户端程序版本
-$ docker version
-Client: Docker Engine - Community
- Version:           18.09.2
- API version:       1.39
- Go version:        go1.10.8
- Git commit:        6247962
- Built:             Sun Feb 10 04:12:39 2019
- OS/Arch:           darwin/amd64
- Experimental:      false
-
-# minio的客户端程序版本
-$ minio --version
-minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
-</div>
-</div>
-<p>从上面的版本输出记录中我们其实可以看出，版本信息中不仅记录了基本的构建环境和版本信息，同时还记录了commitId，所以这些信息应该是在build时动态传入到程序中的，大概猜测一下应该就是提前在程序的version相关代码中预留好版本相关的变量，然后在构建的时候对变量进行赋值，以此来实现变量的动态注入。</p>
-
-<p><strong>小试牛刀</strong></p>
-
-<p>在大概猜测后，查看到相关文档中有说明可以在构建时使用参数<code>-ldflags -X importpath.name=value</code>来动态注入变量。在官方稳定<a href="https://golang.org/cmd/link/">link</a>中有详细说明:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></pre></td>
-<td class="lntd">
-<pre class="chroma">-X importpath.name=value
-	Set the value of the string variable in importpath named name to value.
-	This is only effective if the variable is declared in the source code either uninitialized
-	or initialized to a constant string expression. -X will not work if the initializer makes
-	a function call or refers to other variables.
-	Note that before Go 1.5 this option took two separate arguments.</pre></td></tr></table>
-</div>
-</div>
-<p>大概意思就是: 可以设置一个字符串变量值给importpath路径下的name。而且仅当字符串变量在源码中没有初始化或初始化成常量字符串表达式时才有效。如果初始化变量调用了函数或者引用了其他变量，<code>-X</code>参数也不会工作。</p>
-
-<p>所以，总结起来就是，可以使用该参数给源码中动态传入一些简单的字符串变量。</p>
-
-<p>接下来，我们简单试用一下:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -858,9 +756,102 @@ minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
 </span><span class="lnt">29
 </span><span class="lnt">30
 </span><span class="lnt">31
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">main</span><span class="p">.</span><span class="k">go</span> 
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># k8s的客户端程序版本
+$ kubectl version -o json --client
+{
+  &#34;clientVersion&#34;: {
+    &#34;major&#34;: &#34;1&#34;,
+    &#34;minor&#34;: &#34;10&#34;,
+    &#34;gitVersion&#34;: &#34;v1.10.11&#34;,
+    &#34;gitCommit&#34;: &#34;637c7e288581ee40ab4ca210618a89a555b6e7e9&#34;,
+    &#34;gitTreeState&#34;: &#34;clean&#34;,
+    &#34;buildDate&#34;: &#34;2018-11-26T14:38:32Z&#34;,
+    &#34;goVersion&#34;: &#34;go1.9.3&#34;,
+    &#34;compiler&#34;: &#34;gc&#34;,
+    &#34;platform&#34;: &#34;darwin/amd64&#34;
+  }
+}
+
+# docker的客户端程序版本
+$ docker version
+Client: Docker Engine - Community
+ Version:           18.09.2
+ API version:       1.39
+ Go version:        go1.10.8
+ Git commit:        6247962
+ Built:             Sun Feb 10 04:12:39 2019
+ OS/Arch:           darwin/amd64
+ Experimental:      false
+
+# minio的客户端程序版本
+$ minio --version
+minio version RELEASE.2020-04-10T03-34-42Z
+
+</code></pre></td></tr></table>
+</div>
+</div><p>从上面的版本输出记录中我们其实可以看出，版本信息中不仅记录了基本的构建环境和版本信息，同时还记录了commitId，所以这些信息应该是在build时动态传入到程序中的，大概猜测一下应该就是提前在程序的version相关代码中预留好版本相关的变量，然后在构建的时候对变量进行赋值，以此来实现变量的动态注入。</p>
+<p><strong>小试牛刀</strong></p>
+<p>在大概猜测后，查看到相关文档中有说明可以在构建时使用参数<code>-ldflags -X importpath.name=value</code>来动态注入变量。在官方稳定<a href="https://golang.org/cmd/link/">link</a>中有详细说明:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">-X importpath.name=value
+	Set the value of the string variable in importpath named name to value.
+	This is only effective if the variable is declared in the source code either uninitialized
+	or initialized to a constant string expression. -X will not work if the initializer makes
+	a function call or refers to other variables.
+	Note that before Go 1.5 this option took two separate arguments.
+</code></pre></td></tr></table>
+</div>
+</div><p>大概意思就是: 可以设置一个字符串变量值给importpath路径下的name。而且仅当字符串变量在源码中没有初始化或初始化成常量字符串表达式时才有效。如果初始化变量调用了函数或者引用了其他变量，<code>-X</code>参数也不会工作。</p>
+<p>所以，总结起来就是，可以使用该参数给源码中动态传入一些简单的字符串变量。</p>
+<p>接下来，我们简单试用一下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">main</span><span class="p">.</span><span class="k">go</span> 
 <span class="nx">cat</span> <span class="nx">main</span><span class="p">.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">main</span>
 <span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
@@ -890,17 +881,16 @@ minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
 <span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="nx">main</span>
 <span class="nx">Version</span><span class="p">:</span> <span class="mf">0.1</span>
 <span class="nx">Built</span><span class="p">:</span> <span class="mi">2020</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">26</span>
-<span class="nx">OS</span><span class="o">/</span><span class="nx">Arch</span><span class="p">:</span> <span class="nx">darwin</span><span class="o">/</span><span class="nx">amd64</span></pre></td></tr></table>
-</div>
-</div>
-<p>如上示例中简单演示了，如何在构建时，给程序注入一些版本相关的信息，这样我们在每次发版时，就可以根据当前的版本、环境、构建等信息为程序注入一个详细的版本信息了。</p>
+<span class="nx">OS</span><span class="o">/</span><span class="nx">Arch</span><span class="p">:</span> <span class="nx">darwin</span><span class="o">/</span><span class="nx">amd64</span>
 
+</code></pre></td></tr></table>
+</div>
+</div><p>如上示例中简单演示了，如何在构建时，给程序注入一些版本相关的信息，这样我们在每次发版时，就可以根据当前的版本、环境、构建等信息为程序注入一个详细的版本信息了。</p>
 <p><strong>项目中使用</strong></p>
-
 <p>上面只是一个简单的示例用来演示如何利用<code>-ldflags -X importpath.name=value</code>参数来给程序动态注入一些变量值，在实际项目中可能需要维护一个相对全面和通用的版本信息，接下来一起看看项目中大概会如何使用。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -982,9 +972,10 @@ minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
 </span><span class="lnt">80
 </span><span class="lnt">81
 </span><span class="lnt">82
-</span></pre></td>
+</span><span class="lnt">83
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><span class="err">#</span> <span class="nx">首先</span><span class="err">，</span><span class="nx">在项目中维护一个version</span><span class="p">.</span><span class="nx">go的文件</span><span class="err">，</span><span class="nx">用于定义版本相关的信息</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">首先</span><span class="err">，</span><span class="nx">在项目中维护一个version</span><span class="p">.</span><span class="nx">go的文件</span><span class="err">，</span><span class="nx">用于定义版本相关的信息</span>
 <span class="err">$</span> <span class="nx">cat</span> <span class="nx">utils</span><span class="o">/</span><span class="nx">version</span><span class="p">.</span><span class="k">go</span>
 <span class="kn">package</span> <span class="nx">utils</span>
 
@@ -1065,15 +1056,15 @@ minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
 <span class="nx">CommitId</span><span class="p">:</span> <span class="nx">test</span>
 <span class="nx">Build</span> <span class="nx">Date</span><span class="p">:</span> <span class="mi">2020</span><span class="o">-</span><span class="mo">06</span><span class="o">-</span><span class="mi">26</span>
 <span class="nx">Go</span> <span class="nx">Version</span><span class="p">:</span> <span class="nx">go1</span><span class="mf">.14</span>
-<span class="nx">OS</span><span class="o">/</span><span class="nx">Arch</span><span class="p">:</span> <span class="nx">darwin</span><span class="o">/</span><span class="nx">amd64</span> </pre></td></tr></table>
-</div>
-</div>
-<p>此时，我们已经可以对程序中的版本信息进行动态维护和管理了，但是每次手动维护版本信息还是比较麻烦，因此常见的做法是使用脚本或者<code>Makefile</code>来对构建参数进行统一管理.</p>
+<span class="nx">OS</span><span class="o">/</span><span class="nx">Arch</span><span class="p">:</span> <span class="nx">darwin</span><span class="o">/</span><span class="nx">amd64</span> 
 
+</code></pre></td></tr></table>
+</div>
+</div><p>此时，我们已经可以对程序中的版本信息进行动态维护和管理了，但是每次手动维护版本信息还是比较麻烦，因此常见的做法是使用脚本或者<code>Makefile</code>来对构建参数进行统一管理.</p>
 <p>我们在项目中再增加<code>Makefile</code>来管理参数.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1116,9 +1107,9 @@ minio version RELEASE.2020-04-10T03-34-42Z</pre></td></tr></table>
 </span><span class="lnt">41
 </span><span class="lnt">42
 </span><span class="lnt">43
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ cat Makefile 
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat Makefile 
 .PHONY: list vet fmt default clean
 all: list vet fmt default clean
 BINARY=&#34;version&#34;
@@ -1160,20 +1151,15 @@ GitBranch: master
 CommitId: c1702a8
 Build Date: 2020-06-27T13:32:42+0800
 Go Version: go1.14
-OS/Arch: darwin/amd64 </pre></td></tr></table>
+OS/Arch: darwin/amd64 
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>细心的小伙伴们有没有发现，此时我们的版本输出信息和前面<code>docker</code>以及<code>kubectl</code>程序的版本信息有那么一丢丢相似了，其实目前大多数使用Golang开源的程序基本上也都是采用这种方式来管理程序的版本信息的，比如<code>kubectl</code>中的version命令:</p>
-
+</div><p>细心的小伙伴们有没有发现，此时我们的版本输出信息和前面<code>docker</code>以及<code>kubectl</code>程序的版本信息有那么一丢丢相似了，其实目前大多数使用Golang开源的程序基本上也都是采用这种方式来管理程序的版本信息的，比如<code>kubectl</code>中的version命令:</p>
 <p><a href="https://github.com/kubernetes/kubectl/blob/master/pkg/cmd/version/version.go#L38">kubectl-version</a></p>
-
 <p><a href="https://github.com/kubernetes/apimachinery/blob/master/pkg/version/types.go">kubernetes-apimachinery</a></p>
-
 <p>上面的示例代码，我放到了<a href="https://github.com/goops-top/version">go-version</a>中了，有需要的小伙伴可以去看看。</p>
-
-<hr />
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+<hr>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -1186,7 +1172,7 @@ OS/Arch: darwin/amd64 </pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-06-27
+      2020-11-01
       
         
         

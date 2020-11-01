@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>jwt-go on BGBiao的SRE人生</title>
@@ -6,11 +6,7 @@
     <description>Recent content in jwt-go on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://bgbiao.top/tags/jwt-go/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 15 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/jwt-go/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>使用jwt-go验证API</title>
       <link>https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/</link>

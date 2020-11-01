@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/salt%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -74,11 +74,9 @@
 <meta itemprop="description" content="
 背景: 新来这家公司使用Salt来作为基础配置库管理和自动化运维的工具，但是前期同事刚开始使用时只是简单使用，因此对于可用性和可靠性来说都会存在很大问题(具体可能出现的问题下面会提到)。不过作为一个专业的SRE或者运维人员，在使用一个基础组件时，必须要考虑的一个问题就是可用性和可靠性，以前使用Ansible作为配置管理和自动化运维工具时只需对ssh-key或者密码进行管理即可通过水平扩容来保证高可用，而在Salt中需要涉及到salt-minion的发现以及key的管理，接下来对高可用的Salt集群架构进行介绍和实施。
 ">
-
-
-<meta itemprop="datePublished" content="2019-12-11T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2019-12-11T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="2984">
+<meta itemprop="datePublished" content="2019-12-11T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2019-12-11T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2957">
 
 
 
@@ -474,7 +472,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2984 words </span>
+        <span class="more-meta"> 2957 words </span>
           <span class="more-meta"> 6 min read </span>
 
         
@@ -491,19 +489,17 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#单节点salt-master问题">单节点salt-master问题</a></li>
-<li><a href="#salt-master高可用架构方案">salt-master高可用架构方案</a></li>
-<li><a href="#salt-master高可用实施">salt-master高可用实施</a></li>
-<li><a href="#salt-minion接入使用">salt-minion接入使用</a></li>
-<li><a href="#salt使用问题和注意事项">salt使用问题和注意事项</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#单节点salt-master问题">单节点salt-master问题</a></li>
+        <li><a href="#salt-master高可用架构方案">salt-master高可用架构方案</a></li>
+        <li><a href="#salt-master高可用实施">salt-master高可用实施</a></li>
+        <li><a href="#salt-minion接入使用">salt-minion接入使用</a></li>
+        <li><a href="#salt使用问题和注意事项">salt使用问题和注意事项</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -513,47 +509,40 @@ if (!doNotTrack) {
       <blockquote>
 <p>背景: 新来这家公司使用<a href="https://docs.saltstack.com/en/latest/">Salt</a>来作为基础配置库管理和自动化运维的工具，但是前期同事刚开始使用时只是简单使用，因此对于可用性和可靠性来说都会存在很大问题(具体可能出现的问题下面会提到)。不过作为一个专业的SRE或者运维人员，在使用一个基础组件时，必须要考虑的一个问题就是<code>可用性</code>和<code>可靠性</code>，以前使用<a href="https://docs.ansible.com/">Ansible</a>作为配置管理和自动化运维工具时只需对<code>ssh-key</code>或者密码进行管理即可通过水平扩容来保证高可用，而在<code>Salt</code>中需要涉及到<code>salt-minion</code>的发现以及<code>key</code>的管理，接下来对<code>高可用的Salt集群架构</code>进行介绍和实施。</p>
 </blockquote>
-
 <h3 id="单节点salt-master问题">单节点salt-master问题</h3>
-
 <ol>
-<li><p>比如说2c2g的机器在管理500+左右的ECS时，就会发现异常慢，而且调用salt-api会出现异常，此时如果去检查资源使用率，就会发现cpu和load都会暴涨，这是因为在使用salt的场景中大部分会使用同步调用，此时salt相关的进程会一直占用资源，直到minion返回结果</p></li>
-
-<li><p>当单节点主机异常时，整体的salt管控端将会失效，也就意味着全量的主机将无法被统一管理，这对于任何一个基于salt的自动化管理系统来说都是一个大灾难</p></li>
+<li>
+<p>比如说2c2g的机器在管理500+左右的ECS时，就会发现异常慢，而且调用salt-api会出现异常，此时如果去检查资源使用率，就会发现cpu和load都会暴涨，这是因为在使用salt的场景中大部分会使用同步调用，此时salt相关的进程会一直占用资源，直到minion返回结果</p>
+</li>
+<li>
+<p>当单节点主机异常时，整体的salt管控端将会失效，也就意味着全量的主机将无法被统一管理，这对于任何一个基于salt的自动化管理系统来说都是一个大灾难</p>
+</li>
 </ol>
-
 <p>因此，基于以上考虑，salt-master高可用架构的构建对于任何一个<code>生产环境</code>的自动化基础设施来讲都是刻不容缓的。</p>
-
 <h3 id="salt-master高可用架构方案">salt-master高可用架构方案</h3>
-
 <p><a href="https://docs.saltstack.com/en/master/topics/highavailability/index.html">salt高可用方案</a></p>
-
-<p>在salt的官方文档中提供了三种高可用的方案:
-- <a href="https://docs.saltstack.com/en/master/topics/tutorials/multimaster.html#tutorial-multi-master">多Master结构</a>: 该种方式需要在<code>minion</code>中配置多个master，此时默认所有的master都是在线的，同时多个master必须共享相同的<code>cryptographic keys</code>，而且<code>minion keys</code>必须在所有的master节点单独允许，此外还需要<code>file_roots</code>和<code>pillar_roots</code>保持同步
-- 故障切换的多Master结构: 同上，都是多Master架构，默认情况下采用的是顺序master，不过可以通过<code>master_type</code>参数修改为<code>failover</code>，以此来保障多Master节点之间的故障切换(通常failover需要<code>master_alive_interval</code>和<code>master_shuffle: True</code>参数支持)
-- <a href="https://docs.saltstack.com/en/master/topics/topology/syndic.html#syndic">syndic</a>: salt-syndic其实不能算是一种严格的高可用架构，它有点儿类似代理的方式，即在主控master节点下设置syndic节点，由syndic节点来管控旗下的minion节点
-- [多Master结构下的syndic]: 同上</p>
-
-<p>大概了解了集中高可用方案之后，我们做一个简单分析:<br />
-1. 首先我们为了保障高可用，需要允许任意节点都是高可用的，因此排除<code>syndic</code>方案
-2. 在<code>多master</code>，<code>故障切换的多master</code>和<code>多master下的syndic</code>中，在可用用性和性能承受范围内考虑架构的简洁性，排除<code>多master下的syndic</code>方案</p>
-
+<p>在salt的官方文档中提供了三种高可用的方案:</p>
+<ul>
+<li><a href="https://docs.saltstack.com/en/master/topics/tutorials/multimaster.html#tutorial-multi-master">多Master结构</a>: 该种方式需要在<code>minion</code>中配置多个master，此时默认所有的master都是在线的，同时多个master必须共享相同的<code>cryptographic keys</code>，而且<code>minion keys </code>必须在所有的master节点单独允许，此外还需要<code>file_roots</code>和<code>pillar_roots</code>保持同步</li>
+<li>故障切换的多Master结构: 同上，都是多Master架构，默认情况下采用的是顺序master，不过可以通过<code>master_type</code>参数修改为<code>failover</code>，以此来保障多Master节点之间的故障切换(通常failover需要<code>master_alive_interval</code>和<code>master_shuffle: True</code>参数支持)</li>
+<li><a href="https://docs.saltstack.com/en/master/topics/topology/syndic.html#syndic">syndic</a>: salt-syndic其实不能算是一种严格的高可用架构，它有点儿类似代理的方式，即在主控master节点下设置syndic节点，由syndic节点来管控旗下的minion节点</li>
+<li></li>
+</ul>
+<p>大概了解了集中高可用方案之后，我们做一个简单分析:</p>
+<ol>
+<li>首先我们为了保障高可用，需要允许任意节点都是高可用的，因此排除<code>syndic</code>方案</li>
+<li>在<code>多master</code>，<code>故障切换的多master</code>和<code>多master下的syndic</code>中，在可用用性和性能承受范围内考虑架构的简洁性，排除<code>多master下的syndic</code>方案</li>
+</ol>
 <p>因此，最终可供我们选择的即为<code>多master</code>方案，至于<code>failover</code>其实只是<code>多master</code>下的一种类型。</p>
-
 <h3 id="salt-master高可用实施">salt-master高可用实施</h3>
-
 <p><code>注意:</code> 在<code>多Master结构</code>中也提到了，<code>cryptographic key</code>和<code>file_roots</code>以及<code>pillar_roots</code>需要保持同步，我们这里使用共享存储方式来实现多master节点的文件同步。</p>
-
 <p>如果使用的是阿里云，可以使用<a href="https://www.aliyun.com/product/nas?source=5176.11533457&amp;userCode=n0qkvlxu&amp;type=copy">NAS</a>服务来实现多主机的共享文件存储.</p>
-
-<p><a href="https://www.aliyun.com/product/nas?source=5176.11533457&amp;userCode=n0qkvlxu&amp;type=copy"><img src="https://tva1.sinaimg.cn/large/006tNbRwly1g9sqdlv593j316i0eun0l.jpg" alt="NAS存储" /></a></p>
-
+<p><a href="https://www.aliyun.com/product/nas?source=5176.11533457&amp;userCode=n0qkvlxu&amp;type=copy"><img src="https://tva1.sinaimg.cn/large/006tNbRwly1g9sqdlv593j316i0eun0l.jpg" alt="NAS存储"></a></p>
 <p>如果是非云，或者非阿里云的环境，可以采用传统的<code>NFS</code>存储方式来实现共享存储，不过<code>NFS</code>仅提供了共享，却不保证高可用性，如果需要大规模使用也是需要考虑备份错输。另外其他的方式就是采用<code>GlusterFS</code>或者<code>CephFS</code>之类的分布式共享存储方案。因此在迁移迁移阶段，我们先采用<code>GlusterFS</code>来提供底层的高可用的共性存储(后期会直接迁移到阿里云的NAS服务)</p>
-
 <p><strong>1.创建一个glusterfs volume</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -589,9 +578,10 @@ if (!doNotTrack) {
 </span><span class="lnt">34
 </span><span class="lnt">35
 </span><span class="lnt">36
-</span></pre></td>
+</span><span class="lnt">37
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 创建一个salt卷(复制卷)
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 创建一个salt卷(复制卷)
 $ gluster volume create salt replica 2 node4:/data/salt node5:/data/salt force
 
 # 查看当前gluster集群下的volume(也供给k8s中的自建mysql使用)
@@ -626,15 +616,15 @@ $ cat /etc/hosts
 
 $ mount -t glusterfs 10.0.21.73:/salt /opt/data/salt-data/
 $ df -H | grep /opt/data/
-10.0.21.73:/salt  215G     0  215G    0% /opt/data/salt-data</pre></td></tr></table>
-</div>
-</div>
-<p><strong>2.修改salt-master配置文件</strong></p>
+10.0.21.73:/salt  215G     0  215G    0% /opt/data/salt-data
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>2.修改salt-master配置文件</strong></p>
 <p><code>注意:</code> 每次master接收minion的认证后会将认证文件统一存放在<code>pki_dir</code>目录下，如果是在单master像多Master改造，需要保持该文件的全量同步</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -674,9 +664,10 @@ $ df -H | grep /opt/data/
 </span><span class="lnt">38
 </span><span class="lnt">39
 </span><span class="lnt">40
-</span></pre></td>
+</span><span class="lnt">41
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># salt-master-1
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># salt-master-1
 $ grep -v ^#  /etc/salt/master  | grep -v ^$
 interface: 10.0.217.78
 pki_dir: /opt/data/salt-data/pki/master
@@ -715,13 +706,14 @@ $ salt-key -a 10.0.79.90 -y
 
 [root@salt-master-1 ~]# salt 10.0.79.90 test.ping
 10.0.79.90:
-    True</pre></td></tr></table>
+    True
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>3.修改file_roots和pillar_sls目录</strong></p>
+</div><p><strong>3.修改file_roots和pillar_sls目录</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -757,9 +749,10 @@ $ salt-key -a 10.0.79.90 -y
 </span><span class="lnt">34
 </span><span class="lnt">35
 </span><span class="lnt">36
-</span></pre></td>
+</span><span class="lnt">37
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 修改salt-master相关配置
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 修改salt-master相关配置
 # 增加file_roots目录(默认在/srv/salt/目录下)
 $ grep -v ^#  /etc/salt/master  | grep -v ^$
 interface: 10.0.79.88
@@ -794,15 +787,15 @@ Total states run:     25
     Found 3 items
     drwxr-x--x   - root   hadoop          0 2018-12-03 20:05 /hive/dw
     drwxr-x--x   - root   hadoop          0 2019-04-02 11:03 /hive/ods
-    drwxr-x--x   - hadoop hadoop          0 2019-07-18 21:26 /hive/rpt</pre></td></tr></table>
-</div>
-</div>
-<p><code>注意:</code>在新的master节点验证完毕后，将全部master节点的<code>/etc/salt/master</code>配置文件进行同步(<code>interface</code>参数需要为指定的地址)即可.</p>
+    drwxr-x--x   - hadoop hadoop          0 2019-07-18 21:26 /hive/rpt
 
+</code></pre></td></tr></table>
+</div>
+</div><p><code>注意:</code>在新的master节点验证完毕后，将全部master节点的<code>/etc/salt/master</code>配置文件进行同步(<code>interface</code>参数需要为指定的地址)即可.</p>
 <h3 id="salt-minion接入使用">salt-minion接入使用</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -819,9 +812,10 @@ Total states run:     25
 </span><span class="lnt">15
 </span><span class="lnt">16
 </span><span class="lnt">17
-</span></pre></td>
+</span><span class="lnt">18
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 安装salt-minion
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 安装salt-minion
 $ yum install salt-minion -y
 
 # 修改salt-minion配置文件(id为唯一标识salt-minion)
@@ -837,13 +831,13 @@ id: 10.0.79.90
 $ systemctl daemon-reload &amp;&amp; systemctl restart salt-minion
 
 # salt-master手动同意请求(可用设置成定期accept all)
-$ salt-key -a 10.0.79.90 -y</pre></td></tr></table>
-</div>
-</div>
-<h3 id="salt使用问题和注意事项">salt使用问题和注意事项</h3>
+$ salt-key -a 10.0.79.90 -y
 
-<ul class="task-list">
-<li><label><input type="checkbox" checked disabled class="task-list-item"> master设备会为每个minion的auth-request请求计算签名。 在有许多minions和频繁的auth请求时，这可以消耗掉master服务器上相当多的CPU资源.</label></li>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="salt使用问题和注意事项">salt使用问题和注意事项</h3>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> master设备会为每个minion的auth-request请求计算签名。 在有许多minions和频繁的auth请求时，这可以消耗掉master服务器上相当多的CPU资源.</li>
 </ul>
     </div>
 

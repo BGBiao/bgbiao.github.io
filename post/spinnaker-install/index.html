@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.58.2" />
+<meta name="generator" content="Hugo 0.77.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/spinnaker-install/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,15 +69,13 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/spinnaker-install/" />
 <meta property="article:published_time" content="2010-08-26T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-15T16:53:30+08:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="name" content="Spinnaker国内生产环境级别集群搭建">
 <meta itemprop="description" content="
 前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用minio作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。
 ">
-
-
-<meta itemprop="datePublished" content="2010-08-26T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-01-15T16:53:30&#43;08:00" />
+<meta itemprop="datePublished" content="2010-08-26T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
 <meta itemprop="wordCount" content="4135">
 
 
@@ -491,19 +489,14 @@ if (!doNotTrack) {
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#基本环境准备">基本环境准备</a></li>
-<li><a href="#spinnaker集群部署">Spinnaker集群部署</a>
-<ul>
-<li><a href="#注意事项">注意事项</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#基本环境准备">基本环境准备</a></li>
+        <li><a href="#spinnaker集群部署">Spinnaker集群部署</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
@@ -513,21 +506,17 @@ if (!doNotTrack) {
       <blockquote>
 <p>前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用<code>minio</code>作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。</p>
 </blockquote>
-
 <p><strong>前提条件</strong></p>
-
 <ul>
 <li>1.spinnaker机器可直连外网(科学上网)</li>
 <li>2.minio持久化层</li>
 <li>3.jenkins(基本认证)</li>
 </ul>
-
 <h3 id="基本环境准备">基本环境准备</h3>
-
 <p><strong>1. 网络环境配置</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -540,9 +529,9 @@ if (!doNotTrack) {
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 访问国外网站(准备一个翻墙代理)
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 访问国外网站(准备一个翻墙代理)
 $ export http_proxy=http://172.29.202.140:8118
 $ export https_proxy=http://172.29.202.140:8118
 $ curl www.google.com -I
@@ -554,15 +543,14 @@ Content-Type: text/html; charset=ISO-8859-1
 P3P: CP=&#34;This is not a P3P policy! See g.co/p3phelp for more info.&#34;
 Server: gws
 X-XSS-Protection: 0
-......</pre></td></tr></table>
+......
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>2. minio持久化</strong></p>
-
+</div><p><strong>2. minio持久化</strong></p>
 <p><a href="https://min.io/">minio-开源的对象存储引擎</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -587,9 +575,11 @@ X-XSS-Protection: 0
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
-</span></pre></td>
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># minio 持久化层(真生生产环境需要高可用)
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># minio 持久化层(真生生产环境需要高可用)
 $  docker run -itd  -p 9000:9000 -v /opt/data/minio:/data/ --name minio1 -e &#34;MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE&#34; -e &#34;MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&#34; --restart=on-failure:3 minio/minio server /data
 0719d218a9bcd83c730b88234bb22f75b37fd993fb3c149cf70638ea6c811009
 $  docker ps -l
@@ -613,32 +603,29 @@ Object API (Amazon S3 compatible):
    Java:       https://docs.min.io/docs/java-client-quickstart-guide
    Python:     https://docs.min.io/docs/python-client-quickstart-guide
    JavaScript: https://docs.min.io/docs/javascript-client-quickstart-guide
-   .NET:       https://docs.min.io/docs/dotnet-client-quickstart-guide</pre></td></tr></table>
-</div>
-</div>
-<p><strong>3. Jenkins(可选)</strong></p>
+   .NET:       https://docs.min.io/docs/dotnet-client-quickstart-guide
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>3. Jenkins(可选)</strong></p>
 <p>Spinnaker主要用来做CD，也就是持续部署，同时也包含了一些应用管理以及部署流程上的相关特性。因此，在标准的CI/CD流水线中其实是可以融合在一起的，所以Jenkins可有可无，如果有的话，可以直接从Spinnaker中进行任务触发然后自动化部署。</p>
-
 <p><code>注意:Jenkins使用基本认证是可以直接接入Spinnaker集群的，如果接了LDAP认证的可能会有些问题(无法获取到job信息)</code></p>
-
 <h3 id="spinnaker集群部署">Spinnaker集群部署</h3>
-
 <p><a href="https://www.spinnaker.io/guides/developer/getting-set-up/">Spinnaker部署</a></p>
-
-<p><strong>0.整体步骤</strong>
-- 安装Halyard
-- 配置存储服务
-- 选择一个云提供商(Kubernetes)
-- 配置部署模式
-- 执行<code>hal deploy apply</code>进行部署</p>
-
+<p><strong>0.整体步骤</strong></p>
+<ul>
+<li>安装Halyard</li>
+<li>配置存储服务</li>
+<li>选择一个云提供商(Kubernetes)</li>
+<li>配置部署模式</li>
+<li>执行<code>hal deploy apply</code>进行部署</li>
+</ul>
 <p>** 1.安装hal工具**</p>
-
 <p><code>注意:Spinnaker部署环境必须是Ubuntu或Debian，当然官方也提供了Docker容器部署方式。推荐先使用Ubuntu机器进行安装。</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -683,9 +670,11 @@ Object API (Amazon S3 compatible):
 </span><span class="lnt">43
 </span><span class="lnt">44
 </span><span class="lnt">45
-</span></pre></td>
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 进入ubuntu安装hal环境
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 进入ubuntu安装hal环境
 $ curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/debian/InstallHalyard.sh
 $ apt-get update &amp;&amp; apt-get install curl vim -y
 $ export http_proxy=http://172.29.202.140:8118
@@ -729,35 +718,39 @@ To use the auto-completion either restart your shell, or run
 # 确认hal版本以及相关情况
 $ hal -v
 1.22.0-20190718020510
-$ . /home/spinnaker/.bashrc</pre></td></tr></table>
+$ . /home/spinnaker/.bashrc
+
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>2. 配置hal的代理</strong>
-&gt;如果<code>hal</code>使用默认JVM参数使用时，可能会出现如下情况(仅在国内):</p>
+</div><p><strong>2. 配置hal的代理</strong></p>
+<blockquote>
+<p>如果<code>hal</code>使用默认JVM参数使用时，可能会出现如下情况(仅在国内):</p>
+</blockquote>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">- Get released versions
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">- Get released versions
   Failure
 Problems in Global:
 ! ERROR Could not load &#34;versions.yml&#34; from config bucket:
   Connection reset.
 
-- Failed to load available Spinnaker versions.</pre></td></tr></table>
+- Failed to load available Spinnaker versions.
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><code>注意:为Halyard设置代理，因为每次更新需要去墙外直接获取数据.修改DEFAULT_JVM_OPTS参数(export http_proxy会直接影响整个终端环境)</code></p>
+</div><p><code>注意:为Halyard设置代理，因为每次更新需要去墙外直接获取数据.修改DEFAULT_JVM_OPTS参数(export http_proxy会直接影响整个终端环境)</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -789,9 +782,10 @@ Problems in Global:
 </span><span class="lnt">30
 </span><span class="lnt">31
 </span><span class="lnt">32
-</span></pre></td>
+</span><span class="lnt">33
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 修改/opt/halyard/bin/halyard文件(最后一定要给localhost和example.com设置不代理)
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 修改/opt/halyard/bin/halyard文件(最后一定要给localhost和example.com设置不代理)
 # example.com即为最终想要访问Spinnaker集群的域名
 DEFAULT_JVM_OPTS=&#39;&#34;-Djava.security.egd=file:/dev/./urandom&#34; &#34;-Dspring.config.additional-location=/opt/spinnaker/config/&#34; &#34;-Dhttp.proxyHost=172.29.202.140&#34; &#34;-Dhttp.proxyPort=8118&#34; &#34;-Dhttps.proxyHost=172.29.202.140&#34; &#34;-Dhttps.proxyPort=8118&#34; &#34;-Dhttp.nonProxyHosts=\&#34;localhost|*.example.com\&#34;&#34;&#39;
 
@@ -822,15 +816,15 @@ $ hal version list
  - 1.15.3 (ExtremelyWickedShockinglyEvilAndVile):
    Changelog: https://gist.github.com/spinnaker-release/bed366b82e09498dbb536c098ac11f14
    Published: Tue Aug 27 05:09:21 CST 2019
-   (Requires Halyard &gt;= 1.17)</pre></td></tr></table>
-</div>
-</div>
-<p><code>注意:每个hal的版本都会对应一个可用的Spinnaker的版本列表,其实挺恶心的(镜像版本不一致)</code></p>
+   (Requires Halyard &gt;= 1.17)
 
+</code></pre></td></tr></table>
+</div>
+</div><p><code>注意:每个hal的版本都会对应一个可用的Spinnaker的版本列表,其实挺恶心的(镜像版本不一致)</code></p>
 <p><strong>3. 配置kubectl环境</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -842,9 +836,10 @@ $ hal version list
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span></pre></td>
+</span><span class="lnt">13
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">$ apt install snapd -y
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ apt install snapd -y
 $ snap install kubectl --classic
 
 $ kubectl  version
@@ -855,13 +850,14 @@ $ kubectl  --kubeconfig kubeconfig get nodes
 NAME              STATUS   ROLES    AGE   VERSION
 k8s-master-1   Ready    master   90d   v1.14.1
 k8s-node-1     Ready    &lt;none&gt;   90d   v1.14.2
-k8s-node-2     Ready    &lt;none&gt;   90d   v1.14.2</pre></td></tr></table>
+k8s-node-2     Ready    &lt;none&gt;   90d   v1.14.2
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>4. 配置spinnaker环境</strong></p>
+</div><p><strong>4. 配置spinnaker环境</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1134,9 +1130,10 @@ k8s-node-2     Ready    &lt;none&gt;   90d   v1.14.2</pre></td></tr></table>
 </span><span class="lnt">271
 </span><span class="lnt">272
 </span><span class="lnt">273
-</span></pre></td>
+</span><span class="lnt">274
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 开始k8s支持
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 开始k8s支持
 $ hal config provider kubernetes enable
 # 开启jenkins支持
 $ hal config ci jenkins enable
@@ -1408,19 +1405,17 @@ Date: Wed, 28 Aug 2019 03:36:02 GMT
 Etag: &#34;453f-58df54dd71b00&#34;
 Last-Modified: Thu, 18 Jul 2019 14:19:56 GMT
 Server: Apache/2.4.38 (Debian)
-Vary: Accept-Encoding</pre></td></tr></table>
-</div>
-</div>
-<p><strong>5. Spinnaker使用</strong></p>
+Vary: Accept-Encoding
 
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>5. Spinnaker使用</strong></p>
 <p><code>注意:deck组件是spinnaker的ui,gate组件为spinnaker的api网关，因此这两个组件的域名必须都能解析</code></p>
-
 <p>在用户本地绑定<code>k8s-node-ip  deck-spinnaker.example.com gate-spinnaker.example.com</code> hosts配置后即可通过<a href="http://deck-spinnaker.example.com">http://deck-spinnaker.example.com</a> 进行访问.</p>
-
 <p><strong>6. Spinnaker升级</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1479,9 +1474,11 @@ Vary: Accept-Encoding</pre></td></tr></table>
 </span><span class="lnt">57
 </span><span class="lnt">58
 </span><span class="lnt">59
-</span></pre></td>
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 更新spinnaker配置的config文件
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 更新spinnaker配置的config文件
 hal config version edit --version 1.15.2
 
 # 查看1.15.2相关的镜像
@@ -1539,17 +1536,17 @@ artifactSources:
   debianRepository: https://dl.bintray.com/spinnaker-releases/debians
   dockerRegistry: gcr.io/spinnaker-marketplace
   googleImageProject: marketplace-spinnaker-release
-  gitPrefix: https://github.com/spinnaker</pre></td></tr></table>
-</div>
-</div>
-<p><code>注意</code>:每个版本的镜像都是不同，此时需要下载相关镜像，并需要将镜像标签在<code>/home/spinnaker/.hal/default/service-settings/</code>目录下的文件进行逐一更新。</p>
+  gitPrefix: https://github.com/spinnaker
 
+
+</code></pre></td></tr></table>
+</div>
+</div><p><code>注意</code>:每个版本的镜像都是不同，此时需要下载相关镜像，并需要将镜像标签在<code>/home/spinnaker/.hal/default/service-settings/</code>目录下的文件进行逐一更新。</p>
 <h4 id="注意事项">注意事项</h4>
-
 <p>作者在安装该环境时，<code>kubernetes</code>版本为1.14.3，<code>hal</code>的版本为1.22.0-20190718020510，<code>spinnaker</code>的版本为<code>1.14.1</code> ，而当<code>Kubernetes</code>升级到1.15以上版本后，<code>Deployment</code>相关的API版本由<code>apps/v1beta1</code>等已经更新为<code>apps/v1</code>(非稳定版本已经废弃)，导致再次安装<code>spinnaker</code>时出现类似如下错误:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -1557,22 +1554,22 @@ artifactSources:
 </span><span class="lnt">6
 </span><span class="lnt">7
 </span><span class="lnt">8
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">Failure
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">Failure
 Problems in Global:
 ! ERROR Failed to deploy manifest:
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
 ........
-........</pre></td></tr></table>
+........
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><strong>解决方案</strong></p>
+</div><p><strong>解决方案</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1582,9 +1579,9 @@ metadata:
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># 更新halyard
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 更新halyard
 $ update-halyard
 # 修改hal的默认JVM配置，增加代理配置
 $ vi /opt/halyard/bin/halyard 
@@ -1593,14 +1590,12 @@ $ hal shutdown
 $ hal -v
 1.27.0-20191107172815
 # 重新执行spinnaker部署安装
-$ hal deploy apply</pre></td></tr></table>
+$ hal deploy apply
+</code></pre></td></tr></table>
 </div>
-</div>
-<p><a href="https://github.com/spinnaker/spinnaker/issues/4995">参考文章</a></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球" /></p>
-
-<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号" /></p>
+</div><p><a href="https://github.com/spinnaker/spinnaker/issues/4995">参考文章</a></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
     </div>
 
     
@@ -1613,7 +1608,7 @@ $ hal deploy apply</pre></td></tr></table>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-01-15
+      2020-11-01
       
         
         
