@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.77.0" />
+<meta name="generator" content="Hugo 0.82.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.01e3d8f03f142b439a96010ab309f91dd8b973cdd2248b73944b9b0db931248a.css" integrity="sha256-AePY8D8UK0OalgEKswn5Hdi5c83SJItzlEubDbkxJIo=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,21 +67,17 @@
 OCR
 光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" />
-<meta property="article:published_time" content="2017-12-09T15:59:29+00:00" />
-<meta property="article:modified_time" content="2017-12-09T15:59:29+00:00" />
+<meta property="og:url" content="https://bgbiao.top/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2017-12-09T15:59:29&#43;00:00" />
+<meta property="article:modified_time" content="2017-12-09T15:59:29&#43;00:00" />
+
 <meta itemprop="name" content="开源OCR引擎tesseract的构建使用">
 <meta itemprop="description" content="简介
 OCR
-光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。">
-<meta itemprop="datePublished" content="2017-12-09T15:59:29+00:00" />
-<meta itemprop="dateModified" content="2017-12-09T15:59:29+00:00" />
+光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。"><meta itemprop="datePublished" content="2017-12-09T15:59:29&#43;00:00" />
+<meta itemprop="dateModified" content="2017-12-09T15:59:29&#43;00:00" />
 <meta itemprop="wordCount" content="3153">
-
-
-
-<meta itemprop="keywords" content="OCR,Tesseract4.0,Docker," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="OCR,Tesseract4.0,Docker," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="开源OCR引擎tesseract的构建使用"/>
 <meta name="twitter:description" content="简介
 OCR
@@ -158,42 +154,6 @@ if (!doNotTrack) {
           <div class="mobile-menu-parent">
             <span class="mobile-submenu-open"></span>
             <a href="https://bgbiao.top/">
-              Golang相关文档
-            </a>
-          </div>
-          <ul class="mobile-submenu-list">
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
-              </li>
-            
-              <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
-              </li>
-            
-          </ul>
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          
-            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
-          
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          <div class="mobile-menu-parent">
-            <span class="mobile-submenu-open"></span>
-            <a href="https://bgbiao.top/">
               学习文档
             </a>
           </div>
@@ -204,6 +164,42 @@ if (!doNotTrack) {
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
         
       </li>
     
@@ -379,23 +375,39 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
           <ul class="submenu">
             
               <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
               </li>
             
           </ul>
@@ -410,22 +422,6 @@ if (!doNotTrack) {
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
-
-        
-
-      </li>
-    
-        <li class="menu-item">
-        
-          
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
-          <ul class="submenu">
-            
-              <li>
-                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-          </ul>
 
         
 
@@ -1236,7 +1232,7 @@ Tesseract Open Source OCR Engine v4.00.00alpha with Leptonica
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">

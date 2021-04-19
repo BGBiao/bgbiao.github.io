@@ -35,7 +35,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.77.0" />
+<meta name="generator" content="Hugo 0.82.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" />
@@ -56,7 +56,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.01e3d8f03f142b439a96010ab309f91dd8b973cdd2248b73944b9b0db931248a.css" integrity="sha256-AePY8D8UK0OalgEKswn5Hdi5c83SJItzlEubDbkxJIo=" media="screen" crossorigin="anonymous">
 
 
 
@@ -71,23 +71,19 @@
 笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
 鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" />
-<meta property="article:published_time" content="2020-04-25T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-04-25T00:00:00+00:00" />
+<meta property="og:url" content="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-04-25T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-04-25T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="kafka生产规划和运维">
 <meta itemprop="description" content="
 前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
 
 笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
-鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.">
-<meta itemprop="datePublished" content="2020-04-25T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2020-04-25T00:00:00+00:00" />
+鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识."><meta itemprop="datePublished" content="2020-04-25T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-04-25T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="25324">
-
-
-
-<meta itemprop="keywords" content="运维,kafka," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="运维,kafka," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="kafka生产规划和运维"/>
 <meta name="twitter:description" content="
 前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
@@ -166,42 +162,6 @@ if (!doNotTrack) {
           <div class="mobile-menu-parent">
             <span class="mobile-submenu-open"></span>
             <a href="https://bgbiao.top/">
-              Golang相关文档
-            </a>
-          </div>
-          <ul class="mobile-submenu-list">
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
-              </li>
-            
-              <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
-              </li>
-            
-          </ul>
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          
-            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
-          
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          <div class="mobile-menu-parent">
-            <span class="mobile-submenu-open"></span>
-            <a href="https://bgbiao.top/">
               学习文档
             </a>
           </div>
@@ -212,6 +172,42 @@ if (!doNotTrack) {
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
         
       </li>
     
@@ -387,23 +383,39 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
           <ul class="submenu">
             
               <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
               </li>
             
           </ul>
@@ -418,22 +430,6 @@ if (!doNotTrack) {
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
-
-        
-
-      </li>
-    
-        <li class="menu-item">
-        
-          
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
-          <ul class="submenu">
-            
-              <li>
-                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-          </ul>
 
         
 
@@ -2382,7 +2378,7 @@ test-bgbiao     test-full-push    0          61299           61337           38 
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">

@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.77.0" />
+<meta name="generator" content="Hugo 0.82.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.01e3d8f03f142b439a96010ab309f91dd8b973cdd2248b73944b9b0db931248a.css" integrity="sha256-AePY8D8UK0OalgEKswn5Hdi5c83SJItzlEubDbkxJIo=" media="screen" crossorigin="anonymous">
 
 
 
@@ -72,9 +72,10 @@ context: 使用context中的cancel，这种模式是主线程通知子线程结�
 sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方法设置等待子goroutine的数量减1，当等待数量为0时，Wait函数退出.
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" />
-<meta property="article:published_time" content="2019-12-13T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-12-13T00:00:00+00:00" />
+<meta property="og:url" content="https://bgbiao.top/post/goroutine%E4%B8%8E%E4%B8%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%80%9A%E4%BF%A1/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2019-12-13T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2019-12-13T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="Goroutine与主进程的通信">
 <meta itemprop="description" content="还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过context这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。
 子goroutine与主线程同步的集中方式:
@@ -82,15 +83,10 @@ sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方
 channel: 每个goroutine往主进程的chan写数据，然后由主进程去读取，直到读取完了全部goroutine的chan就算运行完毕，此时主进程即可正常退出。这种方式是子线程通知主线程结束.
 context: 使用context中的cancel，这种模式是主线程通知子线程结束
 sync.WaitGroup: 通过Add方法设置等待子goroutine的数量，使用Done方法设置等待子goroutine的数量减1，当等待数量为0时，Wait函数退出.
-">
-<meta itemprop="datePublished" content="2019-12-13T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2019-12-13T00:00:00+00:00" />
+"><meta itemprop="datePublished" content="2019-12-13T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-12-13T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="1398">
-
-
-
-<meta itemprop="keywords" content="Golang,goroutine,进程通信,线程," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="Golang,goroutine,进程通信,线程," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Goroutine与主进程的通信"/>
 <meta name="twitter:description" content="还记得前半年去某条面试，面试小哥问我，当一个进程启动多个goroutine时，某个goroutine挂了，如何让主进程知道，当时大概知道可以通过context这个包来实现，但是当时没有具体去了解和熟悉这块，在这里再总结下。
 子goroutine与主线程同步的集中方式:
@@ -171,42 +167,6 @@ if (!doNotTrack) {
           <div class="mobile-menu-parent">
             <span class="mobile-submenu-open"></span>
             <a href="https://bgbiao.top/">
-              Golang相关文档
-            </a>
-          </div>
-          <ul class="mobile-submenu-list">
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
-              </li>
-            
-              <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
-              </li>
-            
-          </ul>
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          
-            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
-          
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          <div class="mobile-menu-parent">
-            <span class="mobile-submenu-open"></span>
-            <a href="https://bgbiao.top/">
               学习文档
             </a>
           </div>
@@ -217,6 +177,42 @@ if (!doNotTrack) {
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
         
       </li>
     
@@ -392,23 +388,39 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
           <ul class="submenu">
             
               <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
               </li>
             
           </ul>
@@ -423,22 +435,6 @@ if (!doNotTrack) {
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
-
-        
-
-      </li>
-    
-        <li class="menu-item">
-        
-          
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
-          <ul class="submenu">
-            
-              <li>
-                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-          </ul>
 
         
 
@@ -1089,7 +1085,7 @@ if (!doNotTrack) {
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">

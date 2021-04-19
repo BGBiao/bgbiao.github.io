@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>BGBiao的SRE人生</title>
+    <title>首页 on BGBiao的SRE人生</title>
     <link>https://bgbiao.top/</link>
-    <description>Recent content on BGBiao的SRE人生</description>
+    <description>Recent content in 首页 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 19 Apr 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://bgbiao.top/index.xml" rel="self" type="application/rss+xml" />
     
@@ -2346,7 +2346,8 @@ minio version RELEASE.2020-04-10T03-34-42Z
 
 &lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;从上面的版本输出记录中我们其实可以看出，版本信息中不仅记录了基本的构建环境和版本信息，同时还记录了commitId，所以这些信息应该是在build时动态传入到程序中的，大概猜测一下应该就是提前在程序的version相关代码中预留好版本相关的变量，然后在构建的时候对变量进行赋值，以此来实现变量的动态注入。&lt;/p&gt;
+&lt;/div&gt;&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;从上面的版本输出记录中我们其实可以看出，版本信息中不仅记录了基本的构建环境和版本信息，同时还记录了commitId，所以这些信息应该是在build时动态传入到程序中的，大概猜测一下应该就是提前在程序的version相关代码中预留好版本相关的变量，然后在构建的时候对变量进行赋值，以此来实现变量的动态注入。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;小试牛刀&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;在大概猜测后，查看到相关文档中有说明可以在构建时使用参数&lt;code&gt;-ldflags -X importpath.name=value&lt;/code&gt;来动态注入变量。在官方稳定&lt;a href=&#34;https://golang.org/cmd/link/&#34;&gt;link&lt;/a&gt;中有详细说明:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;

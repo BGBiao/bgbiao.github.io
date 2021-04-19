@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.77.0" />
+<meta name="generator" content="Hugo 0.82.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/" />
@@ -54,7 +54,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.01e3d8f03f142b439a96010ab309f91dd8b973cdd2248b73944b9b0db931248a.css" integrity="sha256-AePY8D8UK0OalgEKswn5Hdi5c83SJItzlEubDbkxJIo=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,21 +67,17 @@
 无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/" />
-<meta property="article:published_time" content="2020-06-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-06-14T00:00:00+00:00" />
+<meta property="og:url" content="https://bgbiao.top/post/kafka%E7%BB%8F%E5%85%B8%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AF%A6%E8%A7%A3/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-06-14T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-06-14T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="kafka经典面试题详解">
 <meta itemprop="description" content="
 无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
-">
-<meta itemprop="datePublished" content="2020-06-14T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2020-06-14T00:00:00+00:00" />
+"><meta itemprop="datePublished" content="2020-06-14T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-06-14T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="7472">
-
-
-
-<meta itemprop="keywords" content="kafka,运维,面试," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="kafka,运维,面试," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="kafka经典面试题详解"/>
 <meta name="twitter:description" content="
 无论是作为面试官，还是应聘者，我都接触过很多 Kafka 面试题。而在最近面试了很多候选人，发现写了熟悉Kafka，但是对于Kafka相关的知识却是只知道大概用处，简单搭建和使用。我想说，虽然我们是SRE(可靠性工程师)，但不论你是业务层的SRE还是基础设施层的SRE，我们都需要对业务方的使用场景有足够理解，或者对我们要提供的服务有足够的了解才行，这样你才能整体的保证你的业务连续性以及业务可靠性。因此，专门总结了如下经典的kafka面试详解。
@@ -158,42 +154,6 @@ if (!doNotTrack) {
           <div class="mobile-menu-parent">
             <span class="mobile-submenu-open"></span>
             <a href="https://bgbiao.top/">
-              Golang相关文档
-            </a>
-          </div>
-          <ul class="mobile-submenu-list">
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
-              </li>
-            
-              <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
-              </li>
-            
-          </ul>
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          
-            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
-          
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          <div class="mobile-menu-parent">
-            <span class="mobile-submenu-open"></span>
-            <a href="https://bgbiao.top/">
               学习文档
             </a>
           </div>
@@ -204,6 +164,42 @@ if (!doNotTrack) {
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
         
       </li>
     
@@ -379,23 +375,39 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
           <ul class="submenu">
             
               <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
               </li>
             
           </ul>
@@ -410,22 +422,6 @@ if (!doNotTrack) {
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
-
-        
-
-      </li>
-    
-        <li class="menu-item">
-        
-          
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
-          <ul class="submenu">
-            
-              <li>
-                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-          </ul>
 
         
 
@@ -821,7 +817,7 @@ if (!doNotTrack) {
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">

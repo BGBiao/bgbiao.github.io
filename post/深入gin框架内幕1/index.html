@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.77.0" />
+<meta name="generator" content="Hugo 0.82.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.01e3d8f03f142b439a96010ab309f91dd8b973cdd2248b73944b9b0db931248a.css" integrity="sha256-AePY8D8UK0OalgEKswn5Hdi5c83SJItzlEubDbkxJIo=" media="screen" crossorigin="anonymous">
 
 
 
@@ -68,21 +68,17 @@
 Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini但性能更好的API框架，不同于谢大主导的Beegoweb框架，后者更像是Python语言中的Django框架，内部包含了开发一个web程序所需的各种组件。
 如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/" />
-<meta property="article:published_time" content="2020-01-11T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-11T00:00:00+00:00" />
+<meta property="og:url" content="https://bgbiao.top/post/%E6%B7%B1%E5%85%A5gin%E6%A1%86%E6%9E%B6%E5%86%85%E5%B9%951/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-01-11T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2020-01-11T00:00:00&#43;00:00" />
+
 <meta itemprop="name" content="深入Gin框架内幕1">
 <meta itemprop="description" content="Gin框架介绍
 Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini但性能更好的API框架，不同于谢大主导的Beegoweb框架，后者更像是Python语言中的Django框架，内部包含了开发一个web程序所需的各种组件。
-如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。">
-<meta itemprop="datePublished" content="2020-01-11T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2020-01-11T00:00:00+00:00" />
+如果你是性能和高效的追求者，我相信你会像我一样爱上Gin。"><meta itemprop="datePublished" content="2020-01-11T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-01-11T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="5824">
-
-
-
-<meta itemprop="keywords" content="Golang,Gin," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="Golang,Gin," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="深入Gin框架内幕1"/>
 <meta name="twitter:description" content="Gin框架介绍
 Gin是一个用 Go (Golang) 编写的 web 框架。它是一个类似于martini但性能更好的API框架，不同于谢大主导的Beegoweb框架，后者更像是Python语言中的Django框架，内部包含了开发一个web程序所需的各种组件。
@@ -159,42 +155,6 @@ if (!doNotTrack) {
           <div class="mobile-menu-parent">
             <span class="mobile-submenu-open"></span>
             <a href="https://bgbiao.top/">
-              Golang相关文档
-            </a>
-          </div>
-          <ul class="mobile-submenu-list">
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
-              </li>
-            
-              <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
-              </li>
-            
-          </ul>
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          
-            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
-          
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          <div class="mobile-menu-parent">
-            <span class="mobile-submenu-open"></span>
-            <a href="https://bgbiao.top/">
               学习文档
             </a>
           </div>
@@ -205,6 +165,42 @@ if (!doNotTrack) {
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
         
       </li>
     
@@ -380,23 +376,39 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
           <ul class="submenu">
             
               <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
               </li>
             
           </ul>
@@ -411,22 +423,6 @@ if (!doNotTrack) {
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
-
-        
-
-      </li>
-    
-        <li class="menu-item">
-        
-          
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
-          <ul class="submenu">
-            
-              <li>
-                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-          </ul>
 
         
 
@@ -1081,7 +1077,7 @@ type IRouter interface {
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">

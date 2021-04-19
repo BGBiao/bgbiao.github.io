@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.77.0" />
+<meta name="generator" content="Hugo 0.82.0" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/operatehivewithpython/" />
@@ -55,7 +55,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.fa3d941d1d0e0ddc985804227feabffea55c89883eb0af34e0532a7ae9135151.css" integrity="sha256-&#43;j2UHR0ODdyYWAQif&#43;q//qVciYg&#43;sK804FMqeukTUVE=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.01e3d8f03f142b439a96010ab309f91dd8b973cdd2248b73944b9b0db931248a.css" integrity="sha256-AePY8D8UK0OalgEKswn5Hdi5c83SJItzlEubDbkxJIo=" media="screen" crossorigin="anonymous">
 
 
 
@@ -69,22 +69,18 @@
 
 本篇简单记录下使用Python操作Hive。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://bgbiao.top/post/operatehivewithpython/" />
-<meta property="article:published_time" content="2018-10-28T14:14:39+00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
+<meta property="og:url" content="https://bgbiao.top/post/operatehivewithpython/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2018-10-28T14:14:39&#43;00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+
 <meta itemprop="name" content="使用Python来操作Hive中的数据">
 <meta itemprop="description" content="
 背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了Hive作为数据仓库工具，同时使用Hue来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.
 
-本篇简单记录下使用Python操作Hive。">
-<meta itemprop="datePublished" content="2018-10-28T14:14:39+00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+本篇简单记录下使用Python操作Hive。"><meta itemprop="datePublished" content="2018-10-28T14:14:39&#43;00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
 <meta itemprop="wordCount" content="3115">
-
-
-
-<meta itemprop="keywords" content="Hive,Python,Hadoop," />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="Hive,Python,Hadoop," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="使用Python来操作Hive中的数据"/>
 <meta name="twitter:description" content="
 背景:在整个运维内部数据仓库构建中，我们使用了Hadoop大数据生态圈中的组件来支撑运维数据的数据仓库构建。我们使用了Hive作为数据仓库工具，同时使用Hue来对整个运维数据进行管理和查询，最终根据部门需求生成结构化数据存入关系型或K/V型数据库，以供其他部门进行商业化决策。但是在使用command-line方式和hue上操作hive时，经常会有些许问题，并且灵活性交差，因此为了改善数据到Hive的加载过程以及对Hive库中数据的操作，借此机会使用PyHive库进行操作管理Hive.
@@ -162,42 +158,6 @@ if (!doNotTrack) {
           <div class="mobile-menu-parent">
             <span class="mobile-submenu-open"></span>
             <a href="https://bgbiao.top/">
-              Golang相关文档
-            </a>
-          </div>
-          <ul class="mobile-submenu-list">
-            
-              <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
-              </li>
-            
-              <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
-              </li>
-            
-              <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
-              </li>
-            
-              <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
-              </li>
-            
-          </ul>
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          
-            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
-          
-        
-      </li><li class="mobile-menu-item">
-        
-          
-          <div class="mobile-menu-parent">
-            <span class="mobile-submenu-open"></span>
-            <a href="https://bgbiao.top/">
               学习文档
             </a>
           </div>
@@ -208,6 +168,42 @@ if (!doNotTrack) {
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          <div class="mobile-menu-parent">
+            <span class="mobile-submenu-open"></span>
+            <a href="https://bgbiao.top/">
+              Golang相关
+            </a>
+          </div>
+          <ul class="mobile-submenu-list">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+              </li>
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+              </li>
+            
+          </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
+          
         
       </li>
     
@@ -383,23 +379,39 @@ if (!doNotTrack) {
         <li class="menu-item">
         
           
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关文档</a>
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
           <ul class="submenu">
             
               <li>
-                <a href="https://gowebexamples.com/">Golang web开发示例</a>
+                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
+              </li>
+            
+          </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">Golang相关</a>
+          <ul class="submenu">
+            
+              <li>
+                <a href="https://bgbiao.top/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
+                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://rpcx.io/">Golang RPCX框架</a>
+                <a href="https://bgbiao.top/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
+                <a href="https://bgbiao.top/">Golang 开源书籍</a>
               </li>
             
           </ul>
@@ -414,22 +426,6 @@ if (!doNotTrack) {
           
             <a class="menu-item-link" href="https://bgbiao.top/about/">关于我</a>
           
-
-        
-
-      </li>
-    
-        <li class="menu-item">
-        
-          
-          <a class="menu-item-link menu-parent" href="https://bgbiao.top/">学习文档</a>
-          <ul class="submenu">
-            
-              <li>
-                <a href="https://otexts.com/fppcn/index.html">&lt;预测:方法与实践&gt;</a>
-              </li>
-            
-          </ul>
 
         
 
@@ -1231,7 +1227,7 @@ if __name__ == &#39;__main__&#39;:
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">
