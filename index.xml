@@ -12,6 +12,594 @@
     
     
     <item>
+      <title>一分钟构建高可用的分布式追踪系统-Jaeger</title>
+      <link>https://bgbiao.top/post/kubernetes-helm-jaeger/</link>
+      <pubDate>Sun, 30 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kubernetes-helm-jaeger/</guid>
+      
+        <description>&lt;h2 id=&#34;一分钟构建高可用的分布式追踪系统-jaeger&#34;&gt;一分钟构建高可用的分布式追踪系统-Jaeger&lt;/h2&gt;
+&lt;p&gt;关键技术:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/&#34;&gt;Kubernetes&lt;/a&gt;: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.jaegertracing.io/&#34;&gt;Jaeger&lt;/a&gt;: 开源端到端的分布式追踪系统&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://helm.sh/&#34;&gt;Helm&lt;/a&gt;: Kubernetes 中的包管理器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;背景&#34;&gt;背景&lt;/h3&gt;
+&lt;p&gt;Kubernetes 已经成为整个云原生公认的基础设施了，随着互联网业务的快速发展，越来越多的业务会在一开始就选择使用云原生的方式进行开发和交付，而 Helm 就是整个过程中用来交付环境的工具，就好比在过去，我们会将各个业务打包成 tar 包或者 RPM 包，然后交付到不同环境进行部署。&lt;/p&gt;
+&lt;p&gt;而云原生应用天然的分布式和微服务特性会使得我们在业务运行过程中很难洞察到业务问题，对于 SRE 来讲，就无从谈起可用性和稳定性问题了。因此，对于云原生系统而言，一个可靠的分布式应用监控以及链路追踪系统就显得尤为重要了。&lt;/p&gt;
+&lt;p&gt;当然，类似的分布式应用监控和追踪系统也有很多，比如 &lt;a href=&#34;http://skywalking.apache.org/&#34;&gt;SkyWaling&lt;/a&gt;、&lt;a href=&#34;https://zipkin.io/&#34;&gt;Zipkin&lt;/a&gt;、&lt;a href=&#34;https://github.com/dianping/cat&#34;&gt;Cat&lt;/a&gt;、&lt;a href=&#34;https://github.com/pinpoint-apm/pinpoint&#34;&gt;Pinpoint&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;而工作中使用到了 Jaeger 以及对 Golang 语言相对而言比较熟悉，从而有了本篇文章。&lt;/p&gt;
+&lt;h3 id=&#34;技术点介绍&#34;&gt;技术点介绍&lt;/h3&gt;
+&lt;p&gt;对于 Kubernetes 而言，不用多说，想必技术同学应该都知道了，下面主要介绍 Helm 和 Jaeger ，毕竟这俩才是快速构建高可用的分布式追踪系统的关键。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Helm&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Helm 为团队提供了在 Kubernetes 内部创建、安装和管理应用程序时需要协作的工具，有点类似于 Ubuntu 中的 APT 或 CentOS 中的 YUM&lt;/p&gt;
+&lt;p&gt;对于操作者而言，主要有如下功能:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;查找要安装和使用的预打包软件（Chart）&lt;/li&gt;
+&lt;li&gt;轻松创建和托管自己的软件包&lt;/li&gt;
+&lt;li&gt;将软件包安装到任何 K8s 集群中&lt;/li&gt;
+&lt;li&gt;查询集群以查看已安装和正在运行的程序包&lt;/li&gt;
+&lt;li&gt;更新、删除、回滚或查看已安装软件包的历史记录&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;核心组件:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;helm: Helm 是一个命令行下的客户端工具。主要用于 Kubernetes 应用程序 Chart 的创建、打包、发布以及创建和管理本地和远程的 Chart 仓库&lt;/li&gt;
+&lt;li&gt;Chart: Helm 的软件包，采用 TAR 格式。类似于 APT 的 DEB 包或者 YUM 的 RPM 包，其包含了一组定义 Kubernetes 资源相关的 YAML 文件。&lt;/li&gt;
+&lt;li&gt;Repoistory: Helm 的软件仓库，Repository 本质上是一个 Web 服务器，该服务器保存了一系列的 Chart 软件包以供用户下载，并且提供了一个该 Repository 的 Chart 包的清单文件以供查询。Helm 可以同时管理多个不同的 Repository。&lt;/li&gt;
+&lt;li&gt;Release: 使用 helm install 命令在 Kubernetes 集群中部署的 Chart 称为 Release。可以理解为 Helm 使用 Chart 包部署的一个应用实例。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Jaeger&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Jaeger 受 Dapper 和 OpenZipkin 的启发，是由 Uber Technologies 发布的开源分布式追踪系统。它用于&lt;code&gt;监控和排查&lt;/code&gt;基于微服务的分布式系统问题，包括:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;分布式上下文传播&lt;/li&gt;
+&lt;li&gt;分布式事务监控&lt;/li&gt;
+&lt;li&gt;根因分析&lt;/li&gt;
+&lt;li&gt;服务依赖关系分析&lt;/li&gt;
+&lt;li&gt;性能/延迟优化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Jaeger 架构:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqzqp27hfqj30qo0f0dhs.jpg&#34; alt=&#34;直接存储架构&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqzqq9pnqmj30qo0f00uw.jpg&#34; alt=&#34;使用Kafka作为中间缓冲区架构&#34;&gt;&lt;/p&gt;
+&lt;p&gt;整体上讲，一个基础的 Jaeger 追踪系统包含下面几个部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;jaeger-query: 用于客户端查询和检索组件，并包含了一个基础的UI&lt;/li&gt;
+&lt;li&gt;jaeger-collector: 接收来自 jaeger-agent 的 trace 数据，并通过处理管道来执行。当前的处理管道包含验证 trace 数据，创建索引，执行数据转换以及将数据存储到对应的后端&lt;/li&gt;
+&lt;li&gt;jaeger-agent: 一个网络守护进程，侦听通过 UDP 发送的 spans ，它对其进行批处理并发送给收集器。它被设计为作为基础设施组件部署到所有主机。代理将收集器的路由和发现从客户机抽象出来&lt;/li&gt;
+&lt;li&gt;backend-storage: 用于指标数据存储的可插拔式后端存储，支持 Cassandra, Elasticsearch and Kafka&lt;/li&gt;
+&lt;li&gt;ingester: 可选组件，用于从 kafka 中消费数据并写入到可直接读取的 Cassandra 或 Elasticsearch 存储中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; trace 和 span 是链路追踪系统中的专业属于，span 就表示具体的一个工作单元，并且包含了该单元的元数据比如具体是什么操作，执行的时间等等，而 trace 是通过整个系统的数据路径，可以被认为是将 Spans 组成一个有向无环图(DAG)&lt;/p&gt;
+&lt;p&gt;而对于一个多组件系统来说，也存在多个网络端口用于数据的传输，下图即为各个组件的端口用途:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqzr8ywyayj31o00s6aex.jpg&#34; alt=&#34;jaeger-ports&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;jaeger-环境快速初始化&#34;&gt;Jaeger 环境快速初始化&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当前选用es作为后端存储，必须版本是6 (因为es-go 的sdk 是强依赖版本的，jaeger 最新版本只支持es6)&lt;/li&gt;
+&lt;li&gt;es采用外置实实例，因为有状态服务在k8s集群中暂时不好维护数据状态，便于生产环境直接替换独立的 es 集群实例&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;安装helm v3 以及基础使用&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz
+$ tar -zxvf helm-v3.1.2-linux-amd64.tar.gz
+$ cd linux-amd64
+$ mv helm /usr/local/bin/
+$ helm --help
+
+# 添加helm 仓库
+$ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+$ helm repo add bitnami https://charts.bitnami.com/bitnami
+# 查看仓库列表
+$ helm repo list
+
+# chart 语法检查
+$ helm lint chart
+
+# yaml 模版渲染
+$ helm template chart
+
+# chart 部署(创建服务的release)
+$ helm install
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;下载Jaeger Helm Chart&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# git clone https://gitee.com/BGBiao/sample-jaeger.git
+
+# 目录结构
+
+sh-4.2# cd sample-jaeger/
+sh-4.2# ls
+Chart.lock  charts  Chart.yaml	es  files  readme.md  templates  values.yaml
+sh-4.2# tree -L 2 .
+.
+|-- Chart.lock
+|-- charts
+|-- Chart.yaml
+|-- es
+|   `-- elasticsearch.yml
+|-- readme.md
+|-- templates
+|   |-- agent-deploy.yaml
+|   |-- agent-svc.yaml
+|   |-- collector-deploy.yaml
+|   |-- collector-svc.yaml
+|   |-- configmap.yaml
+|   |-- elasticsearch-secret.yaml
+|   |-- _helpers.tpl
+|   |-- hotrod-deploy.yaml
+|   |-- hotrod-ingress.yaml
+|   |-- hotrod-svc.yaml
+|   |-- query-deploy.yaml
+|   `-- query-svc.yaml
+`-- values.yaml
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;准备 ElasticSearch 后端存储&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 使用docker 方式准备一个外置的es 实例
+$ docker run --name jaeger-es  -itd -p 9200:9200 -p 9300:9300 -e &amp;#34;discovery.type=single-node&amp;#34; -v $PWD/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml elasticsearch:6.4.3
+
+$ curl localhost:9200
+{&amp;#34;error&amp;#34;:{&amp;#34;root_cause&amp;#34;:[{&amp;#34;type&amp;#34;:&amp;#34;security_exception&amp;#34;,&amp;#34;reason&amp;#34;:&amp;#34;missing authentication token for REST request [/]&amp;#34;,&amp;#34;header&amp;#34;:{&amp;#34;WWW-Authenticate&amp;#34;:&amp;#34;Basic realm=\&amp;#34;security\&amp;#34; charset=\&amp;#34;UTF-8\&amp;#34;&amp;#34;}}],&amp;#34;type&amp;#34;:&amp;#34;security_exception&amp;#34;,&amp;#34;reason&amp;#34;:&amp;#34;missing authentication token for REST request [/]&amp;#34;,&amp;#34;header&amp;#34;:{&amp;#34;WWW-Authenticate&amp;#34;:&amp;#34;Basic realm=\&amp;#34;security\&amp;#34; charset=\&amp;#34;UTF-8\&amp;#34;&amp;#34;}},&amp;#34;status&amp;#34;:401}
+
+# 因为es 开启了认证，需要先设置密码访问
+sh-4.2# docker exec -it jaeger-es-tmp bash
+./bin/elasticsearch-setup-passwords
+Sets the passwords for reserved users
+
+Commands
+--------
+auto - Uses randomly generated passwords
+interactive - Uses passwords entered by a user
+
+Non-option arguments:
+command
+
+Option         Description
+------         -----------
+-h, --help     show help
+-s, --silent   show minimal output
+-v, --verbose  show verbose output
+ERROR: Missing command
+
+# 设置elasticstack 所有的密码
+[root@b90822f2c26b elasticsearch]# ./bin/elasticsearch-setup-passwords interactive
+Initiating the setup of passwords for reserved users elastic,kibana,logstash_system,beats_system.
+You will be prompted to enter passwords as the process progresses.
+Please confirm that you would like to continue [y/N]y
+
+
+Enter password for [elastic]:
+Reenter password for [elastic]:
+Enter password for [kibana]:
+Reenter password for [kibana]:
+Enter password for [logstash_system]:
+Reenter password for [logstash_system]:
+Enter password for [beats_system]:
+Reenter password for [beats_system]:
+Changed password for user [kibana]
+Changed password for user [logstash_system]
+Changed password for user [beats_system]
+Changed password for user [elastic]
+
+# 使用密码访问es实例
+$ curl -u &amp;#39;elastic:xxxxxxx&amp;#39; http://localhost:9200
+{
+  &amp;#34;name&amp;#34; : &amp;#34;1xdrvFl&amp;#34;,
+  &amp;#34;cluster_name&amp;#34; : &amp;#34;docker-cluster&amp;#34;,
+  &amp;#34;cluster_uuid&amp;#34; : &amp;#34;CO76XmP0Qbexysev4Al2MQ&amp;#34;,
+  &amp;#34;version&amp;#34; : {
+    &amp;#34;number&amp;#34; : &amp;#34;6.4.3&amp;#34;,
+    &amp;#34;build_flavor&amp;#34; : &amp;#34;default&amp;#34;,
+    &amp;#34;build_type&amp;#34; : &amp;#34;tar&amp;#34;,
+    &amp;#34;build_hash&amp;#34; : &amp;#34;fe40335&amp;#34;,
+    &amp;#34;build_date&amp;#34; : &amp;#34;2018-10-30T23:17:19.084789Z&amp;#34;,
+    &amp;#34;build_snapshot&amp;#34; : false,
+    &amp;#34;lucene_version&amp;#34; : &amp;#34;7.4.0&amp;#34;,
+    &amp;#34;minimum_wire_compatibility_version&amp;#34; : &amp;#34;5.6.0&amp;#34;,
+    &amp;#34;minimum_index_compatibility_version&amp;#34; : &amp;#34;5.0.0&amp;#34;
+  },
+  &amp;#34;tagline&amp;#34; : &amp;#34;You Know, for Search&amp;#34;
+}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;修改 Chart 配置并安装 Release&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;
+# 修改helm chart 中的es地址 storage.elasticsearch.host/storage.elasticsearch.password
+#  部署整个jaeger 服务
+sh-4.2# ls
+Chart.lock  charts  Chart.yaml	es  files  readme.md  templates  values.yaml
+sh-4.2# helm install -n sample-jaeger jaeger .
+Error: create: failed to create: namespaces &amp;#34;sample-jaeger&amp;#34; not found
+sh-4.2#
+
+
+sh-4.2# kubectl  create ns sample-jaeger
+namespace/sample-jaeger created
+sh-4.2# helm install -n sample-jaeger jaeger .
+NAME: jaeger
+LAST DEPLOYED: Sun May 23 23:42:58 2021
+NAMESPACE: sample-jaeger
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+sh-4.2# helm list -n sample-jaeger
+NAME  	NAMESPACE    	REVISION	UPDATED                               	STATUS  	CHART              	APP VERSION
+jaeger	sample-jaeger	1       	2021-05-23 23:42:58.75504002 +0800 CST	deployed	sample-jaeger-0.1.0	1.16.0
+
+
+sh-4.2# kubectl  get all -n sample-jaeger
+NAME                                                       READY   STATUS    RESTARTS   AGE
+pod/jaeger-agent-579587cb85-rzd46                          1/1     Running   0          27s
+pod/jaeger-collector-57c57bc788-682sn                      1/1     Running   0          27s
+pod/jaeger-query-85d86d44d-dhj7g                           1/1     Running   0          27s
+pod/jaeger-sample-jaeger-jaeger-example-7bf65bd75b-mlxhv   1/1     Running   0          27s
+
+NAME                                          TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
+service/jaeger-agent                          NodePort   172.16.127.123   &amp;lt;none&amp;gt;        6831:31139/UDP,5775:31355/TCP,6832:30937/TCP,5778:32360/TCP      27s
+service/jaeger-agent-backup                   NodePort   172.16.125.116   &amp;lt;none&amp;gt;        6831:30036/UDP,5775:31138/TCP,6832:31179/TCP,5778:30568/TCP      27s
+service/jaeger-collector                      NodePort   172.16.127.93    &amp;lt;none&amp;gt;        14250:30708/TCP,14268:32354/TCP,9411:32312/TCP,14267:30986/TCP   27s
+service/jaeger-collector-backup               NodePort   172.16.125.137   &amp;lt;none&amp;gt;        14250:30477/TCP,14268:32513/TCP,9411:30679/TCP,14267:31237/TCP   27s
+service/jaeger-query                          NodePort   172.16.124.251   &amp;lt;none&amp;gt;        16686:30843/TCP,16687:30530/TCP                                  27s
+service/jaeger-query-backup                   NodePort   172.16.125.214   &amp;lt;none&amp;gt;        16686:30273/TCP,16687:30858/TCP                                  27s
+service/jaeger-sample-jaeger-jaeger-example   NodePort   172.16.125.35    &amp;lt;none&amp;gt;        80:31255/TCP                                                     27s
+
+NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/jaeger-agent                          1/1     1            1           27s
+deployment.apps/jaeger-collector                      1/1     1            1           27s
+deployment.apps/jaeger-query                          1/1     1            1           27s
+deployment.apps/jaeger-sample-jaeger-jaeger-example   1/1     1            1           27s
+
+NAME                                                             DESIRED   CURRENT   READY   AGE
+replicaset.apps/jaeger-agent-579587cb85                          1         1         1       27s
+replicaset.apps/jaeger-collector-57c57bc788                      1         1         1       27s
+replicaset.apps/jaeger-query-85d86d44d                           1         1         1       27s
+replicaset.apps/jaeger-sample-jaeger-jaeger-example-7bf65bd75b   1         1         1       27s
+
+
+# 这里我们测试下jaeger-query 的服务
+sh-4.2# curl 172.16.124.251:16686 -I
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Date: Sun, 23 May 2021 15:44:39 GMT
+
+# 此时发现我们核心的几个服务都没有问题(agent,collector,query)
+# 接下里就可以直接访问我们的jaeger 的服务页面了
+# 因为我们的service 采用了nodePort 类型，可以直接访问主机的ip:port
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Jaeger 系统使用&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqssor4at5j316b0u0tj8.jpg&#34; alt=&#34;jaeger-首页&#34;&gt;&lt;/p&gt;
+&lt;p&gt;注意: 默认我们没有应用的数据采集，因此看不到任何链路相关的数据，其实可以看到，我们上面也部署了一个测试程序&lt;code&gt;jaeger-example&lt;/code&gt;，它是一个简单但却完整的程序，贯穿了前后端，数据库缓存等全流程的逻辑，可以让我们清楚的查看整个调用链路。&lt;/p&gt;
+&lt;p&gt;这个时候我们直接打开&lt;code&gt;jaeger-example&lt;/code&gt; 对应的地址即可。 &lt;code&gt;node:31255&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqsstii7c0j321a0qk434.jpg&#34; alt=&#34;jaeger-horod&#34;&gt;&lt;/p&gt;
+&lt;p&gt;可以看到整个服务提供了一个全局视角，从用户的客户端id进入请求开始，来模拟全流程的服务请求流转，接下来就可以随意点击几个服务模块，让服务主动上报一些数据给jaeger&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqst0eer6tj321k0sgqba.jpg&#34; alt=&#34;jaeger-hotROD-serving&#34;&gt;&lt;/p&gt;
+&lt;p&gt;模拟一些用户的请求后，我们就可以查看到服务的一些指标了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqst2f95flj31670u0gxc.jpg&#34; alt=&#34;choose-some-filter-find-trace&#34;&gt;&lt;/p&gt;
+&lt;p&gt;可以看到刚才的模拟请求中，总共产生了5个Traces，也就分别对应了我们在 &lt;code&gt;hotROD&lt;/code&gt; 服务中的5次请求&lt;/p&gt;
+&lt;p&gt;然后，点进去任何一条链路，都可以查看到整个调用过程的耗时情况&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqst58e03cj316c0u07he.jpg&#34; alt=&#34;tracing-timeline&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqst8iy9b1j315w0u0an4.jpg&#34; alt=&#34;tracing-troubshooting&#34;&gt;&lt;/p&gt;
+&lt;p&gt;从调用链路的方法调用，也能很快查看到调用超时以及异常模块&lt;/p&gt;
+&lt;p&gt;然后右上角可以选择 trace 数据的方式，比如可以看到调用关系，这样就很方便我们来查看一个完整服务的各个调用关系&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gqstb2t7raj31jb0u0tn1.jpg&#34; alt=&#34;trace-graph&#34;&gt;&lt;/p&gt;
+&lt;p&gt;到这里，我们就可以看到，我们使用 helm 快速部署了一个分布式的 jaeger 集群&lt;/p&gt;
+&lt;p&gt;当然啦，hotROD 服务仅仅是测试服务，验证我们的jaeger 监控可用，之后我们需要将它销毁以释放相关的资源&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;修改Helm Chart更新服务&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 由于我们的 服务都是通过在chart 中的yaml定义的，因此服务的管控只需要改yaml就行。&lt;/p&gt;
+&lt;p&gt;修改&lt;code&gt;values.yaml&lt;/code&gt; 文件中的&lt;code&gt;jaegerExample.enabled: false&lt;/code&gt; 后，执行如下命令&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 制定配置文件，对指定的release 进行更新
+sh-4.2# helm  upgrade -n sample-jaeger -f ./values.yaml jaeger .
+Release &amp;#34;jaeger&amp;#34; has been upgraded. Happy Helming!
+NAME: jaeger
+LAST DEPLOYED: Mon May 24 00:18:46 2021
+NAMESPACE: sample-jaeger
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+
+# 可以看到，REVISION 已经更新到2
+## 并且我们的jaeger-example 服务已经下线
+sh-4.2# helm  list -n sample-jaeger
+NAME  	NAMESPACE    	REVISION	UPDATED                                	STATUS  	CHART              	APP VERSION
+jaeger	sample-jaeger	2       	2021-05-24 00:18:46.865941544 +0800 CST	deployed	sample-jaeger-0.1.0	1.16.0
+
+sh-4.2# kubectl get all -n sample-jaeger
+NAME                                    READY   STATUS    RESTARTS   AGE
+pod/jaeger-agent-579587cb85-rzd46       1/1     Running   0          38m
+pod/jaeger-collector-57c57bc788-682sn   1/1     Running   0          38m
+pod/jaeger-query-85d86d44d-dhj7g        1/1     Running   0          38m
+
+NAME                              TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
+service/jaeger-agent              NodePort   172.16.127.123   &amp;lt;none&amp;gt;        6831:31139/UDP,5775:31355/TCP,6832:30937/TCP,5778:32360/TCP      38m
+service/jaeger-agent-backup       NodePort   172.16.125.116   &amp;lt;none&amp;gt;        6831:30036/UDP,5775:31138/TCP,6832:31179/TCP,5778:30568/TCP      38m
+service/jaeger-collector          NodePort   172.16.127.93    &amp;lt;none&amp;gt;        14250:30708/TCP,14268:32354/TCP,9411:32312/TCP,14267:30986/TCP   38m
+service/jaeger-collector-backup   NodePort   172.16.125.137   &amp;lt;none&amp;gt;        14250:30477/TCP,14268:32513/TCP,9411:30679/TCP,14267:31237/TCP   38m
+service/jaeger-query              NodePort   172.16.124.251   &amp;lt;none&amp;gt;        16686:30843/TCP,16687:30530/TCP                                  38m
+service/jaeger-query-backup       NodePort   172.16.125.214   &amp;lt;none&amp;gt;        16686:30273/TCP,16687:30858/TCP                                  38m
+
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/jaeger-agent       1/1     1            1           38m
+deployment.apps/jaeger-collector   1/1     1            1           38m
+deployment.apps/jaeger-query       1/1     1            1           38m
+
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/jaeger-agent-579587cb85       1         1         1       38m
+replicaset.apps/jaeger-collector-57c57bc788   1         1         1       38m
+replicaset.apps/jaeger-query-85d86d44d        1         1         1       38m
+
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;如此，我们就使用helm 来很优雅的管理了我们服务的部署以及实例的管理。&lt;/p&gt;
+&lt;p&gt;最后，我们有没有发现，直接使用helm 可能会有几个问题:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;ol&gt;
+&lt;li&gt;命名空间没办法声明，且不能自动创建&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;不支持像kubectl apply命令，来直接更新对应资源的配置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;无法做到环境的区分以及chart版本控制&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其实，在社区里已经有相关的工具来解决这些问题了，就是 &lt;a href=&#34;https://github.com/roboll/helmfile&#34;&gt;helmfile&lt;/a&gt; ，它可以通过&lt;code&gt;helmfile.yaml&lt;/code&gt; 文件来帮助用户管理和维护众多 helm chart，提高部署的可观测性和可重复性，区分环境，免去各种 &lt;code&gt;--set&lt;/code&gt; 参数的困扰，感兴趣的同学可以去试一试。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>如何更加优雅的使用 Systemd 管理服务</title>
       <link>https://bgbiao.top/post/systemd-doc/</link>
       <pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate>
@@ -8758,493 +9346,6 @@ $ cat traefik.toml
 &lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>基于DCGM和Prometheus的GPU监控方案</title>
-      <link>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</link>
-      <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</guid>
-      
-        <description>&lt;h2 id=&#34;基于dcgm和prometheus的gpu监控方案&#34;&gt;基于DCGM和Prometheus的GPU监控方案&lt;/h2&gt;
-&lt;blockquote&gt;
-&lt;p&gt;背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过&lt;code&gt;nvidia-smi&lt;/code&gt;这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于&lt;a href=&#34;https://developer.nvidia.com/dcgm&#34;&gt;DCGM&lt;/a&gt;相关的监控解决方案。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;DCGM(Data Center GPU Manager)即数据中心GPU管理器，是一套用于在集群环境中管理和监视&lt;code&gt;Tesla™&lt;/code&gt;GPU的工具。&lt;/p&gt;
-&lt;p&gt;它包括主动健康监控，全面诊断，系统警报以及包括电源和时钟管理在内的治理策略。&lt;/p&gt;
-&lt;p&gt;它可以由系统管理员独立使用，并且可以轻松地集成到NVIDIA合作伙伴的集群管理，资源调度和监视产品中。&lt;/p&gt;
-&lt;p&gt;DCGM简化了数据中心中的GPU管理，提高了资源可靠性和正常运行时间，自动化了管理任务，并有助于提高整体基础架构效率。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 虽然可以通过&lt;code&gt;nvidia-smi&lt;/code&gt;命令将相关的信息采集，并定期汇报到数据存储进行数据分析计算和展现，但是涉及到一整套的监控体系的整合，仍然需要使用方进行一些列的改造。因此这里，我们采用NVIDIA官方提供的DCGM方案来进行GPU数据采集，并通过声称下一代监控系统的Prometheus进行整个监控和告警的集成。&lt;/p&gt;
-&lt;h3 id=&#34;dcgm工具部署&#34;&gt;DCGM工具部署&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ git clone https://github.com/NVIDIA/gpu-monitoring-tools.git
-
-# 构建dcgm-exporter工具，其实就是nvidia官方对于nvidia-docker2.x推出的用于gpu数据监控的工具
-# 最终会将gpu卡的metrics基本信息存储以metrics的数据格式存储到文件中
-$ cd dcgm-exporter
-# nvidia/dcgm-exporter:latest
-$ make 
-
-$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
-
-# 查看dcgm-exporter收集到的gpu metrics数据
-$ docker exec -it nvidia-dcgm-exporter tail -n 10  /run/prometheus/dcgm.prom
-dcgm_ecc_dbe_aggregate_total{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
-# HELP dcgm_retired_pages_sbe Total number of retired pages due to single-bit errors.
-# TYPE dcgm_retired_pages_sbe counter
-dcgm_retired_pages_sbe{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
-# HELP dcgm_retired_pages_dbe Total number of retired pages due to double-bit errors.
-# TYPE dcgm_retired_pages_dbe counter
-dcgm_retired_pages_dbe{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
-# HELP dcgm_retired_pages_pending Total number of pages pending retirement.
-# TYPE dcgm_retired_pages_pending counter
-dcgm_retired_pages_pending{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;dcgm-exporter采集指标项以及含义:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;指标&lt;/th&gt;
-&lt;th&gt;含义&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_fan_speed_percent&lt;/td&gt;
-&lt;td&gt;GPU 风扇转速占比（%）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_sm_clock&lt;/td&gt;
-&lt;td&gt;GPU sm 时钟(MHz)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_memory_clock&lt;/td&gt;
-&lt;td&gt;GPU 内存时钟(MHz)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_gpu_temp&lt;/td&gt;
-&lt;td&gt;GPU 运行的温度(℃)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_power_usage&lt;/td&gt;
-&lt;td&gt;GPU 的功率（w）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_pcie_tx_throughput&lt;/td&gt;
-&lt;td&gt;GPU PCIe TX传输的字节总数 （kb）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_pcie_rx_throughput&lt;/td&gt;
-&lt;td&gt;GPU PCIe RX接收的字节总数   （kb）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_pcie_replay_counter&lt;/td&gt;
-&lt;td&gt;GPU PCIe重试的总数&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_gpu_utilization&lt;/td&gt;
-&lt;td&gt;GPU 利用率（%）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_mem_copy_utilization&lt;/td&gt;
-&lt;td&gt;GPU 内存利用率（%）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_enc_utilization&lt;/td&gt;
-&lt;td&gt;GPU 编码器利用率 （%）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_dec_utilization&lt;/td&gt;
-&lt;td&gt;GPU 解码器利用率 (%)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_xid_errors&lt;/td&gt;
-&lt;td&gt;GPU 上一个xid错误的值&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_power_violation&lt;/td&gt;
-&lt;td&gt;GPU 功率限制导致的节流持续时间(us)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_thermal_violation&lt;/td&gt;
-&lt;td&gt;GPU 热约束节流持续时间(us)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_sync_boost_violation&lt;/td&gt;
-&lt;td&gt;GPU 同步增强限制，限制持续时间(us)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_fb_free&lt;/td&gt;
-&lt;td&gt;GPU fb（帧缓存）的剩余（MiB）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;dcgm_fb_used&lt;/td&gt;
-&lt;td&gt;GPU fb （帧缓存）的使用 （MiB）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;其实到这，dcgm已经完整的将我们需要的gpu的metrics数据采集出来了，并且是符合prometheus的数据格式和标准的，此时，我们可以根据实际的情况编写一个简单的api程序，将采集到的数据以api的形式暴露出去，就可以让整个prometheus server对各个gpu主机的metrics进行采集和监控。&lt;/p&gt;
-&lt;p&gt;不过官方提供了基于kubernetes集群中pod方式的api接口，采用golang语言开发，具体使用情况可参考如下文档。&lt;/p&gt;
-&lt;h3 id=&#34;prometheus-gpu-metrics-exporter&#34;&gt;prometheus gpu metrics exporter&lt;/h3&gt;
-&lt;p&gt;在&lt;code&gt;gpu-monitoring-tools&lt;/code&gt;项目中，默认提供了一个&lt;code&gt;pod-gpu-metrics-exporter&lt;/code&gt;模块，用于在kubernetes集群中的gpu-metrics的部署，官方的示例步骤如下:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;nvidia-k8s-device-plugin&lt;/li&gt;
-&lt;li&gt;Deploy GPU Pods&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在使kubernetes集群中部署的前提是你的GPU要托管在k8s集群内部，这也就意味着你得先成功将带GPU的主机成功托管到集群中，并且能够调度GPU资源&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 创建一个监控的命名空间
-# Create the monitoring namespace
-$ kubectl create namespace monitoring
-
-# Add gpu metrics endpoint to prometheus
-$ kubectl create -f prometheus/prometheus-configmap.yaml
-
-# Deploy prometheus
-$ kubectl create -f prometheus/prometheus-deployment.yaml
-
-$ kubectl create -f pod-gpu-metrics-exporter-daemonset.yaml
-
-# Open in browser: localhost:9090
-
-# 具体的docker镜像构建和运行
-# 依然是gpu-monitoring-tools项目
-$ cd  pod-gpu-metrics-exporter
-$ docker build -t pod-gpu-metrics-exporter .
-
-# 运行dcgm-exporter
-$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
-
-# 运行gpu-metrics-exporter
-$ docker run -d --privileged --rm -p 9400:9400 -v /var/lib/kubelet/pod-resources:/var/lib/kubelet/pod-resources --volumes-from nvidia-dcgm-exporter:ro nvidia/pod-gpu-metrics-exporter:v1.0.0-alpha
-
-# 此时就将上述的那个dcgm-exporter中采集到数据成功暴露到对外的接口了
-$ curl -s localhost:9400/gpu/metrics
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;需要注意的是，在&lt;code&gt;gpu-metrics-exporter&lt;/code&gt;的程序中，是针对pod的方式来采集gpu的metrics的信息，并且附带了pod本身的基本信息，因此如果你的&lt;code&gt;gpu&lt;/code&gt;主机还未在kubernetes集群中托管，官方提供的镜像可能并不能使用，需要对&lt;code&gt;src/http.go&lt;/code&gt;文件中采集的路径进行改变，将默认的&lt;code&gt;gpuPodMetrics&lt;/code&gt;改成&lt;code&gt;gpuMetrics&lt;/code&gt;即可，两者会去读取不同的dcgm-exporter暴露出来的metrics文件，否则访问api接口时会发现无法找到metrics文件.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;func getGPUmetrics(resp http.ResponseWriter, req *http.Request) {
-	//metrics, err := ioutil.ReadFile(gpuPodMetrics)
-	metrics, err := ioutil.ReadFile(gpuMetrics)
-	if err != nil {
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		glog.Errorf(&amp;#34;error responding to %v%v: %v&amp;#34;, req.Host, req.URL, err.Error())
-		return
-	}
-	resp.Write(metrics)
-}
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;参考&lt;a href=&#34;https://github.com/BGBiao/gpu-monitoring-tools/tree/master/gpu-metrics-exporter&#34;&gt;gpu-metrics-exporter&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;图省事的，可以直接下载如下两个镜像，在已经work 的GPU主机上直接运行.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;dcgm-exporter: &lt;code&gt;docker pull bgbiao/dcgm-exporter:latest&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;gpu-metrics-exporter: &lt;code&gt;docker pull bgbiao/gpu-metrics-exporter:latest&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 确定dcgm-exporter是运行的
-$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter bgbiao/dcgm-exporter
-
-$ docker run -d --privileged --rm -p 9400:9400  --volumes-from nvidia-dcgm-exporter:ro bgbiao/gpu-metrics-exporter
-
-# 检查gpu暴露出来的基础信息
-$ curl -s localhost:9400/gpu/metrics
-dcgm_ecc_dbe_aggregate_total{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 0
-....
-....
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;h3 id=&#34;prometheus采集&#34;&gt;prometheus采集&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 有了上述的gpu-metrics-exporter之后，我们的gpu相关的运行数据就可以以premetheus兼容的方式获取了，此时在prometheus-server上配置，去定期pull 数据即可，我们的prometheus-server目前部署在kubernetes集群内部，因此这里分享将gpu的数据采集到kubernetes集群内部的prometheus中。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;创建endpoint以及对应的service&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# gpu-metrics的endpoint和service配置
-
-$ cat endpoint-gpus.yaml
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: gpu-metrics
-  namespace: monitoring
-  labels:
-    app: gpu-metrics
-subsets:
-- addresses:
-  - ip: 172.16.65.234
-  ports:
-  - port: 9400
-    name: http-metrics
-    protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: monitoring
-  name: gpu-metrics
-  labels:
-    app: gpu-metrics
-spec:
-  ports:
-  - name: http-metrics
-    port: 19400
-    targetPort: 9400
-    protocol: TCP
-
-$ kubectl  apply -f endpoint-gpus.yaml
-
-# 查看创建的相关资源
-$ kubectl  get ep,svc -n monitoring  -l app=gpu-metrics
-NAME                    ENDPOINTS            AGE
-endpoints/gpu-metrics   172.16.65.234:9400   5m24s
-
-NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
-service/gpu-metrics   ClusterIP   10.253.138.97   &amp;lt;none&amp;gt;        19400/TCP   5m24s
-
-# 测试service暴露的端点
-# 确保集群内部可以访问service暴露出来的endpoint即可
-
-$ curl 10.253.138.97:19400/gpu/metrics
-# HELP dcgm_sm_clock SM clock frequency (in MHz).
-# TYPE dcgm_sm_clock gauge
-dcgm_sm_clock{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 1328
-# HELP dcgm_memory_clock Memory clock frequency (in MHz).
-# TYPE dcgm_memory_clock gauge
-dcgm_memory_clock{gpu=&amp;#34;0&amp;#34;,uuid=&amp;#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&amp;#34;} 715
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;创建prometheus抓取数据的规则&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ cat prometheus-gpus.yml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: gpu-metrics
-  name: gpu-metrics
-  namespace: monitoring
-spec:
-  # 对应的端点是上面创建的svc的ports
-  endpoints:
-    # 定义endpoint采集的时间和采集的URI
-  - interval: 30s
-    port: http-metrics
-    path: /gpu/metrics
-  jobLabel: app
-  # 匹配monitoring命名空间的app=gpu-metrics的svc
-  namespaceSelector:
-    matchNames:
-    - monitoring
-  selector:
-    matchLabels:
-      app: gpu-metrics
-
-$ kubectl  apply -f prometheus-gpus.yml
-servicemonitor.monitoring.coreos.com/gpu-metrics created
-
-$ kubectl  get servicemonitor  -n monitoring gpu-metrics
-NAME          AGE
-gpu-metrics   69s
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;当上述资源创建完成后，在集群内部的prometheus-server中就可以找到对应的target，确认状态为up即表示prometheus已正常采集集群外gpu的metrics数据了，接下来数据就会以30s为间隔，源源不断的将数据采集到prometheus存储中.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdiuxv5l47j31pk0aegon.jpg&#34; alt=&#34;prometheus-gpu-targets&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;gpu监控信息的展示&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;到这里，我们已经到万里长征的最后一步了，就是把prometheus中gpu的监控数据用grafana展示出来，以实时去分析一些gpu的基本数据。&lt;/p&gt;
-&lt;p&gt;在grafana官网中，已经有大佬制作了gpu监控的相关模板，比如&lt;code&gt;[GPU-Nodes-Metrics](https://grafana.com/grafana/dashboards/12027)&lt;/code&gt;,因此，对于我们使用者来说，在grafana的面板中，将该模板导入即可使用。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdiv4s5t9nj30ec0ek0tc.jpg&#34; alt=&#34;选择导入方式创建&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdj0dzwdmjj31ly0u041p.jpg&#34; alt=&#34;指定模板(dashboard id或json)&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdj0ftc6d8j31nd0u0djg.jpg&#34; alt=&#34;注意:确认prometheus库正确后即可导入&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdj0h15tp5j31oi0u0n5x.jpg&#34; alt=&#34;最终的GPU监控图&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;参考项目&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/gpu-monitoring-tools&#34;&gt;gpu-monitor-tools&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/grafana/dashboards/11752&#34;&gt;gpu-metrics-grafana&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;</description>
       
     </item>
     

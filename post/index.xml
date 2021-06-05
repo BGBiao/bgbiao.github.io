@@ -6,7 +6,22 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 30 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>一分钟构建高可用的分布式追踪系统-Jaeger</title>
+      <link>https://bgbiao.top/post/kubernetes-helm-jaeger/</link>
+      <pubDate>Sun, 30 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/kubernetes-helm-jaeger/</guid>
+      <description>&lt;h2 id=&#34;一分钟构建高可用的分布式追踪系统-jaeger&#34;&gt;一分钟构建高可用的分布式追踪系统-Jaeger&lt;/h2&gt;
+&lt;p&gt;关键技术:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/&#34;&gt;Kubernetes&lt;/a&gt;: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.jaegertracing.io/&#34;&gt;Jaeger&lt;/a&gt;: 开源端到端的分布式追踪系统&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://helm.sh/&#34;&gt;Helm&lt;/a&gt;: Kubernetes 中的包管理器&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
     <item>
       <title>如何更加优雅的使用 Systemd 管理服务</title>
       <link>https://bgbiao.top/post/systemd-doc/</link>
@@ -222,18 +237,6 @@
 &lt;li&gt;Metrics: Traefik提供的自身详细的metrics数据&lt;/li&gt;
 &lt;li&gt;Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况&lt;/li&gt;
 &lt;/ul&gt;</description>
-    </item>
-    
-    <item>
-      <title>基于DCGM和Prometheus的GPU监控方案</title>
-      <link>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</link>
-      <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/</guid>
-      <description>&lt;h2 id=&#34;基于dcgm和prometheus的gpu监控方案&#34;&gt;基于DCGM和Prometheus的GPU监控方案&lt;/h2&gt;
-&lt;blockquote&gt;
-&lt;p&gt;背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过&lt;code&gt;nvidia-smi&lt;/code&gt;这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于&lt;a href=&#34;https://developer.nvidia.com/dcgm&#34;&gt;DCGM&lt;/a&gt;相关的监控解决方案。&lt;/p&gt;
-&lt;/blockquote&gt;</description>
     </item>
     
   </channel>

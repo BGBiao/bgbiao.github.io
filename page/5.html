@@ -462,6 +462,52 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/k8s-delete-namespace/">k8s删除Terminating状态的命名空间</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2019-10-21" class="post-time">
+        2019-10-21
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+          
+        </div>
+      <span class="more-meta"> 803 words </span>
+      <span class="more-meta"> 2 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <blockquote>
+<p>背景: 我们都知道在k8s中namespace有两种常见的状态，即Active和Terminating状态，其中后者一般会比较少见，只有当对应的命名空间下还存在运行的资源，但是该命名空间被删除时才会出现所谓的terminating状态，这种情况下只要等待k8s本身将命名空间下的资源回收后，该命名空间将会被系统自动删除。但是今天遇到命名空间下已没相关资源，但依然无法删除terminating状态的命名空间的情况，特此记录一下.</p>
+</blockquote>
+    </div>
+    <div class="read-more">
+      <a href="/post/k8s-delete-namespace/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/golang-unit-test/">Golang中的单元测试、基准测试、覆盖测试</a>
     </h1>
     
@@ -883,52 +929,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/operatehivewithpython/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/operatemysqlwithpython/">使用Python操作MySQL</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2018-10-27" class="post-time">
-        2018-10-27
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          
-        </div>
-      <span class="more-meta"> 4462 words </span>
-      <span class="more-meta"> 9 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>前言: 最近做内部运维数据的数据仓库，最终将Hive中的数据清洗后需要业务决策相关的数据进行结构化处理，并存储到关系型数据库MySQL中，以供后期对外接口使用。本篇简单记录下使用Python操作MySQL数据库的简单操作。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/operatemysqlwithpython/" class="read-more-link">Read more</a>
     </div>
     
   </div>
