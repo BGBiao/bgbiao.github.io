@@ -6,7 +6,16 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 30 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>从0构建 SRE 体系</title>
+      <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
+      <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</guid>
+      <description>前言: 该文章为19年 Ernese Norelus 发表在 medium 上的Building SRE from Scratch，现在看来也依然不会觉得过时，一起再来回顾一下。 首先从一张构建 SRE 体系图</description>
+    </item>
+    
     <item>
       <title>一分钟构建高可用的分布式追踪系统-Jaeger</title>
       <link>https://bgbiao.top/post/kubernetes-helm-jaeger/</link>
@@ -220,23 +229,6 @@
       
       <guid>https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
       <description>背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;quot;裸奔&amp;quot;上线的，除了一些传统的主机级别的监控之外，很难有</description>
-    </item>
-    
-    <item>
-      <title>Traefik的可观测性方案</title>
-      <link>https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</link>
-      <pubDate>Tue, 07 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
-      <description>&lt;h2 id=&#34;traefik的可观测性支持&#34;&gt;Traefik的可观测性支持&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&#34;https://docs.traefik.io/observability/logs/&#34;&gt;traefik-observability&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;服务日志: Traefik进程本身相关的操作日志&lt;/li&gt;
-&lt;li&gt;访问日志: 由Traefik接管的代理服务的访问日志(access.log)&lt;/li&gt;
-&lt;li&gt;Metrics: Traefik提供的自身详细的metrics数据&lt;/li&gt;
-&lt;li&gt;Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况&lt;/li&gt;
-&lt;/ul&gt;</description>
     </item>
     
   </channel>

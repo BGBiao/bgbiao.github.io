@@ -6,7 +6,16 @@
     <description>Recent content in 运维 on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>从0构建 SRE 体系</title>
+      <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
+      <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</guid>
+      <description>前言: 该文章为19年 Ernese Norelus 发表在 medium 上的Building SRE from Scratch，现在看来也依然不会觉得过时，一起再来回顾一下。 首先从一张构建 SRE 体系图</description>
+    </item>
+    
     <item>
       <title>如何更加优雅的使用 Systemd 管理服务</title>
       <link>https://bgbiao.top/post/systemd-doc/</link>

@@ -6,7 +6,34 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 30 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DevOps</title>
+      <link>https://bgbiao.top/tags/devops/</link>
+      <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/devops/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SRE</title>
+      <link>https://bgbiao.top/tags/sre/</link>
+      <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/sre/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>运维</title>
+      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Golang</title>
       <link>https://bgbiao.top/tags/golang/</link>
@@ -67,15 +94,6 @@
       <pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>运维</title>
-      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</link>
-      <pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4/</guid>
       <description></description>
     </item>
     
@@ -143,15 +161,6 @@
     </item>
     
     <item>
-      <title>SRE</title>
-      <link>https://bgbiao.top/tags/sre/</link>
-      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/sre/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>运维体系</title>
       <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/</link>
       <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
@@ -175,15 +184,6 @@
       <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/git/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>regex</title>
-      <link>https://bgbiao.top/tags/regex/</link>
-      <pubDate>Sat, 06 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/regex/</guid>
       <description></description>
     </item>
     

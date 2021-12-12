@@ -6,7 +6,16 @@
     <description>Recent content in DevOps on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/devops/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/devops/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>从0构建 SRE 体系</title>
+      <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
+      <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</guid>
+      <description>前言: 该文章为19年 Ernese Norelus 发表在 medium 上的Building SRE from Scratch，现在看来也依然不会觉得过时，一起再来回顾一下。 首先从一张构建 SRE 体系图</description>
+    </item>
+    
     <item>
       <title>Linux下快速构建Android编译环境</title>
       <link>https://bgbiao.top/post/%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BAandroid%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/</link>
