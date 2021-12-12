@@ -13,8 +13,7 @@
       <pubDate>Sun, 30 May 2021 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/kubernetes-helm-jaeger/</guid>
-      <description>&lt;h2 id=&#34;一分钟构建高可用的分布式追踪系统-jaeger&#34;&gt;一分钟构建高可用的分布式追踪系统-Jaeger&lt;/h2&gt;
-&lt;p&gt;关键技术:&lt;/p&gt;
+      <description>&lt;p&gt;关键技术:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://kubernetes.io/&#34;&gt;Kubernetes&lt;/a&gt;: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.jaegertracing.io/&#34;&gt;Jaeger&lt;/a&gt;: 开源端到端的分布式追踪系统&lt;/li&gt;

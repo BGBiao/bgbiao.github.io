@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>从0构建 SRE 体系</title>
+      <title>从零构建 SRE 体系</title>
       <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
       <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
       
@@ -182,8 +182,7 @@ Risk = TTR * (Freq /Yr) * (% of users)
 &lt;p&gt;了解如何使用错误预算和风险分析等基本工具来指导必要的决策，以平衡您对可靠性的投入与对应用程序功能或其他业务优先级的投入。&lt;/p&gt;
 &lt;p&gt;详细阐述了监控分布式系统的四个黄金指标。&lt;/p&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gxb2kvpootj30ha086t9a.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;
-</description>
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/008i3skNly1gxb2kvpootj30ha086t9a.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;</description>
       
     </item>
     
@@ -194,8 +193,7 @@ Risk = TTR * (Freq /Yr) * (% of users)
       
       <guid>https://bgbiao.top/post/kubernetes-helm-jaeger/</guid>
       
-        <description>&lt;h2 id=&#34;一分钟构建高可用的分布式追踪系统-jaeger&#34;&gt;一分钟构建高可用的分布式追踪系统-Jaeger&lt;/h2&gt;
-&lt;p&gt;关键技术:&lt;/p&gt;
+        <description>&lt;p&gt;关键技术:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://kubernetes.io/&#34;&gt;Kubernetes&lt;/a&gt;: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.jaegertracing.io/&#34;&gt;Jaeger&lt;/a&gt;: 开源端到端的分布式追踪系统&lt;/li&gt;

@@ -8,12 +8,15 @@
     <language>en</language>
     <lastBuildDate>Sun, 12 Dec 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>从0构建 SRE 体系</title>
+      <title>从零构建 SRE 体系</title>
       <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
       <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</guid>
-      <description>前言: 该文章为19年 Ernese Norelus 发表在 medium 上的Building SRE from Scratch，现在看来也依然不会觉得过时，一起再来回顾一下。 首先从一张构建 SRE 体系图</description>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;前言: 该文章为19年 Ernese Norelus 发表在 &lt;a href=&#34;https://medium.com/&#34;&gt;medium&lt;/a&gt; 上的&lt;a href=&#34;https://medium.com/ibm-garage/building-sre-from-scratch-485e23985bbd&#34;&gt;Building SRE from Scratch&lt;/a&gt;，现在看来也依然不会觉得过时，一起再来回顾一下。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;首先从一张构建 SRE 体系图开始，从为什么构建 SRE、SRE 目标以及如何实现 SRE。&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -22,8 +25,7 @@
       <pubDate>Sun, 30 May 2021 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/kubernetes-helm-jaeger/</guid>
-      <description>&lt;h2 id=&#34;一分钟构建高可用的分布式追踪系统-jaeger&#34;&gt;一分钟构建高可用的分布式追踪系统-Jaeger&lt;/h2&gt;
-&lt;p&gt;关键技术:&lt;/p&gt;
+      <description>&lt;p&gt;关键技术:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://kubernetes.io/&#34;&gt;Kubernetes&lt;/a&gt;: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.jaegertracing.io/&#34;&gt;Jaeger&lt;/a&gt;: 开源端到端的分布式追踪系统&lt;/li&gt;
