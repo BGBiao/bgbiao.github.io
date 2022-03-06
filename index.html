@@ -462,6 +462,92 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/coredns-loop/">CoreDNS loop 插件异常问题</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2022-03-06" class="post-time">
+        2022-03-06
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
+          
+        </div>
+      <span class="more-meta"> 2105 words </span>
+      <span class="more-meta"> 5 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <p>关键技术:</p>
+<ul>
+<li><a href="https://kubernetes.io/">Kubernetes</a>: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施</li>
+<li><a href="https://coredns.io">CoreDNS</a>: DNS and Service Discovery ，当前公认的云原生基础设施之名字服务系统</li>
+<li><a href="https://coredns.io/plugins/loop/">CoreDNS-plugins-loop</a>: CoreDNS loop 插件文档</li>
+</ul>
+<h3 id="背景">背景</h3>
+<p>最近有遇到一个客户集群，发现集群中的 CoreDNS 老是异常(loop 插件检测到有回路后进行 panic)，因此怀疑是 K8S 集群在交付或者初始化过程中做了一些额外的动作，为了查明真相我们对客户环境进行一次排查和状况模拟，顺便来一起学习一下在 CoreDNS 中 loop 插件的相关知识。</p>
+<h3 id="问题现象">问题现象</h3>
+<p>在查看 coredns pod 启动日志时，发现有如下对应异常:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ kubectl  get pods -n kube-system | grep dns
+coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
+
+$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
+[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &lt; 1.19
+.:53
+[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
+CoreDNS-1.8.4
+linux/amd64, go1.16.4, 053c4d5
+[INFO] 127.0.0.1:34652 - 36041 &#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&#34; NOERROR - 0 6.002536937s
+[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&gt;127.0.0.53:53: i/o timeout
+[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&gt; :53) detected for zone &#34;.&#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &#34;HINFO 2066162189351134310.8810881223121065474.&#34;
+
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+    <div class="read-more">
+      <a href="/post/coredns-loop/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/">从零构建 SRE 体系</a>
     </h1>
     
@@ -875,52 +961,6 @@ if (!doNotTrack) {
 </article>
 
   
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/">kafka中关于HW(High Watermark)和Leader Epoch的讨论</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-06-15" class="post-time">
-        2020-06-15
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 3173 words </span>
-      <span class="more-meta"> 7 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>我们知道在kafka中有一个名词叫做HW(High Watermark)，但是具体这个高水位是用来做什么的呢？我们一起来学习下</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/kafka%E9%AB%98%E6%B0%B4%E4%BD%8D%E5%92%8Cleader-epoch%E7%9A%84%E8%AE%A8%E8%AE%BA/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
 </section>
 
 
@@ -1043,7 +1083,7 @@ if (!doNotTrack) {
     &copy;
     
       2017 -
-    2021
+    2022
     <span class="heart">
       
       <i class="iconfont">

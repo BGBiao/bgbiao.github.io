@@ -12,6 +12,281 @@
     
     
     <item>
+      <title>CoreDNS loop 插件异常问题</title>
+      <link>https://bgbiao.top/post/coredns-loop/</link>
+      <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/coredns-loop/</guid>
+      
+        <description>&lt;p&gt;关键技术:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/&#34;&gt;Kubernetes&lt;/a&gt;: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://coredns.io&#34;&gt;CoreDNS&lt;/a&gt;: DNS and Service Discovery ，当前公认的云原生基础设施之名字服务系统&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://coredns.io/plugins/loop/&#34;&gt;CoreDNS-plugins-loop&lt;/a&gt;: CoreDNS loop 插件文档&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;背景&#34;&gt;背景&lt;/h3&gt;
+&lt;p&gt;最近有遇到一个客户集群，发现集群中的 CoreDNS 老是异常(loop 插件检测到有回路后进行 panic)，因此怀疑是 K8S 集群在交付或者初始化过程中做了一些额外的动作，为了查明真相我们对客户环境进行一次排查和状况模拟，顺便来一起学习一下在 CoreDNS 中 loop 插件的相关知识。&lt;/p&gt;
+&lt;h3 id=&#34;问题现象&#34;&gt;问题现象&lt;/h3&gt;
+&lt;p&gt;在查看 coredns pod 启动日志时，发现有如下对应异常:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ kubectl  get pods -n kube-system | grep dns
+coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
+
+$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
+[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &amp;lt; 1.19
+.:53
+[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
+CoreDNS-1.8.4
+linux/amd64, go1.16.4, 053c4d5
+[INFO] 127.0.0.1:34652 - 36041 &amp;#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&amp;#34; NOERROR - 0 6.002536937s
+[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&amp;gt;127.0.0.53:53: i/o timeout
+[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&amp;gt; :53) detected for zone &amp;#34;.&amp;#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &amp;#34;HINFO 2066162189351134310.8810881223121065474.&amp;#34;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;看到该异常时，第一时间想到的是 客户应该在集群中做了一些 dns 的自定义配置(因为我们交付模版中并没有为 CoreDNS 开启 loop 插件)，而配置后又触发了一些冲突，进而导致服务异常。&lt;/p&gt;
+&lt;p&gt;虽然基本已经确定了是客户自行修改的配置导致的异常，但为何或者具体如何出现的该问题呢？我们继续往下看。&lt;/p&gt;
+&lt;h3 id=&#34;问题排查和处理&#34;&gt;问题排查和处理&lt;/h3&gt;
+&lt;p&gt;其实对于 CoreDNS 这种开源界比较优秀的软件，对异常的处理以及修复都已经做的特别好了，比如上述的日志中已经明显提示，对于这种错误如何进行 troubleshooting 了。&lt;/p&gt;
+&lt;p&gt;我们跟随官方文档，其实就可以知道，对于相关问题已经说的比较明白，我在这里总结以下几点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;ol&gt;
+&lt;li&gt;loop 插件的作用:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;该插件会检测简单转发环路，并且当发现回路时会使服务器&lt;code&gt;停止&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;回路的影响:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;当 CoreDNS 转发中存在环路时，会不断向自己转发，如此形成死循环，会导致资源无穷占用，最终导致主机 OOM&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;为何会导致回路:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;CoreDNS直接将请求转发给自己，比如通过 127.0.0.1, ::1, 或者 127.0.0.53&lt;/li&gt;
+&lt;li&gt;CoreDNS将请求转发到上游服务器，后者再将请求转发回 CoreDNS&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;loop 插件生效的条件:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;回路必须在 coredns 启动时出现&lt;/li&gt;
+&lt;li&gt;回路必须出现在一个 &lt;code&gt;HINFO&lt;/code&gt; 类型的查询&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如上四个点，看完之后，基本上就知道为何 coredns 启动失败了，此时查看了 coredns 的配置项并无异常，核心配置如下:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# coredns 中的核心配置，可以看到是开启了loop 配置的
+    .:53 {
+        errors
+        health {
+          lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        log . {
+          class all
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+          max_concurrent 1000
+        }
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;如上配置可以看到，CoreDNS 的确开启了 loop 插件，并且没有显式声明会讲请求转发到 &lt;code&gt;127.0.0.1&lt;/code&gt; 或者 &lt;code&gt;127.0.0.53&lt;/code&gt; 之类的本地地址。&lt;/p&gt;
+&lt;p&gt;但是我们也观察到会将请求转发到 &lt;code&gt;/etc/resolv.conf&lt;/code&gt;，而一般情况下，在 K8S 集群中的 workload 的 &lt;code&gt;dnsPolicy&lt;/code&gt; 通常为 &lt;code&gt;Default&lt;/code&gt;，也就是当 CoreDNS  pod 调度到哪个节点，将会转发到节点的 &lt;code&gt;/etc/resolv.conf&lt;/code&gt; 配置中，因此接下来可以去查看节点的配置。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 查看coredns 被调度到的节点上的resolv.conf 配置
+# cat /etc/resolv.conf  | grep -v ^#
+
+nameserver 127.0.0.53
+options edns0
+nameserver 183.60.83.19
+nameserver 183.60.82.98
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;此时，对于上面 coredns 异常的原因就已经大概清楚了，就是节点上的 &lt;code&gt;/etc/resolv.conf&lt;/code&gt; 配置了 &lt;code&gt;127.0.0.53&lt;/code&gt; 。&lt;/p&gt;
+&lt;p&gt;按照 &lt;code&gt;loop&lt;/code&gt; 插件的说法，就是启动了 &lt;code&gt;loop&lt;/code&gt; 模块，并成功检测到了回路，那此时，把回路清理掉，应该就可以恢复正常，我们可以尝试把对应节点上的 &lt;code&gt;nameserver 127.0.0.53&lt;/code&gt; 删除掉。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 此时修改节点的的配置后删除pod发现可以重新启动了
+$ kubectl  delete pods -n kube-system coredns-bdbc5564-8qldp
+pod &amp;#34;coredns-bdbc5564-8qldp&amp;#34; deleted
+
+$ kubectl  get pods -n kube-system | grep dns
+coredns-bdbc5564-j6nwl              1/1     Running   0          100s
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;根因和解决方案&#34;&gt;根因和解决方案&lt;/h3&gt;
+&lt;p&gt;目前，客户的问题已经解决，但是客户反馈自己没有修改过节点上的配置，并且依然认为是 K8S 集群交付和初始化方做了动作，希望能够找到节点上的 &lt;code&gt;127.0.0.53&lt;/code&gt; 是如何来的。&lt;/p&gt;
+&lt;p&gt;作为平台方，在新增节点或者交付集群时，的确会进行初始化节点，但对于在 &lt;code&gt;/etc/resolv.conf&lt;/code&gt; 中增加 &lt;code&gt;127.0.0.53&lt;/code&gt; 是肯定不会做的。&lt;/p&gt;
+&lt;p&gt;最终通过不断查询相关资料，发现客户用的是 &lt;code&gt;Ubuntu&lt;/code&gt; 的操作系统，而在 &lt;code&gt;Ubuntu&lt;/code&gt; 的操作系统中，默认会使用到&lt;code&gt;systemd-resolved&lt;/code&gt; 进行管理 dns server，并且会设置一个 &lt;code&gt;127.0.0.53&lt;/code&gt; 的地址用于本地dns 缓存。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.codenong.com/jsba6d4c63c1ef/#:~:text=ubuntu%E4%B8%8A%E7%BD%91%E6%85%A2%E7%9A%84%E4%B8%80%E4%B8%AA%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0%20%E5%B0%B1%E6%98%AF%E5%9B%A0%E4%B8%BA%2Fetc%2Fresolve.conf%E4%B8%AD%E5%AD%98%E5%9C%A8%20nameserver,127.0.0.53%E5%9B%9E%E7%8E%AF%E5%9C%B0%E5%9D%80%E3%80%82%20%E8%BF%99%E6%98%AF%E5%9B%A0%E4%B8%BAubuntu%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9C%AA%E9%85%8D%E7%BD%AEDNS%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8C%E4%BD%BF%E7%94%A8%E5%BA%94%E7%94%A8%E9%BB%98%E8%AE%A4%E7%9A%84127.0.0.53%EF%BC%8C%E8%BF%99%E4%B8%AA%E4%BC%9A%E5%AF%BC%E8%87%B4%E7%94%B5%E8%84%91%E8%BF%9E%20wifi%20%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E9%99%B7%E5%85%A5%E4%B8%80%E4%B8%AA%E4%B8%8D%E5%81%9C%E5%9C%B0%E8%BF%9B%E8%A1%8Cdns%E8%A7%A3%E6%9E%90%E7%9A%84%E6%AD%BB%E5%BE%AA%E7%8E%AF%E3%80%82&#34;&gt;Ubuntu 127.0.0.53 问题和解决办法&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;经过测试的确是发现 &lt;code&gt;Ubuntu&lt;/code&gt; 的操作系统会增加该 name Server ，到这里也就基本上清楚了，节点上的 &lt;code&gt;127.0.0.53&lt;/code&gt; 记录的来源。&lt;/p&gt;
+&lt;p&gt;那看到这里要如何解决呢？&lt;/p&gt;
+&lt;p&gt;根据该问题，个人认为会有如下方案可供选择:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;ol&gt;
+&lt;li&gt;CoreDNS 关闭 &lt;code&gt;loop&lt;/code&gt; 插件，这也是最粗暴直接的&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;继续开启&lt;code&gt;loop&lt;/code&gt; 插件，但是尝试对 &lt;code&gt;HINFO&lt;/code&gt; 类型的请求做干预&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;手动修改节点上的 &lt;code&gt;/etc/resolv.conf&lt;/code&gt; 配置，确保没有 &lt;code&gt;nameserver 127.0.0.53&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;修改 coredns 的亲和性和凡亲和性策略，仅调度到非 Ubuntu 节点&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对于如上四种方案，前两者选择对 CoreDNS 的配置进行直接干预，来整体影响 CoreDNS 的功能。&lt;/p&gt;
+&lt;p&gt;而后两种方案则是通过人工干预集群节点和默认的调度行为。&lt;/p&gt;
+&lt;p&gt;但是，对于 K8S 集群而言，如果不设置特殊的规则(比如label，affinity，nodeSelector)去影响默认的调度策略，默认是无法根据 OS 信息去影响调度的，并且对于开放的 k8s 集群，也不应该禁止用户使用 Ubuntu 操作系统。&lt;/p&gt;
+&lt;p&gt;那为了最小化的改动并且能够最大限度支撑现有需求，我们可以选择方案2进行问题的兜底。&lt;/p&gt;
+&lt;p&gt;我们可以使用如下配置来对&lt;code&gt;HINFO&lt;/code&gt; 的请求，强制返回 &lt;code&gt;NXDOMAIN&lt;/code&gt; ，如此一来也就不回直接产生 &lt;code&gt;HINFO&lt;/code&gt; 的异常请求&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$  kubectl  edit -n kube-system cm coredns
+....
+        .:53 {
+            template ANY HINFO . {
+                rcode NXDOMAIN
+            }
+        }
+....
+....
+
+
+# 对 HINFO 类型查询做了干预后，可以查看具体的请求
+$ dig  +short  @172.16.0.80 kubernetes.default.svc
+$ dig  +short  @172.16.0.80  kubernetes.default.svc HINFO
+
+# 对应coredns pod 的查询日志如下:
+
+2022-03-05T06:08:39.299Z [INFO] 10.0.1.80:45430 - 60055 &amp;#39;A IN kubernetes.default.svc. udp 63 false 4096&amp;#39; NXDOMAIN qr,aa,rd,ra 115 0.000093025s
+2022-03-05T06:09:03.685Z [INFO] 10.0.1.80:35006 - 61274 &amp;#39;HINFO IN kubernetes.default.svc. udp 63 false 4096&amp;#39; NXDOMAIN qr,aa,rd 40 0.000109837s
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;总结&#34;&gt;总结&lt;/h3&gt;
+&lt;p&gt;至此，我们也算是找到了问题的根因，并且给出了比较合适的解决方案。&lt;/p&gt;
+&lt;p&gt;同时，也学习到了 CoreDNS 这种比较优秀的开源软件的设计，针对于一些风险检测的规避和和默认行为，能够忍我们更早的发现系统的风险和问题。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>从零构建 SRE 体系</title>
       <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
       <pubDate>Sun, 12 Dec 2021 00:00:00 +0000</pubDate>
@@ -8140,360 +8415,6 @@ java version &amp;#34;1.8.0_141&amp;#34;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;由上述的输出可知，初始的堆内存为&lt;code&gt;264241152/1024/1024=252M&lt;/code&gt;，而堆内存最大为&lt;code&gt;4206886912/1024/1024/1024=3G&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;这个时候可能就会有一个问题就是，该ECS上跑多少个&lt;code&gt;java -jar xxx.jar&lt;/code&gt;这类的服务会比较好呢？如果按照每个服务都能使用3G的堆内存来算，该机器上做多跑4个这类的服务是一个比较合理的规划，但是考虑实际的业务使用需求，单纯这样考虑可能会有点唐突了，因此还是建议每个应用在部署时指定一些基础的参数，比如初始堆和最大堆，并且这两个参数一般建议设置成一致，以免在运行过程中堆的扩容造成的损耗。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-</description>
-      
-    </item>
-    
-    <item>
-      <title>分布式对象存储Minio的可观测性方案</title>
-      <link>https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</link>
-      <pubDate>Sun, 12 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8minio%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;背景: 对于初创企业来说，在很长一段时间一些基础的开源服务基本都是&amp;quot;裸奔&amp;quot;上线的，除了一些传统的主机级别的监控之外，很难有一些额外的性能指标来描述该服务的整体性能情况。因此，在我们的&lt;a href=&#34;https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/&#34;&gt;Minio对象存储服务&lt;/a&gt;上线到最近一直也是裸奔的，虽然暂时也没出现过故障，但是作为一名专业搞笑的SRE来讲，服务的可观测性一定得跟上，不然后期铁锅是妥妥的背定了，这篇文章就主要介绍下&lt;code&gt;Minio&lt;/code&gt;的可观测性方案。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;开源组件的可观测性现状&#34;&gt;开源组件的可观测性现状&lt;/h3&gt;
-&lt;p&gt;在开头提到了，初创企业的开源服务初期大多都是裸奔上线的，出现这种情况我认为一般分为内因和外因:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;内因是开源的基础中间件性能指标通常很多，不容易抽象，因此这些服务的性能指标数据通常可以通过内部的api或cli来获取，不太容易直接和开源的监控系统进行集成;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;外因是对于初创企业来说，人力有限并且对于众多开源组件的理解不够深入导致前面说的&amp;quot;裸奔&amp;quot;上线的现象。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;不过随着以&lt;code&gt;Kubernetes&lt;/code&gt;，&lt;code&gt;Prometheus&lt;/code&gt;为代表的CloudNative理念不断发展，越来越多的开源中间件也支持了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的性能指标，这对于初创企业的技术团队来说可谓是一个福音。&lt;/p&gt;
-&lt;p&gt;截止目前，我们所熟知的很多开源软件已经内置了兼容&lt;code&gt;Prometheus Metrics&lt;/code&gt;的API接口，不再需要第三方的&lt;code&gt;exporter&lt;/code&gt;来导出一些性能指标数据。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;[内置Metrics接口的开源软件](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics)&lt;/code&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://docs.ceph.com/docs/master/mgr/prometheus/&#34;&gt;Ceph&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-metrics&#34;&gt;Docker&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.envoyproxy.io/docs/envoy/latest/operations/admin.html#get--stats?format=prometheus&#34;&gt;Envoy&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/coreos/etcd&#34;&gt;Etcd&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/apache/flink&#34;&gt;Flink&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://docs.grafana.org/administration/metrics/&#34;&gt;Grafana&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/Kong/kong-plugin-prometheus&#34;&gt;Kong&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/kubernetes/kubernetes&#34;&gt;Kubernetes&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/BuoyantIO/linkerd&#34;&gt;Linkerd&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/minio/minio&#34;&gt;Minio&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://rabbitmq.com/prometheus.html&#34;&gt;RabbitMQ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/influxdata/telegraf/tree/master/plugins/outputs/prometheus_client&#34;&gt;Telegraf&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/containous/traefik&#34;&gt;Traefik&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/openzipkin/zipkin/tree/master/zipkin-server#metrics&#34;&gt;Zipkin&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;minio集群的可观测性&#34;&gt;Minio集群的可观测性&lt;/h3&gt;
-&lt;p&gt;得益于&lt;code&gt;Minio&lt;/code&gt;的云原生化，这款分布式的对象存储服务天然的支持了&lt;code&gt;Prometheus Metrics&lt;/code&gt;格式的指标数据以及服务端点(API)，因此，如果想要在已有的Minio集群中增加性能指标的监控，将是一件很容易的事情。&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://docs.min.io/docs/how-to-monitor-minio-using-prometheus.html&#34;&gt;使用Prometheus监控Minio服务&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Minio服务通过内置的服务端点暴露监控数据，用来监控服务整体的健康状态以及性能指标:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Healthcheck 探针: 提供两个服务探活接口，一个用于检测服务是否启动，另外一个用于检测服务是否可以正常对外提供服务(服务就绪)&lt;/li&gt;
-&lt;li&gt;
-&lt;ul&gt;
-&lt;li&gt;探活接口: &lt;code&gt;/minio/health/live&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;ul&gt;
-&lt;li&gt;就绪接口: &lt;code&gt;/minio/health/ready&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Prometheus 探针: 提供了prometheus metrics格式的性能指标数据&lt;/li&gt;
-&lt;li&gt;
-&lt;ul&gt;
-&lt;li&gt;Metrics接口: &lt;code&gt;/minio/prometheus/metrics&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Healthcheck相关的探针默认是非认证的接口，服务启动后可直接访问; Prometheus探针的接口默认是基于&lt;code&gt;JWT认证&lt;/code&gt;的接口，需要额外设置来访问其Metrics数据。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Minio的Metrics数据暴露&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;管理员可通过下述方式获取Metrics端点的jwt token:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 获取token
-$ mc admin prometheus generate  minio
-scrape_configs:
-- job_name: minio-job
-  bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjQ3NDAwMzM4MjAsImlzcyI6InByb21ldGhldXMiLCJzdWIiOiJNaW5pb1NvdWwifQ.1QiANgXVCpAPWCdF9EejhH608rZbdCRcHe3RtalC2XnScWtYMk_OG0ih-Z3t4ADb1cnYREdTrQwWscFw6Xvk3Q
-  metrics_path: /minio/prometheus/metrics
-  scheme: http
-  static_configs:
-  - targets: [minio.bgbiao.top]
-
-# 在配置prometheus的scrape时配置如上相关参数
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;通常对于内部系统间的调用来说，权限可能没那么重要，可以增加如下环境变量来开启metrics的非认证方式:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;MINIO_PROMETHEUS_AUTH_TYPE=&amp;#34;public&amp;#34;
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;此时，直接访问接口可以获取到如下的Metrics数据:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ curl -s  minio.bgbiao.top/minio/prometheus/metrics | head -10
-# HELP disk_storage_available Total available space left on the disk
-# TYPE disk_storage_available gauge
-disk_storage_available{disk=&amp;#34;/data/minio&amp;#34;} 2.78376280064e+11
-# HELP disk_storage_total Total space on the disk
-# TYPE disk_storage_total gauge
-disk_storage_total{disk=&amp;#34;/data/minio&amp;#34;} 3.00809048064e+11
-# HELP disk_storage_used Total disk storage used on the disk
-# TYPE disk_storage_used gauge
-disk_storage_used{disk=&amp;#34;/data/minio&amp;#34;} 2.2432768e+10
-# HELP go_gc_duration_seconds A summary of the GC invocation durations.
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;minio-metrics相关定义&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;标准的运行时指标使用以&lt;code&gt;go_&lt;/code&gt;开头&lt;/li&gt;
-&lt;li&gt;进程级别的指标以&lt;code&gt;process_&lt;/code&gt;开头&lt;/li&gt;
-&lt;li&gt;prometheus暴露的指标&lt;code&gt;promhttp_&lt;/code&gt;开头&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;disk_storage_used&lt;/code&gt;: 磁盘使用空间&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;disk_storage_available&lt;/code&gt;: 磁盘可用空间&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;disk_storage_total&lt;/code&gt;: 磁盘总空间&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;minio_disks_offline&lt;/code&gt;: 当前minio实例中处于下线状态的个数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;minio_disks_total&lt;/code&gt;: 当前minio实例的磁盘总数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s3_requests_total&lt;/code&gt;: 当前minio实例中s3接口总请求数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s3_errors_total&lt;/code&gt;: s3接口错误请求数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s3_requests_current&lt;/code&gt;: 活动状态的s3请求数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;internode_rx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例接收的节点间字节的总数(bytes)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;internode_tx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例发送到其他节点的字节总数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s3_rx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例接收的s3字节总数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s3_tx_bytes_total&lt;/code&gt;: 当前MinIO服务器实例发送的s3字节总数&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;s3_ttfb_seconds_&lt;/code&gt;: 统计s3请求的延迟信息&lt;/li&gt;
-&lt;li&gt;
-&lt;ul&gt;
-&lt;li&gt;bucket: bucket操作相关的延迟&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;ul&gt;
-&lt;li&gt;count: 延迟统计&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;ul&gt;
-&lt;li&gt;sum: 总延迟&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; Minio不同的版本的Metrics数据有区别，需要查看具体暴露的数据指标&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;示例&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 打开文件数
-process_open_fds{job=&amp;#34;minio-metrics&amp;#34;}
-
-# 启动时间(时间戳)
-process_start_time_seconds{job=&amp;#34;minio-metrics&amp;#34;}
-
-# 虚拟内存使用
-process_virtual_memory_bytes{job=&amp;#34;minio-metrics&amp;#34;}
-
-# cpu占用时间
-process_cpu_seconds_total{job=&amp;#34;minio-metrics&amp;#34;}
-
-# minio对外的http接口状态
-promhttp_metric_handler_requests_total{job=&amp;#34;minio-metrics&amp;#34;}
-
-# 链接中的http请求
-promhttp_metric_handler_requests_in_flight{job=&amp;#34;minio-metrics&amp;#34;}
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;配置prometheus数据抓取&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 我们的Prometheus是使用CRD方式部署在Kubernetes集群中的，因此抓取外部Metrics数据需要做如下的操作.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;# 暴露minio服务
-$ cat endpoint-minio.yaml
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: minio-metrics
-  namespace: monitoring
-  labels:
-    app: minio-metrics
-subsets:
-- addresses:
-  - ip: 192.168.0.148
-  - ip: 192.168.0.149
-  - ip: 192.168.0.150
-  - ip: 192.168.0.151
-  ports:
-  - port: 9000
-    name: http-metrics
-    protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: monitoring
-  name: minio-metrics
-  labels:
-    app: minio-metrics
-spec:
-  ports:
-  - name: http-metrics
-    port: 9000
-    targetPort: 9000
-    protocol: TCP
-
-# prometheus servicemonitor
-$ cat prometheus-minio.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: minio-metrics
-  name: minio-metrics
-  namespace: monitoring
-spec:
-  # 对应的端点是上面创建的svc的ports
-  endpoints:
-  # 可以定义两个采集端点，一个是minio服务本身的监控，一个是minio节点的基础监控
-  - interval: 30s
-    port: http-metrics
-    path: /minio/prometheus/metrics
-  jobLabel: app
-  # 匹配monitoring命名空间的app=minio-metrics的svc
-  namespaceSelector:
-    matchNames:
-    - monitoring
-  selector:
-    matchLabels:
-      app: minio-metrics
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;查看prometheus监控的minio相关数据&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Prometheus成功抓取minio metrics数据后，即可在prometheus中查看到先关数据:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdnrt82rfpj324a0t47at.jpg&#34; alt=&#34;minio-prometheus-metrics&#34;&gt;&lt;/p&gt;
-&lt;p&gt;在Grafana中配置关心的指标以及相关图表:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/00831rSTly1gdofcrk9bbj31gr0u04a4.jpg&#34; alt=&#34;minio-grafana监控&#34;&gt;&lt;/p&gt;
-&lt;p&gt;为了方便其他运维小伙伴们，我将Minio的Grafana模板开源出来，有需求的可以直接使用如下模板:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://grafana.com/grafana/dashboards/12063&#34;&gt;minio-grafana模板&lt;/a&gt;&lt;/p&gt;
-&lt;hr&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg&#34; alt=&#34;知识星球&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gdra6n69uhj30f00kkgot.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
