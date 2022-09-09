@@ -6,7 +6,21 @@
     <description>Recent content in Posts on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>初识 WebSocket 以及 Golang 实现</title>
+      <link>https://bgbiao.top/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/</link>
+      <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/</guid>
+      <description>&lt;h2 id=&#34;初识-websocket-以及-golang-实现&#34;&gt;初识 WebSocket 以及 Golang 实现&lt;/h2&gt;
+&lt;h3 id=&#34;一-websocket-介绍&#34;&gt;一、 WebSocket 介绍&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;1.1 WebSocket 的诞生背景&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;在网络冲浪中，我们接触到最多的协议必定是 HTTP/HTTPS 协议，这两种协议的工作原理可简述为：客户端通过浏览器发送一个请求，服务器在接受到请求后进行处理并将得到的结果返回给客户端，由客户端处理结果。可见其主要为一种 “拉取” 信息的形式。&lt;/p&gt;
+&lt;p&gt;随着时代的发展，出现了一些需要实时发送信息的场景，比如体育实况更新、金融证券的实时信息、实时数据监控等。而如何实现 “推送” 信息的形式呢？在 WebSocket 还未诞生的时候，采用的是轮询技术来实现信息的推送：每间隔一定的时间，浏览器自动发送一个 HTTP 请求，以此主动拉取服务器的最新消息。使用轮询技术，需要不停向服务器发送 HTTP 请求，这样会占用很多的带宽和服务器资源，并且还是不能实现服务器主动向客户端推送数据。&lt;/p&gt;
+&lt;p&gt;在上述背景下，一种全双工的通信协议 WebSocket 应运而生，它实现了服务端主动向客户端推送数据，使得客户端与服务器间的信息交互更为便捷。&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>CoreDNS loop 插件异常问题</title>
       <link>https://bgbiao.top/post/coredns-loop/</link>
@@ -264,15 +278,6 @@ linux/amd64, go1.16.4, 053c4d5
 &lt;/blockquote&gt;
 &lt;p&gt;笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为&lt;code&gt;日志收集&lt;/code&gt;、&lt;code&gt;数据管道&lt;/code&gt;、&lt;code&gt;流式计算&lt;/code&gt;、&lt;code&gt;业务事件存储&lt;/code&gt;几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的&lt;code&gt;可用性&lt;/code&gt;，&lt;code&gt;可靠性&lt;/code&gt;，&lt;code&gt;数据一致性&lt;/code&gt;要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。&lt;/p&gt;
 &lt;p&gt;鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>你还记得你JVM的的初始堆大小吗</title>
-      <link>https://bgbiao.top/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/</link>
-      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/</guid>
-      <description>通常对于很多java应用来说，当打成jar包后会下意识的使用java -jar xxx.jar来运行应用，而不是根据自己业务或实际debug的一些需求</description>
     </item>
     
   </channel>

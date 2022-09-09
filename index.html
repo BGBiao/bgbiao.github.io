@@ -462,6 +462,55 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/">初识 WebSocket 以及 Golang 实现</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2022-09-09" class="post-time">
+        2022-09-09
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+          
+        </div>
+      <span class="more-meta"> 4049 words </span>
+      <span class="more-meta"> 9 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <h2 id="初识-websocket-以及-golang-实现">初识 WebSocket 以及 Golang 实现</h2>
+<h3 id="一-websocket-介绍">一、 WebSocket 介绍</h3>
+<p><strong>1.1 WebSocket 的诞生背景</strong></p>
+<p>在网络冲浪中，我们接触到最多的协议必定是 HTTP/HTTPS 协议，这两种协议的工作原理可简述为：客户端通过浏览器发送一个请求，服务器在接受到请求后进行处理并将得到的结果返回给客户端，由客户端处理结果。可见其主要为一种 “拉取” 信息的形式。</p>
+<p>随着时代的发展，出现了一些需要实时发送信息的场景，比如体育实况更新、金融证券的实时信息、实时数据监控等。而如何实现 “推送” 信息的形式呢？在 WebSocket 还未诞生的时候，采用的是轮询技术来实现信息的推送：每间隔一定的时间，浏览器自动发送一个 HTTP 请求，以此主动拉取服务器的最新消息。使用轮询技术，需要不停向服务器发送 HTTP 请求，这样会占用很多的带宽和服务器资源，并且还是不能实现服务器主动向客户端推送数据。</p>
+<p>在上述背景下，一种全双工的通信协议 WebSocket 应运而生，它实现了服务端主动向客户端推送数据，使得客户端与服务器间的信息交互更为便捷。</p>
+    </div>
+    <div class="read-more">
+      <a href="/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/coredns-loop/">CoreDNS loop 插件异常问题</a>
     </h1>
     
@@ -911,50 +960,6 @@ linux/amd64, go1.16.4, 053c4d5
     </div>
     <div class="read-more">
       <a href="/post/kafka%E5%9C%A8zookeeper%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/">一文帮你理解整个SRE运维体系</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-06-19" class="post-time">
-        2020-06-19
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 5631 words </span>
-      <span class="more-meta"> 12 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      SRE运维体系的构建和工作职责划分。 可观测性系统 在任何有一定规模的企业内部，一旦推行起来整个SRE的运维模式，那么对于可观测性系统的建设将变
-    </div>
-    <div class="read-more">
-      <a href="/post/sre%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/" class="read-more-link">Read more</a>
     </div>
     
   </div>

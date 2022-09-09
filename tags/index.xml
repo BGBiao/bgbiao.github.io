@@ -6,7 +6,16 @@
     <description>Recent content in Tags on BGBiao的SRE人生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2022</title>
+      <link>https://bgbiao.top/tags/2022/</link>
+      <pubDate>Fri, 09 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://bgbiao.top/tags/2022/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>CoreDNS</title>
       <link>https://bgbiao.top/tags/coredns/</link>
@@ -175,15 +184,6 @@
       <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>面试</title>
-      <link>https://bgbiao.top/tags/%E9%9D%A2%E8%AF%95/</link>
-      <pubDate>Sun, 14 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E9%9D%A2%E8%AF%95/</guid>
       <description></description>
     </item>
     
