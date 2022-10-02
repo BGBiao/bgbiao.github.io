@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on BGBiao的SRE人生</title>
+    <title>Posts on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
     <link>https://bgbiao.top/post/</link>
-    <description>Recent content in Posts on BGBiao的SRE人生</description>
+    <description>Recent content in Posts on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Fri, 16 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/post/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +13,8 @@
       <pubDate>Fri, 16 Sep 2022 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/post/2022%E5%B9%B4%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E8%87%AA%E5%8A%A8%E5%8C%96%E5%92%8C%E7%9B%91%E6%8E%A7%E7%9A%8417%E4%B8%AA%E6%9C%80%E4%BD%B3devops%E5%B7%A5%E5%85%B7/</guid>
-      <description>原文： https://medium.com/@rphilogene/17-best-devops-tools-to-use-in-2022-for-infrastructure-automation-and-monitoring-b3470cf9e00f 让我们从基础设施代码(IaC)和配置管理开始。 Infrastructure as Code / Configuration Management Infrastructure as code (IaC) 可以帮助我们自动的提供云基础架构。 无论是VM、数据库、云网络、安全</description>
+      <description>&lt;p&gt;让我们从基础设施代码(IaC)和配置管理开始。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/e6c9d24egy1h68dklrpemj212w0m474k.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -48,7 +49,7 @@
 &lt;p&gt;在查看 coredns pod 启动日志时，发现有如下对应异常:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
@@ -60,23 +61,21 @@
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ kubectl  get pods -n kube-system | grep dns
-coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
-
-$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
-[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &amp;lt; 1.19
-.:53
-[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
-CoreDNS-1.8.4
-linux/amd64, go1.16.4, 053c4d5
-[INFO] 127.0.0.1:34652 - 36041 &amp;#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&amp;#34; NOERROR - 0 6.002536937s
-[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&amp;gt;127.0.0.53:53: i/o timeout
-[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&amp;gt; :53) detected for zone &amp;#34;.&amp;#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &amp;#34;HINFO 2066162189351134310.8810881223121065474.&amp;#34;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ kubectl  get pods -n kube-system | grep dns
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &amp;lt; 1.19
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.:53
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CoreDNS-1.8.4
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;linux/amd64, go1.16.4, 053c4d5
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[INFO] 127.0.0.1:34652 - 36041 &amp;#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&amp;#34; NOERROR - 0 6.002536937s
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&amp;gt;127.0.0.53:53: i/o timeout
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&amp;gt; :53) detected for zone &amp;#34;.&amp;#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &amp;#34;HINFO 2066162189351134310.8810881223121065474.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
     </item>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>traefik on BGBiao的SRE人生</title>
+    <title>traefik on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
     <link>https://bgbiao.top/tags/traefik/</link>
-    <description>Recent content in traefik on BGBiao的SRE人生</description>
+    <description>Recent content in traefik on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/traefik/index.xml" rel="self" type="application/rss+xml" />

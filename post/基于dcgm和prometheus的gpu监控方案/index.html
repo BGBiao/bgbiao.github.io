@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>基于DCGM和Prometheus的GPU监控方案 - BGBiao的SRE人生</title>
+  <title>基于DCGM和Prometheus的GPU监控方案 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="基于DCGM和Prometheus的GPU监控方案  背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
+  <meta name="description" content="基于DCGM和Prometheus的GPU监控方案 背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/" />
@@ -69,16 +69,16 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/%E5%9F%BA%E4%BA%8Edcgm%E5%92%8Cprometheus%E7%9A%84gpu%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-04-05T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-04-05T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="基于DCGM和Prometheus的GPU监控方案">
 <meta itemprop="description" content="基于DCGM和Prometheus的GPU监控方案
 
 背景: 在早期的GPU监控中我们会使用一些NVML工具来对GPU卡的基本信息进行采集，并持久化到监控系统的数据存储层。因为我们知道，其实通过nvidia-smi这样的命令也是可以获取到GPU的基本信息的，但随着整个AI市场的发展和成熟，对于GPU的监控也越来越需要一套标准化的工具体系，也就是本篇文章讲的关于DCGM相关的监控解决方案。
-"><meta itemprop="datePublished" content="2020-04-05T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="3144">
+"><meta itemprop="datePublished" content="2020-04-05T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="3138">
 <meta itemprop="keywords" content="prometheus,gpu,nvidia,prometheus," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="基于DCGM和Prometheus的GPU监控方案"/>
 <meta name="twitter:description" content="基于DCGM和Prometheus的GPU监控方案
@@ -141,7 +141,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -180,22 +180,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -357,7 +375,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -398,22 +416,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -472,7 +516,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
             
           </div>
-        <span class="more-meta"> 3144 words </span>
+        <span class="more-meta"> 3138 words </span>
           <span class="more-meta"> 7 min read </span>
 
         
@@ -516,7 +560,7 @@ if (!doNotTrack) {
 <h3 id="dcgm工具部署">DCGM工具部署</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -538,33 +582,31 @@ if (!doNotTrack) {
 </span><span class="lnt">20
 </span><span class="lnt">21
 </span><span class="lnt">22
-</span><span class="lnt">23
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/NVIDIA/gpu-monitoring-tools.git
-
-# 构建dcgm-exporter工具，其实就是nvidia官方对于nvidia-docker2.x推出的用于gpu数据监控的工具
-# 最终会将gpu卡的metrics基本信息存储以metrics的数据格式存储到文件中
-$ cd dcgm-exporter
-# nvidia/dcgm-exporter:latest
-$ make 
-
-$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
-
-# 查看dcgm-exporter收集到的gpu metrics数据
-$ docker exec -it nvidia-dcgm-exporter tail -n 10  /run/prometheus/dcgm.prom
-dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
-# HELP dcgm_retired_pages_sbe Total number of retired pages due to single-bit errors.
-# TYPE dcgm_retired_pages_sbe counter
-dcgm_retired_pages_sbe{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
-# HELP dcgm_retired_pages_dbe Total number of retired pages due to double-bit errors.
-# TYPE dcgm_retired_pages_dbe counter
-dcgm_retired_pages_dbe{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
-# HELP dcgm_retired_pages_pending Total number of pages pending retirement.
-# TYPE dcgm_retired_pages_pending counter
-dcgm_retired_pages_pending{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ git clone https://github.com/NVIDIA/gpu-monitoring-tools.git
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 构建dcgm-exporter工具，其实就是nvidia官方对于nvidia-docker2.x推出的用于gpu数据监控的工具
+</span></span><span class="line"><span class="cl"># 最终会将gpu卡的metrics基本信息存储以metrics的数据格式存储到文件中
+</span></span><span class="line"><span class="cl">$ cd dcgm-exporter
+</span></span><span class="line"><span class="cl"># nvidia/dcgm-exporter:latest
+</span></span><span class="line"><span class="cl">$ make 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看dcgm-exporter收集到的gpu metrics数据
+</span></span><span class="line"><span class="cl">$ docker exec -it nvidia-dcgm-exporter tail -n 10  /run/prometheus/dcgm.prom
+</span></span><span class="line"><span class="cl">dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+</span></span><span class="line"><span class="cl"># HELP dcgm_retired_pages_sbe Total number of retired pages due to single-bit errors.
+</span></span><span class="line"><span class="cl"># TYPE dcgm_retired_pages_sbe counter
+</span></span><span class="line"><span class="cl">dcgm_retired_pages_sbe{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+</span></span><span class="line"><span class="cl"># HELP dcgm_retired_pages_dbe Total number of retired pages due to double-bit errors.
+</span></span><span class="line"><span class="cl"># TYPE dcgm_retired_pages_dbe counter
+</span></span><span class="line"><span class="cl">dcgm_retired_pages_dbe{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+</span></span><span class="line"><span class="cl"># HELP dcgm_retired_pages_pending Total number of pages pending retirement.
+</span></span><span class="line"><span class="cl"># TYPE dcgm_retired_pages_pending counter
+</span></span><span class="line"><span class="cl">dcgm_retired_pages_pending{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>dcgm-exporter采集指标项以及含义:</p>
 <table>
@@ -660,7 +702,7 @@ dcgm_retired_pages_pending{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea
 <p><code>注意:</code> 在使kubernetes集群中部署的前提是你的GPU要托管在k8s集群内部，这也就意味着你得先成功将带GPU的主机成功托管到集群中，并且能够调度GPU资源</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -687,43 +729,41 @@ dcgm_retired_pages_pending{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea
 </span><span class="lnt">25
 </span><span class="lnt">26
 </span><span class="lnt">27
-</span><span class="lnt">28
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 创建一个监控的命名空间
-# Create the monitoring namespace
-$ kubectl create namespace monitoring
-
-# Add gpu metrics endpoint to prometheus
-$ kubectl create -f prometheus/prometheus-configmap.yaml
-
-# Deploy prometheus
-$ kubectl create -f prometheus/prometheus-deployment.yaml
-
-$ kubectl create -f pod-gpu-metrics-exporter-daemonset.yaml
-
-# Open in browser: localhost:9090
-
-# 具体的docker镜像构建和运行
-# 依然是gpu-monitoring-tools项目
-$ cd  pod-gpu-metrics-exporter
-$ docker build -t pod-gpu-metrics-exporter .
-
-# 运行dcgm-exporter
-$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
-
-# 运行gpu-metrics-exporter
-$ docker run -d --privileged --rm -p 9400:9400 -v /var/lib/kubelet/pod-resources:/var/lib/kubelet/pod-resources --volumes-from nvidia-dcgm-exporter:ro nvidia/pod-gpu-metrics-exporter:v1.0.0-alpha
-
-# 此时就将上述的那个dcgm-exporter中采集到数据成功暴露到对外的接口了
-$ curl -s localhost:9400/gpu/metrics
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 创建一个监控的命名空间
+</span></span><span class="line"><span class="cl"># Create the monitoring namespace
+</span></span><span class="line"><span class="cl">$ kubectl create namespace monitoring
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Add gpu metrics endpoint to prometheus
+</span></span><span class="line"><span class="cl">$ kubectl create -f prometheus/prometheus-configmap.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Deploy prometheus
+</span></span><span class="line"><span class="cl">$ kubectl create -f prometheus/prometheus-deployment.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl create -f pod-gpu-metrics-exporter-daemonset.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Open in browser: localhost:9090
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 具体的docker镜像构建和运行
+</span></span><span class="line"><span class="cl"># 依然是gpu-monitoring-tools项目
+</span></span><span class="line"><span class="cl">$ cd  pod-gpu-metrics-exporter
+</span></span><span class="line"><span class="cl">$ docker build -t pod-gpu-metrics-exporter .
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 运行dcgm-exporter
+</span></span><span class="line"><span class="cl">$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter nvidia/dcgm-exporter
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 运行gpu-metrics-exporter
+</span></span><span class="line"><span class="cl">$ docker run -d --privileged --rm -p 9400:9400 -v /var/lib/kubelet/pod-resources:/var/lib/kubelet/pod-resources --volumes-from nvidia-dcgm-exporter:ro nvidia/pod-gpu-metrics-exporter:v1.0.0-alpha
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 此时就将上述的那个dcgm-exporter中采集到数据成功暴露到对外的接口了
+</span></span><span class="line"><span class="cl">$ curl -s localhost:9400/gpu/metrics
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>需要注意的是，在<code>gpu-metrics-exporter</code>的程序中，是针对pod的方式来采集gpu的metrics的信息，并且附带了pod本身的基本信息，因此如果你的<code>gpu</code>主机还未在kubernetes集群中托管，官方提供的镜像可能并不能使用，需要对<code>src/http.go</code>文件中采集的路径进行改变，将默认的<code>gpuPodMetrics</code>改成<code>gpuMetrics</code>即可，两者会去读取不同的dcgm-exporter暴露出来的metrics文件，否则访问api接口时会发现无法找到metrics文件.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -733,21 +773,19 @@ $ curl -s localhost:9400/gpu/metrics
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">func getGPUmetrics(resp http.ResponseWriter, req *http.Request) {
-	//metrics, err := ioutil.ReadFile(gpuPodMetrics)
-	metrics, err := ioutil.ReadFile(gpuMetrics)
-	if err != nil {
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		glog.Errorf(&#34;error responding to %v%v: %v&#34;, req.Host, req.URL, err.Error())
-		return
-	}
-	resp.Write(metrics)
-}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">func getGPUmetrics(resp http.ResponseWriter, req *http.Request) {
+</span></span><span class="line"><span class="cl">	//metrics, err := ioutil.ReadFile(gpuPodMetrics)
+</span></span><span class="line"><span class="cl">	metrics, err := ioutil.ReadFile(gpuMetrics)
+</span></span><span class="line"><span class="cl">	if err != nil {
+</span></span><span class="line"><span class="cl">		http.Error(resp, err.Error(), http.StatusInternalServerError)
+</span></span><span class="line"><span class="cl">		glog.Errorf(&#34;error responding to %v%v: %v&#34;, req.Host, req.URL, err.Error())
+</span></span><span class="line"><span class="cl">		return
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">	resp.Write(metrics)
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>参考<a href="https://github.com/BGBiao/gpu-monitoring-tools/tree/master/gpu-metrics-exporter">gpu-metrics-exporter</a></p>
 <p>图省事的，可以直接下载如下两个镜像，在已经work 的GPU主机上直接运行.</p>
@@ -757,7 +795,7 @@ $ curl -s localhost:9400/gpu/metrics
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -767,28 +805,26 @@ $ curl -s localhost:9400/gpu/metrics
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 确定dcgm-exporter是运行的
-$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter bgbiao/dcgm-exporter
-
-$ docker run -d --privileged --rm -p 9400:9400  --volumes-from nvidia-dcgm-exporter:ro bgbiao/gpu-metrics-exporter
-
-# 检查gpu暴露出来的基础信息
-$ curl -s localhost:9400/gpu/metrics
-dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
-....
-....
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 确定dcgm-exporter是运行的
+</span></span><span class="line"><span class="cl">$ docker run -d --runtime=nvidia --rm --name=nvidia-dcgm-exporter bgbiao/dcgm-exporter
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ docker run -d --privileged --rm -p 9400:9400  --volumes-from nvidia-dcgm-exporter:ro bgbiao/gpu-metrics-exporter
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 检查gpu暴露出来的基础信息
+</span></span><span class="line"><span class="cl">$ curl -s localhost:9400/gpu/metrics
+</span></span><span class="line"><span class="cl">dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 0
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="prometheus采集">prometheus采集</h3>
 <p><code>注意:</code> 有了上述的gpu-metrics-exporter之后，我们的gpu相关的运行数据就可以以premetheus兼容的方式获取了，此时在prometheus-server上配置，去定期pull 数据即可，我们的prometheus-server目前部署在kubernetes集群内部，因此这里分享将gpu的数据采集到kubernetes集群内部的prometheus中。</p>
 <p><strong>创建endpoint以及对应的service</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -840,68 +876,66 @@ dcgm_ecc_dbe_aggregate_total{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11
 </span><span class="lnt">50
 </span><span class="lnt">51
 </span><span class="lnt">52
-</span><span class="lnt">53
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># gpu-metrics的endpoint和service配置
-
-$ cat endpoint-gpus.yaml
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: gpu-metrics
-  namespace: monitoring
-  labels:
-    app: gpu-metrics
-subsets:
-- addresses:
-  - ip: 172.16.65.234
-  ports:
-  - port: 9400
-    name: http-metrics
-    protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: monitoring
-  name: gpu-metrics
-  labels:
-    app: gpu-metrics
-spec:
-  ports:
-  - name: http-metrics
-    port: 19400
-    targetPort: 9400
-    protocol: TCP
-
-$ kubectl  apply -f endpoint-gpus.yaml
-
-# 查看创建的相关资源
-$ kubectl  get ep,svc -n monitoring  -l app=gpu-metrics
-NAME                    ENDPOINTS            AGE
-endpoints/gpu-metrics   172.16.65.234:9400   5m24s
-
-NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
-service/gpu-metrics   ClusterIP   10.253.138.97   &lt;none&gt;        19400/TCP   5m24s
-
-# 测试service暴露的端点
-# 确保集群内部可以访问service暴露出来的endpoint即可
-
-$ curl 10.253.138.97:19400/gpu/metrics
-# HELP dcgm_sm_clock SM clock frequency (in MHz).
-# TYPE dcgm_sm_clock gauge
-dcgm_sm_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 1328
-# HELP dcgm_memory_clock Memory clock frequency (in MHz).
-# TYPE dcgm_memory_clock gauge
-dcgm_memory_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 715
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># gpu-metrics的endpoint和service配置
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ cat endpoint-gpus.yaml
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: Endpoints
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: gpu-metrics
+</span></span><span class="line"><span class="cl">  namespace: monitoring
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app: gpu-metrics
+</span></span><span class="line"><span class="cl">subsets:
+</span></span><span class="line"><span class="cl">- addresses:
+</span></span><span class="line"><span class="cl">  - ip: 172.16.65.234
+</span></span><span class="line"><span class="cl">  ports:
+</span></span><span class="line"><span class="cl">  - port: 9400
+</span></span><span class="line"><span class="cl">    name: http-metrics
+</span></span><span class="line"><span class="cl">    protocol: TCP
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: Service
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  namespace: monitoring
+</span></span><span class="line"><span class="cl">  name: gpu-metrics
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app: gpu-metrics
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  ports:
+</span></span><span class="line"><span class="cl">  - name: http-metrics
+</span></span><span class="line"><span class="cl">    port: 19400
+</span></span><span class="line"><span class="cl">    targetPort: 9400
+</span></span><span class="line"><span class="cl">    protocol: TCP
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl  apply -f endpoint-gpus.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看创建的相关资源
+</span></span><span class="line"><span class="cl">$ kubectl  get ep,svc -n monitoring  -l app=gpu-metrics
+</span></span><span class="line"><span class="cl">NAME                    ENDPOINTS            AGE
+</span></span><span class="line"><span class="cl">endpoints/gpu-metrics   172.16.65.234:9400   5m24s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
+</span></span><span class="line"><span class="cl">service/gpu-metrics   ClusterIP   10.253.138.97   &lt;none&gt;        19400/TCP   5m24s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 测试service暴露的端点
+</span></span><span class="line"><span class="cl"># 确保集群内部可以访问service暴露出来的endpoint即可
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ curl 10.253.138.97:19400/gpu/metrics
+</span></span><span class="line"><span class="cl"># HELP dcgm_sm_clock SM clock frequency (in MHz).
+</span></span><span class="line"><span class="cl"># TYPE dcgm_sm_clock gauge
+</span></span><span class="line"><span class="cl">dcgm_sm_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 1328
+</span></span><span class="line"><span class="cl"># HELP dcgm_memory_clock Memory clock frequency (in MHz).
+</span></span><span class="line"><span class="cl"># TYPE dcgm_memory_clock gauge
+</span></span><span class="line"><span class="cl">dcgm_memory_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1f226&#34;} 715
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>创建prometheus抓取数据的规则</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -931,41 +965,39 @@ dcgm_memory_clock{gpu=&#34;0&#34;,uuid=&#34;GPU-b91e30ac-fe77-e236-11ea-078bc2d1
 </span><span class="lnt">28
 </span><span class="lnt">29
 </span><span class="lnt">30
-</span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat prometheus-gpus.yml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: gpu-metrics
-  name: gpu-metrics
-  namespace: monitoring
-spec:
-  # 对应的端点是上面创建的svc的ports
-  endpoints:
-    # 定义endpoint采集的时间和采集的URI
-  - interval: 30s
-    port: http-metrics
-    path: /gpu/metrics
-  jobLabel: app
-  # 匹配monitoring命名空间的app=gpu-metrics的svc
-  namespaceSelector:
-    matchNames:
-    - monitoring
-  selector:
-    matchLabels:
-      app: gpu-metrics
-
-$ kubectl  apply -f prometheus-gpus.yml
-servicemonitor.monitoring.coreos.com/gpu-metrics created
-
-$ kubectl  get servicemonitor  -n monitoring gpu-metrics
-NAME          AGE
-gpu-metrics   69s
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ cat prometheus-gpus.yml
+</span></span><span class="line"><span class="cl">apiVersion: monitoring.coreos.com/v1
+</span></span><span class="line"><span class="cl">kind: ServiceMonitor
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    app: gpu-metrics
+</span></span><span class="line"><span class="cl">  name: gpu-metrics
+</span></span><span class="line"><span class="cl">  namespace: monitoring
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  # 对应的端点是上面创建的svc的ports
+</span></span><span class="line"><span class="cl">  endpoints:
+</span></span><span class="line"><span class="cl">    # 定义endpoint采集的时间和采集的URI
+</span></span><span class="line"><span class="cl">  - interval: 30s
+</span></span><span class="line"><span class="cl">    port: http-metrics
+</span></span><span class="line"><span class="cl">    path: /gpu/metrics
+</span></span><span class="line"><span class="cl">  jobLabel: app
+</span></span><span class="line"><span class="cl">  # 匹配monitoring命名空间的app=gpu-metrics的svc
+</span></span><span class="line"><span class="cl">  namespaceSelector:
+</span></span><span class="line"><span class="cl">    matchNames:
+</span></span><span class="line"><span class="cl">    - monitoring
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      app: gpu-metrics
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl  apply -f prometheus-gpus.yml
+</span></span><span class="line"><span class="cl">servicemonitor.monitoring.coreos.com/gpu-metrics created
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl  get servicemonitor  -n monitoring gpu-metrics
+</span></span><span class="line"><span class="cl">NAME          AGE
+</span></span><span class="line"><span class="cl">gpu-metrics   69s
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>当上述资源创建完成后，在集群内部的prometheus-server中就可以找到对应的target，确认状态为up即表示prometheus已正常采集集群外gpu的metrics数据了，接下来数据就会以30s为间隔，源源不断的将数据采集到prometheus存储中.</p>
 <p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdiuxv5l47j31pk0aegon.jpg" alt="prometheus-gpu-targets"></p>
@@ -1127,6 +1159,27 @@ gpu-metrics   69s
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

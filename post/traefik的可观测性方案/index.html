@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Traefik的可观测性方案 - BGBiao的SRE人生</title>
+  <title>Traefik的可观测性方案 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -25,7 +25,7 @@
 <meta name="author" content="BGBiao" />
   <meta name="description" content="Traefik的可观测性支持 traefik-observability
 注意: 在Traefik-2.X的生态里，将可观测性分为了如下几个部分，并提升到了专门的功能说明中
- 服务日志: Traefik进程本身相关的操作日志 访问日志: 由Traefik接管的代理服务的访问日志(access.log) Metrics: Traefik提供的自身详细的metrics数据 Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况 " />
+服务日志: Traefik进程本身相关的操作日志 访问日志: 由Traefik接管的代理服务的访问日志(access.log) Metrics: Traefik提供的自身详细的metrics数据 Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/" />
@@ -75,8 +75,8 @@ Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或�
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/traefik%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E6%96%B9%E6%A1%88/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-04-07T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-04-07T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="Traefik的可观测性方案">
 <meta itemprop="description" content="Traefik的可观测性支持
@@ -87,9 +87,9 @@ traefik-observability
 访问日志: 由Traefik接管的代理服务的访问日志(access.log)
 Metrics: Traefik提供的自身详细的metrics数据
 Tracing: Traefik也提供了追踪相关的接口，用来可视化分布式或微服务中的调用情况
-"><meta itemprop="datePublished" content="2020-04-07T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="5057">
+"><meta itemprop="datePublished" content="2020-04-07T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="5047">
 <meta itemprop="keywords" content="traefik,kubernetes,可观测性,prometheus,grafana," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Traefik的可观测性方案"/>
 <meta name="twitter:description" content="Traefik的可观测性支持
@@ -157,7 +157,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -196,22 +196,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -373,7 +391,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -414,22 +432,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -487,7 +531,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 5057 words </span>
+        <span class="more-meta"> 5047 words </span>
           <span class="more-meta"> 11 min read </span>
 
         
@@ -534,7 +578,7 @@ if (!doNotTrack) {
 <p><code>相关配置</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -547,18 +591,18 @@ if (!doNotTrack) {
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-$ cat traefik.toml
-[log]
-  filePath = &#34;/path/to/traefik.log&#34;   # 配置traefik的进程日志路径
-  format = &#34;json&#34;                     # 配置日志文件的格式[text(text|json)]
-  level = &#34;DEBUG&#34;                     # 指定日志输出的级别[ERROR(ERROR|DEBUG|INFO|PANIC|FATAL|WARN)]
-
-# cli 配置
---log.filePath=/path/to/traefik.log
---log.format=json
---log.level=DEBUG
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">$ cat traefik.toml
+</span></span><span class="line"><span class="cl">[log]
+</span></span><span class="line"><span class="cl">  filePath = &#34;/path/to/traefik.log&#34;   # 配置traefik的进程日志路径
+</span></span><span class="line"><span class="cl">  format = &#34;json&#34;                     # 配置日志文件的格式[text(text|json)]
+</span></span><span class="line"><span class="cl">  level = &#34;DEBUG&#34;                     # 指定日志输出的级别[ERROR(ERROR|DEBUG|INFO|PANIC|FATAL|WARN)]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--log.filePath=/path/to/traefik.log
+</span></span><span class="line"><span class="cl">--log.format=json
+</span></span><span class="line"><span class="cl">--log.level=DEBUG
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code> 具体的日志配置参数需要和当前环境中的traefik大版本兼容，否则可能会出现意想不到的问题。</p>
 <h3 id="访问日志">访问日志</h3>
@@ -567,7 +611,7 @@ $ cat traefik.toml
 <p><code>相关配置</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -603,55 +647,51 @@ $ cat traefik.toml
 </span><span class="lnt">34
 </span><span class="lnt">35
 </span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-$ cat traefik.toml
-[accessLog]
-  filePath = &#34;/path/to/traefik.log&#34;
-  format = &#34;&#34;                       # 指定访问日志的格式，默认使用CLF(Common Log Format)，可以指定为json格式
-  bufferingSize = 100               # 以异步方式写入日志需要指定该参数，表示写入到指定输出设备前保留在内存中的日志行数
-  [accessLog.filters]               # 指定一组逻辑上是Or的过滤连接器,指定多个过滤器将比只指定一个过滤器保留更多的访问日志
-    statusCodes = [&#34;200&#34;, &#34;300-302&#34;] # 过滤指定状态码范围的请求日志
-    retryAttempts = true             # 当有重试时保留日志
-    minDuration = &#34;10ms&#34;             # 当请求花费的时间超过指定的持续时间时，保留访问日志
-    
-  [accessLog.fields]                # 限制访问日志中的字段(可以使用fields.names和fields.header选项来决定字段的输出)
-    defaultMode = &#34;keep&#34;            # 每种字段可以设置成如下字段(keep:保留字段,drop:丢弃,redact:使用redacted替换值)
-    [accessLog.fields.names]        # 指定限制的字段名称
-      &#34;ClientUsername&#34; = &#34;drop&#34;     # 设置ClientUsername字段为丢弃
-    [accessLog.fields.headers]      # 设置headers相关字段
-      defaultMode = &#34;keep&#34;          # 对全部的header进行默认保留
-      [accessLog.fields.headers.names] # 对指定的header字段设置保留规则
-        &#34;User-Agent&#34; = &#34;redact&#34;
-        &#34;Authorization&#34; = &#34;drop&#34;
-        &#34;Content-Type&#34; = &#34;keep&#34;
-
-# cli 配置
---accesslog=true
---accesslog.filepath=/path/to/access.log
---accesslog.format=json
---accesslog.bufferingsize=100
---accesslog.filters.statuscodes=200,300-302
---accesslog.filters.retryattempts
---accesslog.filters.minduration=10ms
---accesslog.fields.defaultmode=keep
---accesslog.fields.names.ClientUsername=drop
---accesslog.fields.headers.defaultmode=keep
---accesslog.fields.headers.names.User-Agent=redact
---accesslog.fields.headers.names.Authorization=drop
---accesslog.fields.headers.names.Content-Type=keep
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">$ cat traefik.toml
+</span></span><span class="line"><span class="cl">[accessLog]
+</span></span><span class="line"><span class="cl">  filePath = &#34;/path/to/traefik.log&#34;
+</span></span><span class="line"><span class="cl">  format = &#34;&#34;                       # 指定访问日志的格式，默认使用CLF(Common Log Format)，可以指定为json格式
+</span></span><span class="line"><span class="cl">  bufferingSize = 100               # 以异步方式写入日志需要指定该参数，表示写入到指定输出设备前保留在内存中的日志行数
+</span></span><span class="line"><span class="cl">  [accessLog.filters]               # 指定一组逻辑上是Or的过滤连接器,指定多个过滤器将比只指定一个过滤器保留更多的访问日志
+</span></span><span class="line"><span class="cl">    statusCodes = [&#34;200&#34;, &#34;300-302&#34;] # 过滤指定状态码范围的请求日志
+</span></span><span class="line"><span class="cl">    retryAttempts = true             # 当有重试时保留日志
+</span></span><span class="line"><span class="cl">    minDuration = &#34;10ms&#34;             # 当请求花费的时间超过指定的持续时间时，保留访问日志
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">  [accessLog.fields]                # 限制访问日志中的字段(可以使用fields.names和fields.header选项来决定字段的输出)
+</span></span><span class="line"><span class="cl">    defaultMode = &#34;keep&#34;            # 每种字段可以设置成如下字段(keep:保留字段,drop:丢弃,redact:使用redacted替换值)
+</span></span><span class="line"><span class="cl">    [accessLog.fields.names]        # 指定限制的字段名称
+</span></span><span class="line"><span class="cl">      &#34;ClientUsername&#34; = &#34;drop&#34;     # 设置ClientUsername字段为丢弃
+</span></span><span class="line"><span class="cl">    [accessLog.fields.headers]      # 设置headers相关字段
+</span></span><span class="line"><span class="cl">      defaultMode = &#34;keep&#34;          # 对全部的header进行默认保留
+</span></span><span class="line"><span class="cl">      [accessLog.fields.headers.names] # 对指定的header字段设置保留规则
+</span></span><span class="line"><span class="cl">        &#34;User-Agent&#34; = &#34;redact&#34;
+</span></span><span class="line"><span class="cl">        &#34;Authorization&#34; = &#34;drop&#34;
+</span></span><span class="line"><span class="cl">        &#34;Content-Type&#34; = &#34;keep&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--accesslog=true
+</span></span><span class="line"><span class="cl">--accesslog.filepath=/path/to/access.log
+</span></span><span class="line"><span class="cl">--accesslog.format=json
+</span></span><span class="line"><span class="cl">--accesslog.bufferingsize=100
+</span></span><span class="line"><span class="cl">--accesslog.filters.statuscodes=200,300-302
+</span></span><span class="line"><span class="cl">--accesslog.filters.retryattempts
+</span></span><span class="line"><span class="cl">--accesslog.filters.minduration=10ms
+</span></span><span class="line"><span class="cl">--accesslog.fields.defaultmode=keep
+</span></span><span class="line"><span class="cl">--accesslog.fields.names.ClientUsername=drop
+</span></span><span class="line"><span class="cl">--accesslog.fields.headers.defaultmode=keep
+</span></span><span class="line"><span class="cl">--accesslog.fields.headers.names.User-Agent=redact
+</span></span><span class="line"><span class="cl">--accesslog.fields.headers.names.Authorization=drop
+</span></span><span class="line"><span class="cl">--accesslog.fields.headers.names.Content-Type=keep
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code> 由于我们是将Traefik当做Kubernetes集群中的边缘节点，去代理内部HTTP服务的，因此Traefik部署在集群内部,将进程日志和访问日志都以volume的方式挂载到边缘节点的数据目录中。</p>
 <p>使用<code>DaemonSet</code>方式将Traefik部署在k8s集群内部，具体的配置如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -748,108 +788,106 @@ $ cat traefik.toml
 </span><span class="lnt">95
 </span><span class="lnt">96
 </span><span class="lnt">97
-</span><span class="lnt">98
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat traefik-ds.yml
----
-kind: DaemonSet
-apiVersion: extensions/v1beta1
-metadata:
-  name: traefik-ingress-controller
-  namespace: kube-system
-  labels:
-    k8s-app: traefik-ingress-lb
-spec:
-  template:
-    metadata:
-      labels:
-        k8s-app: traefik-ingress-lb
-        name: traefik-ingress-lb
-    spec:
-      affinity:
-        # 定义node的亲和性，不允许调度到master节点
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/master
-                operator: DoesNotExist
-      serviceAccountName: traefik-ingress-controller
-      terminationGracePeriodSeconds: 30
-      hostNetwork: true
-      containers:
-      - image: traefik:v1.7.16
-        name: traefik-ingress-lb
-        ports:
-        - name: http
-          containerPort: 80
-          hostPort: 80
-        - name: admin
-          containerPort: 8080
-        securityContext:
-          capabilities:
-            drop:
-            - ALL
-            add:
-            - NET_BIND_SERVICE
-        args:
-        - --api
-        - --kubernetes
-        - --logLevel=INFO
-        - --traefikLog.filePath=/logdata/traefik.log
-        - --configfile=/config/traefik.toml
-        - --accesslog.filepath=/logdata/access.log
-        - --accesslog.bufferingsize=100
-        volumeMounts:
-        - mountPath: /config
-          name: config
-        - mountPath: /logdata
-          name: access-log
-      volumes:
-      - configMap:
-          name: traefik-config
-        name: config
-      - name: access-log
-        hostPath:
-          path: /opt/logs/ingress/
-
-# 查看traefik 的状态
-$ kubectl  get pods -n kube-system  | grep traefik
-traefik-ingress-controller-2dx7k   1/1     Running   0          5h28m
-...
-...
-
-$ kubectl  get svc -n kube-system  | grep traefik
-traefik-ingress-service   ClusterIP   10.253.132.216   &lt;none&gt;        80/TCP,8080/TCP          123d
-traefik-web-ui            ClusterIP   10.253.54.184    &lt;none&gt;        80/TCP                   172d
-
-
-# 可以通过节点的ping接口和admin接口来查看traefik服务是否正常
-$ curl 10.253.132.216/ping
-OK
-
-$ curl 10.253.132.216:8080
-&lt;a href=&#34;/dashboard/&#34;&gt;Found&lt;/a&gt;.
-
-
-# 在调度到treafik的节点上查看进程日志和访问日志
-$ tree -L 2 /opt/logs/ingress/
-/opt/logs/ingress/
-├── access.log
-└── traefik.log
-
-$ tail -n 10 /opt/logs/ingress/traefik.log
-time=&#34;2020-04-07T08:53:38Z&#34; level=warning msg=&#34;Endpoints not available for my-data/my-data-selfaccess-dev&#34;
-time=&#34;2020-04-07T08:53:38Z&#34; level=warning msg=&#34;Endpoints not available for my-data/my-data-metadata-prod1&#34;
-
-
-$ tail -n 10 /opt/logs/ingress/access.log
-172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;POST /.kibana/_search?ignore_unavailable=true&amp;filter_path=aggregations.types.buckets HTTP/1.1&#34; 503 161 &#34;-&#34; &#34;-&#34; 491674 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.41.10:9200&#34; 1ms
-172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;POST /.kibana/_search?ignore_unavailable=true&amp;filter_path=aggregations.types.buckets HTTP/1.1&#34; 503 161 &#34;-&#34; &#34;-&#34; 491671 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.26.20:9200&#34; 1ms
-172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;GET /.kibana/doc/config%3A6.4.0 HTTP/1.1&#34; 503 301 &#34;-&#34; &#34;-&#34; 491675 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.14.6:9200&#34; 1ms
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ cat traefik-ds.yml
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">kind: DaemonSet
+</span></span><span class="line"><span class="cl">apiVersion: extensions/v1beta1
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: traefik-ingress-controller
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">        name: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      affinity:
+</span></span><span class="line"><span class="cl">        # 定义node的亲和性，不允许调度到master节点
+</span></span><span class="line"><span class="cl">        nodeAffinity:
+</span></span><span class="line"><span class="cl">          requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span class="line"><span class="cl">            nodeSelectorTerms:
+</span></span><span class="line"><span class="cl">            - matchExpressions:
+</span></span><span class="line"><span class="cl">              - key: node-role.kubernetes.io/master
+</span></span><span class="line"><span class="cl">                operator: DoesNotExist
+</span></span><span class="line"><span class="cl">      serviceAccountName: traefik-ingress-controller
+</span></span><span class="line"><span class="cl">      terminationGracePeriodSeconds: 30
+</span></span><span class="line"><span class="cl">      hostNetwork: true
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - image: traefik:v1.7.16
+</span></span><span class="line"><span class="cl">        name: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">        ports:
+</span></span><span class="line"><span class="cl">        - name: http
+</span></span><span class="line"><span class="cl">          containerPort: 80
+</span></span><span class="line"><span class="cl">          hostPort: 80
+</span></span><span class="line"><span class="cl">        - name: admin
+</span></span><span class="line"><span class="cl">          containerPort: 8080
+</span></span><span class="line"><span class="cl">        securityContext:
+</span></span><span class="line"><span class="cl">          capabilities:
+</span></span><span class="line"><span class="cl">            drop:
+</span></span><span class="line"><span class="cl">            - ALL
+</span></span><span class="line"><span class="cl">            add:
+</span></span><span class="line"><span class="cl">            - NET_BIND_SERVICE
+</span></span><span class="line"><span class="cl">        args:
+</span></span><span class="line"><span class="cl">        - --api
+</span></span><span class="line"><span class="cl">        - --kubernetes
+</span></span><span class="line"><span class="cl">        - --logLevel=INFO
+</span></span><span class="line"><span class="cl">        - --traefikLog.filePath=/logdata/traefik.log
+</span></span><span class="line"><span class="cl">        - --configfile=/config/traefik.toml
+</span></span><span class="line"><span class="cl">        - --accesslog.filepath=/logdata/access.log
+</span></span><span class="line"><span class="cl">        - --accesslog.bufferingsize=100
+</span></span><span class="line"><span class="cl">        volumeMounts:
+</span></span><span class="line"><span class="cl">        - mountPath: /config
+</span></span><span class="line"><span class="cl">          name: config
+</span></span><span class="line"><span class="cl">        - mountPath: /logdata
+</span></span><span class="line"><span class="cl">          name: access-log
+</span></span><span class="line"><span class="cl">      volumes:
+</span></span><span class="line"><span class="cl">      - configMap:
+</span></span><span class="line"><span class="cl">          name: traefik-config
+</span></span><span class="line"><span class="cl">        name: config
+</span></span><span class="line"><span class="cl">      - name: access-log
+</span></span><span class="line"><span class="cl">        hostPath:
+</span></span><span class="line"><span class="cl">          path: /opt/logs/ingress/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看traefik 的状态
+</span></span><span class="line"><span class="cl">$ kubectl  get pods -n kube-system  | grep traefik
+</span></span><span class="line"><span class="cl">traefik-ingress-controller-2dx7k   1/1     Running   0          5h28m
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl  get svc -n kube-system  | grep traefik
+</span></span><span class="line"><span class="cl">traefik-ingress-service   ClusterIP   10.253.132.216   &lt;none&gt;        80/TCP,8080/TCP          123d
+</span></span><span class="line"><span class="cl">traefik-web-ui            ClusterIP   10.253.54.184    &lt;none&gt;        80/TCP                   172d
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 可以通过节点的ping接口和admin接口来查看traefik服务是否正常
+</span></span><span class="line"><span class="cl">$ curl 10.253.132.216/ping
+</span></span><span class="line"><span class="cl">OK
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ curl 10.253.132.216:8080
+</span></span><span class="line"><span class="cl">&lt;a href=&#34;/dashboard/&#34;&gt;Found&lt;/a&gt;.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 在调度到treafik的节点上查看进程日志和访问日志
+</span></span><span class="line"><span class="cl">$ tree -L 2 /opt/logs/ingress/
+</span></span><span class="line"><span class="cl">/opt/logs/ingress/
+</span></span><span class="line"><span class="cl">├── access.log
+</span></span><span class="line"><span class="cl">└── traefik.log
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ tail -n 10 /opt/logs/ingress/traefik.log
+</span></span><span class="line"><span class="cl">time=&#34;2020-04-07T08:53:38Z&#34; level=warning msg=&#34;Endpoints not available for my-data/my-data-selfaccess-dev&#34;
+</span></span><span class="line"><span class="cl">time=&#34;2020-04-07T08:53:38Z&#34; level=warning msg=&#34;Endpoints not available for my-data/my-data-metadata-prod1&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ tail -n 10 /opt/logs/ingress/access.log
+</span></span><span class="line"><span class="cl">172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;POST /.kibana/_search?ignore_unavailable=true&amp;filter_path=aggregations.types.buckets HTTP/1.1&#34; 503 161 &#34;-&#34; &#34;-&#34; 491674 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.41.10:9200&#34; 1ms
+</span></span><span class="line"><span class="cl">172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;POST /.kibana/_search?ignore_unavailable=true&amp;filter_path=aggregations.types.buckets HTTP/1.1&#34; 503 161 &#34;-&#34; &#34;-&#34; 491671 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.26.20:9200&#34; 1ms
+</span></span><span class="line"><span class="cl">172.16.21.28 - - [07/Apr/2020:08:52:54 +0000] &#34;GET /.kibana/doc/config%3A6.4.0 HTTP/1.1&#34; 503 301 &#34;-&#34; &#34;-&#34; 491675 &#34;prod-es-cluster.soulapp-inc.cn&#34; &#34;http://20.0.14.6:9200&#34; 1ms
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>从访问日志的输出格式中，我们可以看到，traefik的访问日志和Nginx的访问日志会比较相似，有了这份日志后，我们可以通过一些ELK之类的日志分析方案来分期网站的整体状态，比如UV,PV,区域分布，状态分布以及响应时间等等。</p>
 <p>另外，我们是将访问日志直接持久化输出到node节点上，后面可以通过node主机上的日志采集插件，将日志发送到ELK Stack中，进行分析，当然也可以直接将ELK Stack的日志采集端部署到traefik的pod中，也是可以的。</p>
@@ -864,7 +902,7 @@ $ tail -n 10 /opt/logs/ingress/access.log
 <p>想要开启<code>metrics</code>的支持，只需要做如下配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -877,24 +915,24 @@ $ tail -n 10 /opt/logs/ingress/access.log
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-    [metrics]
-      [metrics.prometheus]
-      buckets=[0.1,0.3,1.2,5.0]
-      entryPoint = &#34;traefik&#34;
-
-# yaml 配置文件
-metrics: {}
-
-# cli 配置
---metrics=true
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">    [metrics]
+</span></span><span class="line"><span class="cl">      [metrics.prometheus]
+</span></span><span class="line"><span class="cl">      buckets=[0.1,0.3,1.2,5.0]
+</span></span><span class="line"><span class="cl">      entryPoint = &#34;traefik&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># yaml 配置文件
+</span></span><span class="line"><span class="cl">metrics: {}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--metrics=true
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>Datadog后端支持</strong></p>
 <p>配置详情:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -908,31 +946,29 @@ metrics: {}
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml配置文件
-[metrics]
-  [metrics.datadog]
-    address = &#34;127.0.0.1:8125&#34;
-    addEntryPointsLabels = true   #在入口处增加metrics标签[true]
-    addServicesLabels = true      #在service中启用meirtcs[true]
-    pushInterval = 10s            #push metrics到datalog的间隔时间[10s]
-
-# cli 配置
---metrics.datadog=true
---metrics.datadog.address=127.0.0.1:8125
---metrics.datadog.addEntryPointsLabels=true
---metrics.datadog.addServicesLabels=true
---metrics.datadog.pushInterval=10s
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml配置文件
+</span></span><span class="line"><span class="cl">[metrics]
+</span></span><span class="line"><span class="cl">  [metrics.datadog]
+</span></span><span class="line"><span class="cl">    address = &#34;127.0.0.1:8125&#34;
+</span></span><span class="line"><span class="cl">    addEntryPointsLabels = true   #在入口处增加metrics标签[true]
+</span></span><span class="line"><span class="cl">    addServicesLabels = true      #在service中启用meirtcs[true]
+</span></span><span class="line"><span class="cl">    pushInterval = 10s            #push metrics到datalog的间隔时间[10s]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--metrics.datadog=true
+</span></span><span class="line"><span class="cl">--metrics.datadog.address=127.0.0.1:8125
+</span></span><span class="line"><span class="cl">--metrics.datadog.addEntryPointsLabels=true
+</span></span><span class="line"><span class="cl">--metrics.datadog.addServicesLabels=true
+</span></span><span class="line"><span class="cl">--metrics.datadog.pushInterval=10s
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>InfluxDB后端支持</strong></p>
 <p>配置详情:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -958,37 +994,37 @@ metrics: {}
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml配置
-[metrics]
-  [metrics.influxDB]
-    address = &#34;localhost:8089&#34;     #指定influxdb地址 [localhost:8089]
-    protocol = &#34;udp&#34;               #influxdb的传输协议 [udp(udp|http)]
-    database = &#34;db&#34;                #指定metrics写入的库[&#34;&#34;]
-    retentionPolicy = &#34;two_hours&#34;  #metrics在influxdb中的保留策略 [&#34;&#34;]
-    username = &#34;&#34;                  #influxdb用户名
-    password = &#34;&#34;                  #influxdb密码
-    addEntryPointsLabels = true    #入口处增加metrics标签[true]
-    addServicesLabels = true       #在service中启用meirtcs[true]
-    pushInterval = 10s             #push metrics到datalog的间隔时间[10s]
-
-# cli 配置
---metrics.influxdb=true
---metrics.influxdb.address=localhost:8089
---metrics.influxdb.protocol=udp
---metrics.influxdb.database=db
---metrics.influxdb.retentionPolicy=two_hours
---metrics.influxdb.username=john
---metrics.influxdb.password=secret
---metrics.influxdb.addEntryPointsLabels=true
---metrics.influxdb.addServicesLabels=true
---metrics.influxdb.pushInterval=10s
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml配置
+</span></span><span class="line"><span class="cl">[metrics]
+</span></span><span class="line"><span class="cl">  [metrics.influxDB]
+</span></span><span class="line"><span class="cl">    address = &#34;localhost:8089&#34;     #指定influxdb地址 [localhost:8089]
+</span></span><span class="line"><span class="cl">    protocol = &#34;udp&#34;               #influxdb的传输协议 [udp(udp|http)]
+</span></span><span class="line"><span class="cl">    database = &#34;db&#34;                #指定metrics写入的库[&#34;&#34;]
+</span></span><span class="line"><span class="cl">    retentionPolicy = &#34;two_hours&#34;  #metrics在influxdb中的保留策略 [&#34;&#34;]
+</span></span><span class="line"><span class="cl">    username = &#34;&#34;                  #influxdb用户名
+</span></span><span class="line"><span class="cl">    password = &#34;&#34;                  #influxdb密码
+</span></span><span class="line"><span class="cl">    addEntryPointsLabels = true    #入口处增加metrics标签[true]
+</span></span><span class="line"><span class="cl">    addServicesLabels = true       #在service中启用meirtcs[true]
+</span></span><span class="line"><span class="cl">    pushInterval = 10s             #push metrics到datalog的间隔时间[10s]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--metrics.influxdb=true
+</span></span><span class="line"><span class="cl">--metrics.influxdb.address=localhost:8089
+</span></span><span class="line"><span class="cl">--metrics.influxdb.protocol=udp
+</span></span><span class="line"><span class="cl">--metrics.influxdb.database=db
+</span></span><span class="line"><span class="cl">--metrics.influxdb.retentionPolicy=two_hours
+</span></span><span class="line"><span class="cl">--metrics.influxdb.username=john
+</span></span><span class="line"><span class="cl">--metrics.influxdb.password=secret
+</span></span><span class="line"><span class="cl">--metrics.influxdb.addEntryPointsLabels=true
+</span></span><span class="line"><span class="cl">--metrics.influxdb.addServicesLabels=true
+</span></span><span class="line"><span class="cl">--metrics.influxdb.pushInterval=10s
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>Prometheus后端支持</strong></p>
 <p>配置详情:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1006,53 +1042,51 @@ metrics: {}
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml配置
-[metrics]
-  [metrics.prometheus]
-    buckets = [0.1,0.3,1.2,5.0]      #延迟的metrics的bucket存储[0.100000, 0.300000, 1.200000, 5.000000]
-    addEntryPointsLabels = true      #入口处增加metrics标签[true]
-    addServicesLabels = true         #在service中启用meirtcs[true]
-    entryPoint = &#34;traefik&#34;           #指定metrics的端点[traefik(默认是管理端口8080/metrics)],也可以自定义
-    manualRouting = true             #是否禁用内部路由[false]
-
-# cli配置
---metrics.prometheus=true
---metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
---metrics.prometheus.addEntryPointsLabels=true
---metrics.prometheus.addServicesLabels=true
-## 自定义了一个metrics端点，并指定了端口
---metrics.prometheus.entryPoint=metrics
---entryPoints.metrics.address=:8082
---metrics.prometheus.manualrouting=true
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml配置
+</span></span><span class="line"><span class="cl">[metrics]
+</span></span><span class="line"><span class="cl">  [metrics.prometheus]
+</span></span><span class="line"><span class="cl">    buckets = [0.1,0.3,1.2,5.0]      #延迟的metrics的bucket存储[0.100000, 0.300000, 1.200000, 5.000000]
+</span></span><span class="line"><span class="cl">    addEntryPointsLabels = true      #入口处增加metrics标签[true]
+</span></span><span class="line"><span class="cl">    addServicesLabels = true         #在service中启用meirtcs[true]
+</span></span><span class="line"><span class="cl">    entryPoint = &#34;traefik&#34;           #指定metrics的端点[traefik(默认是管理端口8080/metrics)],也可以自定义
+</span></span><span class="line"><span class="cl">    manualRouting = true             #是否禁用内部路由[false]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli配置
+</span></span><span class="line"><span class="cl">--metrics.prometheus=true
+</span></span><span class="line"><span class="cl">--metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
+</span></span><span class="line"><span class="cl">--metrics.prometheus.addEntryPointsLabels=true
+</span></span><span class="line"><span class="cl">--metrics.prometheus.addServicesLabels=true
+</span></span><span class="line"><span class="cl">## 自定义了一个metrics端点，并指定了端口
+</span></span><span class="line"><span class="cl">--metrics.prometheus.entryPoint=metrics
+</span></span><span class="line"><span class="cl">--entryPoints.metrics.address=:8082
+</span></span><span class="line"><span class="cl">--metrics.prometheus.manualrouting=true
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code>和其他两种方式不同的是，prometheus仅会暴露metrics，是需要使用prometheus-server定期进行<code>pull</code>来收集数据的。</p>
 <p>配置生效后，可以访问如下端口进行测试:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 自定义了metrics端点
-$ curl localhost:8082/metrics
-
-# 使用默认的traefik端点(用的是admin的端口)
-$ curl localhost:8080/metrics
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 自定义了metrics端点
+</span></span><span class="line"><span class="cl">$ curl localhost:8082/metrics
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用默认的traefik端点(用的是admin的端口)
+</span></span><span class="line"><span class="cl">$ curl localhost:8080/metrics
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>StatsD后端支持</strong></p>
 <p>详细配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1070,23 +1104,23 @@ $ curl localhost:8080/metrics
 </span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置
-[metrics]
-  [metrics.statsD]
-    address = &#34;localhost:8125&#34;          # 指定statsD服务地址
-    addEntryPointsLabels = true         # 入口处增加metrics标签[true] 
-    addServicesLabels = true            # 在service中启用meirtcs[true]
-    pushInterval = 10s                  # push间隔
-    prefix = &#34;traefik&#34;                  # 定义metrics收集的前缀[traefik]
-
-# cli 配置
---metrics.statsd=true
---metrics.statsd.address=localhost:8125
---metrics.statsd.addEntryPointsLabels=true
---metrics.statsd.addServicesLabels=true
---metrics.statsd.pushInterval=10s
---metrics.statsd.prefix=&#34;traefik&#34;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置
+</span></span><span class="line"><span class="cl">[metrics]
+</span></span><span class="line"><span class="cl">  [metrics.statsD]
+</span></span><span class="line"><span class="cl">    address = &#34;localhost:8125&#34;          # 指定statsD服务地址
+</span></span><span class="line"><span class="cl">    addEntryPointsLabels = true         # 入口处增加metrics标签[true] 
+</span></span><span class="line"><span class="cl">    addServicesLabels = true            # 在service中启用meirtcs[true]
+</span></span><span class="line"><span class="cl">    pushInterval = 10s                  # push间隔
+</span></span><span class="line"><span class="cl">    prefix = &#34;traefik&#34;                  # 定义metrics收集的前缀[traefik]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--metrics.statsd=true
+</span></span><span class="line"><span class="cl">--metrics.statsd.address=localhost:8125
+</span></span><span class="line"><span class="cl">--metrics.statsd.addEntryPointsLabels=true
+</span></span><span class="line"><span class="cl">--metrics.statsd.addServicesLabels=true
+</span></span><span class="line"><span class="cl">--metrics.statsd.pushInterval=10s
+</span></span><span class="line"><span class="cl">--metrics.statsd.prefix=&#34;traefik&#34;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>Prometheus后端的Metrics示例</strong></p>
 <p><code>注意:</code> 由于在生产环境使用的是traefik-1.7.6版本，因此上述的一些配置参数可能并不适用于该版本，详细的参数需要查看具体版本的支持参数，同时我们将traefik当做kubernetes集群中的ingress方案，因此如下操作在一个可用的k8s集群内部。</p>
@@ -1094,7 +1128,7 @@ $ curl localhost:8080/metrics
 <p><code>1.traefik的metrics配置</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1141,58 +1175,56 @@ $ curl localhost:8080/metrics
 </span><span class="lnt">45
 </span><span class="lnt">46
 </span><span class="lnt">47
-</span><span class="lnt">48
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># traefik metrics 配置
-$ cat traefik-config.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: traefik-config
-  namespace: kube-system
-data:
-  traefik.toml: |
-    defaultEntryPoints = [&#34;http&#34;,&#34;https&#34;]
-    debug = false
-    logLevel = &#34;INFO&#34;
-
-    InsecureSkipVerify = true
-    [entryPoints]
-      [entryPoints.http]
-      address = &#34;:80&#34;
-      compress = true
-      [entryPoints.https]
-      address = &#34;:443&#34;
-        [entryPoints.https.tls]
-    [web]
-      address = &#34;:8080&#34;
-    [kubernetes]
-    # 定义metrics相关参数
-    [metrics]
-      [metrics.prometheus]
-      buckets=[0.1,0.3,1.2,5.0]
-      entryPoint = &#34;traefik&#34;
-    [ping]
-    entryPoint = &#34;http&#34;
-
-# 重新调度pod后，即可查看暴露的endpoint
-
-$ kubectl  get ep -A | grep traefik
-kube-system            traefik-ingress-service                    172.16.171.163:80,172.16.21.26:80,172.16.21.27:80 + 11 more...            122d
-kube-system            traefik-web-ui                             172.16.171.163:8080,172.16.21.26:8080,172.16.21.27:8080 + 4 more...       171d
-
-$ kubectl  get svc -n kube-system | grep traefik
-traefik-ingress-service   ClusterIP   10.253.132.216   &lt;none&gt;        80/TCP,8080/TCP          122d
-traefik-web-ui            ClusterIP   10.253.54.184    &lt;none&gt;        80/TCP                   171d
-
-# 测试访问metrics服务(因为和traefik相关的两个service均路由到了traefil-ingress的pod上,下面两个效果是一致的)
-$ curl -s  10.253.132.216:8080/metrics  | head -10
-....
-....
-$ curl -s  10.253.54.184/metrics | head -10
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># traefik metrics 配置
+</span></span><span class="line"><span class="cl">$ cat traefik-config.yaml
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ConfigMap
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: traefik-config
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">data:
+</span></span><span class="line"><span class="cl">  traefik.toml: |
+</span></span><span class="line"><span class="cl">    defaultEntryPoints = [&#34;http&#34;,&#34;https&#34;]
+</span></span><span class="line"><span class="cl">    debug = false
+</span></span><span class="line"><span class="cl">    logLevel = &#34;INFO&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    InsecureSkipVerify = true
+</span></span><span class="line"><span class="cl">    [entryPoints]
+</span></span><span class="line"><span class="cl">      [entryPoints.http]
+</span></span><span class="line"><span class="cl">      address = &#34;:80&#34;
+</span></span><span class="line"><span class="cl">      compress = true
+</span></span><span class="line"><span class="cl">      [entryPoints.https]
+</span></span><span class="line"><span class="cl">      address = &#34;:443&#34;
+</span></span><span class="line"><span class="cl">        [entryPoints.https.tls]
+</span></span><span class="line"><span class="cl">    [web]
+</span></span><span class="line"><span class="cl">      address = &#34;:8080&#34;
+</span></span><span class="line"><span class="cl">    [kubernetes]
+</span></span><span class="line"><span class="cl">    # 定义metrics相关参数
+</span></span><span class="line"><span class="cl">    [metrics]
+</span></span><span class="line"><span class="cl">      [metrics.prometheus]
+</span></span><span class="line"><span class="cl">      buckets=[0.1,0.3,1.2,5.0]
+</span></span><span class="line"><span class="cl">      entryPoint = &#34;traefik&#34;
+</span></span><span class="line"><span class="cl">    [ping]
+</span></span><span class="line"><span class="cl">    entryPoint = &#34;http&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 重新调度pod后，即可查看暴露的endpoint
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl  get ep -A | grep traefik
+</span></span><span class="line"><span class="cl">kube-system            traefik-ingress-service                    172.16.171.163:80,172.16.21.26:80,172.16.21.27:80 + 11 more...            122d
+</span></span><span class="line"><span class="cl">kube-system            traefik-web-ui                             172.16.171.163:8080,172.16.21.26:8080,172.16.21.27:8080 + 4 more...       171d
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl  get svc -n kube-system | grep traefik
+</span></span><span class="line"><span class="cl">traefik-ingress-service   ClusterIP   10.253.132.216   &lt;none&gt;        80/TCP,8080/TCP          122d
+</span></span><span class="line"><span class="cl">traefik-web-ui            ClusterIP   10.253.54.184    &lt;none&gt;        80/TCP                   171d
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 测试访问metrics服务(因为和traefik相关的两个service均路由到了traefil-ingress的pod上,下面两个效果是一致的)
+</span></span><span class="line"><span class="cl">$ curl -s  10.253.132.216:8080/metrics  | head -10
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">$ curl -s  10.253.54.184/metrics | head -10
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code> 推荐使用traefik-web-ui暴露的svc地址</p>
 <p>指标以及相关含义:</p>
@@ -1282,7 +1314,7 @@ $ curl -s  10.253.54.184/metrics | head -10
 <p>注意，此时我们需要配置prometheus-server来对traefik暴露的metrics进行定期的pull采集。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1310,33 +1342,33 @@ $ curl -s  10.253.54.184/metrics | head -10
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 在k8s中创建一个prometheus monitor service
-$ cat prometheus-traefik.yml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    k8s-app: traefik-ingress-lb
-  name: traefik-metrics
-  namespace: monitoring
-spec:
-  # 对应的端点是上面创建的svc的ports
-  endpoints:
-    # 定义endpoint采集的时间
-  - interval: 30s
-    port: admin
-    path: /metrics
-  jobLabel: k8s-app
-  # 匹配monitoring命名空间的app=gpu-metrics的svc
-  namespaceSelector:
-    matchNames:
-    - kube-system
-  selector:
-    matchLabels:
-      k8s-app: traefik-ingress-lb
-
-$ kubectl apply -f prometheus-traefik.yml
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 在k8s中创建一个prometheus monitor service
+</span></span><span class="line"><span class="cl">$ cat prometheus-traefik.yml
+</span></span><span class="line"><span class="cl">apiVersion: monitoring.coreos.com/v1
+</span></span><span class="line"><span class="cl">kind: ServiceMonitor
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">  name: traefik-metrics
+</span></span><span class="line"><span class="cl">  namespace: monitoring
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  # 对应的端点是上面创建的svc的ports
+</span></span><span class="line"><span class="cl">  endpoints:
+</span></span><span class="line"><span class="cl">    # 定义endpoint采集的时间
+</span></span><span class="line"><span class="cl">  - interval: 30s
+</span></span><span class="line"><span class="cl">    port: admin
+</span></span><span class="line"><span class="cl">    path: /metrics
+</span></span><span class="line"><span class="cl">  jobLabel: k8s-app
+</span></span><span class="line"><span class="cl">  # 匹配monitoring命名空间的app=gpu-metrics的svc
+</span></span><span class="line"><span class="cl">  namespaceSelector:
+</span></span><span class="line"><span class="cl">    matchNames:
+</span></span><span class="line"><span class="cl">    - kube-system
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    matchLabels:
+</span></span><span class="line"><span class="cl">      k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kubectl apply -f prometheus-traefik.yml
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>配置完成后，即可在prometheus中查看相关的metrics数据。</p>
 <p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdl4lcmvwsj32620o0ah5.jpg" alt="prometheus-traefik-metrics"></p>
@@ -1361,7 +1393,7 @@ $ kubectl apply -f prometheus-traefik.yml
 <p><code>注意:</code> 默认情况下，traefik使用<code>Jaeger</code>来最为追踪系统的后端实现.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1371,27 +1403,25 @@ $ kubectl apply -f prometheus-traefik.yml
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-$ cat traefik.toml
-[tracing]
-  serviceName = &#34;traefik&#34;			# 选择追踪系统的后端实现[traefik(表示使用jaeger)]
-  spanNameLimit = 150					# 限制长名称的名称阶段(这可以防止某些跟踪提供程序删除超过其长度限制的跟踪)
-
-# cli 配置
---tracing=true
---tracing.serviceName=traefik
---tracing.spanNameLimit=150
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">$ cat traefik.toml
+</span></span><span class="line"><span class="cl">[tracing]
+</span></span><span class="line"><span class="cl">  serviceName = &#34;traefik&#34;			# 选择追踪系统的后端实现[traefik(表示使用jaeger)]
+</span></span><span class="line"><span class="cl">  spanNameLimit = 150					# 限制长名称的名称阶段(这可以防止某些跟踪提供程序删除超过其长度限制的跟踪)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--tracing=true
+</span></span><span class="line"><span class="cl">--tracing.serviceName=traefik
+</span></span><span class="line"><span class="cl">--tracing.spanNameLimit=150
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>2.Jaeger</strong></p>
 <p>相关配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1420,46 +1450,44 @@ $ cat traefik.toml
 </span><span class="lnt">27
 </span><span class="lnt">28
 </span><span class="lnt">29
-</span><span class="lnt">30
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-$ cat traefik.toml
-[tracing]
-  [tracing.jaeger]					# 开启jaeger的追踪支持
-    samplingServerURL = &#34;http://localhost:5778/sampling&#34; 		# 指定jaeger-agent的http采样地址
-    samplingType = &#34;const&#34;	# 指定采样类型[const(const|probabilistic|rateLimiting)]
-    samplingParam = 1.0			# 采样参数的值[1.0(const:0|1,probabilistic:0-1,rateLimiting:每秒的span数)]
-    localAgentHostPort = &#34;127.0.0.1:6831&#34;										# 本地agent主机和端口(会发送到jaeger-agent)
-    gen128Bit = true				# 生成128位的traceId,兼容OpenCensus
-    propagation = &#34;jaeger&#34;  # 设置数据传输的header类型[jaeger(jaeger|b3兼容OpenZipkin)]
-    traceContextHeaderName = &#34;uber-trace-id&#34;  # 跟踪上下文的header,用于传输跟踪上下文的http头名
-  [tracing.jaeger.collector]  # 指定jaeger的collector服务
-    endpoint = &#34;http://127.0.0.1:14268/api/traces?format=jaeger.thrift&#34;
-    user = &#34;my-user&#34;          # 向collector提交时的http认证用户[&#34;&#34;]
-    password = &#34;my-password&#34;  # 向collector提交时的http认证密码[&#34;&#34;]
-
-
-# cli 配置
---tracing.jaeger=true
---tracing.jaeger.samplingServerURL=http://localhost:5778/sampling
---tracing.jaeger.samplingType=const
---tracing.jaeger.samplingParam=1.0
---tracing.jaeger.localAgentHostPort=127.0.0.1:6831
---tracing.jaeger.gen128Bit
---tracing.jaeger.propagation=jaeger
---tracing.jaeger.traceContextHeaderName=uber-trace-id
---tracing.jaeger.collector.endpoint=http://127.0.0.1:14268/api/traces?format=jaeger.thrift
---tracing.jaeger.collector.user=my-user
---tracing.jaeger.collector.password=my-password
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">$ cat traefik.toml
+</span></span><span class="line"><span class="cl">[tracing]
+</span></span><span class="line"><span class="cl">  [tracing.jaeger]					# 开启jaeger的追踪支持
+</span></span><span class="line"><span class="cl">    samplingServerURL = &#34;http://localhost:5778/sampling&#34; 		# 指定jaeger-agent的http采样地址
+</span></span><span class="line"><span class="cl">    samplingType = &#34;const&#34;	# 指定采样类型[const(const|probabilistic|rateLimiting)]
+</span></span><span class="line"><span class="cl">    samplingParam = 1.0			# 采样参数的值[1.0(const:0|1,probabilistic:0-1,rateLimiting:每秒的span数)]
+</span></span><span class="line"><span class="cl">    localAgentHostPort = &#34;127.0.0.1:6831&#34;										# 本地agent主机和端口(会发送到jaeger-agent)
+</span></span><span class="line"><span class="cl">    gen128Bit = true				# 生成128位的traceId,兼容OpenCensus
+</span></span><span class="line"><span class="cl">    propagation = &#34;jaeger&#34;  # 设置数据传输的header类型[jaeger(jaeger|b3兼容OpenZipkin)]
+</span></span><span class="line"><span class="cl">    traceContextHeaderName = &#34;uber-trace-id&#34;  # 跟踪上下文的header,用于传输跟踪上下文的http头名
+</span></span><span class="line"><span class="cl">  [tracing.jaeger.collector]  # 指定jaeger的collector服务
+</span></span><span class="line"><span class="cl">    endpoint = &#34;http://127.0.0.1:14268/api/traces?format=jaeger.thrift&#34;
+</span></span><span class="line"><span class="cl">    user = &#34;my-user&#34;          # 向collector提交时的http认证用户[&#34;&#34;]
+</span></span><span class="line"><span class="cl">    password = &#34;my-password&#34;  # 向collector提交时的http认证密码[&#34;&#34;]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--tracing.jaeger=true
+</span></span><span class="line"><span class="cl">--tracing.jaeger.samplingServerURL=http://localhost:5778/sampling
+</span></span><span class="line"><span class="cl">--tracing.jaeger.samplingType=const
+</span></span><span class="line"><span class="cl">--tracing.jaeger.samplingParam=1.0
+</span></span><span class="line"><span class="cl">--tracing.jaeger.localAgentHostPort=127.0.0.1:6831
+</span></span><span class="line"><span class="cl">--tracing.jaeger.gen128Bit
+</span></span><span class="line"><span class="cl">--tracing.jaeger.propagation=jaeger
+</span></span><span class="line"><span class="cl">--tracing.jaeger.traceContextHeaderName=uber-trace-id
+</span></span><span class="line"><span class="cl">--tracing.jaeger.collector.endpoint=http://127.0.0.1:14268/api/traces?format=jaeger.thrift
+</span></span><span class="line"><span class="cl">--tracing.jaeger.collector.user=my-user
+</span></span><span class="line"><span class="cl">--tracing.jaeger.collector.password=my-password
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>3.Zipkin</strong></p>
 <p>相关配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1473,31 +1501,29 @@ $ cat traefik.toml
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-[tracing]
-  [tracing.zipkin]                  # 指定使用zipkin追踪系统
-    httpEndpoint = &#34;http://localhost:9411/api/v2/spans&#34;   # 指定zipkip收集数据的http端点
-    sameSpan = true                 # 使用Zipkin SameSpan RPC 类型追踪方式
-    id128Bit = true                 # 使用Zipkin 128 bit的追踪id(true)
-    sampleRate = 0.2                # 指定请求trace系统的频率[1.0(0.1-1.0)]
-
-# cli 配置
---tracing.zipkin=true
---tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans
---tracing.zipkin.sameSpan=true
---tracing.zipkin.id128Bit=false
---tracing.zipkin.sampleRate=0.2
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">[tracing]
+</span></span><span class="line"><span class="cl">  [tracing.zipkin]                  # 指定使用zipkin追踪系统
+</span></span><span class="line"><span class="cl">    httpEndpoint = &#34;http://localhost:9411/api/v2/spans&#34;   # 指定zipkip收集数据的http端点
+</span></span><span class="line"><span class="cl">    sameSpan = true                 # 使用Zipkin SameSpan RPC 类型追踪方式
+</span></span><span class="line"><span class="cl">    id128Bit = true                 # 使用Zipkin 128 bit的追踪id(true)
+</span></span><span class="line"><span class="cl">    sampleRate = 0.2                # 指定请求trace系统的频率[1.0(0.1-1.0)]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--tracing.zipkin=true
+</span></span><span class="line"><span class="cl">--tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans
+</span></span><span class="line"><span class="cl">--tracing.zipkin.sameSpan=true
+</span></span><span class="line"><span class="cl">--tracing.zipkin.id128Bit=false
+</span></span><span class="line"><span class="cl">--tracing.zipkin.sampleRate=0.2
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>4.Elastic</strong></p>
 <p>相关配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1510,24 +1536,22 @@ $ cat traefik.toml
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># toml 配置文件
-$ cat traefik.toml
-[tracing]
-  [tracing.elastic]
-    serverURL = &#34;http://apm:8200&#34;     # 指定Elastic APM服务地址
-    secretToken = &#34;&#34;                  # 指定Elastic APM服务的安全token
-    serviceEnvironment = &#34;&#34;           # 指定APM Server的环境
-
-# cli 配置
---tracing.elastic=true
---tracing.elastic.serverurl=&#34;http://apm:8200&#34;
---tracing.elastic.secrettoken=&#34;mytoken&#34;
---tracing.elastic.serviceenvironment=&#34;production&#34;
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># toml 配置文件
+</span></span><span class="line"><span class="cl">$ cat traefik.toml
+</span></span><span class="line"><span class="cl">[tracing]
+</span></span><span class="line"><span class="cl">  [tracing.elastic]
+</span></span><span class="line"><span class="cl">    serverURL = &#34;http://apm:8200&#34;     # 指定Elastic APM服务地址
+</span></span><span class="line"><span class="cl">    secretToken = &#34;&#34;                  # 指定Elastic APM服务的安全token
+</span></span><span class="line"><span class="cl">    serviceEnvironment = &#34;&#34;           # 指定APM Server的环境
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cli 配置
+</span></span><span class="line"><span class="cl">--tracing.elastic=true
+</span></span><span class="line"><span class="cl">--tracing.elastic.serverurl=&#34;http://apm:8200&#34;
+</span></span><span class="line"><span class="cl">--tracing.elastic.secrettoken=&#34;mytoken&#34;
+</span></span><span class="line"><span class="cl">--tracing.elastic.serviceenvironment=&#34;production&#34;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
@@ -1679,6 +1703,27 @@ $ cat traefik.toml
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

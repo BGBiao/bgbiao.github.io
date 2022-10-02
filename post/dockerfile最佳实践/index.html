@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Dockerfile最佳实践 - BGBiao的SRE人生</title>
+  <title>Dockerfile最佳实践 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -24,9 +24,9 @@
 
 <meta name="author" content="BGBiao" />
   <meta name="description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
- 1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。
-  2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
-  3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
+1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。
+2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。
+3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
@@ -36,7 +36,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" />
@@ -78,8 +78,8 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2017-11-09T21:40:51&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2017-11-09T21:40:51+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="Dockerfile最佳实践">
 <meta itemprop="description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
@@ -91,9 +91,9 @@
 
 
 3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。
-"><meta itemprop="datePublished" content="2017-11-09T21:40:51&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="2911">
+"><meta itemprop="datePublished" content="2017-11-09T21:40:51+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="2906">
 <meta itemprop="keywords" content="Docker,Dockerfile," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Dockerfile最佳实践"/>
 <meta name="twitter:description" content="在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。
@@ -162,7 +162,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -201,22 +201,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -378,7 +396,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -419,22 +437,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -492,7 +536,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2911 words </span>
+        <span class="more-meta"> 2906 words </span>
           <span class="more-meta"> 6 min read </span>
 
         
@@ -542,7 +586,7 @@ if (!doNotTrack) {
 <p><code>注意：</code>给image中打入sshd服务的主要原因还是想尽可能的满足用户当前的使用习惯，同时又能够充分利用docker image的特性</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -558,29 +602,29 @@ if (!doNotTrack) {
 </span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-base
-MAINTAINER xuxuebiao
-RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
-    mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
-    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
-    echo &#39;root:redhat&#39; | chpasswd
-EXPOSE 52568
-ENV LANG=zh_CN.UTF-8;\
-    LC_ALL=zh_CN.UTF-8;\
-    TZ &#34;Asia/Shanghai&#34;;\
-    TERM xterm
-CMD /usr/sbin/sshd -D
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM centos6.8-base
+</span></span><span class="line"><span class="cl">MAINTAINER xuxuebiao
+</span></span><span class="line"><span class="cl">RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+</span></span><span class="line"><span class="cl">    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+</span></span><span class="line"><span class="cl">    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
+</span></span><span class="line"><span class="cl">    mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
+</span></span><span class="line"><span class="cl">    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+</span></span><span class="line"><span class="cl">    echo &#39;root:redhat&#39; | chpasswd
+</span></span><span class="line"><span class="cl">EXPOSE 52568
+</span></span><span class="line"><span class="cl">ENV LANG=zh_CN.UTF-8;\
+</span></span><span class="line"><span class="cl">    LC_ALL=zh_CN.UTF-8;\
+</span></span><span class="line"><span class="cl">    TZ &#34;Asia/Shanghai&#34;;\
+</span></span><span class="line"><span class="cl">    TERM xterm
+</span></span><span class="line"><span class="cl">CMD /usr/sbin/sshd -D
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">#docker build -t centos6.8-sshd .
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#docker build -t centos6.8-sshd .
+</span></span></code></pre></td></tr></table>
 </div>
 </div><hr>
 <h4 id="构建上层基本软件环境">构建上层基本软件环境</h4>
@@ -588,7 +632,7 @@ CMD /usr/sbin/sshd -D
 <p>构建一个基于jdk7tomcat6的基本镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -609,59 +653,55 @@ CMD /usr/sbin/sshd -D
 </span><span class="lnt">19
 </span><span class="lnt">20
 </span><span class="lnt">21
-</span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-sshd
-MAINTAINER &#34;xuxuebiao&#34;
-ENV TZ &#34;Asia/Shanghai&#34;;\
-    PATH $PATH:/export/data/
-
-RUN useradd admin;\
-    mkdir -p /export/servers/{jdk1.7.0_71,tomcat6.0.33,nginx};\
-    mkdir -p /export/{App,auto_deploy,Config,data,Data,Domains,home,Logs,servers,Shell};
-WORKDIR /export/data/
-EXPOSE 80
-EXPOSE 8080
-ADD jdk1.7.0_71  /export/servers/jdk1.7.0_71
-ADD tomcat6.0.33 /export/servers/tomcat6.0.33
-ADD profile /etc/profile
-ADD nginx  /export/servers/nginx
-ADD auto-add-tomcat /home/admin/
-COPY start_nginx /etc/init.d/nginx
-COPY init_nginx.sh /export/Shell/
-RUN chmod a+x /etc/init.d/nginx;\
-    chmod a+x /export/Shell/init_nginx.sh;\
-    chown admin.admin -R /export/ /home/admin/
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM centos6.8-sshd
+</span></span><span class="line"><span class="cl">MAINTAINER &#34;xuxuebiao&#34;
+</span></span><span class="line"><span class="cl">ENV TZ &#34;Asia/Shanghai&#34;;\
+</span></span><span class="line"><span class="cl">    PATH $PATH:/export/data/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">RUN useradd admin;\
+</span></span><span class="line"><span class="cl">    mkdir -p /export/servers/{jdk1.7.0_71,tomcat6.0.33,nginx};\
+</span></span><span class="line"><span class="cl">    mkdir -p /export/{App,auto_deploy,Config,data,Data,Domains,home,Logs,servers,Shell};
+</span></span><span class="line"><span class="cl">WORKDIR /export/data/
+</span></span><span class="line"><span class="cl">EXPOSE 80
+</span></span><span class="line"><span class="cl">EXPOSE 8080
+</span></span><span class="line"><span class="cl">ADD jdk1.7.0_71  /export/servers/jdk1.7.0_71
+</span></span><span class="line"><span class="cl">ADD tomcat6.0.33 /export/servers/tomcat6.0.33
+</span></span><span class="line"><span class="cl">ADD profile /etc/profile
+</span></span><span class="line"><span class="cl">ADD nginx  /export/servers/nginx
+</span></span><span class="line"><span class="cl">ADD auto-add-tomcat /home/admin/
+</span></span><span class="line"><span class="cl">COPY start_nginx /etc/init.d/nginx
+</span></span><span class="line"><span class="cl">COPY init_nginx.sh /export/Shell/
+</span></span><span class="line"><span class="cl">RUN chmod a+x /etc/init.d/nginx;\
+</span></span><span class="line"><span class="cl">    chmod a+x /export/Shell/init_nginx.sh;\
+</span></span><span class="line"><span class="cl">    chown admin.admin -R /export/ /home/admin/
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>构建一个基于python27的基本环境，环境中本身已经安装各种第三方程序库：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-sshd
-MAINTAINER biaoge
-ADD python27 /usr/local/python27
-RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
-    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
-    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;
-
-EXPOSE 8000
-EXPOSE 8081
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM centos6.8-sshd
+</span></span><span class="line"><span class="cl">MAINTAINER biaoge
+</span></span><span class="line"><span class="cl">ADD python27 /usr/local/python27
+</span></span><span class="line"><span class="cl">RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
+</span></span><span class="line"><span class="cl">    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
+</span></span><span class="line"><span class="cl">    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">EXPOSE 8000
+</span></span><span class="line"><span class="cl">EXPOSE 8081
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>构建本层的镜像Dockerfile中不能指定新的应用进程，否则基本镜像中的sshd就会失效</code></p>
 <hr>
@@ -670,7 +710,7 @@ EXPOSE 8081
 <p><code>由于supervisord是有python写的，所以可以直接在python模块包中使用</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -692,33 +732,33 @@ EXPOSE 8081
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM centos6.8-base
-MAINTAINER biaoge
-ENV LANG=zh_CN.UTF-8;\
-    LC_ALL=zh_CN.UTF-8;\
-    TZ=&#34;Asia/Shanghai&#34;;\
-    TERM=xterm
-ADD python27 /usr/local/python27
-RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
-    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
-    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;\
-    ln -s /usr/local/python27/bin/supervisord /usr/local/bin/supervisord;
-
-ADD supervisord.conf /etc/supervisord.conf
-EXPOSE 8000 8001 
-
-CMD [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
-#这里其实比较建议使用ENTRYPOINT
-#ENTRYPOINT通常情况下和CMD会一起使用，区别是CMD定义的执行命令会被container创建的时候的command取代。一般情况下ENTRYPOINT会定义命令执行的主体,CMD中增加默认的参数，而实际的参数可以通过创建container的时候用command进行优化选择
-#ENTRYPOINT  [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
-#文末会有演示一个ENTRYPOINT的例子
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM centos6.8-base
+</span></span><span class="line"><span class="cl">MAINTAINER biaoge
+</span></span><span class="line"><span class="cl">ENV LANG=zh_CN.UTF-8;\
+</span></span><span class="line"><span class="cl">    LC_ALL=zh_CN.UTF-8;\
+</span></span><span class="line"><span class="cl">    TZ=&#34;Asia/Shanghai&#34;;\
+</span></span><span class="line"><span class="cl">    TERM=xterm
+</span></span><span class="line"><span class="cl">ADD python27 /usr/local/python27
+</span></span><span class="line"><span class="cl">RUN ln -s /usr/local/python27/bin/python2.7 /usr/local/bin/python27 ;\
+</span></span><span class="line"><span class="cl">    ln -s  /usr/local/python27/bin/pip /usr/local/bin/pip;\
+</span></span><span class="line"><span class="cl">    ln -s /usr/local/python27/bin/ipython /usr/local/bin/ipython;\
+</span></span><span class="line"><span class="cl">    ln -s /usr/local/python27/bin/supervisord /usr/local/bin/supervisord;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ADD supervisord.conf /etc/supervisord.conf
+</span></span><span class="line"><span class="cl">EXPOSE 8000 8001 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">CMD [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
+</span></span><span class="line"><span class="cl">#这里其实比较建议使用ENTRYPOINT
+</span></span><span class="line"><span class="cl">#ENTRYPOINT通常情况下和CMD会一起使用，区别是CMD定义的执行命令会被container创建的时候的command取代。一般情况下ENTRYPOINT会定义命令执行的主体,CMD中增加默认的参数，而实际的参数可以通过创建container的时候用command进行优化选择
+</span></span><span class="line"><span class="cl">#ENTRYPOINT  [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.conf&#34;]
+</span></span><span class="line"><span class="cl">#文末会有演示一个ENTRYPOINT的例子
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>启动之后就会默认启动supervisord.conf中配的服务。</p>
 <p>默认的supervisord.conf文件配置：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -738,37 +778,35 @@ CMD [&#34;/usr/local/bin/supervisord&#34;,&#34;-c&#34;,&#34;/etc/supervisord.con
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">[supervisord]
-http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
-logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
-logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
-logfile_backups=10          ; (num of main logfile rotation backups;default 10)
-loglevel=info               ; (logging level;default info; others: debug,warn)
-pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
-nodaemon=true              ; (start in foreground if true;default false)
-minfds=1024                 ; (min. avail startup file descriptors;default 1024)
-minprocs=200                ; (min. avail process descriptors;default 200)
-
-
-[supervisorctl]
-serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
-
-#额外管理的服务
-#[program:httpd]
-#command = /usr/sbin/httpd
-#[program:sshd]
-#command = /usr/sbin/sshd -D
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[supervisord]
+</span></span><span class="line"><span class="cl">http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
+</span></span><span class="line"><span class="cl">logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
+</span></span><span class="line"><span class="cl">logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
+</span></span><span class="line"><span class="cl">logfile_backups=10          ; (num of main logfile rotation backups;default 10)
+</span></span><span class="line"><span class="cl">loglevel=info               ; (logging level;default info; others: debug,warn)
+</span></span><span class="line"><span class="cl">pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+</span></span><span class="line"><span class="cl">nodaemon=true              ; (start in foreground if true;default false)
+</span></span><span class="line"><span class="cl">minfds=1024                 ; (min. avail startup file descriptors;default 1024)
+</span></span><span class="line"><span class="cl">minprocs=200                ; (min. avail process descriptors;default 200)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">[supervisorctl]
+</span></span><span class="line"><span class="cl">serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#额外管理的服务
+</span></span><span class="line"><span class="cl">#[program:httpd]
+</span></span><span class="line"><span class="cl">#command = /usr/sbin/httpd
+</span></span><span class="line"><span class="cl">#[program:sshd]
+</span></span><span class="line"><span class="cl">#command = /usr/sbin/sshd -D
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="使用上面构建的supervisord镜像进行构建服务镜像">使用上面构建的supervisord镜像进行构建服务镜像</h4>
 <p>镜像可自启动包含sshd和rabbitmq的服务</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -785,33 +823,31 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 </span><span class="lnt">15
 </span><span class="lnt">16
 </span><span class="lnt">17
-</span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM supversord
-MAINTAINER biaoge
-
-#需要如下相关的包
-#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
-COPY *.rpm /usr/local/
-RUN yum localinstall /usr/local/*.rpm -y 
-RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
-    mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
-    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
-    echo &#39;root:redhat&#39; | chpasswd
-EXPOSE 52568 5672 4369 
-
-#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM supversord
+</span></span><span class="line"><span class="cl">MAINTAINER biaoge
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#需要如下相关的包
+</span></span><span class="line"><span class="cl">#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
+</span></span><span class="line"><span class="cl">COPY *.rpm /usr/local/
+</span></span><span class="line"><span class="cl">RUN yum localinstall /usr/local/*.rpm -y 
+</span></span><span class="line"><span class="cl">RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+</span></span><span class="line"><span class="cl">    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+</span></span><span class="line"><span class="cl">    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
+</span></span><span class="line"><span class="cl">    mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
+</span></span><span class="line"><span class="cl">    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+</span></span><span class="line"><span class="cl">    echo &#39;root:redhat&#39; | chpasswd
+</span></span><span class="line"><span class="cl">EXPOSE 52568 5672 4369 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
+</span></span><span class="line"><span class="cl">ADD supervisord.conf /etc/supervisord.conf
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>用来启动sshd和rabbitmq服务的<code>supervisord.conf</code>配置文件。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -833,27 +869,27 @@ ADD supervisord.conf /etc/supervisord.conf
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">[supervisord]
-http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
-logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
-logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
-logfile_backups=10          ; (num of main logfile rotation backups;default 10)
-loglevel=info               ; (logging level;default info; others: debug,warn)
-pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
-nodaemon=true              ; (start in foreground if true;default false)
-minfds=1024                 ; (min. avail startup file descriptors;default 1024)
-minprocs=200                ; (min. avail process descriptors;default 200)
-
-
-[supervisorctl]
-serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
-
-#额外管理的服务
-[program:rabbitmq]
-command = rabbitmq-server
-[program:sshd]
-command = /usr/sbin/sshd -D
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[supervisord]
+</span></span><span class="line"><span class="cl">http_port=/var/tmp/supervisor.sock ; (default is to run a UNIX domain socket server)
+</span></span><span class="line"><span class="cl">logfile=/var/log/supervisord.log ; (main log file;default $CWD/supervisord.log)
+</span></span><span class="line"><span class="cl">logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
+</span></span><span class="line"><span class="cl">logfile_backups=10          ; (num of main logfile rotation backups;default 10)
+</span></span><span class="line"><span class="cl">loglevel=info               ; (logging level;default info; others: debug,warn)
+</span></span><span class="line"><span class="cl">pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+</span></span><span class="line"><span class="cl">nodaemon=true              ; (start in foreground if true;default false)
+</span></span><span class="line"><span class="cl">minfds=1024                 ; (min. avail startup file descriptors;default 1024)
+</span></span><span class="line"><span class="cl">minprocs=200                ; (min. avail process descriptors;default 200)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">[supervisorctl]
+</span></span><span class="line"><span class="cl">serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#额外管理的服务
+</span></span><span class="line"><span class="cl">[program:rabbitmq]
+</span></span><span class="line"><span class="cl">command = rabbitmq-server
+</span></span><span class="line"><span class="cl">[program:sshd]
+</span></span><span class="line"><span class="cl">command = /usr/sbin/sshd -D
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>测试访问：</strong>
 使用上面Dockerfile创建images进行构建容器：</p>
@@ -865,7 +901,7 @@ command = /usr/sbin/sshd -D
 <p>基本sshd镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -878,30 +914,28 @@ command = /usr/sbin/sshd -D
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM supervisord
-MAINTAINER 371990778@qq.com
-#配置相关的ssh需要的文件，以及相关的用户密码
-RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
-    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
-    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
-    mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
-    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
-    echo &#39;root:redhat&#39; | chpasswd
-EXPOSE 52568
-
-#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf 
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM supervisord
+</span></span><span class="line"><span class="cl">MAINTAINER 371990778@qq.com
+</span></span><span class="line"><span class="cl">#配置相关的ssh需要的文件，以及相关的用户密码
+</span></span><span class="line"><span class="cl">RUN ssh-keygen -q -N &#34;&#34; -t dsa -f /etc/ssh/ssh_host_dsa_key ;\
+</span></span><span class="line"><span class="cl">    ssh-keygen -q -N &#34;&#34; -t rsa -f /etc/ssh/ssh_host_rsa_key ;\
+</span></span><span class="line"><span class="cl">    sed -ri &#39;s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g&#39; /etc/pam.d/sshd ;\
+</span></span><span class="line"><span class="cl">    mkdir -p /root/.ssh &amp;&amp; chown root.root /root &amp;&amp; chmod 700 /root/.ssh ;\
+</span></span><span class="line"><span class="cl">    sed -ri &#39;s/#Port 22/Port 52568/g&#39; /etc/ssh/sshd_config ;\
+</span></span><span class="line"><span class="cl">    echo &#39;root:redhat&#39; | chpasswd
+</span></span><span class="line"><span class="cl">EXPOSE 52568
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
+</span></span><span class="line"><span class="cl">ADD supervisord.conf /etc/supervisord.conf 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>相应的supervisord.conf文件中只需要增加相应的额服务启动命令</code></p>
 <p>基本redis镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -914,23 +948,23 @@ ADD supervisord.conf /etc/supervisord.conf
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM sshd-base
-MAINTAINER biaoge
-ADD redis-2.8.9 /usr/local/redis-2.8.9 
-#ADD redis.conf /etc/redis.conf
-RUN ln -s /usr/local/redis-2.8.9/src/redis-cli /usr/local/bin/redis-cli ;\
-    ln -s /usr/local/redis-2.8.9/src/redis-server /usr/local/bin/redis-server;\
-    ln -s /usr/local/redis-2.8.9/redisd.sh /usr/local/bin/redisd.sh
-
-EXPOSE 3679 
-ADD supervisord.conf /etc/supervisord.conf
-#CMD /usr/local/bin/redis-server 
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM sshd-base
+</span></span><span class="line"><span class="cl">MAINTAINER biaoge
+</span></span><span class="line"><span class="cl">ADD redis-2.8.9 /usr/local/redis-2.8.9 
+</span></span><span class="line"><span class="cl">#ADD redis.conf /etc/redis.conf
+</span></span><span class="line"><span class="cl">RUN ln -s /usr/local/redis-2.8.9/src/redis-cli /usr/local/bin/redis-cli ;\
+</span></span><span class="line"><span class="cl">    ln -s /usr/local/redis-2.8.9/src/redis-server /usr/local/bin/redis-server;\
+</span></span><span class="line"><span class="cl">    ln -s /usr/local/redis-2.8.9/redisd.sh /usr/local/bin/redisd.sh
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">EXPOSE 3679 
+</span></span><span class="line"><span class="cl">ADD supervisord.conf /etc/supervisord.conf
+</span></span><span class="line"><span class="cl">#CMD /usr/local/bin/redis-server 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>基本rabbit镜像：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -943,23 +977,23 @@ ADD supervisord.conf /etc/supervisord.conf
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">FROM sshd-base
-MAINTAINER biaoge
-
-#需要如下相关的包
-#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
-COPY *.rpm /usr/local/
-RUN yum localinstall /usr/local/*.rpm -y 
-EXPOSE 5672 4369 
-
-#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
-ADD supervisord.conf /etc/supervisord.conf 
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FROM sshd-base
+</span></span><span class="line"><span class="cl">MAINTAINER biaoge
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#需要如下相关的包
+</span></span><span class="line"><span class="cl">#esl-erlang_18.1-1~centos~6_amd64.rpm  esl-erlang-compat-18.1-1.noarch.rpm  rabbitmq-server-3.1.5-1.noarch.rpm
+</span></span><span class="line"><span class="cl">COPY *.rpm /usr/local/
+</span></span><span class="line"><span class="cl">RUN yum localinstall /usr/local/*.rpm -y 
+</span></span><span class="line"><span class="cl">EXPOSE 5672 4369 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#这里只需要将更新的配置文件拷贝进去，最终会继承父进程中的CMD去执行supervisord中定义的服务
+</span></span><span class="line"><span class="cl">ADD supervisord.conf /etc/supervisord.conf 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>其他案例示范：</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -970,22 +1004,22 @@ ADD supervisord.conf /etc/supervisord.conf
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">FROM</span> <span class="nx">centos</span><span class="p">:</span><span class="mf">6.8</span>
-<span class="nx">MAINTAINER</span> <span class="s">&#34;Andy_xu&#34;</span>
-
-<span class="nx">ENV</span> <span class="nx">TZ</span> <span class="s">&#34;Asia/Shanghai&#34;</span>
-<span class="err">#</span><span class="nx">ENV</span> <span class="nx">PATH</span> <span class="err">$</span><span class="nx">PATH</span><span class="p">:</span><span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="nx">data</span><span class="o">/</span>
-<span class="nx">ENV</span> <span class="nx">TERM</span> <span class="nx">xterm</span>
-
-<span class="nx">RUN</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span>
-<span class="nx">COPY</span> <span class="o">*</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span> 
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">FROM</span> <span class="nx">centos</span><span class="p">:</span><span class="mf">6.8</span>
+</span></span><span class="line"><span class="cl"><span class="nx">MAINTAINER</span> <span class="s">&#34;Andy_xu&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">ENV</span> <span class="nx">TZ</span> <span class="s">&#34;Asia/Shanghai&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="err">#</span><span class="nx">ENV</span> <span class="nx">PATH</span> <span class="err">$</span><span class="nx">PATH</span><span class="p">:</span><span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="nx">data</span><span class="o">/</span>
+</span></span><span class="line"><span class="cl"><span class="nx">ENV</span> <span class="nx">TERM</span> <span class="nx">xterm</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">RUN</span> <span class="nx">mkdir</span> <span class="o">-</span><span class="nx">p</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span>
+</span></span><span class="line"><span class="cl"><span class="nx">COPY</span> <span class="o">*</span> <span class="o">/</span><span class="nx">export</span><span class="o">/</span><span class="kn">package</span> 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意：上面dockerfile文件构建的环境没有默认的ps，需要加载export PS1='[\u@\h \W]\$'</code></p>
 <p>ENTRYPOINT 指令详解</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1016,36 +1050,36 @@ ADD supervisord.conf /etc/supervisord.conf
 </span><span class="lnt">29
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat Dockerfile
-FROM centos6.8
-ENTRYPOINT [&#34;curl&#34;,&#34;-s&#34;,&#34;10.0.0.1:2379/info&#34;]
-#cmd 可以只定义参数
-#CMD [&#34;-v&#34;]
-$ docker build -t curl .
-$ docker  run curl  (执行ENTRYPOINT定义的内容)
-{&#34;ID&#34;:&#34;RDTS:INFK:VAZI:5X75:EYAP:DBTC:AQ42:A5WH:IVJX:K4L2:RJ2R:CZS2&#34;,&#34;Containers&#34;:21,&#34;Images&#34;:150,&#34;Driver&#34;:&#34;overlay&#34;,&#34;DriverStatus&#34;:[[&#34;Backing Filesystem&#34;,&#34;extfs&#34;]],&#34;MemoryLimit&#34;:true,&#34;SwapLimit&#34;:true,&#34;CpuCfsPeriod&#34;:true,&#34;CpuCfsQuota&#34;:true,&#34;IPv4Forwarding&#34;:true,&#34;BridgeNfIptables&#34;:true,&#34;BridgeNfIp6tables&#34;:true,&#34;Debug&#34;:false,&#34;NFd&#34;:42,&#34;OomKillDisable&#34;:true,&#34;NGoroutines&#34;:84,&#34;SystemTime&#34;:&#34;2017-05-19T10:51:57.545371359+08:00&#34;,&#34;ExecutionDriver&#34;:&#34;native-0.2&#34;,&#34;LoggingDriver&#34;:&#34;json-file&#34;,&#34;NEventsListener&#34;:0,&#34;KernelVersion&#34;:&#34;2.6.32-431.wy39.el6.x86_64&#34;,&#34;OperatingSystem&#34;:&#34;\u003cunknown\u003e&#34;,&#34;IndexServerAddress&#34;:&#34;https://index.docker.io/v1/&#34;,&#34;RegistryConfig&#34;:{&#34;InsecureRegistryCIDRs&#34;:[&#34;127.0.0.0/8&#34;],&#34;IndexConfigs&#34;:{&#34;xxbandy123&#34;:{&#34;Name&#34;:&#34;172.25.46.9:5001&#34;,&#34;Mirrors&#34;:[],&#34;Secure&#34;:false,&#34;Official&#34;:false},&#34;docker.io&#34;:{&#34;Name&#34;:&#34;docker.io&#34;,&#34;Mirrors&#34;:null,&#34;Secure&#34;:true,&#34;Official&#34;:true}},&#34;Mirrors&#34;:null},&#34;InitSha1&#34;:&#34;&#34;,&#34;InitPath&#34;:&#34;/usr/bin/docker&#34;,&#34;NCPU&#34;:40,&#34;MemTotal&#34;:135282294784,&#34;DockerRootDir&#34;:&#34;/export/lib/docker&#34;,&#34;HttpProxy&#34;:&#34;&#34;,&#34;HttpsProxy&#34;:&#34;&#34;,&#34;NoProxy&#34;:&#34;&#34;,&#34;Name&#34;:&#34;HC-25-28-12.h.chinabank.com.cn&#34;,&#34;Labels&#34;:null,&#34;ExperimentalBuild&#34;:false,&#34;ServerVersion&#34;:&#34;1.9.1&#34;,&#34;ClusterStore&#34;:&#34;&#34;,&#34;ClusterAdvertise&#34;:&#34;&#34;}
-
-$ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆盖掉Dockerfile中掉CMD指令)
-* About to connect() to 10.0.0.1 port 5256 (#0)
-*   Trying 10.0.0.1... connected
-* Connected to 10.0.0.1 (10.0.0.1) port 5256 (#0)
-&gt; HEAD /info HTTP/1.1
-&gt; User-Agent: curl/7.19.7 (x86_64-redhat-linux-gnu) libcurl/7.19.7 NSS/3.21 Basic ECC zlib/1.2.3 libidn/1.18 libssh2/1.4.2
-&gt; Host: 10.0.0.1:5256
-&gt; Accept: */*
-&gt;
-&lt; HTTP/1.1 404 Not Found
-&lt; Content-Type: text/plain; charset=utf-8
-&lt; Date: Fri, 19 May 2017 02:53:36 GMT
-&lt; Content-Length: 19
-&lt;
-* Connection #0 to host 10.0.0.1 left intact
-* Closing connection #0
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-Date: Fri, 19 May 2017 02:53:36 GMT
-Content-Length: 19
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ cat Dockerfile
+</span></span><span class="line"><span class="cl">FROM centos6.8
+</span></span><span class="line"><span class="cl">ENTRYPOINT [&#34;curl&#34;,&#34;-s&#34;,&#34;10.0.0.1:2379/info&#34;]
+</span></span><span class="line"><span class="cl">#cmd 可以只定义参数
+</span></span><span class="line"><span class="cl">#CMD [&#34;-v&#34;]
+</span></span><span class="line"><span class="cl">$ docker build -t curl .
+</span></span><span class="line"><span class="cl">$ docker  run curl  (执行ENTRYPOINT定义的内容)
+</span></span><span class="line"><span class="cl">{&#34;ID&#34;:&#34;RDTS:INFK:VAZI:5X75:EYAP:DBTC:AQ42:A5WH:IVJX:K4L2:RJ2R:CZS2&#34;,&#34;Containers&#34;:21,&#34;Images&#34;:150,&#34;Driver&#34;:&#34;overlay&#34;,&#34;DriverStatus&#34;:[[&#34;Backing Filesystem&#34;,&#34;extfs&#34;]],&#34;MemoryLimit&#34;:true,&#34;SwapLimit&#34;:true,&#34;CpuCfsPeriod&#34;:true,&#34;CpuCfsQuota&#34;:true,&#34;IPv4Forwarding&#34;:true,&#34;BridgeNfIptables&#34;:true,&#34;BridgeNfIp6tables&#34;:true,&#34;Debug&#34;:false,&#34;NFd&#34;:42,&#34;OomKillDisable&#34;:true,&#34;NGoroutines&#34;:84,&#34;SystemTime&#34;:&#34;2017-05-19T10:51:57.545371359+08:00&#34;,&#34;ExecutionDriver&#34;:&#34;native-0.2&#34;,&#34;LoggingDriver&#34;:&#34;json-file&#34;,&#34;NEventsListener&#34;:0,&#34;KernelVersion&#34;:&#34;2.6.32-431.wy39.el6.x86_64&#34;,&#34;OperatingSystem&#34;:&#34;\u003cunknown\u003e&#34;,&#34;IndexServerAddress&#34;:&#34;https://index.docker.io/v1/&#34;,&#34;RegistryConfig&#34;:{&#34;InsecureRegistryCIDRs&#34;:[&#34;127.0.0.0/8&#34;],&#34;IndexConfigs&#34;:{&#34;xxbandy123&#34;:{&#34;Name&#34;:&#34;172.25.46.9:5001&#34;,&#34;Mirrors&#34;:[],&#34;Secure&#34;:false,&#34;Official&#34;:false},&#34;docker.io&#34;:{&#34;Name&#34;:&#34;docker.io&#34;,&#34;Mirrors&#34;:null,&#34;Secure&#34;:true,&#34;Official&#34;:true}},&#34;Mirrors&#34;:null},&#34;InitSha1&#34;:&#34;&#34;,&#34;InitPath&#34;:&#34;/usr/bin/docker&#34;,&#34;NCPU&#34;:40,&#34;MemTotal&#34;:135282294784,&#34;DockerRootDir&#34;:&#34;/export/lib/docker&#34;,&#34;HttpProxy&#34;:&#34;&#34;,&#34;HttpsProxy&#34;:&#34;&#34;,&#34;NoProxy&#34;:&#34;&#34;,&#34;Name&#34;:&#34;HC-25-28-12.h.chinabank.com.cn&#34;,&#34;Labels&#34;:null,&#34;ExperimentalBuild&#34;:false,&#34;ServerVersion&#34;:&#34;1.9.1&#34;,&#34;ClusterStore&#34;:&#34;&#34;,&#34;ClusterAdvertise&#34;:&#34;&#34;}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ docker  run curl -v -I (ENTRYPOINT后面可以增加自定义参数，会覆盖掉Dockerfile中掉CMD指令)
+</span></span><span class="line"><span class="cl">* About to connect() to 10.0.0.1 port 5256 (#0)
+</span></span><span class="line"><span class="cl">*   Trying 10.0.0.1... connected
+</span></span><span class="line"><span class="cl">* Connected to 10.0.0.1 (10.0.0.1) port 5256 (#0)
+</span></span><span class="line"><span class="cl">&gt; HEAD /info HTTP/1.1
+</span></span><span class="line"><span class="cl">&gt; User-Agent: curl/7.19.7 (x86_64-redhat-linux-gnu) libcurl/7.19.7 NSS/3.21 Basic ECC zlib/1.2.3 libidn/1.18 libssh2/1.4.2
+</span></span><span class="line"><span class="cl">&gt; Host: 10.0.0.1:5256
+</span></span><span class="line"><span class="cl">&gt; Accept: */*
+</span></span><span class="line"><span class="cl">&gt;
+</span></span><span class="line"><span class="cl">&lt; HTTP/1.1 404 Not Found
+</span></span><span class="line"><span class="cl">&lt; Content-Type: text/plain; charset=utf-8
+</span></span><span class="line"><span class="cl">&lt; Date: Fri, 19 May 2017 02:53:36 GMT
+</span></span><span class="line"><span class="cl">&lt; Content-Length: 19
+</span></span><span class="line"><span class="cl">&lt;
+</span></span><span class="line"><span class="cl">* Connection #0 to host 10.0.0.1 left intact
+</span></span><span class="line"><span class="cl">* Closing connection #0
+</span></span><span class="line"><span class="cl">HTTP/1.1 404 Not Found
+</span></span><span class="line"><span class="cl">Content-Type: text/plain; charset=utf-8
+</span></span><span class="line"><span class="cl">Date: Fri, 19 May 2017 02:53:36 GMT
+</span></span><span class="line"><span class="cl">Content-Length: 19
+</span></span></code></pre></td></tr></table>
 </div>
 </div>
     </div>
@@ -1192,6 +1226,27 @@ Content-Length: 19
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

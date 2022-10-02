@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>GPU环境下玩转Docker(一) - BGBiao的SRE人生</title>
+  <title>GPU环境下玩转Docker(一) - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -34,7 +34,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/" />
@@ -70,16 +70,16 @@
 CPU与GPU" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%B8%80/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2017-10-26T10:07:34&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2017-10-26T10:07:34+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="GPU环境下玩转Docker(一)">
 <meta itemprop="description" content="背景：
 随着大数据、人工智能以及机器学习等技术的发展，CPU计算资源已经不能满足很多计算场景，而随着硬件技术的发展，越来越多的人工智能以及机器学习领域开始使用GPU进行计算任务。而GPU环境以及具体的应用方式又给真正做人工智能相关的同学造成了很多困扰，本系列文章将分为三篇，将介绍如何搭建部署GPU环境，使用Docker进行管理GPU容器，使用Kubernetes来调度GPU容器。
 从GPU到GPGPU
-CPU与GPU"><meta itemprop="datePublished" content="2017-10-26T10:07:34&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="6315">
+CPU与GPU"><meta itemprop="datePublished" content="2017-10-26T10:07:34+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="6307">
 <meta itemprop="keywords" content="Docker,GPU,NVIDIA,NVIDIA-Docker," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="GPU环境下玩转Docker(一)"/>
 <meta name="twitter:description" content="背景：
@@ -142,7 +142,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -181,22 +181,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -358,7 +376,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -399,22 +417,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -472,7 +516,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 6315 words </span>
+        <span class="more-meta"> 6307 words </span>
           <span class="more-meta"> 13 min read </span>
 
         
@@ -643,30 +687,26 @@ if (!doNotTrack) {
 <p>如下显示当前主机上支持并有四个GPU设备</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# lspci | grep -i nvidia
-04:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-05:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-06:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-07:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sh-4.2# lspci | grep -i nvidia
+</span></span><span class="line"><span class="cl">04:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
+</span></span><span class="line"><span class="cl">05:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
+</span></span><span class="line"><span class="cl">06:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
+</span></span><span class="line"><span class="cl">07:00.0 3D controller: NVIDIA Corporation Device 17fd (rev a1)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意：如果使用上述命令没有任何输出，那需要更新你的PCI 硬件数据库，然后再次执行；</code></p>
 <p>安装nvidia-linux驱动:
 <code>注意:</code> 用户可以在<a href="https://www.nvidia.cn/Download/index.aspx?lang=cn">nvidia-driver</a>页面选择相应型号相应环境的nvidia驱动，并下载rpm格式的驱动程序。同时用户也可以在<a href="https://www.nvidia.com/object/linux-amd64-display-archive.html">nvidia-driver-run</a>页面下载指定版本的二进制驱动程序。通常情况下，推荐使用后者安装nvidia的驱动，但是前者的rpm包中默认也包含了对应的cuda版本，因此rpm包方式更适合傻瓜式安装，而使用二进制方式用户可以自行安装cuda版本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -704,54 +744,52 @@ if (!doNotTrack) {
 </span><span class="lnt">36
 </span><span class="lnt">37
 </span><span class="lnt">38
-</span><span class="lnt">39
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# wget -O NVIDIA-Linux-x86_64-375.39.run https://www.nvidia.com/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
-sh-4.2# chmod a+x NVIDIA-Linux-x86_64-375.39.run
-# 选择安静模式安装
-sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
-
-# 可能会遇到的问题:
-## 1. 提示kernel-source相关的问题 (原因是kernel和kernel-devel包的版本不一致导致无法检测到内核相关库文件)
-# 重新安装内核相关文件，保证内核头文件和库文件版本一致
-sh-4.2# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y 
-# 卸载错误版本的内核库文件
-sh-4.2# rpm -qa | grep kernel-devel
-kernel-devel-3.10.0-693.el7.x86_64
-kernel-devel-3.10.0-862.el7.x86_64
-sh-4.2# rpm -e kernel-devel-3.10.0-862.el7.x86_64
-sh-4.2# rpm -qa | grep kernel-devel
-kernel-devel-3.10.0-693.el7.x86_64
-sh-4.2# ./NVIDIA-Linux-x86_64-396.45.run -s
-Verifying archive integrity... OK
-Uncompressing NVIDIA Accelerated Graphics Driver for Linux-x86_64 396.45..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-
-## 2. 提示如下
-ERROR: The Nouveau kernel driver is currently in use by your system.  This driver is incompatible with the NVIDIA driver, and must be disabled before proceeding.  Please consult the NVIDIA driver README and your Linux distribution&#39;s documentation for details on how to correctly disable the Nouveau kernel driver.
-
-# 在centos7中需要禁止一个内核模块Nouveau
-sh-4.2# lsmod | grep nouveau
-nouveau              1622010  0
-video                  24520  1 nouveau
-mxm_wmi                13021  1 nouveau
-drm_kms_helper        159169  2 mgag200,nouveau
-ttm                    99345  2 mgag200,nouveau
-drm                   370825  5 ttm,drm_kms_helper,mgag200,nouveau
-i2c_algo_bit           13413  3 igb,mgag200,nouveau
-i2c_core               40756  8 drm,igb,i2c_i801,ipmi_ssif,drm_kms_helper,mgag200,i2c_algo_bit,nouveau
-wmi                    19070  2 mxm_wmi,nouveau
-
-# 临时卸载该模块
-sh-4.2# rmmod nouveau
-sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sh-4.2# wget -O NVIDIA-Linux-x86_64-375.39.run https://www.nvidia.com/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_64-375.39.run
+</span></span><span class="line"><span class="cl">sh-4.2# chmod a+x NVIDIA-Linux-x86_64-375.39.run
+</span></span><span class="line"><span class="cl"># 选择安静模式安装
+</span></span><span class="line"><span class="cl">sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 可能会遇到的问题:
+</span></span><span class="line"><span class="cl">## 1. 提示kernel-source相关的问题 (原因是kernel和kernel-devel包的版本不一致导致无法检测到内核相关库文件)
+</span></span><span class="line"><span class="cl"># 重新安装内核相关文件，保证内核头文件和库文件版本一致
+</span></span><span class="line"><span class="cl">sh-4.2# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y 
+</span></span><span class="line"><span class="cl"># 卸载错误版本的内核库文件
+</span></span><span class="line"><span class="cl">sh-4.2# rpm -qa | grep kernel-devel
+</span></span><span class="line"><span class="cl">kernel-devel-3.10.0-693.el7.x86_64
+</span></span><span class="line"><span class="cl">kernel-devel-3.10.0-862.el7.x86_64
+</span></span><span class="line"><span class="cl">sh-4.2# rpm -e kernel-devel-3.10.0-862.el7.x86_64
+</span></span><span class="line"><span class="cl">sh-4.2# rpm -qa | grep kernel-devel
+</span></span><span class="line"><span class="cl">kernel-devel-3.10.0-693.el7.x86_64
+</span></span><span class="line"><span class="cl">sh-4.2# ./NVIDIA-Linux-x86_64-396.45.run -s
+</span></span><span class="line"><span class="cl">Verifying archive integrity... OK
+</span></span><span class="line"><span class="cl">Uncompressing NVIDIA Accelerated Graphics Driver for Linux-x86_64 396.45..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## 2. 提示如下
+</span></span><span class="line"><span class="cl">ERROR: The Nouveau kernel driver is currently in use by your system.  This driver is incompatible with the NVIDIA driver, and must be disabled before proceeding.  Please consult the NVIDIA driver README and your Linux distribution&#39;s documentation for details on how to correctly disable the Nouveau kernel driver.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 在centos7中需要禁止一个内核模块Nouveau
+</span></span><span class="line"><span class="cl">sh-4.2# lsmod | grep nouveau
+</span></span><span class="line"><span class="cl">nouveau              1622010  0
+</span></span><span class="line"><span class="cl">video                  24520  1 nouveau
+</span></span><span class="line"><span class="cl">mxm_wmi                13021  1 nouveau
+</span></span><span class="line"><span class="cl">drm_kms_helper        159169  2 mgag200,nouveau
+</span></span><span class="line"><span class="cl">ttm                    99345  2 mgag200,nouveau
+</span></span><span class="line"><span class="cl">drm                   370825  5 ttm,drm_kms_helper,mgag200,nouveau
+</span></span><span class="line"><span class="cl">i2c_algo_bit           13413  3 igb,mgag200,nouveau
+</span></span><span class="line"><span class="cl">i2c_core               40756  8 drm,igb,i2c_i801,ipmi_ssif,drm_kms_helper,mgag200,i2c_algo_bit,nouveau
+</span></span><span class="line"><span class="cl">wmi                    19070  2 mxm_wmi,nouveau
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 临时卸载该模块
+</span></span><span class="line"><span class="cl">sh-4.2# rmmod nouveau
+</span></span><span class="line"><span class="cl">sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>查看GPU显卡信息:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -784,38 +822,38 @@ sh-4.2# ./NVIDIA-Linux-x86_64-375.39.run -s
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">sh-4.2# nvidia-smi
-Wed Oct 18 11:58:03 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
-| N/A   23C    P8    17W / 250W |      0MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   1  Tesla M40           On   | 0000:05:00.0     Off |                    0 |
-| N/A   26C    P8    17W / 250W |      0MiB / 11443MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   2  Tesla M40 24GB      On   | 0000:06:00.0     Off |                    0 |
-| N/A   22C    P8    17W / 250W |      0MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   3  Tesla M40           On   | 0000:07:00.0     Off |                    0 |
-| N/A   23C    P8    16W / 250W |      0MiB / 11443MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
-
-# Temp 标识GPU设备的温度
-# Memory-Usage 表示内存使用率
-# GPU-Util 表示GPU使用率
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sh-4.2# nvidia-smi
+</span></span><span class="line"><span class="cl">Wed Oct 18 11:58:03 2017
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
+</span></span><span class="line"><span class="cl">|-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+</span></span><span class="line"><span class="cl">| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+</span></span><span class="line"><span class="cl">|===============================+======================+======================|
+</span></span><span class="line"><span class="cl">|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   23C    P8    17W / 250W |      0MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   1  Tesla M40           On   | 0000:05:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   26C    P8    17W / 250W |      0MiB / 11443MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   2  Tesla M40 24GB      On   | 0000:06:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   22C    P8    17W / 250W |      0MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   3  Tesla M40           On   | 0000:07:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   23C    P8    16W / 250W |      0MiB / 11443MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| Processes:                                                       GPU Memory |
+</span></span><span class="line"><span class="cl">|  GPU       PID  Type  Process name                               Usage      |
+</span></span><span class="line"><span class="cl">|=============================================================================|
+</span></span><span class="line"><span class="cl">|  No running processes found                                                 |
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Temp 标识GPU设备的温度
+</span></span><span class="line"><span class="cl"># Memory-Usage 表示内存使用率
+</span></span><span class="line"><span class="cl"># GPU-Util 表示GPU使用率
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意：上述输出也可以看出该系统上有4块GPU设备，使用Tesla M40型号。其中分别有两块卡24G内存，两块是12G内存，分别处于两个PCIE总线上</code></p>
 <p><code>注意：宿主机内存为256G，cpu为Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz 开启超线程后为24颗逻辑cpu(两颗6核心的cpu开启了超线程)</code></p>
@@ -826,31 +864,27 @@ Wed Oct 18 11:58:03 2017
 <p>因为CUDA开发工具只支持一些指定发行版本的linux，需要用户查看操作系统的架构以及发行版本。可以在CUDA Toolkit发布版本的中查看支持的linux版本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># uname -m &amp;&amp; cat /etc/redhat-release
-x86_64
-CentOS Linux release 7.2.1511 (Core)
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># uname -m &amp;&amp; cat /etc/redhat-release
+</span></span><span class="line"><span class="cl">x86_64
+</span></span><span class="line"><span class="cl">CentOS Linux release 7.2.1511 (Core)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>2.3 检测系统是否安装了gcc</strong></p>
 <p>当使用CUDA Toolkit进行开发的时候，gcc编译器是必须需要的。一般情况下linux主机都会安装了gcc编译器，但是为确保之后的操作不会出现大问题，建议检查下gcc以及版本是否为对应的版本。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># gcc --version
-gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># gcc --version
+</span></span><span class="line"><span class="cl">gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>2.4 检测系统是否有正确的内核头文件以及一些开发包是否安装</strong></p>
 <p>CUDA驱动需要内核头文件和开发工具包来保证驱动程序的安装以及rebuilt，比如你的内核版本为<code>3.17.4-301</code>，那么<code>3.17.4-301</code>的内核头文件以及相关的开发包也必须安装。</p>
@@ -858,17 +892,17 @@ gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
 <p>在centos系统上可以执行如下命令：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># uname -r
-3.10.0-327.el7.x86_64
-
-# yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># uname -r
+</span></span><span class="line"><span class="cl">3.10.0-327.el7.x86_64
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>2.5 选择安装方式</strong></p>
 <p>官方有两种方式去安装： distribution-specific packages (RPM and Deb packages)和distribution-independent package (runfile packages)。其中前者对接了linux发行版原生的包管理系统，是强烈建议的一种安装方式。</p>
@@ -886,37 +920,35 @@ gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-4)
 <p>卸载runfile方式的Toolkit :</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">/usr/local/cuda-X.Y/bin/uninstall_cuda_X.Y.pl
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/usr/local/cuda-X.Y/bin/uninstall_cuda_X.Y.pl
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>卸载runfile方式的Driver：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">/usr/bin/nvidia-uninstall
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">/usr/bin/nvidia-uninstall
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>卸载RPM/Deb方式安装的包：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ yum remove &lt;package_name&gt;                      # Redhat/CentOS
-$ dnf remove &lt;package_name&gt;                      # Fedora
-$ zypper remove &lt;package_name&gt;                   # OpenSUSE/SLES
-$ apt-get --purge remove &lt;package_name&gt;          # Ubuntu
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ yum remove &lt;package_name&gt;                      # Redhat/CentOS
+</span></span><span class="line"><span class="cl">$ dnf remove &lt;package_name&gt;                      # Fedora
+</span></span><span class="line"><span class="cl">$ zypper remove &lt;package_name&gt;                   # OpenSUSE/SLES
+</span></span><span class="line"><span class="cl">$ apt-get --purge remove &lt;package_name&gt;          # Ubuntu
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="安装包管理程序package-manager">安装包管理程序(Package Manager)</h4>
 <p><a href="http://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html#redhat-x86_64">快速安装指南</a></p>
@@ -939,46 +971,44 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># rpm --install cuda-repo-&lt;distro&gt;-&lt;version&gt;.&lt;architecture&gt;.rpm
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># rpm --install cuda-repo-&lt;distro&gt;-&lt;version&gt;.&lt;architecture&gt;.rpm
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>5.清除仓库缓存</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># yum clean expire-cache
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># yum clean expire-cache
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>6.安装CUDA</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># yum install cuda
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># yum install cuda
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>如果i686的libvdpau包安装失败，可以尝试以下步骤来修复该问题。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">yumdownloader</span> <span class="nx">libvdpau</span><span class="p">.</span><span class="nx">i686</span>
-<span class="err">#</span> <span class="nx">sudo</span> <span class="nx">rpm</span> <span class="o">-</span><span class="nx">U</span> <span class="o">--</span><span class="nx">oldpackage</span> <span class="nx">libvdpau</span><span class="o">*</span><span class="p">.</span><span class="nx">rpm</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="err">#</span> <span class="nx">yumdownloader</span> <span class="nx">libvdpau</span><span class="p">.</span><span class="nx">i686</span>
+</span></span><span class="line"><span class="cl"><span class="err">#</span> <span class="nx">sudo</span> <span class="nx">rpm</span> <span class="o">-</span><span class="nx">U</span> <span class="o">--</span><span class="nx">oldpackage</span> <span class="nx">libvdpau</span><span class="o">*</span><span class="p">.</span><span class="nx">rpm</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><ul>
 <li>7.如果需要，添加libcuda.so的软连接</li>
@@ -996,38 +1026,38 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 <p><code>PATH</code>环境变量必须包含<code>/usr/local/cuda-8.0/bin</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意：</code>在使用runfile方式安装的时候，动态链接库<code>LD_LIBRARY_PATH</code>的环境变量需要包含<code>/usr/local/cuda-8.0/lib64</code>.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64\
-                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64\
+</span></span><span class="line"><span class="cl">                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>4.2 强烈推荐的操作</strong></p>
 <p>4.2.1 安装可写的示例程序</p>
 <p>为了修改，编译以及运行样品，样品程序必须也可写权限进行安装，安装脚本如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cuda-install-samples-8.0.sh &lt;dir&gt;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># cuda-install-samples-8.0.sh &lt;dir&gt;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>该脚本会创建一个<code>/usr/local/cuda/samples</code>的只读拷贝，需要将拷贝的内容改为可写。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1045,29 +1075,27 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 </span><span class="lnt">16
 </span><span class="lnt">17
 </span><span class="lnt">18
-</span><span class="lnt">19
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cuda-install-samples-8.0.sh /export/biaoge/cuda-samples
-
-# tree -L 2 /export/biaoge/cuda-samples/
-/export/biaoge/cuda-samples/
-└── NVIDIA_CUDA-8.0_Samples
-    ├── 0_Simple
-    ├── 1_Utilities
-    ├── 2_Graphics
-    ├── 3_Imaging
-    ├── 4_Finance
-    ├── 5_Simulations
-    ├── 6_Advanced
-    ├── 7_CUDALibraries
-    ├── bin
-    ├── common
-    ├── EULA.txt
-    ├── Makefile
-    └── uninstall_cuda_samples_8.0.pl
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># cuda-install-samples-8.0.sh /export/biaoge/cuda-samples
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># tree -L 2 /export/biaoge/cuda-samples/
+</span></span><span class="line"><span class="cl">/export/biaoge/cuda-samples/
+</span></span><span class="line"><span class="cl">└── NVIDIA_CUDA-8.0_Samples
+</span></span><span class="line"><span class="cl">    ├── 0_Simple
+</span></span><span class="line"><span class="cl">    ├── 1_Utilities
+</span></span><span class="line"><span class="cl">    ├── 2_Graphics
+</span></span><span class="line"><span class="cl">    ├── 3_Imaging
+</span></span><span class="line"><span class="cl">    ├── 4_Finance
+</span></span><span class="line"><span class="cl">    ├── 5_Simulations
+</span></span><span class="line"><span class="cl">    ├── 6_Advanced
+</span></span><span class="line"><span class="cl">    ├── 7_CUDALibraries
+</span></span><span class="line"><span class="cl">    ├── bin
+</span></span><span class="line"><span class="cl">    ├── common
+</span></span><span class="line"><span class="cl">    ├── EULA.txt
+</span></span><span class="line"><span class="cl">    ├── Makefile
+</span></span><span class="line"><span class="cl">    └── uninstall_cuda_samples_8.0.pl
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>4.2.2 验证所有的安装</p>
 <p>在继续操作之前，验证一下<code>CUDA Toolkit</code>能够识别到正确的GPU硬件设备是非常重要的。因此这里需要编译一些样品程序来进行检验。</p>
@@ -1076,38 +1104,38 @@ NVIDIA驱动的RPM包会依赖一些额外的包，比如说<code>DKMS</code>和
 <p>当驱动被加载后，可以通过如下命令查看到驱动的版本</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cat /proc/driver/nvidia/version
-NVRM version: NVIDIA UNIX x86_64 Kernel Module  375.39  Tue Jan 31 20:47:00 PST 2017
-GCC version:  gcc version 4.8.5 20150623 (Red Hat 4.8.5-4) (GCC)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># cat /proc/driver/nvidia/version
+</span></span><span class="line"><span class="cl">NVRM version: NVIDIA UNIX x86_64 Kernel Module  375.39  Tue Jan 31 20:47:00 PST 2017
+</span></span><span class="line"><span class="cl">GCC version:  gcc version 4.8.5 20150623 (Red Hat 4.8.5-4) (GCC)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>(2) 编译样品程序
 CUDA Toolkit的版本可以使用<code>nvcc --version/-V</code>查看，该命令运行编译驱动来编译CUDA程序，底层其实调用了gcc编译器来编译c代码，使用<code> NVIDIA PTX</code>编译器来调用CUDA代码。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># nvcc -V
-nvcc: NVIDIA (R) Cuda compiler driver
-Copyright (c) 2005-2016 NVIDIA Corporation
-Built on Tue_Jan_10_13:22:03_CST_2017
-Cuda compilation tools, release 8.0, V8.0.61
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># nvcc -V
+</span></span><span class="line"><span class="cl">nvcc: NVIDIA (R) Cuda compiler driver
+</span></span><span class="line"><span class="cl">Copyright (c) 2005-2016 NVIDIA Corporation
+</span></span><span class="line"><span class="cl">Built on Tue_Jan_10_13:22:03_CST_2017
+</span></span><span class="line"><span class="cl">Cuda compilation tools, release 8.0, V8.0.61
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>NVIDIA CUDA Toolkit在源文件中包含了一些示例程序，用户可以通过修改<code>~/NVIDIA_CUDA-8.0_Samples</code>并执行<code>make</code>来编译这些示例程序。编译的二进制文件将存放在<code>~/NVIDIA_CUDA-8.0_Samples/bin</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1123,27 +1151,27 @@ Cuda compilation tools, release 8.0, V8.0.61
 </span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/deviceQuery
-
-#编译生成deviceQuery二进制文件，在(3)中需要验证环境
-# make
-
-# cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/bandwidthTest
-
-#编译生成bandwidthTest二进制文件，在(3)中用来验证环境
-# make
-
-# ll ../bandwidthTest/bandwidthTest
--rwxr-xr-x 1 root root 603420 Oct 18 16:05 ../bandwidthTest/bandwidthTest
-# ll ../deviceQuery/deviceQuery
--rwxr-xr-x 1 root root 582882 Oct 18 16:44 ../deviceQuery/deviceQuery
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/deviceQuery
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#编译生成deviceQuery二进制文件，在(3)中需要验证环境
+</span></span><span class="line"><span class="cl"># make
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># cd /export/biaoge/cuda-samples/NVIDIA_CUDA-8.0_Samples/1_Utilities/bandwidthTest
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#编译生成bandwidthTest二进制文件，在(3)中用来验证环境
+</span></span><span class="line"><span class="cl"># make
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># ll ../bandwidthTest/bandwidthTest
+</span></span><span class="line"><span class="cl">-rwxr-xr-x 1 root root 603420 Oct 18 16:05 ../bandwidthTest/bandwidthTest
+</span></span><span class="line"><span class="cl"># ll ../deviceQuery/deviceQuery
+</span></span><span class="line"><span class="cl">-rwxr-xr-x 1 root root 582882 Oct 18 16:44 ../deviceQuery/deviceQuery
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>(3) 运行二进制文件</p>
 <p>编译完成之后，在<code>~/NVIDIA_CUDA-8.0_Samples</code>下对应目录下运行<code>deviceQuery</code>.如果CUDA程序被正确安装和配置，<code>deviceQuery</code>的输出应该看起来如下所示。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">  1
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1298,160 +1326,160 @@ Cuda compilation tools, release 8.0, V8.0.61
 </span><span class="lnt">153
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># ./deviceQuery
-./deviceQuery Starting...
-
- CUDA Device Query (Runtime API) version (CUDART static linking)
-
-Detected 4 CUDA Capable device(s)
-
-Device 0: &#34;Tesla M40 24GB&#34;
-  CUDA Driver Version / Runtime Version          8.0 / 8.0
-  CUDA Capability Major/Minor version number:    5.2
-  Total amount of global memory:                 22940 MBytes (24054136832 bytes)
-  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
-  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
-  Memory Clock rate:                             3004 Mhz
-  Memory Bus Width:                              384-bit
-  L2 Cache Size:                                 3145728 bytes
-  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
-  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
-  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
-  Total amount of constant memory:               65536 bytes
-  Total amount of shared memory per block:       49152 bytes
-  Total number of registers available per block: 65536
-  Warp size:                                     32
-  Maximum number of threads per multiprocessor:  2048
-  Maximum number of threads per block:           1024
-  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
-  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
-  Maximum memory pitch:                          2147483647 bytes
-  Texture alignment:                             512 bytes
-  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
-  Run time limit on kernels:                     No
-  Integrated GPU sharing Host Memory:            No
-  Support host page-locked memory mapping:       Yes
-  Alignment requirement for Surfaces:            Yes
-  Device has ECC support:                        Enabled
-  Device supports Unified Addressing (UVA):      Yes
-  Device PCI Domain ID / Bus ID / location ID:   0 / 4 / 0
-  Compute Mode:
-     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
-
-Device 1: &#34;Tesla M40&#34;
-  CUDA Driver Version / Runtime Version          8.0 / 8.0
-  CUDA Capability Major/Minor version number:    5.2
-  Total amount of global memory:                 11443 MBytes (11998855168 bytes)
-  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
-  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
-  Memory Clock rate:                             3004 Mhz
-  Memory Bus Width:                              384-bit
-  L2 Cache Size:                                 3145728 bytes
-  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
-  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
-  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
-  Total amount of constant memory:               65536 bytes
-  Total amount of shared memory per block:       49152 bytes
-  Total number of registers available per block: 65536
-  Warp size:                                     32
-  Maximum number of threads per multiprocessor:  2048
-  Maximum number of threads per block:           1024
-  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
-  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
-  Maximum memory pitch:                          2147483647 bytes
-  Texture alignment:                             512 bytes
-  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
-  Run time limit on kernels:                     No
-  Integrated GPU sharing Host Memory:            No
-  Support host page-locked memory mapping:       Yes
-  Alignment requirement for Surfaces:            Yes
-  Device has ECC support:                        Enabled
-  Device supports Unified Addressing (UVA):      Yes
-  Device PCI Domain ID / Bus ID / location ID:   0 / 5 / 0
-  Compute Mode:
-     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
-
-Device 2: &#34;Tesla M40 24GB&#34;
-  CUDA Driver Version / Runtime Version          8.0 / 8.0
-  CUDA Capability Major/Minor version number:    5.2
-  Total amount of global memory:                 22940 MBytes (24054136832 bytes)
-  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
-  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
-  Memory Clock rate:                             3004 Mhz
-  Memory Bus Width:                              384-bit
-  L2 Cache Size:                                 3145728 bytes
-  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
-  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
-  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
-  Total amount of constant memory:               65536 bytes
-  Total amount of shared memory per block:       49152 bytes
-  Total number of registers available per block: 65536
-  Warp size:                                     32
-  Maximum number of threads per multiprocessor:  2048
-  Maximum number of threads per block:           1024
-  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
-  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
-  Maximum memory pitch:                          2147483647 bytes
-  Texture alignment:                             512 bytes
-  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
-  Run time limit on kernels:                     No
-  Integrated GPU sharing Host Memory:            No
-  Support host page-locked memory mapping:       Yes
-  Alignment requirement for Surfaces:            Yes
-  Device has ECC support:                        Enabled
-  Device supports Unified Addressing (UVA):      Yes
-  Device PCI Domain ID / Bus ID / location ID:   0 / 6 / 0
-  Compute Mode:
-     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
-
-Device 3: &#34;Tesla M40&#34;
-  CUDA Driver Version / Runtime Version          8.0 / 8.0
-  CUDA Capability Major/Minor version number:    5.2
-  Total amount of global memory:                 11443 MBytes (11998855168 bytes)
-  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
-  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
-  Memory Clock rate:                             3004 Mhz
-  Memory Bus Width:                              384-bit
-  L2 Cache Size:                                 3145728 bytes
-  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
-  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
-  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
-  Total amount of constant memory:               65536 bytes
-  Total amount of shared memory per block:       49152 bytes
-  Total number of registers available per block: 65536
-  Warp size:                                     32
-  Maximum number of threads per multiprocessor:  2048
-  Maximum number of threads per block:           1024
-  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
-  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
-  Maximum memory pitch:                          2147483647 bytes
-  Texture alignment:                             512 bytes
-  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
-  Run time limit on kernels:                     No
-  Integrated GPU sharing Host Memory:            No
-  Support host page-locked memory mapping:       Yes
-  Alignment requirement for Surfaces:            Yes
-  Device has ECC support:                        Enabled
-  Device supports Unified Addressing (UVA):      Yes
-  Device PCI Domain ID / Bus ID / location ID:   0 / 7 / 0
-  Compute Mode:
-     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
-&gt; Peer access from Tesla M40 24GB (GPU0) -&gt; Tesla M40 (GPU1) : Yes
-&gt; Peer access from Tesla M40 24GB (GPU0) -&gt; Tesla M40 24GB (GPU2) : Yes
-&gt; Peer access from Tesla M40 24GB (GPU0) -&gt; Tesla M40 (GPU3) : Yes
-&gt; Peer access from Tesla M40 (GPU1) -&gt; Tesla M40 24GB (GPU0) : Yes
-&gt; Peer access from Tesla M40 (GPU1) -&gt; Tesla M40 24GB (GPU2) : Yes
-&gt; Peer access from Tesla M40 (GPU1) -&gt; Tesla M40 (GPU3) : Yes
-&gt; Peer access from Tesla M40 24GB (GPU2) -&gt; Tesla M40 24GB (GPU0) : Yes
-&gt; Peer access from Tesla M40 24GB (GPU2) -&gt; Tesla M40 (GPU1) : Yes
-&gt; Peer access from Tesla M40 24GB (GPU2) -&gt; Tesla M40 (GPU3) : Yes
-&gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 24GB (GPU0) : Yes
-&gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 (GPU1) : Yes
-&gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 24GB (GPU2) : Yes
-
-deviceQuery, CUDA Driver = CUDART, CUDA Driver Version = 8.0, CUDA Runtime Version = 8.0, NumDevs = 4, Device0 = Tesla M40 24GB, Device1 = Tesla M40, Device2 = Tesla M40 24GB, Device3 = Tesla M40
-Result = PASS
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># ./deviceQuery
+</span></span><span class="line"><span class="cl">./deviceQuery Starting...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> CUDA Device Query (Runtime API) version (CUDART static linking)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Detected 4 CUDA Capable device(s)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Device 0: &#34;Tesla M40 24GB&#34;
+</span></span><span class="line"><span class="cl">  CUDA Driver Version / Runtime Version          8.0 / 8.0
+</span></span><span class="line"><span class="cl">  CUDA Capability Major/Minor version number:    5.2
+</span></span><span class="line"><span class="cl">  Total amount of global memory:                 22940 MBytes (24054136832 bytes)
+</span></span><span class="line"><span class="cl">  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
+</span></span><span class="line"><span class="cl">  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
+</span></span><span class="line"><span class="cl">  Memory Clock rate:                             3004 Mhz
+</span></span><span class="line"><span class="cl">  Memory Bus Width:                              384-bit
+</span></span><span class="line"><span class="cl">  L2 Cache Size:                                 3145728 bytes
+</span></span><span class="line"><span class="cl">  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
+</span></span><span class="line"><span class="cl">  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Total amount of constant memory:               65536 bytes
+</span></span><span class="line"><span class="cl">  Total amount of shared memory per block:       49152 bytes
+</span></span><span class="line"><span class="cl">  Total number of registers available per block: 65536
+</span></span><span class="line"><span class="cl">  Warp size:                                     32
+</span></span><span class="line"><span class="cl">  Maximum number of threads per multiprocessor:  2048
+</span></span><span class="line"><span class="cl">  Maximum number of threads per block:           1024
+</span></span><span class="line"><span class="cl">  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+</span></span><span class="line"><span class="cl">  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+</span></span><span class="line"><span class="cl">  Maximum memory pitch:                          2147483647 bytes
+</span></span><span class="line"><span class="cl">  Texture alignment:                             512 bytes
+</span></span><span class="line"><span class="cl">  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+</span></span><span class="line"><span class="cl">  Run time limit on kernels:                     No
+</span></span><span class="line"><span class="cl">  Integrated GPU sharing Host Memory:            No
+</span></span><span class="line"><span class="cl">  Support host page-locked memory mapping:       Yes
+</span></span><span class="line"><span class="cl">  Alignment requirement for Surfaces:            Yes
+</span></span><span class="line"><span class="cl">  Device has ECC support:                        Enabled
+</span></span><span class="line"><span class="cl">  Device supports Unified Addressing (UVA):      Yes
+</span></span><span class="line"><span class="cl">  Device PCI Domain ID / Bus ID / location ID:   0 / 4 / 0
+</span></span><span class="line"><span class="cl">  Compute Mode:
+</span></span><span class="line"><span class="cl">     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Device 1: &#34;Tesla M40&#34;
+</span></span><span class="line"><span class="cl">  CUDA Driver Version / Runtime Version          8.0 / 8.0
+</span></span><span class="line"><span class="cl">  CUDA Capability Major/Minor version number:    5.2
+</span></span><span class="line"><span class="cl">  Total amount of global memory:                 11443 MBytes (11998855168 bytes)
+</span></span><span class="line"><span class="cl">  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
+</span></span><span class="line"><span class="cl">  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
+</span></span><span class="line"><span class="cl">  Memory Clock rate:                             3004 Mhz
+</span></span><span class="line"><span class="cl">  Memory Bus Width:                              384-bit
+</span></span><span class="line"><span class="cl">  L2 Cache Size:                                 3145728 bytes
+</span></span><span class="line"><span class="cl">  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
+</span></span><span class="line"><span class="cl">  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Total amount of constant memory:               65536 bytes
+</span></span><span class="line"><span class="cl">  Total amount of shared memory per block:       49152 bytes
+</span></span><span class="line"><span class="cl">  Total number of registers available per block: 65536
+</span></span><span class="line"><span class="cl">  Warp size:                                     32
+</span></span><span class="line"><span class="cl">  Maximum number of threads per multiprocessor:  2048
+</span></span><span class="line"><span class="cl">  Maximum number of threads per block:           1024
+</span></span><span class="line"><span class="cl">  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+</span></span><span class="line"><span class="cl">  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+</span></span><span class="line"><span class="cl">  Maximum memory pitch:                          2147483647 bytes
+</span></span><span class="line"><span class="cl">  Texture alignment:                             512 bytes
+</span></span><span class="line"><span class="cl">  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+</span></span><span class="line"><span class="cl">  Run time limit on kernels:                     No
+</span></span><span class="line"><span class="cl">  Integrated GPU sharing Host Memory:            No
+</span></span><span class="line"><span class="cl">  Support host page-locked memory mapping:       Yes
+</span></span><span class="line"><span class="cl">  Alignment requirement for Surfaces:            Yes
+</span></span><span class="line"><span class="cl">  Device has ECC support:                        Enabled
+</span></span><span class="line"><span class="cl">  Device supports Unified Addressing (UVA):      Yes
+</span></span><span class="line"><span class="cl">  Device PCI Domain ID / Bus ID / location ID:   0 / 5 / 0
+</span></span><span class="line"><span class="cl">  Compute Mode:
+</span></span><span class="line"><span class="cl">     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Device 2: &#34;Tesla M40 24GB&#34;
+</span></span><span class="line"><span class="cl">  CUDA Driver Version / Runtime Version          8.0 / 8.0
+</span></span><span class="line"><span class="cl">  CUDA Capability Major/Minor version number:    5.2
+</span></span><span class="line"><span class="cl">  Total amount of global memory:                 22940 MBytes (24054136832 bytes)
+</span></span><span class="line"><span class="cl">  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
+</span></span><span class="line"><span class="cl">  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
+</span></span><span class="line"><span class="cl">  Memory Clock rate:                             3004 Mhz
+</span></span><span class="line"><span class="cl">  Memory Bus Width:                              384-bit
+</span></span><span class="line"><span class="cl">  L2 Cache Size:                                 3145728 bytes
+</span></span><span class="line"><span class="cl">  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
+</span></span><span class="line"><span class="cl">  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Total amount of constant memory:               65536 bytes
+</span></span><span class="line"><span class="cl">  Total amount of shared memory per block:       49152 bytes
+</span></span><span class="line"><span class="cl">  Total number of registers available per block: 65536
+</span></span><span class="line"><span class="cl">  Warp size:                                     32
+</span></span><span class="line"><span class="cl">  Maximum number of threads per multiprocessor:  2048
+</span></span><span class="line"><span class="cl">  Maximum number of threads per block:           1024
+</span></span><span class="line"><span class="cl">  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+</span></span><span class="line"><span class="cl">  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+</span></span><span class="line"><span class="cl">  Maximum memory pitch:                          2147483647 bytes
+</span></span><span class="line"><span class="cl">  Texture alignment:                             512 bytes
+</span></span><span class="line"><span class="cl">  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+</span></span><span class="line"><span class="cl">  Run time limit on kernels:                     No
+</span></span><span class="line"><span class="cl">  Integrated GPU sharing Host Memory:            No
+</span></span><span class="line"><span class="cl">  Support host page-locked memory mapping:       Yes
+</span></span><span class="line"><span class="cl">  Alignment requirement for Surfaces:            Yes
+</span></span><span class="line"><span class="cl">  Device has ECC support:                        Enabled
+</span></span><span class="line"><span class="cl">  Device supports Unified Addressing (UVA):      Yes
+</span></span><span class="line"><span class="cl">  Device PCI Domain ID / Bus ID / location ID:   0 / 6 / 0
+</span></span><span class="line"><span class="cl">  Compute Mode:
+</span></span><span class="line"><span class="cl">     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Device 3: &#34;Tesla M40&#34;
+</span></span><span class="line"><span class="cl">  CUDA Driver Version / Runtime Version          8.0 / 8.0
+</span></span><span class="line"><span class="cl">  CUDA Capability Major/Minor version number:    5.2
+</span></span><span class="line"><span class="cl">  Total amount of global memory:                 11443 MBytes (11998855168 bytes)
+</span></span><span class="line"><span class="cl">  (24) Multiprocessors, (128) CUDA Cores/MP:     3072 CUDA Cores
+</span></span><span class="line"><span class="cl">  GPU Max Clock rate:                            1112 MHz (1.11 GHz)
+</span></span><span class="line"><span class="cl">  Memory Clock rate:                             3004 Mhz
+</span></span><span class="line"><span class="cl">  Memory Bus Width:                              384-bit
+</span></span><span class="line"><span class="cl">  L2 Cache Size:                                 3145728 bytes
+</span></span><span class="line"><span class="cl">  Maximum Texture Dimension Size (x,y,z)         1D=(65536), 2D=(65536, 65536), 3D=(4096, 4096, 4096)
+</span></span><span class="line"><span class="cl">  Maximum Layered 1D Texture Size, (num) layers  1D=(16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Maximum Layered 2D Texture Size, (num) layers  2D=(16384, 16384), 2048 layers
+</span></span><span class="line"><span class="cl">  Total amount of constant memory:               65536 bytes
+</span></span><span class="line"><span class="cl">  Total amount of shared memory per block:       49152 bytes
+</span></span><span class="line"><span class="cl">  Total number of registers available per block: 65536
+</span></span><span class="line"><span class="cl">  Warp size:                                     32
+</span></span><span class="line"><span class="cl">  Maximum number of threads per multiprocessor:  2048
+</span></span><span class="line"><span class="cl">  Maximum number of threads per block:           1024
+</span></span><span class="line"><span class="cl">  Max dimension size of a thread block (x,y,z): (1024, 1024, 64)
+</span></span><span class="line"><span class="cl">  Max dimension size of a grid size    (x,y,z): (2147483647, 65535, 65535)
+</span></span><span class="line"><span class="cl">  Maximum memory pitch:                          2147483647 bytes
+</span></span><span class="line"><span class="cl">  Texture alignment:                             512 bytes
+</span></span><span class="line"><span class="cl">  Concurrent copy and kernel execution:          Yes with 2 copy engine(s)
+</span></span><span class="line"><span class="cl">  Run time limit on kernels:                     No
+</span></span><span class="line"><span class="cl">  Integrated GPU sharing Host Memory:            No
+</span></span><span class="line"><span class="cl">  Support host page-locked memory mapping:       Yes
+</span></span><span class="line"><span class="cl">  Alignment requirement for Surfaces:            Yes
+</span></span><span class="line"><span class="cl">  Device has ECC support:                        Enabled
+</span></span><span class="line"><span class="cl">  Device supports Unified Addressing (UVA):      Yes
+</span></span><span class="line"><span class="cl">  Device PCI Domain ID / Bus ID / location ID:   0 / 7 / 0
+</span></span><span class="line"><span class="cl">  Compute Mode:
+</span></span><span class="line"><span class="cl">     &lt; Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) &gt;
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 24GB (GPU0) -&gt; Tesla M40 (GPU1) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 24GB (GPU0) -&gt; Tesla M40 24GB (GPU2) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 24GB (GPU0) -&gt; Tesla M40 (GPU3) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 (GPU1) -&gt; Tesla M40 24GB (GPU0) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 (GPU1) -&gt; Tesla M40 24GB (GPU2) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 (GPU1) -&gt; Tesla M40 (GPU3) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 24GB (GPU2) -&gt; Tesla M40 24GB (GPU0) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 24GB (GPU2) -&gt; Tesla M40 (GPU1) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 24GB (GPU2) -&gt; Tesla M40 (GPU3) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 24GB (GPU0) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 (GPU1) : Yes
+</span></span><span class="line"><span class="cl">&gt; Peer access from Tesla M40 (GPU3) -&gt; Tesla M40 24GB (GPU2) : Yes
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">deviceQuery, CUDA Driver = CUDART, CUDA Driver Version = 8.0, CUDA Runtime Version = 8.0, NumDevs = 4, Device0 = Tesla M40 24GB, Device1 = Tesla M40, Device2 = Tesla M40 24GB, Device3 = Tesla M40
+</span></span><span class="line"><span class="cl">Result = PASS
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample.png" alt="官方文档中的示例程序"></p>
 <p><code>注意：</code>如果CUDA-capable设备和CUDA 驱动都已经成功安装，但是<code>deviceQuery</code>程序报告没有<code>CUDA-capable</code>设备在线，这个可能是<code>/dev/nvidia*</code>相关文件丢失或者没有相应的权限。</p>
@@ -1459,7 +1487,7 @@ Result = PASS
 <p>运行<code>bandwidthTest</code>程序来确认系统和CUDA-capable设备可以正常通信，输出结果如下所示：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1486,32 +1514,32 @@ Result = PASS
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># ./bandwidthTest
-[CUDA Bandwidth Test] - Starting...
-Running on...
-
- Device 0: Tesla M40 24GB
- Quick Mode
-
- Host to Device Bandwidth, 1 Device(s)
- PINNED Memory Transfers
-   Transfer Size (Bytes)	Bandwidth(MB/s)
-   33554432			11710.6
-
- Device to Host Bandwidth, 1 Device(s)
- PINNED Memory Transfers
-   Transfer Size (Bytes)	Bandwidth(MB/s)
-   33554432			12464.9
-
- Device to Device Bandwidth, 1 Device(s)
- PINNED Memory Transfers
-   Transfer Size (Bytes)	Bandwidth(MB/s)
-   33554432			210964.2
-
-Result = PASS
-
-NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># ./bandwidthTest
+</span></span><span class="line"><span class="cl">[CUDA Bandwidth Test] - Starting...
+</span></span><span class="line"><span class="cl">Running on...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> Device 0: Tesla M40 24GB
+</span></span><span class="line"><span class="cl"> Quick Mode
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> Host to Device Bandwidth, 1 Device(s)
+</span></span><span class="line"><span class="cl"> PINNED Memory Transfers
+</span></span><span class="line"><span class="cl">   Transfer Size (Bytes)	Bandwidth(MB/s)
+</span></span><span class="line"><span class="cl">   33554432			11710.6
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> Device to Host Bandwidth, 1 Device(s)
+</span></span><span class="line"><span class="cl"> PINNED Memory Transfers
+</span></span><span class="line"><span class="cl">   Transfer Size (Bytes)	Bandwidth(MB/s)
+</span></span><span class="line"><span class="cl">   33554432			12464.9
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> Device to Device Bandwidth, 1 Device(s)
+</span></span><span class="line"><span class="cl"> PINNED Memory Transfers
+</span></span><span class="line"><span class="cl">   Transfer Size (Bytes)	Bandwidth(MB/s)
+</span></span><span class="line"><span class="cl">   33554432			210964.2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Result = PASS
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/cuda-sample-1.png" alt="官方文档中的示例程序"></p>
 <p>上图表示测试通过，如果测试没有通过，可以确认下系统上CUDA-capable NVIDIA GPU是否正确安装。</p>
@@ -1519,24 +1547,24 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
 <p>4.2.3  安装Nsight Eclipse plugins</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># /usr/local/cuda-9.0/bin/nsight_ee_plugins_manage.sh install &lt;eclipse-dir&gt;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># /usr/local/cuda-9.0/bin/nsight_ee_plugins_manage.sh install &lt;eclipse-dir&gt;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>4.3 可选的操作</strong></p>
 <p>在使用CUDA Toolkit中，有很多可选操作但是不是必须的但是可以提供额外的功能。</p>
 <p>4.3.1 安装第三方库文件</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># yum install freeglut-devel libX11-devel libXi-devel libXmu-devel \
-    make mesa-libGLU-devel
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># yum install freeglut-devel libX11-devel libXi-devel libXmu-devel \
+</span></span><span class="line"><span class="cl">    make mesa-libGLU-devel
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>4.3.2 为cuda-gdb安装源代码
 使用<code>runfile</code>方式安装后<code>cuda-gdb</code>源代码会自动安装。</p>
@@ -1688,6 +1716,27 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

@@ -541,6 +541,13 @@
   </url>
   
   <url>
+    <loc>https://bgbiao.top/books/</loc>
+    <lastmod>2022-10-01T21:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://bgbiao.top/about/</loc>
     <lastmod>2019-08-28T21:41:52+08:00</lastmod>
     <changefreq>weekly</changefreq>

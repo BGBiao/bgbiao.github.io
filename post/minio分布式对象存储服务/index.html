@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>开源分布式对象存储服务-MinIO - BGBiao的SRE人生</title>
+  <title>开源分布式对象存储服务-MinIO - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/" />
@@ -68,15 +68,15 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/minio%E5%88%86%E5%B8%83%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9C%8D%E5%8A%A1/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-01-22T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-01-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="开源分布式对象存储服务-MinIO">
 <meta itemprop="description" content="
 背景:通常在企业中我们会将一些图片，视频，文档等相关数据存储在对象存储中，以便于数据的存储和快速获取。在过去的一段时间，我们将这部分数据存储在公有云的对象存储服务上，但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的数据，这部分数据较为敏感，因此对于敏感数据的存储我们选择了使用兼容S3协议的开源分布式对象存储-Minio来进行自建服务。
-"><meta itemprop="datePublished" content="2020-01-22T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="5113">
+"><meta itemprop="datePublished" content="2020-01-22T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="5104">
 <meta itemprop="keywords" content="golang,minio,对象存储,oss," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="开源分布式对象存储服务-MinIO"/>
 <meta name="twitter:description" content="
@@ -138,7 +138,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -177,22 +177,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -354,7 +372,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -395,22 +413,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -468,7 +512,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 5113 words </span>
+        <span class="more-meta"> 5104 words </span>
           <span class="more-meta"> 11 min read </span>
 
         
@@ -530,7 +574,7 @@ if (!doNotTrack) {
 <h4 id="使用纠错码模式运行minio服务">使用纠错码模式运行minio服务</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -544,25 +588,23 @@ if (!doNotTrack) {
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 使用二进制方式运行有12个驱动器的minio服务
-$ minio server /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8 /data9 /data10 /data11 /data12
-
-# 使用docker方式运行有8驱动器的minio服务
-$ docker run -p 9000:9000 --name minio \
-  -v /mnt/data1:/data1 \
-  -v /mnt/data2:/data2 \
-  -v /mnt/data3:/data3 \
-  -v /mnt/data4:/data4 \
-  -v /mnt/data5:/data5 \
-  -v /mnt/data6:/data6 \
-  -v /mnt/data7:/data7 \
-  -v /mnt/data8:/data8 \
-  minio/minio server /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 使用二进制方式运行有12个驱动器的minio服务
+</span></span><span class="line"><span class="cl">$ minio server /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8 /data9 /data10 /data11 /data12
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用docker方式运行有8驱动器的minio服务
+</span></span><span class="line"><span class="cl">$ docker run -p 9000:9000 --name minio \
+</span></span><span class="line"><span class="cl">  -v /mnt/data1:/data1 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data2:/data2 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data3:/data3 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data4:/data4 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data5:/data5 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data6:/data6 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data7:/data7 \
+</span></span><span class="line"><span class="cl">  -v /mnt/data8:/data8 \
+</span></span><span class="line"><span class="cl">  minio/minio server /data1 /data2 /data3 /data4 /data5 /data6 /data7 /data8
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>以纠错码方式运行服务后，你就可以尝试将任意一半盘毁坏，依然不会影响整个系统的IO。但是<code>如果要求不影响写，处于正常的的驱动器个数必须大于N/2</code></p>
 <h4 id="分布式minio集群">分布式MinIO集群</h4>
@@ -593,7 +635,7 @@ $ docker run -p 9000:9000 --name minio \
 <p>我们以1个驱动器的4节点来组成集群:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -628,46 +670,44 @@ $ docker run -p 9000:9000 --name minio \
 </span><span class="lnt">33
 </span><span class="lnt">34
 </span><span class="lnt">35
-</span><span class="lnt">36
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># tree -L 1 /opt/app/
-/opt/app/
-├── minio
-├── minio.conf
-
-$ cat minio.conf
-MINIO_ACCESS_KEY=BGBiao
-MINIO_SECRET_KEY=BGBiao
-ENDPOINTS=&#34;http://10.0.0.148:9000/data/minio http://172.16.62.149:9000/data/minio http://172.16.62.150:9000/data/minio http://172.16.62.151:9000/data/minio&#34;
-
-$ cat /usr/lib/systemd/system/minio.service
-[Unit]
-Description=Minio
-Documentation=https://docs.minio.io
-Wants=network-online.target
-After=network-online.target
-AssertFileIsExecutable=/opt/app/minio
-
-[Service]
-EnvironmentFile=-/opt/app/minio.conf
-ExecStart=/opt/app/minio server $ENDPOINTS
-
-# Let systemd restart this service always
-Restart=always
-# Specifies the maximum file descriptor number that can be opened by this process
-LimitNOFILE=65536
-# Disable timeout logic and wait until process is stopped
-TimeoutStopSec=infinity
-SendSIGKILL=no
-[Install]
-WantedBy=multi-user.target
-
-
-# 将上述配置同步到4个节点，并启动，minio实例之间会自行发现各个节点
-$ systemctl restart minio
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># tree -L 1 /opt/app/
+</span></span><span class="line"><span class="cl">/opt/app/
+</span></span><span class="line"><span class="cl">├── minio
+</span></span><span class="line"><span class="cl">├── minio.conf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ cat minio.conf
+</span></span><span class="line"><span class="cl">MINIO_ACCESS_KEY=BGBiao
+</span></span><span class="line"><span class="cl">MINIO_SECRET_KEY=BGBiao
+</span></span><span class="line"><span class="cl">ENDPOINTS=&#34;http://10.0.0.148:9000/data/minio http://172.16.62.149:9000/data/minio http://172.16.62.150:9000/data/minio http://172.16.62.151:9000/data/minio&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ cat /usr/lib/systemd/system/minio.service
+</span></span><span class="line"><span class="cl">[Unit]
+</span></span><span class="line"><span class="cl">Description=Minio
+</span></span><span class="line"><span class="cl">Documentation=https://docs.minio.io
+</span></span><span class="line"><span class="cl">Wants=network-online.target
+</span></span><span class="line"><span class="cl">After=network-online.target
+</span></span><span class="line"><span class="cl">AssertFileIsExecutable=/opt/app/minio
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">[Service]
+</span></span><span class="line"><span class="cl">EnvironmentFile=-/opt/app/minio.conf
+</span></span><span class="line"><span class="cl">ExecStart=/opt/app/minio server $ENDPOINTS
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Let systemd restart this service always
+</span></span><span class="line"><span class="cl">Restart=always
+</span></span><span class="line"><span class="cl"># Specifies the maximum file descriptor number that can be opened by this process
+</span></span><span class="line"><span class="cl">LimitNOFILE=65536
+</span></span><span class="line"><span class="cl"># Disable timeout logic and wait until process is stopped
+</span></span><span class="line"><span class="cl">TimeoutStopSec=infinity
+</span></span><span class="line"><span class="cl">SendSIGKILL=no
+</span></span><span class="line"><span class="cl">[Install]
+</span></span><span class="line"><span class="cl">WantedBy=multi-user.target
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 将上述配置同步到4个节点，并启动，minio实例之间会自行发现各个节点
+</span></span><span class="line"><span class="cl">$ systemctl restart minio
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="minio分布式对象存储服务使用">Minio分布式对象存储服务使用</h3>
 <p>当使用前面的方式成功运行minio的对象服务后，我们就可以使用以下几种方式进行访问:</p>
@@ -685,22 +725,20 @@ $ systemctl restart minio
 <p><strong>客户端配置管理</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 添加minio云存储服务(会将数据存入~/.mc/config.json)
-# mc config host add &lt;ALIAS&gt; &lt;YOUR-S3-ENDPOINT&gt; &lt;YOUR-ACCESS-KEY&gt; &lt;YOUR-SECRET-KEY&gt; &lt;API-SIGNATURE&gt;
-$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 添加minio云存储服务(会将数据存入~/.mc/config.json)
+</span></span><span class="line"><span class="cl"># mc config host add &lt;ALIAS&gt; &lt;YOUR-S3-ENDPOINT&gt; &lt;YOUR-ACCESS-KEY&gt; &lt;YOUR-SECRET-KEY&gt; &lt;API-SIGNATURE&gt;
+</span></span><span class="line"><span class="cl">$ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>查看bucket</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -717,33 +755,31 @@ $ mc config host add minio http://bgbiao.top:9000 BGBiao BGBiao S3v4
 </span><span class="lnt">15
 </span><span class="lnt">16
 </span><span class="lnt">17
-</span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看minio集群中的bucket
-$ mc ls minio
-[2020-01-10 20:54:19 CST]      0B test11/
-[2019-07-08 19:51:02 CST]      0B test23/
-[2019-07-08 20:10:58 CST]      0B test4/
-
-# 查看bucket的内容
-$ mc ls minio/test11
-[2019-07-05 21:22:34 CST]   88KiB 111
-[2019-07-07 11:03:21 CST]   88KiB 112
-[2019-07-08 10:50:51 CST]   88KiB 113
-[2019-07-08 18:17:17 CST]   88KiB 114
-[2019-07-09 11:51:30 CST]   66KiB 116
-[2019-07-09 14:24:23 CST]   66KiB 117.jpg
-[2019-07-09 14:33:17 CST]   66KiB 118.jpg
-[2019-07-09 14:52:36 CST]   66KiB 119.jpg
-[2020-01-10 20:52:28 CST]  7.4KiB server.xml
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 查看minio集群中的bucket
+</span></span><span class="line"><span class="cl">$ mc ls minio
+</span></span><span class="line"><span class="cl">[2020-01-10 20:54:19 CST]      0B test11/
+</span></span><span class="line"><span class="cl">[2019-07-08 19:51:02 CST]      0B test23/
+</span></span><span class="line"><span class="cl">[2019-07-08 20:10:58 CST]      0B test4/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看bucket的内容
+</span></span><span class="line"><span class="cl">$ mc ls minio/test11
+</span></span><span class="line"><span class="cl">[2019-07-05 21:22:34 CST]   88KiB 111
+</span></span><span class="line"><span class="cl">[2019-07-07 11:03:21 CST]   88KiB 112
+</span></span><span class="line"><span class="cl">[2019-07-08 10:50:51 CST]   88KiB 113
+</span></span><span class="line"><span class="cl">[2019-07-08 18:17:17 CST]   88KiB 114
+</span></span><span class="line"><span class="cl">[2019-07-09 11:51:30 CST]   66KiB 116
+</span></span><span class="line"><span class="cl">[2019-07-09 14:24:23 CST]   66KiB 117.jpg
+</span></span><span class="line"><span class="cl">[2019-07-09 14:33:17 CST]   66KiB 118.jpg
+</span></span><span class="line"><span class="cl">[2019-07-09 14:52:36 CST]   66KiB 119.jpg
+</span></span><span class="line"><span class="cl">[2020-01-10 20:52:28 CST]  7.4KiB server.xml
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>bucket管理</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -763,36 +799,34 @@ $ mc ls minio/test11
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 创建一个bucket
-$ mc mb minio/bgbiao
-Bucket created successfully `minio/bgbiao`.
-$ mc ls minio/ | grep bgbiao
-[2020-01-22 16:32:43 CST]      0B bgbiao/
-
-# rb可以直接删除指定的bucket
-$ mc rb minio/bgbiao
-Removed `minio/bgbiao` successfully.
-
-# tree可以打印出来bucket组织的文件系统树形结构
-$ mc tree --depth 2 --files minio/bgbiao
-minio/bgbiao
-└─ hostname.txt
-
-# du可以查看某个bucket或者object的大小
-$ mc du minio/bgbiao
-10B bgbiao
-$ mc du minio/
-9.1GiB
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 创建一个bucket
+</span></span><span class="line"><span class="cl">$ mc mb minio/bgbiao
+</span></span><span class="line"><span class="cl">Bucket created successfully `minio/bgbiao`.
+</span></span><span class="line"><span class="cl">$ mc ls minio/ | grep bgbiao
+</span></span><span class="line"><span class="cl">[2020-01-22 16:32:43 CST]      0B bgbiao/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># rb可以直接删除指定的bucket
+</span></span><span class="line"><span class="cl">$ mc rb minio/bgbiao
+</span></span><span class="line"><span class="cl">Removed `minio/bgbiao` successfully.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># tree可以打印出来bucket组织的文件系统树形结构
+</span></span><span class="line"><span class="cl">$ mc tree --depth 2 --files minio/bgbiao
+</span></span><span class="line"><span class="cl">minio/bgbiao
+</span></span><span class="line"><span class="cl">└─ hostname.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># du可以查看某个bucket或者object的大小
+</span></span><span class="line"><span class="cl">$ mc du minio/bgbiao
+</span></span><span class="line"><span class="cl">10B bgbiao
+</span></span><span class="line"><span class="cl">$ mc du minio/
+</span></span><span class="line"><span class="cl">9.1GiB
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>对象管理</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -839,63 +873,61 @@ $ mc du minio/
 </span><span class="lnt">45
 </span><span class="lnt">46
 </span><span class="lnt">47
-</span><span class="lnt">48
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 将本地文件拷贝到minio的oss服务
-# 并直接使用cat命令访问
-$ hostname &gt; hostname.txt
-$ mc cp hostname.txt minio/bgbiao/
-hostname.txt:         10 B / 10 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  132 B/s 0s%
-$ mc ls minio/bgbiao/
-[2020-01-22 16:33:52 CST]     10B hostname.txt
-$ mc cat  minio/bgbiao/hostname.txt
-localhost
-
-# 使用pipe命令可以将标准输入的数据直接写入到minio的存储中
-$ echo ${PATH} | mc pipe minio/bgbiao/path.txt
-$ mc ls minio/bgbiao/
-[2020-01-22 16:33:52 CST]     10B hostname.txt
-[2020-01-22 16:43:43 CST]    111B path.txt
-$ mc cat minio/bgbiao/path.txt
-/Users/BGBiao/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/soul/bin
-
-
-# 受用share命令生成可供外部匿名下载的临时链接地址
-# 生成后我们就可以使用共享链接在4小时内随意下载
-$ mc share download --expire 4h minio/bgbiao/hostname.txt
-URL: http://bgbiao.top:9000/bgbiao/hostname.txt
-Expire: 4 hours 0 minutes 0 seconds
-Share: http://bgbiao.top:9000/bgbiao/hostname.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T083619Z&amp;X-Amz-Expires=14400&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=ec49806b7c249bbeb140af759afeff907672ebd97637b759efd11d4f9b1a20b3
-
-# 使用mirror指令对bucket内容进行镜像(最实用的一个指令)
-# 将minio这个对象服务下的bgbiao的整个bucket的对象镜像到本地
-# 使用minio的mc客户端可以在多个minio服务之间进行数据镜像
-$ mc mirror minio/bgbiao .
-...iao/hostname.txt:  10 B / 10 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  39 B/s 0s %
-
-# 使用find指令来直接查找内容(相对比较实用,find指令支持很多方便快捷的参数，和Linux本地的find命令内容相似)
-# 查找名称为*.txt的文件并打印临时url下载地址
-$ mc find minio/bgbiao/ --name &#34;*.txt&#34; --print {url}
-http://bgbiao.top:9000/bgbiao/hostname.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T084926Z&amp;X-Amz-Expires=604800&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=a02a370575cae5d5cf92c565d02918e20d734f80afed3e5eebf5fe1433aa348a
-http://bgbiao.top:9000/bgbiao/path.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T084926Z&amp;X-Amz-Expires=604800&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=d7d87f6a4f9d406ae02a6844574f02f6e1479215bee8401feea58e95e98b8b36
- 
-# diff命令可以列出两个bucket之间对象的大小，名字，时间的不同
-$ mc diff . minio/bgbiao/
-&gt; http://bgbiao.top:9000/bgbiao/path.txt
-&lt; readme.md
-
-# rm可以直接删除指定的对象(--force --recursive就相当于我们linux中的rm -rf)
-$ mc rm --force --recursive   minio/bgbiao
-Removing `minio/bgbiao/hostname.txt`.
-Removing `minio/bgbiao/path.txt`.
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 将本地文件拷贝到minio的oss服务
+</span></span><span class="line"><span class="cl"># 并直接使用cat命令访问
+</span></span><span class="line"><span class="cl">$ hostname &gt; hostname.txt
+</span></span><span class="line"><span class="cl">$ mc cp hostname.txt minio/bgbiao/
+</span></span><span class="line"><span class="cl">hostname.txt:         10 B / 10 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  132 B/s 0s%
+</span></span><span class="line"><span class="cl">$ mc ls minio/bgbiao/
+</span></span><span class="line"><span class="cl">[2020-01-22 16:33:52 CST]     10B hostname.txt
+</span></span><span class="line"><span class="cl">$ mc cat  minio/bgbiao/hostname.txt
+</span></span><span class="line"><span class="cl">localhost
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用pipe命令可以将标准输入的数据直接写入到minio的存储中
+</span></span><span class="line"><span class="cl">$ echo ${PATH} | mc pipe minio/bgbiao/path.txt
+</span></span><span class="line"><span class="cl">$ mc ls minio/bgbiao/
+</span></span><span class="line"><span class="cl">[2020-01-22 16:33:52 CST]     10B hostname.txt
+</span></span><span class="line"><span class="cl">[2020-01-22 16:43:43 CST]    111B path.txt
+</span></span><span class="line"><span class="cl">$ mc cat minio/bgbiao/path.txt
+</span></span><span class="line"><span class="cl">/Users/BGBiao/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/soul/bin
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 受用share命令生成可供外部匿名下载的临时链接地址
+</span></span><span class="line"><span class="cl"># 生成后我们就可以使用共享链接在4小时内随意下载
+</span></span><span class="line"><span class="cl">$ mc share download --expire 4h minio/bgbiao/hostname.txt
+</span></span><span class="line"><span class="cl">URL: http://bgbiao.top:9000/bgbiao/hostname.txt
+</span></span><span class="line"><span class="cl">Expire: 4 hours 0 minutes 0 seconds
+</span></span><span class="line"><span class="cl">Share: http://bgbiao.top:9000/bgbiao/hostname.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T083619Z&amp;X-Amz-Expires=14400&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=ec49806b7c249bbeb140af759afeff907672ebd97637b759efd11d4f9b1a20b3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用mirror指令对bucket内容进行镜像(最实用的一个指令)
+</span></span><span class="line"><span class="cl"># 将minio这个对象服务下的bgbiao的整个bucket的对象镜像到本地
+</span></span><span class="line"><span class="cl"># 使用minio的mc客户端可以在多个minio服务之间进行数据镜像
+</span></span><span class="line"><span class="cl">$ mc mirror minio/bgbiao .
+</span></span><span class="line"><span class="cl">...iao/hostname.txt:  10 B / 10 B  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  39 B/s 0s %
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用find指令来直接查找内容(相对比较实用,find指令支持很多方便快捷的参数，和Linux本地的find命令内容相似)
+</span></span><span class="line"><span class="cl"># 查找名称为*.txt的文件并打印临时url下载地址
+</span></span><span class="line"><span class="cl">$ mc find minio/bgbiao/ --name &#34;*.txt&#34; --print {url}
+</span></span><span class="line"><span class="cl">http://bgbiao.top:9000/bgbiao/hostname.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T084926Z&amp;X-Amz-Expires=604800&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=a02a370575cae5d5cf92c565d02918e20d734f80afed3e5eebf5fe1433aa348a
+</span></span><span class="line"><span class="cl">http://bgbiao.top:9000/bgbiao/path.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=BGBiao%2F20200122%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200122T084926Z&amp;X-Amz-Expires=604800&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=d7d87f6a4f9d406ae02a6844574f02f6e1479215bee8401feea58e95e98b8b36
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"># diff命令可以列出两个bucket之间对象的大小，名字，时间的不同
+</span></span><span class="line"><span class="cl">$ mc diff . minio/bgbiao/
+</span></span><span class="line"><span class="cl">&gt; http://bgbiao.top:9000/bgbiao/path.txt
+</span></span><span class="line"><span class="cl">&lt; readme.md
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># rm可以直接删除指定的对象(--force --recursive就相当于我们linux中的rm -rf)
+</span></span><span class="line"><span class="cl">$ mc rm --force --recursive   minio/bgbiao
+</span></span><span class="line"><span class="cl">Removing `minio/bgbiao/hostname.txt`.
+</span></span><span class="line"><span class="cl">Removing `minio/bgbiao/path.txt`.
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>minio运维管理</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -985,105 +1017,99 @@ Removing `minio/bgbiao/path.txt`.
 </span><span class="lnt">88
 </span><span class="lnt">89
 </span><span class="lnt">90
-</span><span class="lnt">91
-</span><span class="lnt">92
-</span><span class="lnt">93
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># stat可以查看minio服务的元数据信息
-$ mc stat minio/bgbiao
-Name      : bgbiao/
-Date      : 1970-01-01 08:00:00 CST
-Size      : 0 B
-Type      : folder
-$ mc stat minio/bgbiao/hostname.txt
-Name      : hostname.txt
-Date      : 2020-01-22 17:04:27 CST
-Size      : 10 B
-ETag      : 902f570940ba8d4b74743a3a97f5aff6-1
-Type      : file
-Metadata  :
-  Content-Type         : text/plain
-  X-Minio-Deployment-Id: 80525c40-fec3-459e-8080-6f5210548647
-
-
-# retention指令可以设置指定前缀的对象的保留时间
-
-# events指令可以查看和添加对象的事件
-
-# watch可以实时监听对象的events
-
-# policy用来管理匿名用户对bucket和object的访问
-# 设置bgbiao这个bucket匿名用户仅可以下载(download/public/upload)
-$ mc policy set download minio/bgbiao
-$ mc policy list minio/bgbiao 
-
-# admin用来管理minio服务
-# mc admin info 查看minio服务基本信息
-# mc admin service 重启和停止minio服务
-# mc admin config  管理minio服务的配置信息
-$ mc admin info minio
-●  10.0.0.149:9000
-   Uptime: 1 day
-   Version: 2020-01-16T22:40:29Z
-   Network: 4/4 OK
-   Drives: 1/1 OK
-
-●  10.0.0.150:9000
-   Uptime: 1 day
-   Version: 2020-01-16T22:40:29Z
-   Network: 4/4 OK
-   Drives: 1/1 OK
-
-●  10.0.0.151:9000
-   Uptime: 1 day
-   Version: 2020-01-16T22:40:29Z
-   Network: 4/4 OK
-   Drives: 1/1 OK
-
-●  10.0.0.148:9000
-   Uptime: 1 day
-   Version: 2020-01-16T22:40:29Z
-   Network: 4/4 OK
-   Drives: 1/1 OK
-
-13 GiB Used, 2 Buckets, 166,580 Objects
-4 drives online, 0 drives offline
- 
-# config 用来管理客户端的配置文件(还记得我们刚开始配置本地环境的时候吗)
-# minio默认帮我们配置了一些公共的对象存储服务，同时也配置了一个本地的oss服务
-$ mc config host list
-gcs
-  URL       : https://storage.googleapis.com
-  AccessKey : YOUR-ACCESS-KEY-HERE
-  SecretKey : YOUR-SECRET-KEY-HERE
-  API       : S3v2
-  Lookup    : dns
-
-local
-  URL       : http://localhost:9000
-  AccessKey :
-  SecretKey :
-  API       :
-  Lookup    : auto
-
-minio
-  URL       : http://bgbiao.top:9000
-  AccessKey : BGBiao
-  SecretKey : BGBiao
-  API       : s3v4
-  Lookup    : auto
-
-play
-  URL       : https://play.min.io
-  AccessKey : Q3AM3UQ867SPQQA43P2F
-  SecretKey : zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
-  API       : S3v4
-  Lookup    : auto
-
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># stat可以查看minio服务的元数据信息
+</span></span><span class="line"><span class="cl">$ mc stat minio/bgbiao
+</span></span><span class="line"><span class="cl">Name      : bgbiao/
+</span></span><span class="line"><span class="cl">Date      : 1970-01-01 08:00:00 CST
+</span></span><span class="line"><span class="cl">Size      : 0 B
+</span></span><span class="line"><span class="cl">Type      : folder
+</span></span><span class="line"><span class="cl">$ mc stat minio/bgbiao/hostname.txt
+</span></span><span class="line"><span class="cl">Name      : hostname.txt
+</span></span><span class="line"><span class="cl">Date      : 2020-01-22 17:04:27 CST
+</span></span><span class="line"><span class="cl">Size      : 10 B
+</span></span><span class="line"><span class="cl">ETag      : 902f570940ba8d4b74743a3a97f5aff6-1
+</span></span><span class="line"><span class="cl">Type      : file
+</span></span><span class="line"><span class="cl">Metadata  :
+</span></span><span class="line"><span class="cl">  Content-Type         : text/plain
+</span></span><span class="line"><span class="cl">  X-Minio-Deployment-Id: 80525c40-fec3-459e-8080-6f5210548647
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># retention指令可以设置指定前缀的对象的保留时间
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># events指令可以查看和添加对象的事件
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># watch可以实时监听对象的events
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># policy用来管理匿名用户对bucket和object的访问
+</span></span><span class="line"><span class="cl"># 设置bgbiao这个bucket匿名用户仅可以下载(download/public/upload)
+</span></span><span class="line"><span class="cl">$ mc policy set download minio/bgbiao
+</span></span><span class="line"><span class="cl">$ mc policy list minio/bgbiao 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># admin用来管理minio服务
+</span></span><span class="line"><span class="cl"># mc admin info 查看minio服务基本信息
+</span></span><span class="line"><span class="cl"># mc admin service 重启和停止minio服务
+</span></span><span class="line"><span class="cl"># mc admin config  管理minio服务的配置信息
+</span></span><span class="line"><span class="cl">$ mc admin info minio
+</span></span><span class="line"><span class="cl">●  10.0.0.149:9000
+</span></span><span class="line"><span class="cl">   Uptime: 1 day
+</span></span><span class="line"><span class="cl">   Version: 2020-01-16T22:40:29Z
+</span></span><span class="line"><span class="cl">   Network: 4/4 OK
+</span></span><span class="line"><span class="cl">   Drives: 1/1 OK
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">●  10.0.0.150:9000
+</span></span><span class="line"><span class="cl">   Uptime: 1 day
+</span></span><span class="line"><span class="cl">   Version: 2020-01-16T22:40:29Z
+</span></span><span class="line"><span class="cl">   Network: 4/4 OK
+</span></span><span class="line"><span class="cl">   Drives: 1/1 OK
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">●  10.0.0.151:9000
+</span></span><span class="line"><span class="cl">   Uptime: 1 day
+</span></span><span class="line"><span class="cl">   Version: 2020-01-16T22:40:29Z
+</span></span><span class="line"><span class="cl">   Network: 4/4 OK
+</span></span><span class="line"><span class="cl">   Drives: 1/1 OK
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">●  10.0.0.148:9000
+</span></span><span class="line"><span class="cl">   Uptime: 1 day
+</span></span><span class="line"><span class="cl">   Version: 2020-01-16T22:40:29Z
+</span></span><span class="line"><span class="cl">   Network: 4/4 OK
+</span></span><span class="line"><span class="cl">   Drives: 1/1 OK
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">13 GiB Used, 2 Buckets, 166,580 Objects
+</span></span><span class="line"><span class="cl">4 drives online, 0 drives offline
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"># config 用来管理客户端的配置文件(还记得我们刚开始配置本地环境的时候吗)
+</span></span><span class="line"><span class="cl"># minio默认帮我们配置了一些公共的对象存储服务，同时也配置了一个本地的oss服务
+</span></span><span class="line"><span class="cl">$ mc config host list
+</span></span><span class="line"><span class="cl">gcs
+</span></span><span class="line"><span class="cl">  URL       : https://storage.googleapis.com
+</span></span><span class="line"><span class="cl">  AccessKey : YOUR-ACCESS-KEY-HERE
+</span></span><span class="line"><span class="cl">  SecretKey : YOUR-SECRET-KEY-HERE
+</span></span><span class="line"><span class="cl">  API       : S3v2
+</span></span><span class="line"><span class="cl">  Lookup    : dns
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">local
+</span></span><span class="line"><span class="cl">  URL       : http://localhost:9000
+</span></span><span class="line"><span class="cl">  AccessKey :
+</span></span><span class="line"><span class="cl">  SecretKey :
+</span></span><span class="line"><span class="cl">  API       :
+</span></span><span class="line"><span class="cl">  Lookup    : auto
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">minio
+</span></span><span class="line"><span class="cl">  URL       : http://bgbiao.top:9000
+</span></span><span class="line"><span class="cl">  AccessKey : BGBiao
+</span></span><span class="line"><span class="cl">  SecretKey : BGBiao
+</span></span><span class="line"><span class="cl">  API       : s3v4
+</span></span><span class="line"><span class="cl">  Lookup    : auto
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">play
+</span></span><span class="line"><span class="cl">  URL       : https://play.min.io
+</span></span><span class="line"><span class="cl">  AccessKey : Q3AM3UQ867SPQQA43P2F
+</span></span><span class="line"><span class="cl">  SecretKey : zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+</span></span><span class="line"><span class="cl">  API       : S3v4
+</span></span><span class="line"><span class="cl">  Lookup    : auto
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gai9amj2lcj30vu0b275p.jpg" alt="知识星球"></p>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
@@ -1233,6 +1259,27 @@ play
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

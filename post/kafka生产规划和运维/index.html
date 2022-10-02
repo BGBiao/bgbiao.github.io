@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>kafka生产规划和运维 - BGBiao的SRE人生</title>
+  <title>kafka生产规划和运维 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -24,7 +24,7 @@
 
 <meta name="author" content="BGBiao" />
   <meta name="description" content=" 前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
- 笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
+笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
 鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.
 " />
 
@@ -35,7 +35,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" />
@@ -72,17 +72,17 @@
 鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-04-25T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-04-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="kafka生产规划和运维">
 <meta itemprop="description" content="
 前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有Redis集群，ElasticSearch集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。
 
 笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20&#43;ECS，总数据量大约400T，其中承接的Topic服务主要分为日志收集、数据管道、流式计算、业务事件存储几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的可用性，可靠性，数据一致性要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。
-鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识."><meta itemprop="datePublished" content="2020-04-25T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="25324">
+鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识."><meta itemprop="datePublished" content="2020-04-25T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="25308">
 <meta itemprop="keywords" content="运维,kafka," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="kafka生产规划和运维"/>
 <meta name="twitter:description" content="
@@ -146,7 +146,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -185,22 +185,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -362,7 +380,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -403,22 +421,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -476,7 +520,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 25324 words </span>
+        <span class="more-meta"> 25308 words </span>
           <span class="more-meta"> 51 min read </span>
 
         
@@ -547,7 +591,7 @@ if (!doNotTrack) {
 <p>可用通过计算Kafka数据目录中的<code>.index</code>文件来计算当前的mmap编号。<code>.index</code>文件大多数代表了内存映射文件。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -559,17 +603,17 @@ if (!doNotTrack) {
 </span><span class="lnt">10
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 1.统计.index文件个数
-$ find . -name &#39;*index&#39; | wc -l
-
-# 2.为每个session设置vm.max_map_count参数，这将计算当前内存映射文件的数量，mmap限制的最小值就是打开文件的ulimit限制
-# 该值要远大于index的数量
-$ sysctl -w vm.max_map_count=262144
-
-# 3.持久化mmap参数
-$ echo &#39;vm.max_map_count=262144&#39; &gt;&gt; /etc/sysctl.conf
-$ sysctl -p
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 1.统计.index文件个数
+</span></span><span class="line"><span class="cl">$ find . -name &#39;*index&#39; | wc -l
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 2.为每个session设置vm.max_map_count参数，这将计算当前内存映射文件的数量，mmap限制的最小值就是打开文件的ulimit限制
+</span></span><span class="line"><span class="cl"># 该值要远大于index的数量
+</span></span><span class="line"><span class="cl">$ sysctl -w vm.max_map_count=262144
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 3.持久化mmap参数
+</span></span><span class="line"><span class="cl">$ echo &#39;vm.max_map_count=262144&#39; &gt;&gt; /etc/sysctl.conf
+</span></span><span class="line"><span class="cl">$ sysctl -p
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="11-内存">1.1 内存</h4>
 <p>Kafka严重依赖文件系统来存储和缓存消息。</p>
@@ -614,15 +658,13 @@ $ sysctl -p
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat /etc/fstab
-UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults,noatime         0 2
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ cat /etc/fstab
+</span></span><span class="line"><span class="cl">UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults,noatime         0 2
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>XFS文件系统挂载参数优化:</p>
 <ul>
@@ -675,15 +717,15 @@ UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults
 <p>官方推荐的GC参数如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20
-       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M
-       -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20
+</span></span><span class="line"><span class="cl">       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M
+</span></span><span class="line"><span class="cl">       -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>作为参考，LinkedIn最繁忙的集群当前是如下情况:</p>
 <ul>
@@ -697,35 +739,31 @@ UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults
 <p><a href="https://medium.com/pinterest-engineering/how-pinterest-runs-kafka-at-scale-ff9c6f735be">Pinterest的大规模kafka实践</a></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 61G的内存
--Xms8g -Xmx8g -XX:NewSize=512m -XX:MaxNewSize=512m -XX:MetaspaceSize=128m -XX:+UseG1GC -XX:MaxGCPauseMillis=25
-       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=25 
-       -XX:MaxMetaspaceFreeRatio=75
-       -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:PrintTenuringDistribution 
-       -Xloggc:/var/log/kafka/gc.log -XX:UseGCLogFileRotation -XX:NumberOfGCLogFiles=40
-       -XX:GCLogFileSize=50M
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 61G的内存
+</span></span><span class="line"><span class="cl">-Xms8g -Xmx8g -XX:NewSize=512m -XX:MaxNewSize=512m -XX:MetaspaceSize=128m -XX:+UseG1GC -XX:MaxGCPauseMillis=25
+</span></span><span class="line"><span class="cl">       -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=25 
+</span></span><span class="line"><span class="cl">       -XX:MaxMetaspaceFreeRatio=75
+</span></span><span class="line"><span class="cl">       -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:PrintTenuringDistribution 
+</span></span><span class="line"><span class="cl">       -Xloggc:/var/log/kafka/gc.log -XX:UseGCLogFileRotation -XX:NumberOfGCLogFiles=40
+</span></span><span class="line"><span class="cl">       -XX:GCLogFileSize=50M
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">-Xmx10G -Xms10G -server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -XX:MaxInlineLevel=15 -Djava.awt.headless=true -Xloggc:/opt/app/kafka/bin/../logs/kafkaServer-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9999
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-Xmx10G -Xms10G -server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -XX:MaxInlineLevel=15 -Djava.awt.headless=true -Xloggc:/opt/app/kafka/bin/../logs/kafkaServer-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9999
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="4kafka核心配置">4.kafka核心配置</h3>
 <p>Kafka默认设置在大多数情况下都能工作，特别是与性能相关的设置和选项，但是考虑到集群的规划以及场景用途，有一些补充的配置参数可以对生产环境进行调优。</p>
@@ -749,13 +787,13 @@ UUID=&#34;4231b126-7e67-45c4-b8bf-554006291d35&#34;  /export1    xfs    defaults
 <p>在分布式集群中，可以手动指定每个broker的节点信息，同时也可以使用如下方式来自动生成每个broker的id</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">#broker.id
-broker.id.generation.enable=true
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#broker.id
+</span></span><span class="line"><span class="cl">broker.id.generation.enable=true
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>log.dirs</strong></p>
 <p>kafka存储的日志消息都是保存在该参数指定的日志路径下，该值可以指定多个磁盘路径，通常我们会绑定到多个磁盘上。比如<code>log.dirs=/exoprt/kafka1,/export/kafka2,/export/kafka3</code></p>
@@ -796,17 +834,17 @@ broker.id.generation.enable=true
 <p>当0节点的broker再次启动后，会自动恢复为此partition的leader。不会导致负载不均衡和资源浪费，这就是leader的均衡机制(前提是第一次partition在分配的时候，它本身就是一个相对平均的分配)</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">auto.leader.rebalance.enable=true
-# 对应影响的其他两个参数
-# leader.imbalance.per.broker.percentage : 每个broker允许leader不平衡比例(如果每个broker上超过了这个值，controller将会&gt;执行分区再平衡)，默认值10.
-# leader.imbalance.check.interval.seconds: 主分区再平衡的频率，默认值为300s
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">auto.leader.rebalance.enable=true
+</span></span><span class="line"><span class="cl"># 对应影响的其他两个参数
+</span></span><span class="line"><span class="cl"># leader.imbalance.per.broker.percentage : 每个broker允许leader不平衡比例(如果每个broker上超过了这个值，controller将会&gt;执行分区再平衡)，默认值10.
+</span></span><span class="line"><span class="cl"># leader.imbalance.check.interval.seconds: 主分区再平衡的频率，默认值为300s
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>其实，在重要业务的场景中，需要将<code>leader.imbalance.per.broker.percentage</code>参数适当调整小一些，以避免broker中leader不平衡率导致节点的吞吐不均匀</p>
 <p><strong>num.partitions</strong></p>
@@ -928,7 +966,7 @@ broker.id.generation.enable=true
 <p><strong>示例配置</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -943,26 +981,24 @@ broker.id.generation.enable=true
 </span><span class="lnt">13
 </span><span class="lnt">14
 </span><span class="lnt">15
-</span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># ZooKeeper地址
-zookeeper.connect=[list of ZooKeeper servers]
-
-# kafka log相关配置
-num.partitions=8
-default.replication.factor=3
-log.dirs=[List of directories. Kafka should have its own dedicated disk(s) or SSD(s).]
-
-# 其他配置核心配置
-broker.id=[An integer. Start with 0 and increment by 1 for each new broker.]
-listeners=[list of listeners]
-auto.create.topics.enable=false
-# 最小的isr数量，可以在topic级别设置
-min.insync.replicas=2
-queued.max.requests=[number of concurrent requests]
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># ZooKeeper地址
+</span></span><span class="line"><span class="cl">zookeeper.connect=[list of ZooKeeper servers]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># kafka log相关配置
+</span></span><span class="line"><span class="cl">num.partitions=8
+</span></span><span class="line"><span class="cl">default.replication.factor=3
+</span></span><span class="line"><span class="cl">log.dirs=[List of directories. Kafka should have its own dedicated disk(s) or SSD(s).]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 其他配置核心配置
+</span></span><span class="line"><span class="cl">broker.id=[An integer. Start with 0 and increment by 1 for each new broker.]
+</span></span><span class="line"><span class="cl">listeners=[list of listeners]
+</span></span><span class="line"><span class="cl">auto.create.topics.enable=false
+</span></span><span class="line"><span class="cl"># 最小的isr数量，可以在topic级别设置
+</span></span><span class="line"><span class="cl">min.insync.replicas=2
+</span></span><span class="line"><span class="cl">queued.max.requests=[number of concurrent requests]
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code> 在kafka集群中，当broker集群参数确定后，还有一些针对topic的参数是可以进行动态调整的，以提高kafka服务的灵活性。</p>
 <h4 id="43-topic级别的动态参数调整">4.3 Topic级别的动态参数调整</h4>
@@ -1144,7 +1180,7 @@ queued.max.requests=[number of concurrent requests]
 <p>在kafka的发行包中，默认包含了如下管理工具脚本:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1156,23 +1192,21 @@ queued.max.requests=[number of concurrent requests]
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ ls
-connect-distributed.sh        kafka-delete-records.sh              kafka-server-stop.sh
-connect-mirror-maker.sh       kafka-dump-log.sh                    kafka-streams-application-reset.sh
-connect-standalone.sh         kafka-leader-election.sh             kafka-topics.sh
-kafka-acls.sh                 kafka-log-dirs.sh                    kafka-verifiable-consumer.sh
-kafka-broker-api-versions.sh  kafka-mirror-maker.sh                kafka-verifiable-producer.sh
-kafka-configs.sh              kafka-preferred-replica-election.sh  trogdor.sh
-kafka-console-consumer.sh     kafka-producer-perf-test.sh          windows
-kafka-console-producer.sh     kafka-reassign-partitions.sh         zookeeper-security-migration.sh
-kafka-consumer-groups.sh      kafka-replica-verification.sh        zookeeper-server-start.sh
-kafka-consumer-perf-test.sh   kafka-run-class.sh                   zookeeper-server-stop.sh
-kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-shell.sh
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ ls
+</span></span><span class="line"><span class="cl">connect-distributed.sh        kafka-delete-records.sh              kafka-server-stop.sh
+</span></span><span class="line"><span class="cl">connect-mirror-maker.sh       kafka-dump-log.sh                    kafka-streams-application-reset.sh
+</span></span><span class="line"><span class="cl">connect-standalone.sh         kafka-leader-election.sh             kafka-topics.sh
+</span></span><span class="line"><span class="cl">kafka-acls.sh                 kafka-log-dirs.sh                    kafka-verifiable-consumer.sh
+</span></span><span class="line"><span class="cl">kafka-broker-api-versions.sh  kafka-mirror-maker.sh                kafka-verifiable-producer.sh
+</span></span><span class="line"><span class="cl">kafka-configs.sh              kafka-preferred-replica-election.sh  trogdor.sh
+</span></span><span class="line"><span class="cl">kafka-console-consumer.sh     kafka-producer-perf-test.sh          windows
+</span></span><span class="line"><span class="cl">kafka-console-producer.sh     kafka-reassign-partitions.sh         zookeeper-security-migration.sh
+</span></span><span class="line"><span class="cl">kafka-consumer-groups.sh      kafka-replica-verification.sh        zookeeper-server-start.sh
+</span></span><span class="line"><span class="cl">kafka-consumer-perf-test.sh   kafka-run-class.sh                   zookeeper-server-stop.sh
+</span></span><span class="line"><span class="cl">kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-shell.sh
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>这里主要介绍几个常用的工具脚本:</p>
 <p><strong>运维管理类</strong></p>
@@ -1231,7 +1265,7 @@ kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-she
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1255,35 +1289,33 @@ kafka-delegation-tokens.sh    kafka-server-start.sh                zookeeper-she
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
-</span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 创建topic
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --create --topic bgbiao.top
-Created topic bgbiao.top.
-
-# 查看默认创建topic的参数详情(由broker配置决定)
-# 默认3个分区，1个副本
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
-Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
-	Topic: bgbiao.top	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
-	Topic: bgbiao.top	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
-	Topic: bgbiao.top	Partition: 2	Leader: 3	Replicas: 3	Isr: 3
-
-# 指定参数创建topic
-# 指定分区为5，副本为3，topic数据保留2分钟
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --create --topic bgbiao.top-1 --partitions 5 --replication-factor 3 --config retention.ms=120000
-
-# 分区，副本和指定参数都改变了
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top-1
-Topic: bgbiao.top-1	PartitionCount: 5	ReplicationFactor: 3	Configs: min.insync.replicas=1,segment.bytes=1073741824,retention.ms=120000
-	Topic: bgbiao.top-1	Partition: 0	Leader: 2	Replicas: 2,3,1	Isr: 2,3,1
-	Topic: bgbiao.top-1	Partition: 1	Leader: 3	Replicas: 3,1,2	Isr: 3,1,2
-	Topic: bgbiao.top-1	Partition: 2	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3
-	Topic: bgbiao.top-1	Partition: 3	Leader: 2	Replicas: 2,1,3	Isr: 2,1,3
-	Topic: bgbiao.top-1	Partition: 4	Leader: 3	Replicas: 3,2,1	Isr: 3,2,1
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 创建topic
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --create --topic bgbiao.top
+</span></span><span class="line"><span class="cl">Created topic bgbiao.top.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看默认创建topic的参数详情(由broker配置决定)
+</span></span><span class="line"><span class="cl"># 默认3个分区，1个副本
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
+</span></span><span class="line"><span class="cl">Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 2	Leader: 3	Replicas: 3	Isr: 3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 指定参数创建topic
+</span></span><span class="line"><span class="cl"># 指定分区为5，副本为3，topic数据保留2分钟
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --create --topic bgbiao.top-1 --partitions 5 --replication-factor 3 --config retention.ms=120000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 分区，副本和指定参数都改变了
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top-1
+</span></span><span class="line"><span class="cl">Topic: bgbiao.top-1	PartitionCount: 5	ReplicationFactor: 3	Configs: min.insync.replicas=1,segment.bytes=1073741824,retention.ms=120000
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top-1	Partition: 0	Leader: 2	Replicas: 2,3,1	Isr: 2,3,1
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top-1	Partition: 1	Leader: 3	Replicas: 3,1,2	Isr: 3,1,2
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top-1	Partition: 2	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top-1	Partition: 3	Leader: 2	Replicas: 2,1,3	Isr: 2,1,3
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top-1	Partition: 4	Leader: 3	Replicas: 3,2,1	Isr: 3,2,1
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>topic更改</strong></p>
 <p><code>注意:</code> topic的分区(partitions)可以根据需要进行调整(只能调整大，不能调整小)，而且在调整分区的过程中，对于一个有<code>key</code>的主题来说，一条消息的分区逻辑和顺序性可能会受到影响。</p>
@@ -1314,7 +1346,7 @@ Topic: bgbiao.top-1	PartitionCount: 5	ReplicationFactor: 3	Configs: min.insync.r
 <p><code>注意:</code> 通常情况下<code>--replica-assignment</code>参数需要和<code>--partitions</code>一同使用才可以指定分区下的副本到broker节点上的分配，相当于手动扩容迁移</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1329,20 +1361,20 @@ Topic: bgbiao.top-1	PartitionCount: 5	ReplicationFactor: 3	Configs: min.insync.r
 </span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 上面我们刚开始创建的bgbiao.top的topic是1个分区1个副本，这里采用alter参数进行修改基本配置
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --alter  --topic bgbiao.top --replica-assignment 1,2,3,1,2 --partitions 5
-
-# 因为bgbiao.top 这个topic再创建时只有一个replication，因此--replica-assignment参数只能指定副本分配在那个broker上，无法指定多个副本的关系
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
-Topic: bgbiao.top	PartitionCount: 5	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
-	Topic: bgbiao.top	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
-	Topic: bgbiao.top	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
-	Topic: bgbiao.top	Partition: 2	Leader: 3	Replicas: 3	Isr: 3
-	Topic: bgbiao.top	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
-	Topic: bgbiao.top	Partition: 4	Leader: 2	Replicas: 2	Isr: 2
-
- 
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 上面我们刚开始创建的bgbiao.top的topic是1个分区1个副本，这里采用alter参数进行修改基本配置
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --alter  --topic bgbiao.top --replica-assignment 1,2,3,1,2 --partitions 5
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 因为bgbiao.top 这个topic再创建时只有一个replication，因此--replica-assignment参数只能指定副本分配在那个broker上，无法指定多个副本的关系
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
+</span></span><span class="line"><span class="cl">Topic: bgbiao.top	PartitionCount: 5	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 2	Leader: 3	Replicas: 3	Isr: 3
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 4	Leader: 2	Replicas: 2	Isr: 2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>topic相关信息查看</strong></p>
 <ul>
@@ -1377,7 +1409,7 @@ Topic: bgbiao.top	PartitionCount: 5	ReplicationFactor: 1	Configs: min.insync.rep
 <p><code>注意:</code> 在低版本的kafka中使用&ndash;zookeeper来链接集群，高版本中基本都通过&ndash;bootstrap-server指定broker来连接集群</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1434,70 +1466,66 @@ Topic: bgbiao.top	PartitionCount: 5	ReplicationFactor: 1	Configs: min.insync.rep
 </span><span class="lnt">55
 </span><span class="lnt">56
 </span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 列出集群topic
-# --list参数列出可用的topic
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --list
-__consumer_offsets
-....
-....
-
-# 也可以使用--topic指定topic
-# 如果指定topic不存在，将返回空
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --list --topic __consumer_offsets
-__consumer_offsets
-
-# 列出topic详情信息
-# --describe参数(同时可以使用--topic指定topic查看)
-# --exclude-internal参数可以排除内部的topic(__consumer_offsets)
-# --unavailable-partitions参数可以列出leader不可用的topic，在集群故障时快速查看受影响的topic
-# 
-# 可以查看某个topic的分区和副本分布，以及topic级别的相关配置
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic __consumer_offsets
-Topic: __consumer_offsets	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,min.insync.replicas=1,cleanup.policy=compact,segment.bytes=104857600
-	Topic: __consumer_offsets	Partition: 0	Leader: 3	Replicas: 3	Isr: 3
-	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
-....
-....
-
-# 查看集群leader不可用的分区
-# 可以发现leader都为-1，是因为副本和isr的id是4，而broker4其实已经光荣阵亡了
-$ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/log-kafka --describe --unavailable-partitions
-...
-	Topic: realtime_kafka.post_alg_real	Partition: 2	Leader: -1	Replicas: 4	Isr: 4
-	Topic: realtime_kafka.post_alg_real	Partition: 11	Leader: -1	Replicas: 4	Isr: 4
-	Topic: realtime_kafka.post_alg_real	Partition: 20	Leader: -1	Replicas: 4	Isr: 4
-	Topic: realtime_kafka.post_alg_real	Partition: 29	Leader: -1	Replicas: 4	Isr: 4
-	Topic: rm-bp1d3u2p9v3l4da7c632	Partition: 1	Leader: -1	Replicas: 4	Isr: 4
-	Topic: rm-bp1udb05091x11q5x	Partition: 1	Leader: -1	Replicas: 4	Isr: 4
-
-# 查看副本不同步的分区详情
-# 可以发现副本中有不同步的情况，是因为有副本所在的节点已经挂了，通常有一部分是因为资源或者网络原因未同步，还有就是如上述broker阵亡的情况
-# 如果说--unavailable-partitions可以直接查看到受影响的topic，那么--under-replicated-partitions就可以查看可用性受影响的topic，因为当副本为2时，此时broker4阵亡的前提下，topic下的分区是无法保证高可用的
-$ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/log-kafka --describe --under-replicated-partitions
-...
-...
-	Topic: androidregister	Partition: 1	Leader: 2	Replicas: 4,2	Isr: 2
-	Topic: eventjsonlog	Partition: 11	Leader: 2	Replicas: 4,2	Isr: 2
-	Topic: eventjsonlog	Partition: 27	Leader: 2	Replicas: 2,4	Isr: 2
-	Topic: eventjsonlog	Partition: 38	Leader: 13	Replicas: 13,4	Isr: 13
-	Topic: eventjsonlog	Partition: 44	Leader: 10	Replicas: 4,10	Isr: 10
-	Topic: eventjsonlog	Partition: 52	Leader: 12	Replicas: 12,4	Isr: 12
-	Topic: eventjsonlog	Partition: 59	Leader: 11	Replicas: 4,11	Isr: 11
-	Topic: eventlog	Partition: 8	Leader: 16	Replicas: 16,4	Isr: 16
-	Topic: eventlog	Partition: 23	Leader: 3	Replicas: 4,3	Isr: 3
-	Topic: eventlog	Partition: 38	Leader: 13	Replicas: 13,4	Isr: 13
-	Topic: eventlog	Partition: 44	Leader: 10	Replicas: 4,10	Isr: 10
-	Topic: eventlog	Partition: 52	Leader: 12	Replicas: 12,4	Isr: 12
-	Topic: eventlog	Partition: 59	Leader: 11	Replicas: 4,11	Isr: 11
-	Topic: pusheventlog	Partition: 9	Leader: 1	Replicas: 1,4	Isr: 1
-	Topic: pusheventlog	Partition: 12	Leader: 7	Replicas: 4,7	Isr: 7
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 列出集群topic
+</span></span><span class="line"><span class="cl"># --list参数列出可用的topic
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --list
+</span></span><span class="line"><span class="cl">__consumer_offsets
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 也可以使用--topic指定topic
+</span></span><span class="line"><span class="cl"># 如果指定topic不存在，将返回空
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --list --topic __consumer_offsets
+</span></span><span class="line"><span class="cl">__consumer_offsets
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 列出topic详情信息
+</span></span><span class="line"><span class="cl"># --describe参数(同时可以使用--topic指定topic查看)
+</span></span><span class="line"><span class="cl"># --exclude-internal参数可以排除内部的topic(__consumer_offsets)
+</span></span><span class="line"><span class="cl"># --unavailable-partitions参数可以列出leader不可用的topic，在集群故障时快速查看受影响的topic
+</span></span><span class="line"><span class="cl"># 
+</span></span><span class="line"><span class="cl"># 可以查看某个topic的分区和副本分布，以及topic级别的相关配置
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic __consumer_offsets
+</span></span><span class="line"><span class="cl">Topic: __consumer_offsets	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,min.insync.replicas=1,cleanup.policy=compact,segment.bytes=104857600
+</span></span><span class="line"><span class="cl">	Topic: __consumer_offsets	Partition: 0	Leader: 3	Replicas: 3	Isr: 3
+</span></span><span class="line"><span class="cl">	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看集群leader不可用的分区
+</span></span><span class="line"><span class="cl"># 可以发现leader都为-1，是因为副本和isr的id是4，而broker4其实已经光荣阵亡了
+</span></span><span class="line"><span class="cl">$ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/log-kafka --describe --unavailable-partitions
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">	Topic: realtime_kafka.post_alg_real	Partition: 2	Leader: -1	Replicas: 4	Isr: 4
+</span></span><span class="line"><span class="cl">	Topic: realtime_kafka.post_alg_real	Partition: 11	Leader: -1	Replicas: 4	Isr: 4
+</span></span><span class="line"><span class="cl">	Topic: realtime_kafka.post_alg_real	Partition: 20	Leader: -1	Replicas: 4	Isr: 4
+</span></span><span class="line"><span class="cl">	Topic: realtime_kafka.post_alg_real	Partition: 29	Leader: -1	Replicas: 4	Isr: 4
+</span></span><span class="line"><span class="cl">	Topic: rm-bp1d3u2p9v3l4da7c632	Partition: 1	Leader: -1	Replicas: 4	Isr: 4
+</span></span><span class="line"><span class="cl">	Topic: rm-bp1udb05091x11q5x	Partition: 1	Leader: -1	Replicas: 4	Isr: 4
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看副本不同步的分区详情
+</span></span><span class="line"><span class="cl"># 可以发现副本中有不同步的情况，是因为有副本所在的节点已经挂了，通常有一部分是因为资源或者网络原因未同步，还有就是如上述broker阵亡的情况
+</span></span><span class="line"><span class="cl"># 如果说--unavailable-partitions可以直接查看到受影响的topic，那么--under-replicated-partitions就可以查看可用性受影响的topic，因为当副本为2时，此时broker4阵亡的前提下，topic下的分区是无法保证高可用的
+</span></span><span class="line"><span class="cl">$ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/log-kafka --describe --under-replicated-partitions
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">	Topic: androidregister	Partition: 1	Leader: 2	Replicas: 4,2	Isr: 2
+</span></span><span class="line"><span class="cl">	Topic: eventjsonlog	Partition: 11	Leader: 2	Replicas: 4,2	Isr: 2
+</span></span><span class="line"><span class="cl">	Topic: eventjsonlog	Partition: 27	Leader: 2	Replicas: 2,4	Isr: 2
+</span></span><span class="line"><span class="cl">	Topic: eventjsonlog	Partition: 38	Leader: 13	Replicas: 13,4	Isr: 13
+</span></span><span class="line"><span class="cl">	Topic: eventjsonlog	Partition: 44	Leader: 10	Replicas: 4,10	Isr: 10
+</span></span><span class="line"><span class="cl">	Topic: eventjsonlog	Partition: 52	Leader: 12	Replicas: 12,4	Isr: 12
+</span></span><span class="line"><span class="cl">	Topic: eventjsonlog	Partition: 59	Leader: 11	Replicas: 4,11	Isr: 11
+</span></span><span class="line"><span class="cl">	Topic: eventlog	Partition: 8	Leader: 16	Replicas: 16,4	Isr: 16
+</span></span><span class="line"><span class="cl">	Topic: eventlog	Partition: 23	Leader: 3	Replicas: 4,3	Isr: 3
+</span></span><span class="line"><span class="cl">	Topic: eventlog	Partition: 38	Leader: 13	Replicas: 13,4	Isr: 13
+</span></span><span class="line"><span class="cl">	Topic: eventlog	Partition: 44	Leader: 10	Replicas: 4,10	Isr: 10
+</span></span><span class="line"><span class="cl">	Topic: eventlog	Partition: 52	Leader: 12	Replicas: 12,4	Isr: 12
+</span></span><span class="line"><span class="cl">	Topic: eventlog	Partition: 59	Leader: 11	Replicas: 4,11	Isr: 11
+</span></span><span class="line"><span class="cl">	Topic: pusheventlog	Partition: 9	Leader: 1	Replicas: 1,4	Isr: 1
+</span></span><span class="line"><span class="cl">	Topic: pusheventlog	Partition: 12	Leader: 7	Replicas: 4,7	Isr: 7
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>删除</strong></p>
 <ul>
@@ -1506,15 +1534,13 @@ $ /opt/app/kafka_2.11-1.0.1/bin/kafka-topics.sh --zookeeper 172.16.217.38:2181/l
 <p><code>注意:</code> 在删除Topic时会受<code>delete.topic.enable</code>参数的影响，如果为true，则topic直接删除，如果为false，删除仅是标记删除，即在topic的config中增加一个删除标记<code>MarkedForDeletion:true</code>，待broker重启后完全删除(也可通过zk中的数据删除)</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
-</span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 如果delete.topic.enable=true，则直接删除掉
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --delete   --topic bgbiao.top
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 如果delete.topic.enable=true，则直接删除掉
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --delete   --topic bgbiao.top
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code></p>
 <ul>
@@ -1537,22 +1563,22 @@ $ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --
 <p><code>topics-to-move-json-file文件示例</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">{&#34;topics&#34;:
-[{&#34;topic&#34;: &#34;foo&#34;},{&#34;topic&#34;: &#34;foo1&#34;}],
-&#34;version&#34;:1
-}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{&#34;topics&#34;:
+</span></span><span class="line"><span class="cl">[{&#34;topic&#34;: &#34;foo&#34;},{&#34;topic&#34;: &#34;foo1&#34;}],
+</span></span><span class="line"><span class="cl">&#34;version&#34;:1
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>reassignment-json-file文件示例</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -1563,21 +1589,21 @@ $ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 注意:log_dirs是可选参数，需要指定绝对路径，也可以指定为any，当指定后需要和replicas的长度相等
-  {&#34;partitions&#34;:
-  	[{&#34;topic&#34;: &#34;foo&#34;,
-  	  &#34;partition&#34;: 1,
-  	  &#34;replicas&#34;: [1,2,3],
-  	  &#34;log_dirs&#34;: [&#34;dir1&#34;,&#34;dir2&#34;,&#34;dir3&#34;]
-    }],
-  &#34;version&#34;:1
-  }
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 注意:log_dirs是可选参数，需要指定绝对路径，也可以指定为any，当指定后需要和replicas的长度相等
+</span></span><span class="line"><span class="cl">  {&#34;partitions&#34;:
+</span></span><span class="line"><span class="cl">  	[{&#34;topic&#34;: &#34;foo&#34;,
+</span></span><span class="line"><span class="cl">  	  &#34;partition&#34;: 1,
+</span></span><span class="line"><span class="cl">  	  &#34;replicas&#34;: [1,2,3],
+</span></span><span class="line"><span class="cl">  	  &#34;log_dirs&#34;: [&#34;dir1&#34;,&#34;dir2&#34;,&#34;dir3&#34;]
+</span></span><span class="line"><span class="cl">    }],
+</span></span><span class="line"><span class="cl">  &#34;version&#34;:1
+</span></span><span class="line"><span class="cl">  }
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>分区重分配示例:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1639,73 +1665,71 @@ $ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --
 </span><span class="lnt">60
 </span><span class="lnt">61
 </span><span class="lnt">62
-</span><span class="lnt">63
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看当前topic详情
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
-Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
-	Topic: bgbiao.top	Partition: 0	Leader: 3	Replicas: 3	Isr: 3
-	Topic: bgbiao.top	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
-	Topic: bgbiao.top	Partition: 2	Leader: 2	Replicas: 2	Isr: 2
-
-# 1.编辑move.json配置
-$ cat move.json
-{&#34;topics&#34;: [{&#34;topic&#34;: &#34;bgbiao.top&#34;}],
-&#34;version&#34;:1
-}
-
-# 2.生成迁移配置
-# 指定正确的zookeeper地址来获取分区的分布状态以及待迁移的状态
-$ sh /opt/app/kafka/bin/kafka-reassign-partitions.sh --zookeeper 172.29.203.62:2181 --topics-to-move-json-file move.json --broker-list &#34;1,2,3&#34; --generate
-Current partition replica assignment
-{&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:2,&#34;replicas&#34;:[2],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[1],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[3],&#34;log_dirs&#34;:[&#34;any&#34;]}]}
-
-Proposed partition reassignment configuration
-{&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[1],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:2,&#34;replicas&#34;:[3],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[2],&#34;log_dirs&#34;:[&#34;any&#34;]}]}
-
-# 编辑迁移配置
-# 当前分区状态为:bgbiao.top-2的副本在broker2,bgbiao.top-1的副本在broker1,bgbiao.top-0的副本在broker3
-# 迁移后的分区状态:bgbiao.top-2的副本在broker3,bgbiao.top-1的副本在broker2,bgbiao.top-0的副本在broker1
-# 然后将期望的迁移配置保存下来做相关修改即可.
-# 我们是想给某个分区增加副本，因此可以修改成如下配置
-$ cat assignment.json
-{
-    &#34;partitions&#34;: [
-        {
-            &#34;partition&#34;: 0,
-            &#34;replicas&#34;: [
-                3,1,2
-            ],
-            &#34;topic&#34;: &#34;bgbiao.top&#34;
-        }
-    ],
-    &#34;version&#34;: 1
-}
-
-# 3.根据上述的迁移配置执行迁移
-$ sh /opt/app/kafka/bin/kafka-reassign-partitions.sh --zookeeper 172.29.203.62:2181 --reassignment-json-file ./assignment.json --execute
-Current partition replica assignment
-
-{&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:2,&#34;replicas&#34;:[2],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[1],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[3],&#34;log_dirs&#34;:[&#34;any&#34;]}]}
-
-Save this to use as the --reassignment-json-file option during rollback
-Successfully started reassignment of partitions.
-
-# 4.查看上述迁移的进度(将--execute参数改为--verify参数)
-$ sh /opt/app/kafka/bin/kafka-reassign-partitions.sh --zookeeper 172.29.203.62:2181 --reassignment-json-file ./assignment.json --verify
-Status of partition reassignment:
-Reassignment of partition bgbiao.top-0 completed successfully
-
-# 再次查看topix详情
-# 如期望，partition-1增加了两个副本,该副本的整体可用性提高了3倍
-$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
-Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 3	Configs: min.insync.replicas=1,segment.bytes=1073741824
-	Topic: bgbiao.top	Partition: 0	Leader: 3	Replicas: 3,1,2	Isr: 3,1,2
-	Topic: bgbiao.top	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
-	Topic: bgbiao.top	Partition: 2	Leader: 2	Replicas: 2	Isr: 2
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 查看当前topic详情
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
+</span></span><span class="line"><span class="cl">Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 1	Configs: min.insync.replicas=1,segment.bytes=1073741824
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 0	Leader: 3	Replicas: 3	Isr: 3
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 2	Leader: 2	Replicas: 2	Isr: 2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 1.编辑move.json配置
+</span></span><span class="line"><span class="cl">$ cat move.json
+</span></span><span class="line"><span class="cl">{&#34;topics&#34;: [{&#34;topic&#34;: &#34;bgbiao.top&#34;}],
+</span></span><span class="line"><span class="cl">&#34;version&#34;:1
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 2.生成迁移配置
+</span></span><span class="line"><span class="cl"># 指定正确的zookeeper地址来获取分区的分布状态以及待迁移的状态
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-reassign-partitions.sh --zookeeper 172.29.203.62:2181 --topics-to-move-json-file move.json --broker-list &#34;1,2,3&#34; --generate
+</span></span><span class="line"><span class="cl">Current partition replica assignment
+</span></span><span class="line"><span class="cl">{&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:2,&#34;replicas&#34;:[2],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[1],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[3],&#34;log_dirs&#34;:[&#34;any&#34;]}]}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Proposed partition reassignment configuration
+</span></span><span class="line"><span class="cl">{&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[1],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:2,&#34;replicas&#34;:[3],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[2],&#34;log_dirs&#34;:[&#34;any&#34;]}]}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 编辑迁移配置
+</span></span><span class="line"><span class="cl"># 当前分区状态为:bgbiao.top-2的副本在broker2,bgbiao.top-1的副本在broker1,bgbiao.top-0的副本在broker3
+</span></span><span class="line"><span class="cl"># 迁移后的分区状态:bgbiao.top-2的副本在broker3,bgbiao.top-1的副本在broker2,bgbiao.top-0的副本在broker1
+</span></span><span class="line"><span class="cl"># 然后将期望的迁移配置保存下来做相关修改即可.
+</span></span><span class="line"><span class="cl"># 我们是想给某个分区增加副本，因此可以修改成如下配置
+</span></span><span class="line"><span class="cl">$ cat assignment.json
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">    &#34;partitions&#34;: [
+</span></span><span class="line"><span class="cl">        {
+</span></span><span class="line"><span class="cl">            &#34;partition&#34;: 0,
+</span></span><span class="line"><span class="cl">            &#34;replicas&#34;: [
+</span></span><span class="line"><span class="cl">                3,1,2
+</span></span><span class="line"><span class="cl">            ],
+</span></span><span class="line"><span class="cl">            &#34;topic&#34;: &#34;bgbiao.top&#34;
+</span></span><span class="line"><span class="cl">        }
+</span></span><span class="line"><span class="cl">    ],
+</span></span><span class="line"><span class="cl">    &#34;version&#34;: 1
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 3.根据上述的迁移配置执行迁移
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-reassign-partitions.sh --zookeeper 172.29.203.62:2181 --reassignment-json-file ./assignment.json --execute
+</span></span><span class="line"><span class="cl">Current partition replica assignment
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{&#34;version&#34;:1,&#34;partitions&#34;:[{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:2,&#34;replicas&#34;:[2],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:1,&#34;replicas&#34;:[1],&#34;log_dirs&#34;:[&#34;any&#34;]},{&#34;topic&#34;:&#34;bgbiao.top&#34;,&#34;partition&#34;:0,&#34;replicas&#34;:[3],&#34;log_dirs&#34;:[&#34;any&#34;]}]}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Save this to use as the --reassignment-json-file option during rollback
+</span></span><span class="line"><span class="cl">Successfully started reassignment of partitions.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 4.查看上述迁移的进度(将--execute参数改为--verify参数)
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-reassign-partitions.sh --zookeeper 172.29.203.62:2181 --reassignment-json-file ./assignment.json --verify
+</span></span><span class="line"><span class="cl">Status of partition reassignment:
+</span></span><span class="line"><span class="cl">Reassignment of partition bgbiao.top-0 completed successfully
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 再次查看topix详情
+</span></span><span class="line"><span class="cl"># 如期望，partition-1增加了两个副本,该副本的整体可用性提高了3倍
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-topics.sh --bootstrap-server 172.29.203.62:9092 --describe --topic bgbiao.top
+</span></span><span class="line"><span class="cl">Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 3	Configs: min.insync.replicas=1,segment.bytes=1073741824
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 0	Leader: 3	Replicas: 3,1,2	Isr: 3,1,2
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+</span></span><span class="line"><span class="cl">	Topic: bgbiao.top	Partition: 2	Leader: 2	Replicas: 2	Isr: 2
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code> 该工具可以让集群部分节点故障后，及时将新部分的partition进行调整，以恢复partition的高可用性。同时能够让集群在扩展后，快速将已有topic的数据均衡的分布在新节点上，以实现整体负载的均衡。</p>
 <h4 id="13-kafka-log-dirssh">1.3 kafka-log-dirs.sh</h4>
@@ -1725,21 +1749,19 @@ Topic: bgbiao.top	PartitionCount: 3	ReplicationFactor: 3	Configs: min.insync.rep
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 当指定topic后会从全部的broker中进行查找
-$ sh /opt/app/kafka/bin/kafka-log-dirs.sh --bootstrap-server 172.29.203.62:9092 --describe --topic-list myapp-yum-log,myapp
-Querying brokers for log directories information
-Received log directory information from brokers 1,2,3
-{&#34;version&#34;:1,&#34;brokers&#34;:[{&#34;broker&#34;:1,&#34;logDirs&#34;:[{&#34;logDir&#34;:&#34;/opt/data/kafka/kafka-logs&#34;,&#34;error&#34;:null,&#34;partitions&#34;:[{&#34;partition&#34;:&#34;myapp-yum-log-2&#34;,&#34;size&#34;:13291235,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false},{&#34;partition&#34;:&#34;myapp-0&#34;,&#34;size&#34;:0,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false}]}]},{&#34;broker&#34;:2,&#34;logDirs&#34;:[{&#34;logDir&#34;:&#34;/opt/data/kafka/kafka-logs&#34;,&#34;error&#34;:null,&#34;partitions&#34;:[{&#34;partition&#34;:&#34;myapp-1&#34;,&#34;size&#34;:0,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false},{&#34;partition&#34;:&#34;myapp-yum-log-0&#34;,&#34;size&#34;:13258726,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false}]}]},{&#34;broker&#34;:3,&#34;logDirs&#34;:[{&#34;logDir&#34;:&#34;/opt/data/kafka/kafka-logs&#34;,&#34;error&#34;:null,&#34;partitions&#34;:[{&#34;partition&#34;:&#34;myapp-2&#34;,&#34;size&#34;:0,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false},{&#34;partition&#34;:&#34;myapp-yum-log-1&#34;,&#34;size&#34;:13264869,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false}]}]}]}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 当指定topic后会从全部的broker中进行查找
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-log-dirs.sh --bootstrap-server 172.29.203.62:9092 --describe --topic-list myapp-yum-log,myapp
+</span></span><span class="line"><span class="cl">Querying brokers for log directories information
+</span></span><span class="line"><span class="cl">Received log directory information from brokers 1,2,3
+</span></span><span class="line"><span class="cl">{&#34;version&#34;:1,&#34;brokers&#34;:[{&#34;broker&#34;:1,&#34;logDirs&#34;:[{&#34;logDir&#34;:&#34;/opt/data/kafka/kafka-logs&#34;,&#34;error&#34;:null,&#34;partitions&#34;:[{&#34;partition&#34;:&#34;myapp-yum-log-2&#34;,&#34;size&#34;:13291235,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false},{&#34;partition&#34;:&#34;myapp-0&#34;,&#34;size&#34;:0,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false}]}]},{&#34;broker&#34;:2,&#34;logDirs&#34;:[{&#34;logDir&#34;:&#34;/opt/data/kafka/kafka-logs&#34;,&#34;error&#34;:null,&#34;partitions&#34;:[{&#34;partition&#34;:&#34;myapp-1&#34;,&#34;size&#34;:0,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false},{&#34;partition&#34;:&#34;myapp-yum-log-0&#34;,&#34;size&#34;:13258726,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false}]}]},{&#34;broker&#34;:3,&#34;logDirs&#34;:[{&#34;logDir&#34;:&#34;/opt/data/kafka/kafka-logs&#34;,&#34;error&#34;:null,&#34;partitions&#34;:[{&#34;partition&#34;:&#34;myapp-2&#34;,&#34;size&#34;:0,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false},{&#34;partition&#34;:&#34;myapp-yum-log-1&#34;,&#34;size&#34;:13264869,&#34;offsetLag&#34;:0,&#34;isFuture&#34;:false}]}]}]}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>结果是json串，可以看到<code>myapp-yum-log-2</code>在broker-1上占用了<code>13291235</code>字节，也就是<code>12M</code>.</p>
 <h4 id="14-kafka-leader-electionsh">1.4 kafka-leader-election.sh</h4>
@@ -1754,29 +1776,27 @@ Received log directory information from brokers 1,2,3
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 比如我们发现topic的partition-1当前的leader不是优先副本(broker相对倾斜),可以使用如下配置进行leader重新选举
-$ sh kafka-leader-election.sh --bootstrap-server 172.29.203.62:9092 --topic test-bgbiao-1 --partition 0 --election-type preferred
-Valid replica already elected for partitions
-
-
-{&#34;partitions&#34;:
-    [{&#34;topic&#34;: &#34;foo&#34;, &#34;partition&#34;: 1},
-    {&#34;topic&#34;: &#34;foobar&#34;, &#34;partition&#34;: 2}]
-}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 比如我们发现topic的partition-1当前的leader不是优先副本(broker相对倾斜),可以使用如下配置进行leader重新选举
+</span></span><span class="line"><span class="cl">$ sh kafka-leader-election.sh --bootstrap-server 172.29.203.62:9092 --topic test-bgbiao-1 --partition 0 --election-type preferred
+</span></span><span class="line"><span class="cl">Valid replica already elected for partitions
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{&#34;partitions&#34;:
+</span></span><span class="line"><span class="cl">    [{&#34;topic&#34;: &#34;foo&#34;, &#34;partition&#34;: 1},
+</span></span><span class="line"><span class="cl">    {&#34;topic&#34;: &#34;foobar&#34;, &#34;partition&#34;: 2}]
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="15-kafka-configssh">1.5 kafka-configs.sh</h4>
 <p>用来查看和修改kafka相关的配置信息，包含集群的动态配置，topic级别的动态配置等等</p>
@@ -1839,7 +1859,7 @@ Valid replica already elected for partitions
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1866,38 +1886,38 @@ Valid replica already elected for partitions
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 修改topic的数据保留时间
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --add-config retention.ms=10000000 --alter
-
-# 查看topic的动态参数配置
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --describe
-Dynamic configs for topic push-test are:
-  retention.ms=10000000 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:retention.ms=10000000}
-
-# 删除topic动态参数
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --alter --delete-config retention.ms
-Completed updating config for topic push-test.
-
-# 查看broker全部的参数(--all会获取全部的参数)
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --all --broker-defaults  --describe
-Default configs for brokers in the cluster are:
-
-# 也可以使用如下参数查看broker的全部参数(动态的和默认的参数)
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --entity-type brokers --entity-name  1  --describe
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --broker 1  --describe
-
-# broker的动态参数(去除了--all之后，会发现列出的是动态的配置，默认broker是没有动态参数调整的)
-$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --broker 1  --describe
-Dynamic configs for broker 1 are:
-
-# user和client也是类似的
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 修改topic的数据保留时间
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --add-config retention.ms=10000000 --alter
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看topic的动态参数配置
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --describe
+</span></span><span class="line"><span class="cl">Dynamic configs for topic push-test are:
+</span></span><span class="line"><span class="cl">  retention.ms=10000000 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:retention.ms=10000000}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 删除topic动态参数
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --alter --delete-config retention.ms
+</span></span><span class="line"><span class="cl">Completed updating config for topic push-test.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看broker全部的参数(--all会获取全部的参数)
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092 --all --broker-defaults  --describe
+</span></span><span class="line"><span class="cl">Default configs for brokers in the cluster are:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 也可以使用如下参数查看broker的全部参数(动态的和默认的参数)
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --entity-type brokers --entity-name  1  --describe
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --all --broker 1  --describe
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># broker的动态参数(去除了--all之后，会发现列出的是动态的配置，默认broker是没有动态参数调整的)
+</span></span><span class="line"><span class="cl">$ sh kafka-configs.sh --bootstrap-server 172.29.203.62:9092  --broker 1  --describe
+</span></span><span class="line"><span class="cl">Dynamic configs for broker 1 are:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># user和client也是类似的
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="16-kafka-broker-api-versionssh">1.6 kafka-broker-api-versions.sh</h4>
 <p>查看kafka对外的各个api版本.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1953,67 +1973,65 @@ Dynamic configs for broker 1 are:
 </span><span class="lnt">54
 </span><span class="lnt">55
 </span><span class="lnt">56
-</span><span class="lnt">57
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看当前kafka版本
-$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092 --version
-2.5.0 (Commit:66563e712b0b9f84)
-
-# 查看集群所有节点的api版本
-$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092
-172.29.203.106:9092 (id: 2 rack: null) -&gt; (
-	Produce(0): 0 to 8 [usable: 8],
-	Fetch(1): 0 to 11 [usable: 11],
-	ListOffsets(2): 0 to 5 [usable: 5],
-	Metadata(3): 0 to 9 [usable: 9],
-	LeaderAndIsr(4): 0 to 4 [usable: 4],
-	StopReplica(5): 0 to 2 [usable: 2],
-	UpdateMetadata(6): 0 to 6 [usable: 6],
-	ControlledShutdown(7): 0 to 3 [usable: 3],
-	OffsetCommit(8): 0 to 8 [usable: 8],
-	OffsetFetch(9): 0 to 7 [usable: 7],
-	FindCoordinator(10): 0 to 3 [usable: 3],
-	JoinGroup(11): 0 to 7 [usable: 7],
-	Heartbeat(12): 0 to 4 [usable: 4],
-	LeaveGroup(13): 0 to 4 [usable: 4],
-	SyncGroup(14): 0 to 5 [usable: 5],
-	DescribeGroups(15): 0 to 5 [usable: 5],
-	ListGroups(16): 0 to 3 [usable: 3],
-	SaslHandshake(17): 0 to 1 [usable: 1],
-	ApiVersions(18): 0 to 3 [usable: 3],
-	CreateTopics(19): 0 to 5 [usable: 5],
-	DeleteTopics(20): 0 to 4 [usable: 4],
-	DeleteRecords(21): 0 to 1 [usable: 1],
-	InitProducerId(22): 0 to 3 [usable: 3],
-	OffsetForLeaderEpoch(23): 0 to 3 [usable: 3],
-	AddPartitionsToTxn(24): 0 to 1 [usable: 1],
-	AddOffsetsToTxn(25): 0 to 1 [usable: 1],
-	EndTxn(26): 0 to 1 [usable: 1],
-	WriteTxnMarkers(27): 0 [usable: 0],
-	TxnOffsetCommit(28): 0 to 3 [usable: 3],
-	DescribeAcls(29): 0 to 2 [usable: 2],
-	CreateAcls(30): 0 to 2 [usable: 2],
-	DeleteAcls(31): 0 to 2 [usable: 2],
-	DescribeConfigs(32): 0 to 2 [usable: 2],
-	AlterConfigs(33): 0 to 1 [usable: 1],
-	AlterReplicaLogDirs(34): 0 to 1 [usable: 1],
-	DescribeLogDirs(35): 0 to 1 [usable: 1],
-	SaslAuthenticate(36): 0 to 2 [usable: 2],
-	CreatePartitions(37): 0 to 2 [usable: 2],
-	CreateDelegationToken(38): 0 to 2 [usable: 2],
-	RenewDelegationToken(39): 0 to 2 [usable: 2],
-	ExpireDelegationToken(40): 0 to 2 [usable: 2],
-	DescribeDelegationToken(41): 0 to 2 [usable: 2],
-	DeleteGroups(42): 0 to 2 [usable: 2],
-	ElectLeaders(43): 0 to 2 [usable: 2],
-	IncrementalAlterConfigs(44): 0 to 1 [usable: 1],
-	AlterPartitionReassignments(45): 0 [usable: 0],
-	ListPartitionReassignments(46): 0 [usable: 0],
-	OffsetDelete(47): 0 [usable: 0]
-)
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 查看当前kafka版本
+</span></span><span class="line"><span class="cl">$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092 --version
+</span></span><span class="line"><span class="cl">2.5.0 (Commit:66563e712b0b9f84)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看集群所有节点的api版本
+</span></span><span class="line"><span class="cl">$ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092
+</span></span><span class="line"><span class="cl">172.29.203.106:9092 (id: 2 rack: null) -&gt; (
+</span></span><span class="line"><span class="cl">	Produce(0): 0 to 8 [usable: 8],
+</span></span><span class="line"><span class="cl">	Fetch(1): 0 to 11 [usable: 11],
+</span></span><span class="line"><span class="cl">	ListOffsets(2): 0 to 5 [usable: 5],
+</span></span><span class="line"><span class="cl">	Metadata(3): 0 to 9 [usable: 9],
+</span></span><span class="line"><span class="cl">	LeaderAndIsr(4): 0 to 4 [usable: 4],
+</span></span><span class="line"><span class="cl">	StopReplica(5): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	UpdateMetadata(6): 0 to 6 [usable: 6],
+</span></span><span class="line"><span class="cl">	ControlledShutdown(7): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	OffsetCommit(8): 0 to 8 [usable: 8],
+</span></span><span class="line"><span class="cl">	OffsetFetch(9): 0 to 7 [usable: 7],
+</span></span><span class="line"><span class="cl">	FindCoordinator(10): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	JoinGroup(11): 0 to 7 [usable: 7],
+</span></span><span class="line"><span class="cl">	Heartbeat(12): 0 to 4 [usable: 4],
+</span></span><span class="line"><span class="cl">	LeaveGroup(13): 0 to 4 [usable: 4],
+</span></span><span class="line"><span class="cl">	SyncGroup(14): 0 to 5 [usable: 5],
+</span></span><span class="line"><span class="cl">	DescribeGroups(15): 0 to 5 [usable: 5],
+</span></span><span class="line"><span class="cl">	ListGroups(16): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	SaslHandshake(17): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	ApiVersions(18): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	CreateTopics(19): 0 to 5 [usable: 5],
+</span></span><span class="line"><span class="cl">	DeleteTopics(20): 0 to 4 [usable: 4],
+</span></span><span class="line"><span class="cl">	DeleteRecords(21): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	InitProducerId(22): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	OffsetForLeaderEpoch(23): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	AddPartitionsToTxn(24): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	AddOffsetsToTxn(25): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	EndTxn(26): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	WriteTxnMarkers(27): 0 [usable: 0],
+</span></span><span class="line"><span class="cl">	TxnOffsetCommit(28): 0 to 3 [usable: 3],
+</span></span><span class="line"><span class="cl">	DescribeAcls(29): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	CreateAcls(30): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	DeleteAcls(31): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	DescribeConfigs(32): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	AlterConfigs(33): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	AlterReplicaLogDirs(34): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	DescribeLogDirs(35): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	SaslAuthenticate(36): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	CreatePartitions(37): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	CreateDelegationToken(38): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	RenewDelegationToken(39): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	ExpireDelegationToken(40): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	DescribeDelegationToken(41): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	DeleteGroups(42): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	ElectLeaders(43): 0 to 2 [usable: 2],
+</span></span><span class="line"><span class="cl">	IncrementalAlterConfigs(44): 0 to 1 [usable: 1],
+</span></span><span class="line"><span class="cl">	AlterPartitionReassignments(45): 0 [usable: 0],
+</span></span><span class="line"><span class="cl">	ListPartitionReassignments(46): 0 [usable: 0],
+</span></span><span class="line"><span class="cl">	OffsetDelete(47): 0 [usable: 0]
+</span></span><span class="line"><span class="cl">)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="17-生产者和消费者工具">1.7 生产者和消费者工具</h4>
 <ul>
@@ -2022,7 +2040,7 @@ $ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -2042,35 +2060,29 @@ $ sh kafka-broker-api-versions.sh --bootstrap-server 172.29.203.62:9092
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 指定topic从终端写入数据
-$ sh /opt/app/kafka/bin/kafka-console-producer.sh --bootstrap-server 172.29.203.62:9092 --topic test-push
-&gt;hello xxb
-&gt;BGBiao
-&gt;My website is https://bgbiao.top.
-&gt;And
-&gt;公众号: BGBiao
-
-
-# 指定消费者组对topic进行消费
-# --from-beginning表示从头开始消费
-# 因为开始生产者刚开始生产并生产topic，导致topic无leader会有警告信息
-# 可以看到client-id就是consumer-test-bgbiao-1,即consumer的前缀加消费组加数字后缀
-$ sh kafka-console-consumer.sh --bootstrap-server 172.29.203.62:9092 --topic push-test --group test-bgbiao
-[2020-05-31 19:52:13,472] WARN [Consumer clientId=consumer-test-bgbiao-1, groupId=test-bgbiao] Error while fetching metadata with correlation id 2 : {test-push=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
-hello xxb
-BGBiao
-My website is https://bgbiao.top.
-
-公众号: BGBiao
-
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-zed" data-lang="zed"><span class="line"><span class="cl"><span class="err">#</span><span class="w"> </span><span class="err">指定</span><span class="n">topic从终端写入数据</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">$</span><span class="w"> </span><span class="n">sh</span><span class="w"> </span><span class="o">/</span><span class="nn">opt/app/kafka/bin/</span><span class="n">kafka</span><span class="o">-</span><span class="n">console</span><span class="o">-</span><span class="n">producer</span><span class="p">.</span><span class="n">sh</span><span class="w"> </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">server</span><span class="w"> </span><span class="err">172</span><span class="p">.</span><span class="err">29</span><span class="p">.</span><span class="err">203</span><span class="p">.</span><span class="err">62</span><span class="o">:</span><span class="err">9092</span><span class="w"> </span><span class="o">--</span><span class="n">topic</span><span class="w"> </span><span class="n">test</span><span class="o">-</span><span class="n">push</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">&gt;</span><span class="n">hello</span><span class="w"> </span><span class="n">xxb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">&gt;</span><span class="n">BGBiao</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">&gt;</span><span class="n">My</span><span class="w"> </span><span class="n">website</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">https</span><span class="o">:</span><span class="c1">//bgbiao.top.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">&gt;</span><span class="n">And</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">&gt;</span><span class="err">公众号</span><span class="o">:</span><span class="w"> </span><span class="n">BGBiao</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">#</span><span class="w"> </span><span class="err">指定消费者组对</span><span class="n">topic进行消费</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">#</span><span class="w"> </span><span class="o">--</span><span class="n">from</span><span class="o">-</span><span class="n">beginning表示从头开始消费</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">#</span><span class="w"> </span><span class="err">因为开始生产者刚开始生产并生产</span><span class="n">topic</span><span class="err">，导致</span><span class="n">topic无leader会有警告信息</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">#</span><span class="w"> </span><span class="err">可以看到</span><span class="n">client</span><span class="o">-</span><span class="n">id就是consumer</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">bgbiao</span><span class="o">-</span><span class="err">1</span><span class="p">,</span><span class="err">即</span><span class="n">consumer的前缀加消费组加数字后缀</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">$</span><span class="w"> </span><span class="n">sh</span><span class="w"> </span><span class="n">kafka</span><span class="o">-</span><span class="n">console</span><span class="o">-</span><span class="n">consumer</span><span class="p">.</span><span class="n">sh</span><span class="w"> </span><span class="o">--</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">server</span><span class="w"> </span><span class="err">172</span><span class="p">.</span><span class="err">29</span><span class="p">.</span><span class="err">203</span><span class="p">.</span><span class="err">62</span><span class="o">:</span><span class="err">9092</span><span class="w"> </span><span class="o">--</span><span class="n">topic</span><span class="w"> </span><span class="n">push</span><span class="o">-</span><span class="n">test</span><span class="w"> </span><span class="o">--</span><span class="n">group</span><span class="w"> </span><span class="n">test</span><span class="o">-</span><span class="n">bgbiao</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">[</span><span class="err">2020</span><span class="o">-</span><span class="err">05</span><span class="o">-</span><span class="err">31</span><span class="w"> </span><span class="err">19</span><span class="o">:</span><span class="err">52</span><span class="o">:</span><span class="err">13</span><span class="p">,</span><span class="err">472</span><span class="p">]</span><span class="w"> </span><span class="n">WARN</span><span class="w"> </span><span class="p">[</span><span class="n">Consumer</span><span class="w"> </span><span class="n">clientId</span><span class="o">=</span><span class="n">consumer</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">bgbiao</span><span class="o">-</span><span class="err">1</span><span class="p">,</span><span class="w"> </span><span class="n">groupId</span><span class="o">=</span><span class="n">test</span><span class="o">-</span><span class="n">bgbiao</span><span class="p">]</span><span class="w"> </span><span class="n">Error</span><span class="w"> </span><span class="n">while</span><span class="w"> </span><span class="n">fetching</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">correlation</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="err">2</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="n">test</span><span class="o">-</span><span class="n">push</span><span class="o">=</span><span class="n">LEADER_NOT_AVAILABLE</span><span class="p">}</span><span class="w"> </span><span class="p">(</span><span class="n">org</span><span class="p">.</span><span class="n">apache</span><span class="p">.</span><span class="n">kafka</span><span class="p">.</span><span class="n">clients</span><span class="p">.</span><span class="n">NetworkClient</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">hello</span><span class="w"> </span><span class="n">xxb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">BGBiao</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">My</span><span class="w"> </span><span class="n">website</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">https</span><span class="o">:</span><span class="c1">//bgbiao.top.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="err">公众号</span><span class="o">:</span><span class="w"> </span><span class="n">BGBiao</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="18-kafka-consumer-groupssh">1.8 kafka-consumer-groups.sh</h4>
 <p>消费组管理工具，可以列出所有的消费组，查看消费组详情，删除消费组信息以及重置消费组的offset</p>
@@ -2127,7 +2139,7 @@ My website is https://bgbiao.top.
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -2164,42 +2176,42 @@ My website is https://bgbiao.top.
 </span><span class="lnt">35
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看全部的消费者组
-$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --all-grou  --list
-KMOffsetCache-daf27df49ede
-test-bgbiao
-
-# 查看消费者详情
-$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --describe
-
-GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
-test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
-test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
-test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
-
-# 查看消费组的成员
-$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --members --describe
-
-GROUP           CONSUMER-ID                                                 HOST            CLIENT-ID              #PARTITIONS
-test-bgbiao     consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1 3
-
-# 查看消费组状态
-$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --state --describe
-
-GROUP                     COORDINATOR (ID)          ASSIGNMENT-STRATEGY  STATE           #MEMBERS
-test-bgbiao               172.29.203.62:9092 (1)    range                Stable          1
-
-
-# 查看消费组的offset信息
-$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --offsets --describe
-GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
-test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
-test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
-test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
-test-bgbiao     test-full-push    2          61392           61430           38              -                                                           -               -
-test-bgbiao     test-full-push    1          61056           61088           32              -                                                           -               -
-test-bgbiao     test-full-push    0          61299           61337           38              -
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 查看全部的消费者组
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --all-grou  --list
+</span></span><span class="line"><span class="cl">KMOffsetCache-daf27df49ede
+</span></span><span class="line"><span class="cl">test-bgbiao
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看消费者详情
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --describe
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
+</span></span><span class="line"><span class="cl">test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+</span></span><span class="line"><span class="cl">test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+</span></span><span class="line"><span class="cl">test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看消费组的成员
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --members --describe
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP           CONSUMER-ID                                                 HOST            CLIENT-ID              #PARTITIONS
+</span></span><span class="line"><span class="cl">test-bgbiao     consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1 3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看消费组状态
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --state --describe
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">GROUP                     COORDINATOR (ID)          ASSIGNMENT-STRATEGY  STATE           #MEMBERS
+</span></span><span class="line"><span class="cl">test-bgbiao               172.29.203.62:9092 (1)    range                Stable          1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看消费组的offset信息
+</span></span><span class="line"><span class="cl">$ sh /opt/app/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 172.29.203.62:9092 --group test-bgbiao --offsets --describe
+</span></span><span class="line"><span class="cl">GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                 HOST            CLIENT-ID
+</span></span><span class="line"><span class="cl">test-bgbiao     test-push       0          1               1               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+</span></span><span class="line"><span class="cl">test-bgbiao     test-push       1          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+</span></span><span class="line"><span class="cl">test-bgbiao     test-push       2          2               2               0               consumer-test-bgbiao-1-a915f28c-3ee0-46ee-a8d8-6c93bddb7686 /172.29.203.62  consumer-test-bgbiao-1
+</span></span><span class="line"><span class="cl">test-bgbiao     test-full-push    2          61392           61430           38              -                                                           -               -
+</span></span><span class="line"><span class="cl">test-bgbiao     test-full-push    1          61056           61088           32              -                                                           -               -
+</span></span><span class="line"><span class="cl">test-bgbiao     test-full-push    0          61299           61337           38              -
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="2-kafka-manager">2. kafka-manager</h3>
 <h2 id="四集群监控">四、集群监控</h2>
@@ -2351,6 +2363,27 @@ test-bgbiao     test-full-push    0          61299           61337           38 
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

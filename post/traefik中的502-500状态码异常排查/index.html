@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Traefik中的502-500状态码异常排查 - BGBiao的SRE人生</title>
+  <title>Traefik中的502-500状态码异常排查 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/" />
@@ -68,15 +68,15 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/traefik%E4%B8%AD%E7%9A%84502-500%E7%8A%B6%E6%80%81%E7%A0%81%E5%BC%82%E5%B8%B8%E6%8E%92%E6%9F%A5/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-06-28T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-06-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="Traefik中的502-500状态码异常排查">
 <meta itemprop="description" content="
 我们都知道在Kubernetes集群中通常会使用Ingress方案来统一代理集群内部的流量，而常用的Ingress方案为traefik和nginx，和传统的Nginx作为企业内部的反向代理以及负载设备一样，在不同的场景下可能需要专有的配置才能满足需求，否则会出现奇奇怪怪的异常状态码。本篇文章一起来看下，我们在traefik中遇到的500和502异常。
-"><meta itemprop="datePublished" content="2020-06-28T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="4845">
+"><meta itemprop="datePublished" content="2020-06-28T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="4835">
 <meta itemprop="keywords" content="traefik,kubernetes,http,状态码异常," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Traefik中的502-500状态码异常排查"/>
 <meta name="twitter:description" content="
@@ -138,7 +138,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -177,22 +177,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -354,7 +372,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -395,22 +413,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -468,7 +512,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 4845 words </span>
+        <span class="more-meta"> 4835 words </span>
           <span class="more-meta"> 10 min read </span>
 
         
@@ -513,7 +557,7 @@ if (!doNotTrack) {
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -543,50 +587,46 @@ if (!doNotTrack) {
 </span><span class="lnt">28
 </span><span class="lnt">29
 </span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 499 的实际情况就是，客户端指定超时时间为N秒，但是该请求在服务端实际需要执行M秒(M&gt;N秒)，客户端等的不耐烦了就关闭了
-# 对于499状态来讲，解决方式是优化后端代码逻辑或者修改nginx参数
-$ cat nginx.conf
-proxy_ignore_client_abort    on;
-$ curl -i -m 3 http://127.0.0.1/hello.php
-
-
-# 502的实际情况通常是Nginx网关后端的服务器直接宕机了(所以就拿不到上游的响应了)
-# 当然也有可能是上游服务器真正的执行逻辑超过了上游服务器的超时时间限制(比如php-fpm.conf设置request_terminate_timeout5s，但是实际的业务逻辑需要7s才能完成)，此时上游服务器端出现`业务逻辑超时`，给Nginx网关返回了异常的数据造成的
-# 502时后端的几种错误日志
- recv() failed (104: Connection reset by peer) while reading response header from upstream
- upstream prematurely closed connection while reading response header from upstream
- connect() failed (111: Connection refused) while connecting to upstream
-# 整体来说502出现的问题通常是因为后端挂了，或者因为后端负载太高，暂时不可响应
-# 可以在nginx侧增加proxy_read_timeout来暂时缓解
-$ cat nginx.conf
-proxy_read_timeout  20s;
-
-# 504的实际情况就是客户端-&gt;Nginx-&gt;Backend，在过程中Nginx需要作为客户端访问Backend服务，但是在Backend还没用执行完成时，Nginx首先超过了自己的客户端超时时间，此时就会出现504的异常(但是对于客户端来说返回什么呢?)
-# 对于504场景而言，通常的做法就是优化Backend的逻辑，适当减少执行时间；另外也可以适当的增加Nginx作为客户端时的超时时间
-# 要知道，当Nginx作为客户端时，是以一个Proxy的角色存在的，配置如下参数即可
-$ cat nginx.conf
-uwsgi_connect_timeout 5;
-uwsgi_send_timeout 5;
-uwsgi_read_timeout 5;
-fastcgi_read_timeout 5;
-fastcgi_send_timeout 5;
-proxy_connect_timeout      90;
-proxy_send_timeout         90;
-proxy_read_timeout         90;
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 499 的实际情况就是，客户端指定超时时间为N秒，但是该请求在服务端实际需要执行M秒(M&gt;N秒)，客户端等的不耐烦了就关闭了
+</span></span><span class="line"><span class="cl"># 对于499状态来讲，解决方式是优化后端代码逻辑或者修改nginx参数
+</span></span><span class="line"><span class="cl">$ cat nginx.conf
+</span></span><span class="line"><span class="cl">proxy_ignore_client_abort    on;
+</span></span><span class="line"><span class="cl">$ curl -i -m 3 http://127.0.0.1/hello.php
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 502的实际情况通常是Nginx网关后端的服务器直接宕机了(所以就拿不到上游的响应了)
+</span></span><span class="line"><span class="cl"># 当然也有可能是上游服务器真正的执行逻辑超过了上游服务器的超时时间限制(比如php-fpm.conf设置request_terminate_timeout5s，但是实际的业务逻辑需要7s才能完成)，此时上游服务器端出现`业务逻辑超时`，给Nginx网关返回了异常的数据造成的
+</span></span><span class="line"><span class="cl"># 502时后端的几种错误日志
+</span></span><span class="line"><span class="cl"> recv() failed (104: Connection reset by peer) while reading response header from upstream
+</span></span><span class="line"><span class="cl"> upstream prematurely closed connection while reading response header from upstream
+</span></span><span class="line"><span class="cl"> connect() failed (111: Connection refused) while connecting to upstream
+</span></span><span class="line"><span class="cl"># 整体来说502出现的问题通常是因为后端挂了，或者因为后端负载太高，暂时不可响应
+</span></span><span class="line"><span class="cl"># 可以在nginx侧增加proxy_read_timeout来暂时缓解
+</span></span><span class="line"><span class="cl">$ cat nginx.conf
+</span></span><span class="line"><span class="cl">proxy_read_timeout  20s;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 504的实际情况就是客户端-&gt;Nginx-&gt;Backend，在过程中Nginx需要作为客户端访问Backend服务，但是在Backend还没用执行完成时，Nginx首先超过了自己的客户端超时时间，此时就会出现504的异常(但是对于客户端来说返回什么呢?)
+</span></span><span class="line"><span class="cl"># 对于504场景而言，通常的做法就是优化Backend的逻辑，适当减少执行时间；另外也可以适当的增加Nginx作为客户端时的超时时间
+</span></span><span class="line"><span class="cl"># 要知道，当Nginx作为客户端时，是以一个Proxy的角色存在的，配置如下参数即可
+</span></span><span class="line"><span class="cl">$ cat nginx.conf
+</span></span><span class="line"><span class="cl">uwsgi_connect_timeout 5;
+</span></span><span class="line"><span class="cl">uwsgi_send_timeout 5;
+</span></span><span class="line"><span class="cl">uwsgi_read_timeout 5;
+</span></span><span class="line"><span class="cl">fastcgi_read_timeout 5;
+</span></span><span class="line"><span class="cl">fastcgi_send_timeout 5;
+</span></span><span class="line"><span class="cl">proxy_connect_timeout      90;
+</span></span><span class="line"><span class="cl">proxy_send_timeout         90;
+</span></span><span class="line"><span class="cl">proxy_read_timeout         90;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="二traefik中诡异的500和502">二、traefik中诡异的500和502</h3>
 <h4 id="traefik在kubernetes集群中的部署配置">traefik在Kubernetes集群中的部署配置</h4>
 <p>我们当前集群的traefik的配置如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">  1
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -703,135 +743,131 @@ proxy_read_timeout         90;
 </span><span class="lnt">115
 </span><span class="lnt">116
 </span><span class="lnt">117
-</span><span class="lnt">118
-</span><span class="lnt">119
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># traefik的configmap配置文件
-$ cat traefik-config.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: traefik-config
-  namespace: kube-system
-data:
-  traefik.toml: |
-    defaultEntryPoints = [&#34;http&#34;,&#34;https&#34;]
-    debug = false
-    logLevel = &#34;INFO&#34;
-
-    InsecureSkipVerify = true
-    [entryPoints]
-      [entryPoints.http]
-      address = &#34;:80&#34;
-      compress = true
-      [entryPoints.https]
-      address = &#34;:443&#34;
-        [entryPoints.https.tls]
-    [web]
-      address = &#34;:8080&#34;
-    [kubernetes]
-    [metrics]
-      [metrics.prometheus]
-      buckets=[0.1,0.3,1.2,5.0]
-      entryPoint = &#34;traefik&#34;
-    [ping]
-    entryPoint = &#34;http&#34;
-
-# traefik的DaemonSet配置
-$ cat traefik-ds-v1.7.16.yaml
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: traefik-ingress-controller
-  namespace: kube-system
----
-kind: DaemonSet
-apiVersion: extensions/v1beta1
-metadata:
-  name: traefik-ingress-controller
-  namespace: kube-system
-  labels:
-    k8s-app: traefik-ingress-lb
-spec:
-  template:
-    metadata:
-      labels:
-        k8s-app: traefik-ingress-lb
-        name: traefik-ingress-lb
-    spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/master
-                operator: DoesNotExist
-      serviceAccountName: traefik-ingress-controller
-      terminationGracePeriodSeconds: 30
-      hostNetwork: true
-      containers:
-      - image: traefik:v1.7.16
-        name: traefik-ingress-lb
-        ports:
-        - name: http
-          containerPort: 80
-          hostPort: 80
-        - name: admin
-          containerPort: 8080
-        securityContext:
-          capabilities:
-            drop:
-            - ALL
-            add:
-            - NET_BIND_SERVICE
-        args:
-        - --api
-        - --kubernetes
-        - --logLevel=INFO
-        - --traefikLog.filePath=/logdata/traefik.log
-        - --configfile=/config/traefik.toml
-        - --accesslog.filepath=/logdata/access.log
-        - --accesslog.bufferingsize=100
-        volumeMounts:
-        - mountPath: /config
-          name: config
-        - mountPath: /logdata
-          name: access-log
-      volumes:
-      - configMap:
-          name: traefik-config
-        name: config
-      - name: access-log
-        hostPath:
-          path: /opt/logs/ingress/
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: traefik-ingress-service
-  namespace: kube-system
-  labels:
-    k8s-app: traefik-ingress-lb
-spec:
-  selector:
-    k8s-app: traefik-ingress-lb
-  ports:
-    - protocol: TCP
-      port: 80
-      name: web
-    - protocol: TCP
-      port: 8080
-      name: admin
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># traefik的configmap配置文件
+</span></span><span class="line"><span class="cl">$ cat traefik-config.yaml
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ConfigMap
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: traefik-config
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">data:
+</span></span><span class="line"><span class="cl">  traefik.toml: |
+</span></span><span class="line"><span class="cl">    defaultEntryPoints = [&#34;http&#34;,&#34;https&#34;]
+</span></span><span class="line"><span class="cl">    debug = false
+</span></span><span class="line"><span class="cl">    logLevel = &#34;INFO&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    InsecureSkipVerify = true
+</span></span><span class="line"><span class="cl">    [entryPoints]
+</span></span><span class="line"><span class="cl">      [entryPoints.http]
+</span></span><span class="line"><span class="cl">      address = &#34;:80&#34;
+</span></span><span class="line"><span class="cl">      compress = true
+</span></span><span class="line"><span class="cl">      [entryPoints.https]
+</span></span><span class="line"><span class="cl">      address = &#34;:443&#34;
+</span></span><span class="line"><span class="cl">        [entryPoints.https.tls]
+</span></span><span class="line"><span class="cl">    [web]
+</span></span><span class="line"><span class="cl">      address = &#34;:8080&#34;
+</span></span><span class="line"><span class="cl">    [kubernetes]
+</span></span><span class="line"><span class="cl">    [metrics]
+</span></span><span class="line"><span class="cl">      [metrics.prometheus]
+</span></span><span class="line"><span class="cl">      buckets=[0.1,0.3,1.2,5.0]
+</span></span><span class="line"><span class="cl">      entryPoint = &#34;traefik&#34;
+</span></span><span class="line"><span class="cl">    [ping]
+</span></span><span class="line"><span class="cl">    entryPoint = &#34;http&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># traefik的DaemonSet配置
+</span></span><span class="line"><span class="cl">$ cat traefik-ds-v1.7.16.yaml
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">kind: ServiceAccount
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: traefik-ingress-controller
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">kind: DaemonSet
+</span></span><span class="line"><span class="cl">apiVersion: extensions/v1beta1
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: traefik-ingress-controller
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  template:
+</span></span><span class="line"><span class="cl">    metadata:
+</span></span><span class="line"><span class="cl">      labels:
+</span></span><span class="line"><span class="cl">        k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">        name: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">    spec:
+</span></span><span class="line"><span class="cl">      affinity:
+</span></span><span class="line"><span class="cl">        nodeAffinity:
+</span></span><span class="line"><span class="cl">          requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span class="line"><span class="cl">            nodeSelectorTerms:
+</span></span><span class="line"><span class="cl">            - matchExpressions:
+</span></span><span class="line"><span class="cl">              - key: node-role.kubernetes.io/master
+</span></span><span class="line"><span class="cl">                operator: DoesNotExist
+</span></span><span class="line"><span class="cl">      serviceAccountName: traefik-ingress-controller
+</span></span><span class="line"><span class="cl">      terminationGracePeriodSeconds: 30
+</span></span><span class="line"><span class="cl">      hostNetwork: true
+</span></span><span class="line"><span class="cl">      containers:
+</span></span><span class="line"><span class="cl">      - image: traefik:v1.7.16
+</span></span><span class="line"><span class="cl">        name: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">        ports:
+</span></span><span class="line"><span class="cl">        - name: http
+</span></span><span class="line"><span class="cl">          containerPort: 80
+</span></span><span class="line"><span class="cl">          hostPort: 80
+</span></span><span class="line"><span class="cl">        - name: admin
+</span></span><span class="line"><span class="cl">          containerPort: 8080
+</span></span><span class="line"><span class="cl">        securityContext:
+</span></span><span class="line"><span class="cl">          capabilities:
+</span></span><span class="line"><span class="cl">            drop:
+</span></span><span class="line"><span class="cl">            - ALL
+</span></span><span class="line"><span class="cl">            add:
+</span></span><span class="line"><span class="cl">            - NET_BIND_SERVICE
+</span></span><span class="line"><span class="cl">        args:
+</span></span><span class="line"><span class="cl">        - --api
+</span></span><span class="line"><span class="cl">        - --kubernetes
+</span></span><span class="line"><span class="cl">        - --logLevel=INFO
+</span></span><span class="line"><span class="cl">        - --traefikLog.filePath=/logdata/traefik.log
+</span></span><span class="line"><span class="cl">        - --configfile=/config/traefik.toml
+</span></span><span class="line"><span class="cl">        - --accesslog.filepath=/logdata/access.log
+</span></span><span class="line"><span class="cl">        - --accesslog.bufferingsize=100
+</span></span><span class="line"><span class="cl">        volumeMounts:
+</span></span><span class="line"><span class="cl">        - mountPath: /config
+</span></span><span class="line"><span class="cl">          name: config
+</span></span><span class="line"><span class="cl">        - mountPath: /logdata
+</span></span><span class="line"><span class="cl">          name: access-log
+</span></span><span class="line"><span class="cl">      volumes:
+</span></span><span class="line"><span class="cl">      - configMap:
+</span></span><span class="line"><span class="cl">          name: traefik-config
+</span></span><span class="line"><span class="cl">        name: config
+</span></span><span class="line"><span class="cl">      - name: access-log
+</span></span><span class="line"><span class="cl">        hostPath:
+</span></span><span class="line"><span class="cl">          path: /opt/logs/ingress/
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">kind: Service
+</span></span><span class="line"><span class="cl">apiVersion: v1
+</span></span><span class="line"><span class="cl">metadata:
+</span></span><span class="line"><span class="cl">  name: traefik-ingress-service
+</span></span><span class="line"><span class="cl">  namespace: kube-system
+</span></span><span class="line"><span class="cl">  labels:
+</span></span><span class="line"><span class="cl">    k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  selector:
+</span></span><span class="line"><span class="cl">    k8s-app: traefik-ingress-lb
+</span></span><span class="line"><span class="cl">  ports:
+</span></span><span class="line"><span class="cl">    - protocol: TCP
+</span></span><span class="line"><span class="cl">      port: 80
+</span></span><span class="line"><span class="cl">      name: web
+</span></span><span class="line"><span class="cl">    - protocol: TCP
+</span></span><span class="line"><span class="cl">      port: 8080
+</span></span><span class="line"><span class="cl">      name: admin
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="python的对外api接口">Python的对外API接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -856,42 +892,40 @@ spec:
 </span><span class="lnt">23
 </span><span class="lnt">24
 </span><span class="lnt">25
-</span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 接口对外的ingress
-$ kubectl  get ingress -n s-data
-NAME                     HOSTS                    ADDRESS   PORTS   AGE
-data-api.bgbiao.cn   data-api.bgbiao.cn             80      236d
-ops.bgbiao.cn       ops.bgbiao.cn                 80      236d
-
-# 测试对外接口
-$ curl data-api.bgbiao.cn  -i
-HTTP/1.1 401 Unauthorized
-Access-Control-Allow-Headers: Content-Type, X-TOKEN
-Access-Control-Allow-Origin: *
-Content-Length: 58
-Content-Type: application/json
-Vary: Accept-Encoding
-Date: Sun, 28 Jun 2020 14:55:00 GMT
-
-# 接口需要登录，那么我们对登录接口进行压测来模拟问题
-$ curl -X POST  --data &#39;@/root/login.json&#39; -H &#39;Content-type:application/json&#39; http://data-api.bgbiao.cn/account/users/login/   -i
-HTTP/1.1 200 OK
-Access-Control-Allow-Headers: Content-Type, X-TOKEN
-Access-Control-Allow-Origin: *
-Content-Length: 250
-Content-Type: application/json
-Vary: Accept-Encoding
-Date: Sun, 28 Jun 2020 14:56:33 GMT
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 接口对外的ingress
+</span></span><span class="line"><span class="cl">$ kubectl  get ingress -n s-data
+</span></span><span class="line"><span class="cl">NAME                     HOSTS                    ADDRESS   PORTS   AGE
+</span></span><span class="line"><span class="cl">data-api.bgbiao.cn   data-api.bgbiao.cn             80      236d
+</span></span><span class="line"><span class="cl">ops.bgbiao.cn       ops.bgbiao.cn                 80      236d
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 测试对外接口
+</span></span><span class="line"><span class="cl">$ curl data-api.bgbiao.cn  -i
+</span></span><span class="line"><span class="cl">HTTP/1.1 401 Unauthorized
+</span></span><span class="line"><span class="cl">Access-Control-Allow-Headers: Content-Type, X-TOKEN
+</span></span><span class="line"><span class="cl">Access-Control-Allow-Origin: *
+</span></span><span class="line"><span class="cl">Content-Length: 58
+</span></span><span class="line"><span class="cl">Content-Type: application/json
+</span></span><span class="line"><span class="cl">Vary: Accept-Encoding
+</span></span><span class="line"><span class="cl">Date: Sun, 28 Jun 2020 14:55:00 GMT
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 接口需要登录，那么我们对登录接口进行压测来模拟问题
+</span></span><span class="line"><span class="cl">$ curl -X POST  --data &#39;@/root/login.json&#39; -H &#39;Content-type:application/json&#39; http://data-api.bgbiao.cn/account/users/login/   -i
+</span></span><span class="line"><span class="cl">HTTP/1.1 200 OK
+</span></span><span class="line"><span class="cl">Access-Control-Allow-Headers: Content-Type, X-TOKEN
+</span></span><span class="line"><span class="cl">Access-Control-Allow-Origin: *
+</span></span><span class="line"><span class="cl">Content-Length: 250
+</span></span><span class="line"><span class="cl">Content-Type: application/json
+</span></span><span class="line"><span class="cl">Vary: Accept-Encoding
+</span></span><span class="line"><span class="cl">Date: Sun, 28 Jun 2020 14:56:33 GMT
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="诡异的500和502">诡异的500和502</h4>
 <p>在服务部署完成后，一切皆正常，但是简单压测后发现服务出现部分请求失败。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -952,74 +986,70 @@ Date: Sun, 28 Jun 2020 14:56:33 GMT
 </span><span class="lnt">59
 </span><span class="lnt">60
 </span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 使用ab工具进行压测
-# 由压测结果可以发现，20个并发共压测200个请求，期间出现了7次失败请求
-$ ab -c 20 -n 200   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
-...
-Benchmarking data-api.bgbiao.cn (be patient)
-Completed 100 requests
-Completed 200 requests
-Finished 200 requests
-
-
-Server Software:
-Server Hostname:        data-api.bgbiao.cn
-Server Port:            80
-
-Document Path:          /account/users/login/
-Document Length:        250 bytes
-
-Concurrency Level:      20
-Time taken for tests:   1.340 seconds
-Complete requests:      200
-Failed requests:        7
-   (Connect: 0, Receive: 0, Length: 7, Exceptions: 0)
-Write errors:           0
-Non-2xx responses:      7
-Total transferred:      91371 bytes
-Total body sent:        46400
-HTML transferred:       48387 bytes
-Requests per second:    149.21 [#/sec] (mean)
-Time per request:       134.035 [ms] (mean)
-Time per request:       6.702 [ms] (mean, across all concurrent requests)
-Transfer rate:          66.57 [Kbytes/sec] received
-                        33.81 kb/s sent
-                        100.38 kb/s total
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        1    1   0.1      1       1
-Processing:     2  116  27.8    114     179
-Waiting:        2  116  27.8    114     179
-Total:          3  117  27.8    116     180
-
-Percentage of the requests served within a certain time (ms)
-  50%    116
-  66%    121
-  75%    125
-  80%    129
-  90%    154
-  95%    167
-  98%    173
-  99%    175
- 100%    180 (longest request)
-
-
-# 将压测结果保存到文本中进行简单分析
-# 简单分析在200个压测请求中，有4个请求失败，分别为2次500错误和2次502错误
-$ ab -v 10 -c 20 -n 200   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/  &gt; ab-log.txt
-$ cat ab-log.txt | grep HTTP | sort| uniq -c
-    196 HTTP/1.0 200 OK
-      2 HTTP/1.0 500 Internal Server Error
-      2 HTTP/1.0 502 Bad Gateway
-      1 POST /account/users/login/ HTTP/1.0
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 使用ab工具进行压测
+</span></span><span class="line"><span class="cl"># 由压测结果可以发现，20个并发共压测200个请求，期间出现了7次失败请求
+</span></span><span class="line"><span class="cl">$ ab -c 20 -n 200   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">Benchmarking data-api.bgbiao.cn (be patient)
+</span></span><span class="line"><span class="cl">Completed 100 requests
+</span></span><span class="line"><span class="cl">Completed 200 requests
+</span></span><span class="line"><span class="cl">Finished 200 requests
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Server Software:
+</span></span><span class="line"><span class="cl">Server Hostname:        data-api.bgbiao.cn
+</span></span><span class="line"><span class="cl">Server Port:            80
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Document Path:          /account/users/login/
+</span></span><span class="line"><span class="cl">Document Length:        250 bytes
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Concurrency Level:      20
+</span></span><span class="line"><span class="cl">Time taken for tests:   1.340 seconds
+</span></span><span class="line"><span class="cl">Complete requests:      200
+</span></span><span class="line"><span class="cl">Failed requests:        7
+</span></span><span class="line"><span class="cl">   (Connect: 0, Receive: 0, Length: 7, Exceptions: 0)
+</span></span><span class="line"><span class="cl">Write errors:           0
+</span></span><span class="line"><span class="cl">Non-2xx responses:      7
+</span></span><span class="line"><span class="cl">Total transferred:      91371 bytes
+</span></span><span class="line"><span class="cl">Total body sent:        46400
+</span></span><span class="line"><span class="cl">HTML transferred:       48387 bytes
+</span></span><span class="line"><span class="cl">Requests per second:    149.21 [#/sec] (mean)
+</span></span><span class="line"><span class="cl">Time per request:       134.035 [ms] (mean)
+</span></span><span class="line"><span class="cl">Time per request:       6.702 [ms] (mean, across all concurrent requests)
+</span></span><span class="line"><span class="cl">Transfer rate:          66.57 [Kbytes/sec] received
+</span></span><span class="line"><span class="cl">                        33.81 kb/s sent
+</span></span><span class="line"><span class="cl">                        100.38 kb/s total
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Connection Times (ms)
+</span></span><span class="line"><span class="cl">              min  mean[+/-sd] median   max
+</span></span><span class="line"><span class="cl">Connect:        1    1   0.1      1       1
+</span></span><span class="line"><span class="cl">Processing:     2  116  27.8    114     179
+</span></span><span class="line"><span class="cl">Waiting:        2  116  27.8    114     179
+</span></span><span class="line"><span class="cl">Total:          3  117  27.8    116     180
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Percentage of the requests served within a certain time (ms)
+</span></span><span class="line"><span class="cl">  50%    116
+</span></span><span class="line"><span class="cl">  66%    121
+</span></span><span class="line"><span class="cl">  75%    125
+</span></span><span class="line"><span class="cl">  80%    129
+</span></span><span class="line"><span class="cl">  90%    154
+</span></span><span class="line"><span class="cl">  95%    167
+</span></span><span class="line"><span class="cl">  98%    173
+</span></span><span class="line"><span class="cl">  99%    175
+</span></span><span class="line"><span class="cl"> 100%    180 (longest request)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 将压测结果保存到文本中进行简单分析
+</span></span><span class="line"><span class="cl"># 简单分析在200个压测请求中，有4个请求失败，分别为2次500错误和2次502错误
+</span></span><span class="line"><span class="cl">$ ab -v 10 -c 20 -n 200   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/  &gt; ab-log.txt
+</span></span><span class="line"><span class="cl">$ cat ab-log.txt | grep HTTP | sort| uniq -c
+</span></span><span class="line"><span class="cl">    196 HTTP/1.0 200 OK
+</span></span><span class="line"><span class="cl">      2 HTTP/1.0 500 Internal Server Error
+</span></span><span class="line"><span class="cl">      2 HTTP/1.0 502 Bad Gateway
+</span></span><span class="line"><span class="cl">      1 POST /account/users/login/ HTTP/1.0
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="traefik中500和502问题排查">traefik中500和502问题排查</h4>
 <p>前面我们提到了在Nginx的场景中的500和502状态码的原因以及相关的解决方式，那么在Kubernetes集群中，traefik起到的作用和Nginx的作用也是相似的。</p>
@@ -1027,7 +1057,7 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 <p>对于上面的压测请求，我们在访问日志里抓到了如下的异常日志:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1039,23 +1069,21 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ tail -f access.log | grep data-api.bgbiao.cn | grep -v &#39;HTTP/1.0&#34; 200&#39;
-192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267376 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
-192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267385 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
-192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267410 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
-192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267418 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
-192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267484 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
-192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267518 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
-192.168.0.23 - - [28/Jun/2020:14:57:39 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267550 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 4ms
-192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272696 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 2ms
-192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272711 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
-192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272836 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 0ms
-192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272837 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ tail -f access.log | grep data-api.bgbiao.cn | grep -v &#39;HTTP/1.0&#34; 200&#39;
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267376 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267385 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267410 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267418 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267484 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:38 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267518 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 1ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:14:57:39 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122267550 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 4ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272696 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 2ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 502 11 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272711 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 1ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272836 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.26.9:8080&#34; 0ms
+</span></span><span class="line"><span class="cl">192.168.0.23 - - [28/Jun/2020:15:02:06 +0000] &#34;POST /account/users/login/ HTTP/1.0&#34; 500 21 &#34;-&#34; &#34;ApacheBench/2.3&#34; 122272837 &#34;data-api.bgbiao.cn/&#34; &#34;http://20.0.41.8:8080&#34; 0ms
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>可以看到，和我们压测结果里失败请求的状态码相同，都是<code>500</code>和<code>502</code>，虽然数量上不止4个，但这暂时不太重要。</p>
 <p>通常对于大多数人来讲，在代理层看到500或者502都会下意识的想，肯定是上游服务的问题，不过这种猜测也能很快进行排除，排除的方法基本如下:</p>
@@ -1068,48 +1096,44 @@ $ cat ab-log.txt | grep HTTP | sort| uniq -c
 <p>修改traefki中的日志级别为<code>DEBUG</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ cat traefik-ds-v1.7.6.yaml
-....
-        args:
-        - --api
-        - --kubernetes
-        - --logLevel=DEBUG
-....
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ cat traefik-ds-v1.7.6.yaml
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">        args:
+</span></span><span class="line"><span class="cl">        - --api
+</span></span><span class="line"><span class="cl">        - --kubernetes
+</span></span><span class="line"><span class="cl">        - --logLevel=DEBUG
+</span></span><span class="line"><span class="cl">....
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>然后在日志中看到如下相关信息:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 500相关的日志
-time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;&#39;500 Internal Server Error&#39; caused by: http: server closed idle connection&#34;
-time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 500, Length: 21, duration: 1.486276ms&#34;
-
-# 502相关的日志
-time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;&#39;502 Bad Gateway&#39; caused by: EOF&#34;
-time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 502, Length: 11, duration: 1.530677ms&#34;
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 500相关的日志
+</span></span><span class="line"><span class="cl">time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;&#39;500 Internal Server Error&#39; caused by: http: server closed idle connection&#34;
+</span></span><span class="line"><span class="cl">time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 500, Length: 21, duration: 1.486276ms&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 502相关的日志
+</span></span><span class="line"><span class="cl">time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;&#39;502 Bad Gateway&#39; caused by: EOF&#34;
+</span></span><span class="line"><span class="cl">time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/http: Round trip: http://20.0.26.9:8080, code: 502, Length: 11, duration: 1.530677ms&#34;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>上面的500信息，大概可以看出来是traefik的服务进程主动关闭了空闲链接导致的，而下面的502是因为EOF，感觉像是没有读取完响应数据，就被断开了，导致traefik返回502。通常这种情况在Nginx中很常见，也很容易调整相关的配置参数(文章开始有提到)，但是traefik的部署模式以及参数调整，还是需要花心思去看相关文档的。</p>
 <p>然后在github上去翻traefik相关的issues，发现该问题曾经出现过很多次。</p>
@@ -1122,7 +1146,7 @@ time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/htt
 <p>在上面第一个issue中提到，traefik在http的反向代理功能中默认开启了http的keep-alive功能，但是python的应用中未开启http的keep-alive，因为我们上面的测试程序其实也是使用的python开发的，先对该参数进行调整。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1176,65 +1200,65 @@ time=&#34;2020-06-28T15:35:05Z&#34; level=debug msg=&#34;vulcand/oxy/forward/htt
 </span><span class="lnt">52
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 在uwsgi.ini中增加keep-alive参数即可
-$ cat uwsgi.ini
-[uwsgi]
-http = 0.0.0.0:8080
-http-keepalive = 1
-chdir = /opt/app/
-wsgi-file = /opt/app/main.py
-callable = app
-stats = 0.0.0.0:8081
-processes = 2
-threads = 10
-
-# 重启应用后，再次进行压测
-# 之前出现的502和500错误基本都消失了
-# 并发200，共1万个请求，失败的请求数为0，总耗时1min(qps才到160😸)
-$ ab  -c 200 -n 10000   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
-....
-....
-
-Concurrency Level:      200
-Time taken for tests:   59.323 seconds
-Complete requests:      10000
-Failed requests:        0
-Write errors:           0
-Total transferred:      4670000 bytes
-Total body sent:        2320000
-HTML transferred:       2500000 bytes
-Requests per second:    168.57 [#/sec] (mean)
-Time per request:       1186.454 [ms] (mean)
-Time per request:       5.932 [ms] (mean, across all concurrent requests)
-Transfer rate:          76.88 [Kbytes/sec] received
-                        38.19 kb/s sent
-                        115.07 kb/s total
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        1    3  38.6      1    1035
-Processing:   101  942 1457.7    857   32684
-Waiting:      101  942 1457.7    857   32684
-Total:        102  945 1458.0    861   32685
-
-# p99达到7.3s
-Percentage of the requests served within a certain time (ms)
-  50%    861
-  66%   1033
-  75%   1136
-  80%   1191
-  90%   1886
-  95%   2281
-  98%   4209
-  99%   7399
- 100%  32685 (longest request)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 在uwsgi.ini中增加keep-alive参数即可
+</span></span><span class="line"><span class="cl">$ cat uwsgi.ini
+</span></span><span class="line"><span class="cl">[uwsgi]
+</span></span><span class="line"><span class="cl">http = 0.0.0.0:8080
+</span></span><span class="line"><span class="cl">http-keepalive = 1
+</span></span><span class="line"><span class="cl">chdir = /opt/app/
+</span></span><span class="line"><span class="cl">wsgi-file = /opt/app/main.py
+</span></span><span class="line"><span class="cl">callable = app
+</span></span><span class="line"><span class="cl">stats = 0.0.0.0:8081
+</span></span><span class="line"><span class="cl">processes = 2
+</span></span><span class="line"><span class="cl">threads = 10
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 重启应用后，再次进行压测
+</span></span><span class="line"><span class="cl"># 之前出现的502和500错误基本都消失了
+</span></span><span class="line"><span class="cl"># 并发200，共1万个请求，失败的请求数为0，总耗时1min(qps才到160😸)
+</span></span><span class="line"><span class="cl">$ ab  -c 200 -n 10000   -T &#39;application/json&#39; -p /root/login.json http://data-api.bgbiao.cn/account/users/login/
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Concurrency Level:      200
+</span></span><span class="line"><span class="cl">Time taken for tests:   59.323 seconds
+</span></span><span class="line"><span class="cl">Complete requests:      10000
+</span></span><span class="line"><span class="cl">Failed requests:        0
+</span></span><span class="line"><span class="cl">Write errors:           0
+</span></span><span class="line"><span class="cl">Total transferred:      4670000 bytes
+</span></span><span class="line"><span class="cl">Total body sent:        2320000
+</span></span><span class="line"><span class="cl">HTML transferred:       2500000 bytes
+</span></span><span class="line"><span class="cl">Requests per second:    168.57 [#/sec] (mean)
+</span></span><span class="line"><span class="cl">Time per request:       1186.454 [ms] (mean)
+</span></span><span class="line"><span class="cl">Time per request:       5.932 [ms] (mean, across all concurrent requests)
+</span></span><span class="line"><span class="cl">Transfer rate:          76.88 [Kbytes/sec] received
+</span></span><span class="line"><span class="cl">                        38.19 kb/s sent
+</span></span><span class="line"><span class="cl">                        115.07 kb/s total
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Connection Times (ms)
+</span></span><span class="line"><span class="cl">              min  mean[+/-sd] median   max
+</span></span><span class="line"><span class="cl">Connect:        1    3  38.6      1    1035
+</span></span><span class="line"><span class="cl">Processing:   101  942 1457.7    857   32684
+</span></span><span class="line"><span class="cl">Waiting:      101  942 1457.7    857   32684
+</span></span><span class="line"><span class="cl">Total:        102  945 1458.0    861   32685
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># p99达到7.3s
+</span></span><span class="line"><span class="cl">Percentage of the requests served within a certain time (ms)
+</span></span><span class="line"><span class="cl">  50%    861
+</span></span><span class="line"><span class="cl">  66%   1033
+</span></span><span class="line"><span class="cl">  75%   1136
+</span></span><span class="line"><span class="cl">  80%   1191
+</span></span><span class="line"><span class="cl">  90%   1886
+</span></span><span class="line"><span class="cl">  95%   2281
+</span></span><span class="line"><span class="cl">  98%   4209
+</span></span><span class="line"><span class="cl">  99%   7399
+</span></span><span class="line"><span class="cl"> 100%  32685 (longest request)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>通过对业务层的http的keep-alive参数的开启，来暂时解决了500和502的问题，那能否通过traefik层的参数来优化该问题呢，上面第二个issue中其实也提到了。</p>
 <p>即，通过修改traefik的如下几个参数，并重新部署整个traefik集群即可:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1264,40 +1288,40 @@ Percentage of the requests served within a certain time (ms)
 </span><span class="lnt">28
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 关闭traefik的keep-alive参数，参数默认为200，如果参数为0，则使用go标准库中的DefaultMaxIdleConnsPerHost参数
-# keep-alive主要是用来复用链接来减少open files的，但是对于大量的短连接来将这种链接复用就可能出现上述情况
---maxidleconnsperhost=-1 
-# 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间,默认是0次
---retry.attempts=10
-# 该参数已经替换为--respondingtimeouts.idletimeout参数了，默认为3m0s
---idletimeout=60s
-# 默认是0s
---forwardingtimeouts.responseheadertimeout=60s
-
-# traefik 空闲链接超时
-$ ./traefik --help | grep idletimeout
-    --idletimeout                                 (Deprecated) maximum amount of time an idle (keep-alive) connection will remain  (default &#34;0s&#34;)
-    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &#34;3m0s&#34;)
-
-# 响应超时相关参数
- $ ./traefik --help | grep respondingtimeouts
-    --respondingtimeouts                          Timeouts for incoming requests to the Traefik instance                           (default &#34;true&#34;)
-    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &#34;3m0s&#34;)
-    --respondingtimeouts.readtimeout              ReadTimeout is the maximum duration for reading the entire request, including    (default &#34;0s&#34;)
-    --respondingtimeouts.writetimeout             WriteTimeout is the maximum duration before timing out writes of the response.   (default &#34;0s&#34;)
-
-
-# 转发的超时
-$ ./traefik --help | grep forwardingtimeouts
-    --forwardingtimeouts                          Timeouts for requests forwarded to the backend servers                           (default &#34;true&#34;)
-    --forwardingtimeouts.dialtimeout              The amount of time to wait until a connection to a backend server can be         (default &#34;30s&#34;)
-    --forwardingtimeouts.responseheadertimeout    The amount of time to wait for a server&#39;s response headers after fully writing   (default &#34;0s&#34;)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 关闭traefik的keep-alive参数，参数默认为200，如果参数为0，则使用go标准库中的DefaultMaxIdleConnsPerHost参数
+</span></span><span class="line"><span class="cl"># keep-alive主要是用来复用链接来减少open files的，但是对于大量的短连接来将这种链接复用就可能出现上述情况
+</span></span><span class="line"><span class="cl">--maxidleconnsperhost=-1 
+</span></span><span class="line"><span class="cl"># 即通过设置重试次数，增加空闲链接的超时时间，增加转发响应的超时时间,默认是0次
+</span></span><span class="line"><span class="cl">--retry.attempts=10
+</span></span><span class="line"><span class="cl"># 该参数已经替换为--respondingtimeouts.idletimeout参数了，默认为3m0s
+</span></span><span class="line"><span class="cl">--idletimeout=60s
+</span></span><span class="line"><span class="cl"># 默认是0s
+</span></span><span class="line"><span class="cl">--forwardingtimeouts.responseheadertimeout=60s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># traefik 空闲链接超时
+</span></span><span class="line"><span class="cl">$ ./traefik --help | grep idletimeout
+</span></span><span class="line"><span class="cl">    --idletimeout                                 (Deprecated) maximum amount of time an idle (keep-alive) connection will remain  (default &#34;0s&#34;)
+</span></span><span class="line"><span class="cl">    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &#34;3m0s&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 响应超时相关参数
+</span></span><span class="line"><span class="cl"> $ ./traefik --help | grep respondingtimeouts
+</span></span><span class="line"><span class="cl">    --respondingtimeouts                          Timeouts for incoming requests to the Traefik instance                           (default &#34;true&#34;)
+</span></span><span class="line"><span class="cl">    --respondingtimeouts.idletimeout              IdleTimeout is the maximum amount duration an idle (keep-alive) connection will  (default &#34;3m0s&#34;)
+</span></span><span class="line"><span class="cl">    --respondingtimeouts.readtimeout              ReadTimeout is the maximum duration for reading the entire request, including    (default &#34;0s&#34;)
+</span></span><span class="line"><span class="cl">    --respondingtimeouts.writetimeout             WriteTimeout is the maximum duration before timing out writes of the response.   (default &#34;0s&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 转发的超时
+</span></span><span class="line"><span class="cl">$ ./traefik --help | grep forwardingtimeouts
+</span></span><span class="line"><span class="cl">    --forwardingtimeouts                          Timeouts for requests forwarded to the backend servers                           (default &#34;true&#34;)
+</span></span><span class="line"><span class="cl">    --forwardingtimeouts.dialtimeout              The amount of time to wait until a connection to a backend server can be         (default &#34;30s&#34;)
+</span></span><span class="line"><span class="cl">    --forwardingtimeouts.responseheadertimeout    The amount of time to wait for a server&#39;s response headers after fully writing   (default &#34;0s&#34;)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>最终修改后的traefik的参数如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1311,26 +1335,26 @@ $ ./traefik --help | grep forwardingtimeouts
 </span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 可以根据实际情况考虑是否要关闭keep-alive 即增加参数: --maxidleconnsperhost=-1
-        - --api
-        - --kubernetes
-        - --logLevel=INFO
-        - --traefikLog.filePath=/logdata/traefik.log
-        - --configfile=/config/traefik.toml
-        - --accesslog.filepath=/logdata/access.log
-        - --accesslog.bufferingsize=100
-        - --forwardingtimeouts.responseheadertimeout=60s
-        - --respondingtimeouts.idletimeout=180s
-        - --retry.attempts=10
-        - --idletimeout=180s
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 可以根据实际情况考虑是否要关闭keep-alive 即增加参数: --maxidleconnsperhost=-1
+</span></span><span class="line"><span class="cl">        - --api
+</span></span><span class="line"><span class="cl">        - --kubernetes
+</span></span><span class="line"><span class="cl">        - --logLevel=INFO
+</span></span><span class="line"><span class="cl">        - --traefikLog.filePath=/logdata/traefik.log
+</span></span><span class="line"><span class="cl">        - --configfile=/config/traefik.toml
+</span></span><span class="line"><span class="cl">        - --accesslog.filepath=/logdata/access.log
+</span></span><span class="line"><span class="cl">        - --accesslog.bufferingsize=100
+</span></span><span class="line"><span class="cl">        - --forwardingtimeouts.responseheadertimeout=60s
+</span></span><span class="line"><span class="cl">        - --respondingtimeouts.idletimeout=180s
+</span></span><span class="line"><span class="cl">        - --retry.attempts=10
+</span></span><span class="line"><span class="cl">        - --idletimeout=180s
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="三slb中诡异的503">三、SLB中诡异的503</h3>
 <p>在发现域名直接解析到traefik节点上不再出现502和500后，我们将traefik的节点挂载到阿里云的内网slb中，但是又开始出现了诡异的503问题。</p>
 <p>接入slb后的简单压测情况(内网使用的是免费低配的slb😹)</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1356,31 +1380,31 @@ $ ./traefik --help | grep forwardingtimeouts
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># client-&gt;ali-slb-&gt;traefik-&gt;pods
-$ ab -v 10 -c 200 -n 2000   -T &#39;application/json&#39; -p postfile.json http://data-api.soulapp.cn/get_doc &gt; slb-log.txt
-$ cat slb-log.txt | grep  &#39;HTTP/1.1 200&#39; | wc -l
-1322
-$ cat slb-log.txt | grep  &#39;HTTP/1.1 503&#39; | wc -l
-678
-
-
-# client-&gt;traefik-&gt;pods
-$ ab -v 10 -c 200 -n 2000   -T &#39;application/json&#39; -p postfile.json http://data-api.c.bgbiao.cn/get_doc &gt; traefik-log.txt
-Completed 200 requests
-Completed 400 requests
-Completed 600 requests
-Completed 800 requests
-Completed 1000 requests
-Completed 1200 requests
-Completed 1400 requests
-Completed 1600 requests
-Completed 1800 requests
-Completed 2000 requests
-Finished 2000 requests
-
-$ cat traefik-log.txt  | grep  &#39;HTTP/1.0 200&#39; | wc -l
-2000
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># client-&gt;ali-slb-&gt;traefik-&gt;pods
+</span></span><span class="line"><span class="cl">$ ab -v 10 -c 200 -n 2000   -T &#39;application/json&#39; -p postfile.json http://data-api.soulapp.cn/get_doc &gt; slb-log.txt
+</span></span><span class="line"><span class="cl">$ cat slb-log.txt | grep  &#39;HTTP/1.1 200&#39; | wc -l
+</span></span><span class="line"><span class="cl">1322
+</span></span><span class="line"><span class="cl">$ cat slb-log.txt | grep  &#39;HTTP/1.1 503&#39; | wc -l
+</span></span><span class="line"><span class="cl">678
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># client-&gt;traefik-&gt;pods
+</span></span><span class="line"><span class="cl">$ ab -v 10 -c 200 -n 2000   -T &#39;application/json&#39; -p postfile.json http://data-api.c.bgbiao.cn/get_doc &gt; traefik-log.txt
+</span></span><span class="line"><span class="cl">Completed 200 requests
+</span></span><span class="line"><span class="cl">Completed 400 requests
+</span></span><span class="line"><span class="cl">Completed 600 requests
+</span></span><span class="line"><span class="cl">Completed 800 requests
+</span></span><span class="line"><span class="cl">Completed 1000 requests
+</span></span><span class="line"><span class="cl">Completed 1200 requests
+</span></span><span class="line"><span class="cl">Completed 1400 requests
+</span></span><span class="line"><span class="cl">Completed 1600 requests
+</span></span><span class="line"><span class="cl">Completed 1800 requests
+</span></span><span class="line"><span class="cl">Completed 2000 requests
+</span></span><span class="line"><span class="cl">Finished 2000 requests
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ cat traefik-log.txt  | grep  &#39;HTTP/1.0 200&#39; | wc -l
+</span></span><span class="line"><span class="cl">2000
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>后来在阿里云文档中看到如下文档，基本上就是在阿里云的SLB侧对不同规格的SLB做了一定的限流策略，此时会向客户端返回503。</p>
 <p><a href="https://help.aliyun.com/knowledge_detail/102765.html?spm=5176.2000002.0.0.1f9641e8ymfAas">阿里云TPS-503</a></p>
@@ -1532,6 +1556,27 @@ $ cat traefik-log.txt  | grep  &#39;HTTP/1.0 200&#39; | wc -l
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

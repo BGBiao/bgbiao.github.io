@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>一分钟构建高可用的分布式追踪系统-Jaeger - BGBiao的SRE人生</title>
+  <title>一分钟构建高可用的分布式追踪系统-Jaeger - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -24,7 +24,7 @@
 
 <meta name="author" content="BGBiao" />
   <meta name="description" content="关键技术:
- Kubernetes: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施 Jaeger: 开源端到端的分布式追踪系统 Helm: Kubernetes 中的包管理器 " />
+Kubernetes: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施 Jaeger: 开源端到端的分布式追踪系统 Helm: Kubernetes 中的包管理器 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
 
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kubernetes-helm-jaeger/" />
@@ -71,8 +71,8 @@ Helm: Kubernetes 中的包管理器
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/kubernetes-helm-jaeger/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2021-05-30T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2021-05-30T00:00:00&#43;00:00" />
+<meta property="article:published_time" content="2021-05-30T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-05-30T00:00:00+00:00" />
 
 <meta itemprop="name" content="一分钟构建高可用的分布式追踪系统-Jaeger">
 <meta itemprop="description" content="关键技术:
@@ -80,9 +80,9 @@ Helm: Kubernetes 中的包管理器
 Kubernetes: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施
 Jaeger: 开源端到端的分布式追踪系统
 Helm: Kubernetes 中的包管理器
-"><meta itemprop="datePublished" content="2021-05-30T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2021-05-30T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3648">
+"><meta itemprop="datePublished" content="2021-05-30T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-05-30T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3642">
 <meta itemprop="keywords" content="Golang,kubernetes,helm,jaeger," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="一分钟构建高可用的分布式追踪系统-Jaeger"/>
 <meta name="twitter:description" content="关键技术:
@@ -147,7 +147,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -186,22 +186,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -363,7 +381,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -404,22 +422,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -477,7 +521,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
             
           </div>
-        <span class="more-meta"> 3648 words </span>
+        <span class="more-meta"> 3642 words </span>
           <span class="more-meta"> 8 min read </span>
 
         
@@ -571,7 +615,7 @@ if (!doNotTrack) {
 <p><strong>安装helm v3 以及基础使用</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -593,32 +637,32 @@ if (!doNotTrack) {
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz
-$ tar -zxvf helm-v3.1.2-linux-amd64.tar.gz
-$ cd linux-amd64
-$ mv helm /usr/local/bin/
-$ helm --help
-
-# 添加helm 仓库
-$ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-# 查看仓库列表
-$ helm repo list
-
-# chart 语法检查
-$ helm lint chart
-
-# yaml 模版渲染
-$ helm template chart
-
-# chart 部署(创建服务的release)
-$ helm install
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz
+</span></span><span class="line"><span class="cl">$ tar -zxvf helm-v3.1.2-linux-amd64.tar.gz
+</span></span><span class="line"><span class="cl">$ cd linux-amd64
+</span></span><span class="line"><span class="cl">$ mv helm /usr/local/bin/
+</span></span><span class="line"><span class="cl">$ helm --help
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 添加helm 仓库
+</span></span><span class="line"><span class="cl">$ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+</span></span><span class="line"><span class="cl">$ helm repo add bitnami https://charts.bitnami.com/bitnami
+</span></span><span class="line"><span class="cl"># 查看仓库列表
+</span></span><span class="line"><span class="cl">$ helm repo list
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># chart 语法检查
+</span></span><span class="line"><span class="cl">$ helm lint chart
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># yaml 模版渲染
+</span></span><span class="line"><span class="cl">$ helm template chart
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># chart 部署(创建服务的release)
+</span></span><span class="line"><span class="cl">$ helm install
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>下载Jaeger Helm Chart</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -647,45 +691,43 @@ $ helm install
 </span><span class="lnt">27
 </span><span class="lnt">28
 </span><span class="lnt">29
-</span><span class="lnt">30
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># git clone https://gitee.com/BGBiao/sample-jaeger.git
-
-# 目录结构
-
-sh-4.2# cd sample-jaeger/
-sh-4.2# ls
-Chart.lock  charts  Chart.yaml	es  files  readme.md  templates  values.yaml
-sh-4.2# tree -L 2 .
-.
-|-- Chart.lock
-|-- charts
-|-- Chart.yaml
-|-- es
-|   `-- elasticsearch.yml
-|-- readme.md
-|-- templates
-|   |-- agent-deploy.yaml
-|   |-- agent-svc.yaml
-|   |-- collector-deploy.yaml
-|   |-- collector-svc.yaml
-|   |-- configmap.yaml
-|   |-- elasticsearch-secret.yaml
-|   |-- _helpers.tpl
-|   |-- hotrod-deploy.yaml
-|   |-- hotrod-ingress.yaml
-|   |-- hotrod-svc.yaml
-|   |-- query-deploy.yaml
-|   `-- query-svc.yaml
-`-- values.yaml
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># git clone https://gitee.com/BGBiao/sample-jaeger.git
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 目录结构
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sh-4.2# cd sample-jaeger/
+</span></span><span class="line"><span class="cl">sh-4.2# ls
+</span></span><span class="line"><span class="cl">Chart.lock  charts  Chart.yaml	es  files  readme.md  templates  values.yaml
+</span></span><span class="line"><span class="cl">sh-4.2# tree -L 2 .
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">|-- Chart.lock
+</span></span><span class="line"><span class="cl">|-- charts
+</span></span><span class="line"><span class="cl">|-- Chart.yaml
+</span></span><span class="line"><span class="cl">|-- es
+</span></span><span class="line"><span class="cl">|   `-- elasticsearch.yml
+</span></span><span class="line"><span class="cl">|-- readme.md
+</span></span><span class="line"><span class="cl">|-- templates
+</span></span><span class="line"><span class="cl">|   |-- agent-deploy.yaml
+</span></span><span class="line"><span class="cl">|   |-- agent-svc.yaml
+</span></span><span class="line"><span class="cl">|   |-- collector-deploy.yaml
+</span></span><span class="line"><span class="cl">|   |-- collector-svc.yaml
+</span></span><span class="line"><span class="cl">|   |-- configmap.yaml
+</span></span><span class="line"><span class="cl">|   |-- elasticsearch-secret.yaml
+</span></span><span class="line"><span class="cl">|   |-- _helpers.tpl
+</span></span><span class="line"><span class="cl">|   |-- hotrod-deploy.yaml
+</span></span><span class="line"><span class="cl">|   |-- hotrod-ingress.yaml
+</span></span><span class="line"><span class="cl">|   |-- hotrod-svc.yaml
+</span></span><span class="line"><span class="cl">|   |-- query-deploy.yaml
+</span></span><span class="line"><span class="cl">|   `-- query-svc.yaml
+</span></span><span class="line"><span class="cl">`-- values.yaml
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>准备 ElasticSearch 后端存储</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -750,81 +792,79 @@ sh-4.2# tree -L 2 .
 </span><span class="lnt">63
 </span><span class="lnt">64
 </span><span class="lnt">65
-</span><span class="lnt">66
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 使用docker 方式准备一个外置的es 实例
-$ docker run --name jaeger-es  -itd -p 9200:9200 -p 9300:9300 -e &#34;discovery.type=single-node&#34; -v $PWD/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml elasticsearch:6.4.3
-
-$ curl localhost:9200
-{&#34;error&#34;:{&#34;root_cause&#34;:[{&#34;type&#34;:&#34;security_exception&#34;,&#34;reason&#34;:&#34;missing authentication token for REST request [/]&#34;,&#34;header&#34;:{&#34;WWW-Authenticate&#34;:&#34;Basic realm=\&#34;security\&#34; charset=\&#34;UTF-8\&#34;&#34;}}],&#34;type&#34;:&#34;security_exception&#34;,&#34;reason&#34;:&#34;missing authentication token for REST request [/]&#34;,&#34;header&#34;:{&#34;WWW-Authenticate&#34;:&#34;Basic realm=\&#34;security\&#34; charset=\&#34;UTF-8\&#34;&#34;}},&#34;status&#34;:401}
-
-# 因为es 开启了认证，需要先设置密码访问
-sh-4.2# docker exec -it jaeger-es-tmp bash
-./bin/elasticsearch-setup-passwords
-Sets the passwords for reserved users
-
-Commands
---------
-auto - Uses randomly generated passwords
-interactive - Uses passwords entered by a user
-
-Non-option arguments:
-command
-
-Option         Description
-------         -----------
--h, --help     show help
--s, --silent   show minimal output
--v, --verbose  show verbose output
-ERROR: Missing command
-
-# 设置elasticstack 所有的密码
-[root@b90822f2c26b elasticsearch]# ./bin/elasticsearch-setup-passwords interactive
-Initiating the setup of passwords for reserved users elastic,kibana,logstash_system,beats_system.
-You will be prompted to enter passwords as the process progresses.
-Please confirm that you would like to continue [y/N]y
-
-
-Enter password for [elastic]:
-Reenter password for [elastic]:
-Enter password for [kibana]:
-Reenter password for [kibana]:
-Enter password for [logstash_system]:
-Reenter password for [logstash_system]:
-Enter password for [beats_system]:
-Reenter password for [beats_system]:
-Changed password for user [kibana]
-Changed password for user [logstash_system]
-Changed password for user [beats_system]
-Changed password for user [elastic]
-
-# 使用密码访问es实例
-$ curl -u &#39;elastic:xxxxxxx&#39; http://localhost:9200
-{
-  &#34;name&#34; : &#34;1xdrvFl&#34;,
-  &#34;cluster_name&#34; : &#34;docker-cluster&#34;,
-  &#34;cluster_uuid&#34; : &#34;CO76XmP0Qbexysev4Al2MQ&#34;,
-  &#34;version&#34; : {
-    &#34;number&#34; : &#34;6.4.3&#34;,
-    &#34;build_flavor&#34; : &#34;default&#34;,
-    &#34;build_type&#34; : &#34;tar&#34;,
-    &#34;build_hash&#34; : &#34;fe40335&#34;,
-    &#34;build_date&#34; : &#34;2018-10-30T23:17:19.084789Z&#34;,
-    &#34;build_snapshot&#34; : false,
-    &#34;lucene_version&#34; : &#34;7.4.0&#34;,
-    &#34;minimum_wire_compatibility_version&#34; : &#34;5.6.0&#34;,
-    &#34;minimum_index_compatibility_version&#34; : &#34;5.0.0&#34;
-  },
-  &#34;tagline&#34; : &#34;You Know, for Search&#34;
-}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 使用docker 方式准备一个外置的es 实例
+</span></span><span class="line"><span class="cl">$ docker run --name jaeger-es  -itd -p 9200:9200 -p 9300:9300 -e &#34;discovery.type=single-node&#34; -v $PWD/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml elasticsearch:6.4.3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ curl localhost:9200
+</span></span><span class="line"><span class="cl">{&#34;error&#34;:{&#34;root_cause&#34;:[{&#34;type&#34;:&#34;security_exception&#34;,&#34;reason&#34;:&#34;missing authentication token for REST request [/]&#34;,&#34;header&#34;:{&#34;WWW-Authenticate&#34;:&#34;Basic realm=\&#34;security\&#34; charset=\&#34;UTF-8\&#34;&#34;}}],&#34;type&#34;:&#34;security_exception&#34;,&#34;reason&#34;:&#34;missing authentication token for REST request [/]&#34;,&#34;header&#34;:{&#34;WWW-Authenticate&#34;:&#34;Basic realm=\&#34;security\&#34; charset=\&#34;UTF-8\&#34;&#34;}},&#34;status&#34;:401}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 因为es 开启了认证，需要先设置密码访问
+</span></span><span class="line"><span class="cl">sh-4.2# docker exec -it jaeger-es-tmp bash
+</span></span><span class="line"><span class="cl">./bin/elasticsearch-setup-passwords
+</span></span><span class="line"><span class="cl">Sets the passwords for reserved users
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Commands
+</span></span><span class="line"><span class="cl">--------
+</span></span><span class="line"><span class="cl">auto - Uses randomly generated passwords
+</span></span><span class="line"><span class="cl">interactive - Uses passwords entered by a user
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Non-option arguments:
+</span></span><span class="line"><span class="cl">command
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Option         Description
+</span></span><span class="line"><span class="cl">------         -----------
+</span></span><span class="line"><span class="cl">-h, --help     show help
+</span></span><span class="line"><span class="cl">-s, --silent   show minimal output
+</span></span><span class="line"><span class="cl">-v, --verbose  show verbose output
+</span></span><span class="line"><span class="cl">ERROR: Missing command
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 设置elasticstack 所有的密码
+</span></span><span class="line"><span class="cl">[root@b90822f2c26b elasticsearch]# ./bin/elasticsearch-setup-passwords interactive
+</span></span><span class="line"><span class="cl">Initiating the setup of passwords for reserved users elastic,kibana,logstash_system,beats_system.
+</span></span><span class="line"><span class="cl">You will be prompted to enter passwords as the process progresses.
+</span></span><span class="line"><span class="cl">Please confirm that you would like to continue [y/N]y
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Enter password for [elastic]:
+</span></span><span class="line"><span class="cl">Reenter password for [elastic]:
+</span></span><span class="line"><span class="cl">Enter password for [kibana]:
+</span></span><span class="line"><span class="cl">Reenter password for [kibana]:
+</span></span><span class="line"><span class="cl">Enter password for [logstash_system]:
+</span></span><span class="line"><span class="cl">Reenter password for [logstash_system]:
+</span></span><span class="line"><span class="cl">Enter password for [beats_system]:
+</span></span><span class="line"><span class="cl">Reenter password for [beats_system]:
+</span></span><span class="line"><span class="cl">Changed password for user [kibana]
+</span></span><span class="line"><span class="cl">Changed password for user [logstash_system]
+</span></span><span class="line"><span class="cl">Changed password for user [beats_system]
+</span></span><span class="line"><span class="cl">Changed password for user [elastic]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用密码访问es实例
+</span></span><span class="line"><span class="cl">$ curl -u &#39;elastic:xxxxxxx&#39; http://localhost:9200
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">  &#34;name&#34; : &#34;1xdrvFl&#34;,
+</span></span><span class="line"><span class="cl">  &#34;cluster_name&#34; : &#34;docker-cluster&#34;,
+</span></span><span class="line"><span class="cl">  &#34;cluster_uuid&#34; : &#34;CO76XmP0Qbexysev4Al2MQ&#34;,
+</span></span><span class="line"><span class="cl">  &#34;version&#34; : {
+</span></span><span class="line"><span class="cl">    &#34;number&#34; : &#34;6.4.3&#34;,
+</span></span><span class="line"><span class="cl">    &#34;build_flavor&#34; : &#34;default&#34;,
+</span></span><span class="line"><span class="cl">    &#34;build_type&#34; : &#34;tar&#34;,
+</span></span><span class="line"><span class="cl">    &#34;build_hash&#34; : &#34;fe40335&#34;,
+</span></span><span class="line"><span class="cl">    &#34;build_date&#34; : &#34;2018-10-30T23:17:19.084789Z&#34;,
+</span></span><span class="line"><span class="cl">    &#34;build_snapshot&#34; : false,
+</span></span><span class="line"><span class="cl">    &#34;lucene_version&#34; : &#34;7.4.0&#34;,
+</span></span><span class="line"><span class="cl">    &#34;minimum_wire_compatibility_version&#34; : &#34;5.6.0&#34;,
+</span></span><span class="line"><span class="cl">    &#34;minimum_index_compatibility_version&#34; : &#34;5.0.0&#34;
+</span></span><span class="line"><span class="cl">  },
+</span></span><span class="line"><span class="cl">  &#34;tagline&#34; : &#34;You Know, for Search&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>修改 Chart 配置并安装 Release</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -886,73 +926,71 @@ $ curl -u &#39;elastic:xxxxxxx&#39; http://localhost:9200
 </span><span class="lnt">60
 </span><span class="lnt">61
 </span><span class="lnt">62
-</span><span class="lnt">63
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">
-# 修改helm chart 中的es地址 storage.elasticsearch.host/storage.elasticsearch.password
-#  部署整个jaeger 服务
-sh-4.2# ls
-Chart.lock  charts  Chart.yaml	es  files  readme.md  templates  values.yaml
-sh-4.2# helm install -n sample-jaeger jaeger .
-Error: create: failed to create: namespaces &#34;sample-jaeger&#34; not found
-sh-4.2#
-
-
-sh-4.2# kubectl  create ns sample-jaeger
-namespace/sample-jaeger created
-sh-4.2# helm install -n sample-jaeger jaeger .
-NAME: jaeger
-LAST DEPLOYED: Sun May 23 23:42:58 2021
-NAMESPACE: sample-jaeger
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-sh-4.2# helm list -n sample-jaeger
-NAME  	NAMESPACE    	REVISION	UPDATED                               	STATUS  	CHART              	APP VERSION
-jaeger	sample-jaeger	1       	2021-05-23 23:42:58.75504002 +0800 CST	deployed	sample-jaeger-0.1.0	1.16.0
-
-
-sh-4.2# kubectl  get all -n sample-jaeger
-NAME                                                       READY   STATUS    RESTARTS   AGE
-pod/jaeger-agent-579587cb85-rzd46                          1/1     Running   0          27s
-pod/jaeger-collector-57c57bc788-682sn                      1/1     Running   0          27s
-pod/jaeger-query-85d86d44d-dhj7g                           1/1     Running   0          27s
-pod/jaeger-sample-jaeger-jaeger-example-7bf65bd75b-mlxhv   1/1     Running   0          27s
-
-NAME                                          TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
-service/jaeger-agent                          NodePort   172.16.127.123   &lt;none&gt;        6831:31139/UDP,5775:31355/TCP,6832:30937/TCP,5778:32360/TCP      27s
-service/jaeger-agent-backup                   NodePort   172.16.125.116   &lt;none&gt;        6831:30036/UDP,5775:31138/TCP,6832:31179/TCP,5778:30568/TCP      27s
-service/jaeger-collector                      NodePort   172.16.127.93    &lt;none&gt;        14250:30708/TCP,14268:32354/TCP,9411:32312/TCP,14267:30986/TCP   27s
-service/jaeger-collector-backup               NodePort   172.16.125.137   &lt;none&gt;        14250:30477/TCP,14268:32513/TCP,9411:30679/TCP,14267:31237/TCP   27s
-service/jaeger-query                          NodePort   172.16.124.251   &lt;none&gt;        16686:30843/TCP,16687:30530/TCP                                  27s
-service/jaeger-query-backup                   NodePort   172.16.125.214   &lt;none&gt;        16686:30273/TCP,16687:30858/TCP                                  27s
-service/jaeger-sample-jaeger-jaeger-example   NodePort   172.16.125.35    &lt;none&gt;        80:31255/TCP                                                     27s
-
-NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/jaeger-agent                          1/1     1            1           27s
-deployment.apps/jaeger-collector                      1/1     1            1           27s
-deployment.apps/jaeger-query                          1/1     1            1           27s
-deployment.apps/jaeger-sample-jaeger-jaeger-example   1/1     1            1           27s
-
-NAME                                                             DESIRED   CURRENT   READY   AGE
-replicaset.apps/jaeger-agent-579587cb85                          1         1         1       27s
-replicaset.apps/jaeger-collector-57c57bc788                      1         1         1       27s
-replicaset.apps/jaeger-query-85d86d44d                           1         1         1       27s
-replicaset.apps/jaeger-sample-jaeger-jaeger-example-7bf65bd75b   1         1         1       27s
-
-
-# 这里我们测试下jaeger-query 的服务
-sh-4.2# curl 172.16.124.251:16686 -I
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=utf-8
-Date: Sun, 23 May 2021 15:44:39 GMT
-
-# 此时发现我们核心的几个服务都没有问题(agent,collector,query)
-# 接下里就可以直接访问我们的jaeger 的服务页面了
-# 因为我们的service 采用了nodePort 类型，可以直接访问主机的ip:port
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 修改helm chart 中的es地址 storage.elasticsearch.host/storage.elasticsearch.password
+</span></span><span class="line"><span class="cl">#  部署整个jaeger 服务
+</span></span><span class="line"><span class="cl">sh-4.2# ls
+</span></span><span class="line"><span class="cl">Chart.lock  charts  Chart.yaml	es  files  readme.md  templates  values.yaml
+</span></span><span class="line"><span class="cl">sh-4.2# helm install -n sample-jaeger jaeger .
+</span></span><span class="line"><span class="cl">Error: create: failed to create: namespaces &#34;sample-jaeger&#34; not found
+</span></span><span class="line"><span class="cl">sh-4.2#
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sh-4.2# kubectl  create ns sample-jaeger
+</span></span><span class="line"><span class="cl">namespace/sample-jaeger created
+</span></span><span class="line"><span class="cl">sh-4.2# helm install -n sample-jaeger jaeger .
+</span></span><span class="line"><span class="cl">NAME: jaeger
+</span></span><span class="line"><span class="cl">LAST DEPLOYED: Sun May 23 23:42:58 2021
+</span></span><span class="line"><span class="cl">NAMESPACE: sample-jaeger
+</span></span><span class="line"><span class="cl">STATUS: deployed
+</span></span><span class="line"><span class="cl">REVISION: 1
+</span></span><span class="line"><span class="cl">TEST SUITE: None
+</span></span><span class="line"><span class="cl">sh-4.2# helm list -n sample-jaeger
+</span></span><span class="line"><span class="cl">NAME  	NAMESPACE    	REVISION	UPDATED                               	STATUS  	CHART              	APP VERSION
+</span></span><span class="line"><span class="cl">jaeger	sample-jaeger	1       	2021-05-23 23:42:58.75504002 +0800 CST	deployed	sample-jaeger-0.1.0	1.16.0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sh-4.2# kubectl  get all -n sample-jaeger
+</span></span><span class="line"><span class="cl">NAME                                                       READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">pod/jaeger-agent-579587cb85-rzd46                          1/1     Running   0          27s
+</span></span><span class="line"><span class="cl">pod/jaeger-collector-57c57bc788-682sn                      1/1     Running   0          27s
+</span></span><span class="line"><span class="cl">pod/jaeger-query-85d86d44d-dhj7g                           1/1     Running   0          27s
+</span></span><span class="line"><span class="cl">pod/jaeger-sample-jaeger-jaeger-example-7bf65bd75b-mlxhv   1/1     Running   0          27s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                                          TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
+</span></span><span class="line"><span class="cl">service/jaeger-agent                          NodePort   172.16.127.123   &lt;none&gt;        6831:31139/UDP,5775:31355/TCP,6832:30937/TCP,5778:32360/TCP      27s
+</span></span><span class="line"><span class="cl">service/jaeger-agent-backup                   NodePort   172.16.125.116   &lt;none&gt;        6831:30036/UDP,5775:31138/TCP,6832:31179/TCP,5778:30568/TCP      27s
+</span></span><span class="line"><span class="cl">service/jaeger-collector                      NodePort   172.16.127.93    &lt;none&gt;        14250:30708/TCP,14268:32354/TCP,9411:32312/TCP,14267:30986/TCP   27s
+</span></span><span class="line"><span class="cl">service/jaeger-collector-backup               NodePort   172.16.125.137   &lt;none&gt;        14250:30477/TCP,14268:32513/TCP,9411:30679/TCP,14267:31237/TCP   27s
+</span></span><span class="line"><span class="cl">service/jaeger-query                          NodePort   172.16.124.251   &lt;none&gt;        16686:30843/TCP,16687:30530/TCP                                  27s
+</span></span><span class="line"><span class="cl">service/jaeger-query-backup                   NodePort   172.16.125.214   &lt;none&gt;        16686:30273/TCP,16687:30858/TCP                                  27s
+</span></span><span class="line"><span class="cl">service/jaeger-sample-jaeger-jaeger-example   NodePort   172.16.125.35    &lt;none&gt;        80:31255/TCP                                                     27s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-agent                          1/1     1            1           27s
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-collector                      1/1     1            1           27s
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-query                          1/1     1            1           27s
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-sample-jaeger-jaeger-example   1/1     1            1           27s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                                                             DESIRED   CURRENT   READY   AGE
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-agent-579587cb85                          1         1         1       27s
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-collector-57c57bc788                      1         1         1       27s
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-query-85d86d44d                           1         1         1       27s
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-sample-jaeger-jaeger-example-7bf65bd75b   1         1         1       27s
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 这里我们测试下jaeger-query 的服务
+</span></span><span class="line"><span class="cl">sh-4.2# curl 172.16.124.251:16686 -I
+</span></span><span class="line"><span class="cl">HTTP/1.1 200 OK
+</span></span><span class="line"><span class="cl">Content-Type: text/html; charset=utf-8
+</span></span><span class="line"><span class="cl">Date: Sun, 23 May 2021 15:44:39 GMT
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 此时发现我们核心的几个服务都没有问题(agent,collector,query)
+</span></span><span class="line"><span class="cl"># 接下里就可以直接访问我们的jaeger 的服务页面了
+</span></span><span class="line"><span class="cl"># 因为我们的service 采用了nodePort 类型，可以直接访问主机的ip:port
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>Jaeger 系统使用</strong></p>
 <p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gqssor4at5j316b0u0tj8.jpg" alt="jaeger-首页"></p>
@@ -977,7 +1015,7 @@ Date: Sun, 23 May 2021 15:44:39 GMT
 <p>修改<code>values.yaml</code> 文件中的<code>jaegerExample.enabled: false</code> 后，执行如下命令</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1016,54 +1054,48 @@ Date: Sun, 23 May 2021 15:44:39 GMT
 </span><span class="lnt">37
 </span><span class="lnt">38
 </span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 制定配置文件，对指定的release 进行更新
-sh-4.2# helm  upgrade -n sample-jaeger -f ./values.yaml jaeger .
-Release &#34;jaeger&#34; has been upgraded. Happy Helming!
-NAME: jaeger
-LAST DEPLOYED: Mon May 24 00:18:46 2021
-NAMESPACE: sample-jaeger
-STATUS: deployed
-REVISION: 2
-TEST SUITE: None
-
-# 可以看到，REVISION 已经更新到2
-## 并且我们的jaeger-example 服务已经下线
-sh-4.2# helm  list -n sample-jaeger
-NAME  	NAMESPACE    	REVISION	UPDATED                                	STATUS  	CHART              	APP VERSION
-jaeger	sample-jaeger	2       	2021-05-24 00:18:46.865941544 +0800 CST	deployed	sample-jaeger-0.1.0	1.16.0
-
-sh-4.2# kubectl get all -n sample-jaeger
-NAME                                    READY   STATUS    RESTARTS   AGE
-pod/jaeger-agent-579587cb85-rzd46       1/1     Running   0          38m
-pod/jaeger-collector-57c57bc788-682sn   1/1     Running   0          38m
-pod/jaeger-query-85d86d44d-dhj7g        1/1     Running   0          38m
-
-NAME                              TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
-service/jaeger-agent              NodePort   172.16.127.123   &lt;none&gt;        6831:31139/UDP,5775:31355/TCP,6832:30937/TCP,5778:32360/TCP      38m
-service/jaeger-agent-backup       NodePort   172.16.125.116   &lt;none&gt;        6831:30036/UDP,5775:31138/TCP,6832:31179/TCP,5778:30568/TCP      38m
-service/jaeger-collector          NodePort   172.16.127.93    &lt;none&gt;        14250:30708/TCP,14268:32354/TCP,9411:32312/TCP,14267:30986/TCP   38m
-service/jaeger-collector-backup   NodePort   172.16.125.137   &lt;none&gt;        14250:30477/TCP,14268:32513/TCP,9411:30679/TCP,14267:31237/TCP   38m
-service/jaeger-query              NodePort   172.16.124.251   &lt;none&gt;        16686:30843/TCP,16687:30530/TCP                                  38m
-service/jaeger-query-backup       NodePort   172.16.125.214   &lt;none&gt;        16686:30273/TCP,16687:30858/TCP                                  38m
-
-NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/jaeger-agent       1/1     1            1           38m
-deployment.apps/jaeger-collector   1/1     1            1           38m
-deployment.apps/jaeger-query       1/1     1            1           38m
-
-NAME                                          DESIRED   CURRENT   READY   AGE
-replicaset.apps/jaeger-agent-579587cb85       1         1         1       38m
-replicaset.apps/jaeger-collector-57c57bc788   1         1         1       38m
-replicaset.apps/jaeger-query-85d86d44d        1         1         1       38m
-
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 制定配置文件，对指定的release 进行更新
+</span></span><span class="line"><span class="cl">sh-4.2# helm  upgrade -n sample-jaeger -f ./values.yaml jaeger .
+</span></span><span class="line"><span class="cl">Release &#34;jaeger&#34; has been upgraded. Happy Helming!
+</span></span><span class="line"><span class="cl">NAME: jaeger
+</span></span><span class="line"><span class="cl">LAST DEPLOYED: Mon May 24 00:18:46 2021
+</span></span><span class="line"><span class="cl">NAMESPACE: sample-jaeger
+</span></span><span class="line"><span class="cl">STATUS: deployed
+</span></span><span class="line"><span class="cl">REVISION: 2
+</span></span><span class="line"><span class="cl">TEST SUITE: None
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 可以看到，REVISION 已经更新到2
+</span></span><span class="line"><span class="cl">## 并且我们的jaeger-example 服务已经下线
+</span></span><span class="line"><span class="cl">sh-4.2# helm  list -n sample-jaeger
+</span></span><span class="line"><span class="cl">NAME  	NAMESPACE    	REVISION	UPDATED                                	STATUS  	CHART              	APP VERSION
+</span></span><span class="line"><span class="cl">jaeger	sample-jaeger	2       	2021-05-24 00:18:46.865941544 +0800 CST	deployed	sample-jaeger-0.1.0	1.16.0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sh-4.2# kubectl get all -n sample-jaeger
+</span></span><span class="line"><span class="cl">NAME                                    READY   STATUS    RESTARTS   AGE
+</span></span><span class="line"><span class="cl">pod/jaeger-agent-579587cb85-rzd46       1/1     Running   0          38m
+</span></span><span class="line"><span class="cl">pod/jaeger-collector-57c57bc788-682sn   1/1     Running   0          38m
+</span></span><span class="line"><span class="cl">pod/jaeger-query-85d86d44d-dhj7g        1/1     Running   0          38m
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                              TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                          AGE
+</span></span><span class="line"><span class="cl">service/jaeger-agent              NodePort   172.16.127.123   &lt;none&gt;        6831:31139/UDP,5775:31355/TCP,6832:30937/TCP,5778:32360/TCP      38m
+</span></span><span class="line"><span class="cl">service/jaeger-agent-backup       NodePort   172.16.125.116   &lt;none&gt;        6831:30036/UDP,5775:31138/TCP,6832:31179/TCP,5778:30568/TCP      38m
+</span></span><span class="line"><span class="cl">service/jaeger-collector          NodePort   172.16.127.93    &lt;none&gt;        14250:30708/TCP,14268:32354/TCP,9411:32312/TCP,14267:30986/TCP   38m
+</span></span><span class="line"><span class="cl">service/jaeger-collector-backup   NodePort   172.16.125.137   &lt;none&gt;        14250:30477/TCP,14268:32513/TCP,9411:30679/TCP,14267:31237/TCP   38m
+</span></span><span class="line"><span class="cl">service/jaeger-query              NodePort   172.16.124.251   &lt;none&gt;        16686:30843/TCP,16687:30530/TCP                                  38m
+</span></span><span class="line"><span class="cl">service/jaeger-query-backup       NodePort   172.16.125.214   &lt;none&gt;        16686:30273/TCP,16687:30858/TCP                                  38m
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-agent       1/1     1            1           38m
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-collector   1/1     1            1           38m
+</span></span><span class="line"><span class="cl">deployment.apps/jaeger-query       1/1     1            1           38m
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NAME                                          DESIRED   CURRENT   READY   AGE
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-agent-579587cb85       1         1         1       38m
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-collector-57c57bc788   1         1         1       38m
+</span></span><span class="line"><span class="cl">replicaset.apps/jaeger-query-85d86d44d        1         1         1       38m
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>如此，我们就使用helm 来很优雅的管理了我们服务的部署以及实例的管理。</p>
 <p>最后，我们有没有发现，直接使用helm 可能会有几个问题:</p>
@@ -1229,6 +1261,27 @@ replicaset.apps/jaeger-query-85d86d44d        1         1         1       38m
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

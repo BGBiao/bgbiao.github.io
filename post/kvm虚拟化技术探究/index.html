@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>CPU虚拟化技术探究 - BGBiao的SRE人生</title>
+  <title>CPU虚拟化技术探究 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/" />
@@ -67,14 +67,14 @@
 内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2017-11-09T21:57:45&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2017-11-09T21:57:45+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="CPU虚拟化技术探究">
 <meta itemprop="description" content="KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
-内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。"><meta itemprop="datePublished" content="2017-11-09T21:57:45&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="2452">
+内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。"><meta itemprop="datePublished" content="2017-11-09T21:57:45+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="2448">
 <meta itemprop="keywords" content="KVM,NUMA,CPU架构," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="CPU虚拟化技术探究"/>
 <meta name="twitter:description" content="KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
@@ -135,7 +135,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -174,22 +174,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -351,7 +369,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -392,22 +410,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -465,7 +509,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2452 words </span>
+        <span class="more-meta"> 2448 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -515,7 +559,7 @@ Core3 Core4 					Core3 Core4</p>
 <p>查看cpu详情</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -543,33 +587,33 @@ Core3 Core4 					Core3 Core4</p>
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># lscpu
-Architecture:          x86_64
-CPU op-mode(s):        32-bit, 64-bit
-Byte Order:            Little Endian
-CPU(s):                32                   //共有32个逻辑CPU（threads）
-On-line CPU(s) list:   0-31
-Thread(s) per core:    2                    //每个core有2个threads
-Core(s) per socket:    8                    //每个socket有8个cores
-Socket(s):             2                    //共有2个sockets
-NUMA node(s):          2                    //共有2个NUMA nodes
-Vendor ID:             GenuineIntel
-CPU family:            6
-Model:                 63
-Stepping:              2
-CPU MHz:               2600.014
-BogoMIPS:              5199.25
-Virtualization:        VT-x
-L1d cache:             32K
-L1i cache:             32K
-L2 cache:              256K
-L3 cache:              20480K
-NUMA node0 CPU(s):     0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
-NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
-
-# 2(node/socket)*8(8cores/socket)*2(2threads/core)
-2 Sockets 2 CPUs ,1Socket 1 numa node,1 numa node 8 cores,1 core 2 threads
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># lscpu
+</span></span><span class="line"><span class="cl">Architecture:          x86_64
+</span></span><span class="line"><span class="cl">CPU op-mode(s):        32-bit, 64-bit
+</span></span><span class="line"><span class="cl">Byte Order:            Little Endian
+</span></span><span class="line"><span class="cl">CPU(s):                32                   //共有32个逻辑CPU（threads）
+</span></span><span class="line"><span class="cl">On-line CPU(s) list:   0-31
+</span></span><span class="line"><span class="cl">Thread(s) per core:    2                    //每个core有2个threads
+</span></span><span class="line"><span class="cl">Core(s) per socket:    8                    //每个socket有8个cores
+</span></span><span class="line"><span class="cl">Socket(s):             2                    //共有2个sockets
+</span></span><span class="line"><span class="cl">NUMA node(s):          2                    //共有2个NUMA nodes
+</span></span><span class="line"><span class="cl">Vendor ID:             GenuineIntel
+</span></span><span class="line"><span class="cl">CPU family:            6
+</span></span><span class="line"><span class="cl">Model:                 63
+</span></span><span class="line"><span class="cl">Stepping:              2
+</span></span><span class="line"><span class="cl">CPU MHz:               2600.014
+</span></span><span class="line"><span class="cl">BogoMIPS:              5199.25
+</span></span><span class="line"><span class="cl">Virtualization:        VT-x
+</span></span><span class="line"><span class="cl">L1d cache:             32K
+</span></span><span class="line"><span class="cl">L1i cache:             32K
+</span></span><span class="line"><span class="cl">L2 cache:              256K
+</span></span><span class="line"><span class="cl">L3 cache:              20480K
+</span></span><span class="line"><span class="cl">NUMA node0 CPU(s):     0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
+</span></span><span class="line"><span class="cl">NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 2(node/socket)*8(8cores/socket)*2(2threads/core)
+</span></span><span class="line"><span class="cl">2 Sockets 2 CPUs ,1Socket 1 numa node,1 numa node 8 cores,1 core 2 threads
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="kvm虚拟机numa调优">KVM虚拟机NUMA调优</h3>
 <h4 id="宿主机的numa信息查看和配置">宿主机的NUMA信息查看和配置：</h4>
@@ -577,7 +621,7 @@ NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
 <img src="http://oyep1jupk.bkt.clouddn.com/kvm/cpu/CPU-numa.jpg" alt=""></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -661,102 +705,98 @@ NUMA node1 CPU(s):     1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31
 </span><span class="lnt">82
 </span><span class="lnt">83
 </span><span class="lnt">84
-</span><span class="lnt">85
-</span><span class="lnt">86
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># sh getcpuinfo.sh
-===== CPU Topology Table =====
-
-+--------------+---------+-----------+
-| Processor ID | Core ID | Socket ID |
-+--------------+---------+-----------+
-| 0            | 0       | 0         |
-+--------------+---------+-----------+
-| 1            | 0       | 1         |
-+--------------+---------+-----------+
-| 2            | 1       | 0         |
-+--------------+---------+-----------+
-| 3            | 1       | 1         |
-+--------------+---------+-----------+
-| 4            | 2       | 0         |
-+--------------+---------+-----------+
-| 5            | 2       | 1         |
-+--------------+---------+-----------+
-| 6            | 3       | 0         |
-+--------------+---------+-----------+
-| 7            | 3       | 1         |
-+--------------+---------+-----------+
-| 8            | 4       | 0         |
-+--------------+---------+-----------+
-| 9            | 4       | 1         |
-+--------------+---------+-----------+
-| 10           | 5       | 0         |
-+--------------+---------+-----------+
-| 11           | 5       | 1         |
-+--------------+---------+-----------+
-| 12           | 6       | 0         |
-+--------------+---------+-----------+
-| 13           | 6       | 1         |
-+--------------+---------+-----------+
-| 14           | 7       | 0         |
-+--------------+---------+-----------+
-| 15           | 7       | 1         |
-+--------------+---------+-----------+
-| 16           | 0       | 0         |
-+--------------+---------+-----------+
-| 17           | 0       | 1         |
-+--------------+---------+-----------+
-| 18           | 1       | 0         |
-+--------------+---------+-----------+
-| 19           | 1       | 1         |
-+--------------+---------+-----------+
-| 20           | 2       | 0         |
-+--------------+---------+-----------+
-| 21           | 2       | 1         |
-+--------------+---------+-----------+
-| 22           | 3       | 0         |
-+--------------+---------+-----------+
-| 23           | 3       | 1         |
-+--------------+---------+-----------+
-| 24           | 4       | 0         |
-+--------------+---------+-----------+
-| 25           | 4       | 1         |
-+--------------+---------+-----------+
-| 26           | 5       | 0         |
-+--------------+---------+-----------+
-| 27           | 5       | 1         |
-+--------------+---------+-----------+
-| 28           | 6       | 0         |
-+--------------+---------+-----------+
-| 29           | 6       | 1         |
-+--------------+---------+-----------+
-| 30           | 7       | 0         |
-+--------------+---------+-----------+
-| 31           | 7       | 1         |
-+--------------+---------+-----------+
-
-Socket 0: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
-Socket 1: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
-
-===== CPU Info Summary =====
-
-Logical processors: 32
-Physical socket: 2
-Siblings in one socket:  16
-Cores in one socket:  8
-Cores in total: 16
-Hyper-Threading: on
-
-===== END =====
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># sh getcpuinfo.sh
+</span></span><span class="line"><span class="cl">===== CPU Topology Table =====
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| Processor ID | Core ID | Socket ID |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 0            | 0       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 1            | 0       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 2            | 1       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 3            | 1       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 4            | 2       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 5            | 2       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 6            | 3       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 7            | 3       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 8            | 4       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 9            | 4       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 10           | 5       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 11           | 5       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 12           | 6       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 13           | 6       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 14           | 7       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 15           | 7       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 16           | 0       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 17           | 0       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 18           | 1       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 19           | 1       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 20           | 2       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 21           | 2       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 22           | 3       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 23           | 3       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 24           | 4       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 25           | 4       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 26           | 5       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 27           | 5       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 28           | 6       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 29           | 6       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 30           | 7       | 0         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">| 31           | 7       | 1         |
+</span></span><span class="line"><span class="cl">+--------------+---------+-----------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Socket 0: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
+</span></span><span class="line"><span class="cl">Socket 1: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">===== CPU Info Summary =====
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Logical processors: 32
+</span></span><span class="line"><span class="cl">Physical socket: 2
+</span></span><span class="line"><span class="cl">Siblings in one socket:  16
+</span></span><span class="line"><span class="cl">Cores in one socket:  8
+</span></span><span class="line"><span class="cl">Cores in total: 16
+</span></span><span class="line"><span class="cl">Hyper-Threading: on
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">===== END =====
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>查看numa架构模式</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -776,30 +816,30 @@ Hyper-Threading: on
 </span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># cat /sys/bus/pci/devices/0000\:07\:00.0/numa_node
-0
-
-使用numactl --hardware查看当前CPU硬件的情况：
-
-由以下信息可以看到，当前CPU有两颗，每颗CPU8核，每颗CPU有64G内存可以使用
-# numactl --hardware
-available: 2 nodes (0-1)
-node 0 cpus: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
-node 0 size: 65490 MB
-node 0 free: 501 MB
-node 1 cpus: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
-node 1 size: 65536 MB
-node 1 free: 185 MB
-node distances:
-node   0   1
-  0:  10  20
-  1:  20  10
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># cat /sys/bus/pci/devices/0000\:07\:00.0/numa_node
+</span></span><span class="line"><span class="cl">0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">使用numactl --hardware查看当前CPU硬件的情况：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">由以下信息可以看到，当前CPU有两颗，每颗CPU8核，每颗CPU有64G内存可以使用
+</span></span><span class="line"><span class="cl"># numactl --hardware
+</span></span><span class="line"><span class="cl">available: 2 nodes (0-1)
+</span></span><span class="line"><span class="cl">node 0 cpus: 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
+</span></span><span class="line"><span class="cl">node 0 size: 65490 MB
+</span></span><span class="line"><span class="cl">node 0 free: 501 MB
+</span></span><span class="line"><span class="cl">node 1 cpus: 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31
+</span></span><span class="line"><span class="cl">node 1 size: 65536 MB
+</span></span><span class="line"><span class="cl">node 1 free: 185 MB
+</span></span><span class="line"><span class="cl">node distances:
+</span></span><span class="line"><span class="cl">node   0   1
+</span></span><span class="line"><span class="cl">  0:  10  20
+</span></span><span class="line"><span class="cl">  1:  20  10
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>查看每个node的内存情况</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -834,52 +874,50 @@ node   0   1
 </span><span class="lnt">33
 </span><span class="lnt">34
 </span><span class="lnt">35
-</span><span class="lnt">36
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">使用numastat命令可以查看每个节点的内存情况：
-# numastat
-                           node0           node1
-numa_hit             11541910709      7342897046		#使用本节点内存次数
-numa_miss               10973455        14712396		#计划使用本节点而被调度到其他节点次数
-numa_foreign            14712396        10973455		#计划使用其他节点内存而被使用本地内存次数
-interleave_hit             32651           32580		#交叉分配使用的内存中使用本节点的内存次数
-local_node           11540101051      7342503537		#在本节点运行的程序使用本节点内存的次数
-other_node              12783113        15105905		#在其他节点运行的程序使用本节点内存次数
-
-
-
-使用numastat -c 查看相关进程的NUMA内存使用情况：
-# numastat -c qemu-kvm
-
-Per-node process memory usage (in MBs)
-PID              Node 0 Node 1  Total
----------------  ------ ------ ------
-27822 (qemu-kvm)   5786   2449   8236
-27947 (qemu-kvm)   5503   2729   8232
-28108 (qemu-kvm)   4154   4116   8269
-28295 (qemu-kvm)   5845   2410   8255
-32840 (qemu-kvm)   5652   2749   8401
-32994 (qemu-kvm)   6229   2095   8324
-33235 (qemu-kvm)   3086   5287   8373
-33453 (qemu-kvm)   3577   4817   8394
-33620 (qemu-kvm)   5112   3326   8438
-33893 (qemu-kvm)   5529   2863   8391
-34141 (qemu-kvm)   4745   3689   8434
-34318 (qemu-kvm)   2414   5989   8404
----------------  ------ ------ ------
-Total             57632  42519 100151
-
-Liunx系统默认是自动NUMA平衡策略，如果需要关闭Linux系统的自动平衡，可以使用如下命令：
-echo 0 &gt; /proc/sys/kernel/numa_balancing
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">使用numastat命令可以查看每个节点的内存情况：
+</span></span><span class="line"><span class="cl"># numastat
+</span></span><span class="line"><span class="cl">                           node0           node1
+</span></span><span class="line"><span class="cl">numa_hit             11541910709      7342897046		#使用本节点内存次数
+</span></span><span class="line"><span class="cl">numa_miss               10973455        14712396		#计划使用本节点而被调度到其他节点次数
+</span></span><span class="line"><span class="cl">numa_foreign            14712396        10973455		#计划使用其他节点内存而被使用本地内存次数
+</span></span><span class="line"><span class="cl">interleave_hit             32651           32580		#交叉分配使用的内存中使用本节点的内存次数
+</span></span><span class="line"><span class="cl">local_node           11540101051      7342503537		#在本节点运行的程序使用本节点内存的次数
+</span></span><span class="line"><span class="cl">other_node              12783113        15105905		#在其他节点运行的程序使用本节点内存次数
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">使用numastat -c 查看相关进程的NUMA内存使用情况：
+</span></span><span class="line"><span class="cl"># numastat -c qemu-kvm
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Per-node process memory usage (in MBs)
+</span></span><span class="line"><span class="cl">PID              Node 0 Node 1  Total
+</span></span><span class="line"><span class="cl">---------------  ------ ------ ------
+</span></span><span class="line"><span class="cl">27822 (qemu-kvm)   5786   2449   8236
+</span></span><span class="line"><span class="cl">27947 (qemu-kvm)   5503   2729   8232
+</span></span><span class="line"><span class="cl">28108 (qemu-kvm)   4154   4116   8269
+</span></span><span class="line"><span class="cl">28295 (qemu-kvm)   5845   2410   8255
+</span></span><span class="line"><span class="cl">32840 (qemu-kvm)   5652   2749   8401
+</span></span><span class="line"><span class="cl">32994 (qemu-kvm)   6229   2095   8324
+</span></span><span class="line"><span class="cl">33235 (qemu-kvm)   3086   5287   8373
+</span></span><span class="line"><span class="cl">33453 (qemu-kvm)   3577   4817   8394
+</span></span><span class="line"><span class="cl">33620 (qemu-kvm)   5112   3326   8438
+</span></span><span class="line"><span class="cl">33893 (qemu-kvm)   5529   2863   8391
+</span></span><span class="line"><span class="cl">34141 (qemu-kvm)   4745   3689   8434
+</span></span><span class="line"><span class="cl">34318 (qemu-kvm)   2414   5989   8404
+</span></span><span class="line"><span class="cl">---------------  ------ ------ ------
+</span></span><span class="line"><span class="cl">Total             57632  42519 100151
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Liunx系统默认是自动NUMA平衡策略，如果需要关闭Linux系统的自动平衡，可以使用如下命令：
+</span></span><span class="line"><span class="cl">echo 0 &gt; /proc/sys/kernel/numa_balancing
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="虚拟机numa信息查看与配置">虚拟机NUMA信息查看与配置</h4>
 <p>查看虚拟机VCPU和物理CPU的对应关系：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -906,32 +944,32 @@ echo 0 &gt; /proc/sys/kernel/numa_balancing
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># virsh vcpuinfo xxbandy.github.io
-VCPU:           0
-CPU:            12
-State:          running
-CPU time:       466238.9s
-CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-
-VCPU:           1
-CPU:            5
-State:          running
-CPU time:       387815.5s
-CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-
-VCPU:           2
-CPU:            4
-State:          running
-CPU time:       397013.3s
-CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-
-VCPU:           3
-CPU:            31
-State:          running
-CPU time:       389255.3s
-CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-最后一行CPU亲和性：
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># virsh vcpuinfo xxbandy.github.io
+</span></span><span class="line"><span class="cl">VCPU:           0
+</span></span><span class="line"><span class="cl">CPU:            12
+</span></span><span class="line"><span class="cl">State:          running
+</span></span><span class="line"><span class="cl">CPU time:       466238.9s
+</span></span><span class="line"><span class="cl">CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">VCPU:           1
+</span></span><span class="line"><span class="cl">CPU:            5
+</span></span><span class="line"><span class="cl">State:          running
+</span></span><span class="line"><span class="cl">CPU time:       387815.5s
+</span></span><span class="line"><span class="cl">CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">VCPU:           2
+</span></span><span class="line"><span class="cl">CPU:            4
+</span></span><span class="line"><span class="cl">State:          running
+</span></span><span class="line"><span class="cl">CPU time:       397013.3s
+</span></span><span class="line"><span class="cl">CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">VCPU:           3
+</span></span><span class="line"><span class="cl">CPU:            31
+</span></span><span class="line"><span class="cl">State:          running
+</span></span><span class="line"><span class="cl">CPU time:       389255.3s
+</span></span><span class="line"><span class="cl">CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+</span></span><span class="line"><span class="cl">最后一行CPU亲和性：
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="透明大页技术与应用">透明大页技术与应用</h4>
 <p>X86默认的内存页大小是4KB，也可以使用2MB或者1GB的巨型页，系统的巨型页可以传输过虚拟机，kvm虚拟机可以通过分配巨型页提高性能。
@@ -943,7 +981,7 @@ CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 不需要依赖某种库文件</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -976,44 +1014,42 @@ CPU Affinity:   yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
-</span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">透明大页内存配置：
-# cat /sys/kernel/mm/transparent_hugepage/enabled
-[always] madvise never
-修改配置：
-echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled
-参数说明：
-	never：关闭，不使用透明内存
-	alway:尽量使用透明内存，扫描内存，有512个4KB页面可以整合，就整合成一个2MB的页面。
-	madvise:避免改变内存占用
-
-使用情况监控：
-$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan 默认(4096=16MB)一个扫描周期被扫描的内存页数
-4096
-$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/scan_sleep_millisecs 默认(10000=10s)多长时间扫描一次
-10000
-$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/alloc_sleep_millisecs 默认(60000=60s)多长时间整理一次碎片
-60000
-也可以查看meminfo信息；查看当前的巨型页值：
-$ grep Huge /proc/meminfo
-AnonHugePages:  102537216 kB
-HugePages_Total:       0
-HugePages_Free:        0
-HugePages_Rsvd:        0
-HugePages_Surp:        0
-Hugepagesize:       2048 kB
-
-查看当前巨型页使用情况
-$ cat /proc/sys/vm/nr_hugepages
-0
-巨型页默认大小是2MB，可以修改使用的巨型页数量：
-echo 25000 &gt; /proc/sys/vm/nr_hugepages
-或者：
-sysctl vm.nr_hugepages = N
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">透明大页内存配置：
+</span></span><span class="line"><span class="cl"># cat /sys/kernel/mm/transparent_hugepage/enabled
+</span></span><span class="line"><span class="cl">[always] madvise never
+</span></span><span class="line"><span class="cl">修改配置：
+</span></span><span class="line"><span class="cl">echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled
+</span></span><span class="line"><span class="cl">参数说明：
+</span></span><span class="line"><span class="cl">	never：关闭，不使用透明内存
+</span></span><span class="line"><span class="cl">	alway:尽量使用透明内存，扫描内存，有512个4KB页面可以整合，就整合成一个2MB的页面。
+</span></span><span class="line"><span class="cl">	madvise:避免改变内存占用
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">使用情况监控：
+</span></span><span class="line"><span class="cl">$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan 默认(4096=16MB)一个扫描周期被扫描的内存页数
+</span></span><span class="line"><span class="cl">4096
+</span></span><span class="line"><span class="cl">$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/scan_sleep_millisecs 默认(10000=10s)多长时间扫描一次
+</span></span><span class="line"><span class="cl">10000
+</span></span><span class="line"><span class="cl">$ cat /sys/kernel/mm/transparent_hugepage/khugepaged/alloc_sleep_millisecs 默认(60000=60s)多长时间整理一次碎片
+</span></span><span class="line"><span class="cl">60000
+</span></span><span class="line"><span class="cl">也可以查看meminfo信息；查看当前的巨型页值：
+</span></span><span class="line"><span class="cl">$ grep Huge /proc/meminfo
+</span></span><span class="line"><span class="cl">AnonHugePages:  102537216 kB
+</span></span><span class="line"><span class="cl">HugePages_Total:       0
+</span></span><span class="line"><span class="cl">HugePages_Free:        0
+</span></span><span class="line"><span class="cl">HugePages_Rsvd:        0
+</span></span><span class="line"><span class="cl">HugePages_Surp:        0
+</span></span><span class="line"><span class="cl">Hugepagesize:       2048 kB
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">查看当前巨型页使用情况
+</span></span><span class="line"><span class="cl">$ cat /proc/sys/vm/nr_hugepages
+</span></span><span class="line"><span class="cl">0
+</span></span><span class="line"><span class="cl">巨型页默认大小是2MB，可以修改使用的巨型页数量：
+</span></span><span class="line"><span class="cl">echo 25000 &gt; /proc/sys/vm/nr_hugepages
+</span></span><span class="line"><span class="cl">或者：
+</span></span><span class="line"><span class="cl">sysctl vm.nr_hugepages = N
+</span></span></code></pre></td></tr></table>
 </div>
 </div>
     </div>
@@ -1161,6 +1197,27 @@ sysctl vm.nr_hugepages = N
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

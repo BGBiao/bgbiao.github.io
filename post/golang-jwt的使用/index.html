@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>使用jwt-go验证API - BGBiao的SRE人生</title>
+  <title>使用jwt-go验证API - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/" />
@@ -65,13 +65,13 @@
 <meta property="og:description" content="背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/golang-jwt%E7%9A%84%E4%BD%BF%E7%94%A8/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-03-15T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-03-15T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="使用jwt-go验证API">
-<meta itemprop="description" content="背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行"><meta itemprop="datePublished" content="2020-03-15T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="6598">
+<meta itemprop="description" content="背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行"><meta itemprop="datePublished" content="2020-03-15T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="6593">
 <meta itemprop="keywords" content="golang,jwt,jwt-go,token,gin," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="使用jwt-go验证API"/>
 <meta name="twitter:description" content="背景: 在如今前后端分离开发的大环境中，我们需要解决一些登陆，后期身份认证以及鉴权相关的事情，通常的方案就是采用请求头携带token的方式进行"/>
@@ -131,7 +131,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -170,22 +170,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -347,7 +365,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -388,22 +406,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -461,7 +505,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> golang </a>
             
           </div>
-        <span class="more-meta"> 6598 words </span>
+        <span class="more-meta"> 6593 words </span>
           <span class="more-meta"> 14 min read </span>
 
         
@@ -525,17 +569,17 @@ if (!doNotTrack) {
 <p><strong>header</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">{
-    &#34;alg&#34;: &#34;HS256&#34;,
-    &#34;typ&#34;: &#34;JWT&#34;
-}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">    &#34;alg&#34;: &#34;HS256&#34;,
+</span></span><span class="line"><span class="cl">    &#34;typ&#34;: &#34;JWT&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>对上面的json进行base64编码即可得到JWT的第一个部分</p>
 <p><strong>payload</strong></p>
@@ -546,19 +590,19 @@ if (!doNotTrack) {
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">{
-    &#34;sub&#34;: &#34;xxx-api&#34;,
-    &#34;name&#34;: &#34;bgbiao.top&#34;,
-    &#34;admin&#34;: true
-}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">    &#34;sub&#34;: &#34;xxx-api&#34;,
+</span></span><span class="line"><span class="cl">    &#34;name&#34;: &#34;bgbiao.top&#34;,
+</span></span><span class="line"><span class="cl">    &#34;admin&#34;: true
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>对payload部分的json进行base64编码后即可得到JWT的第二个部分</p>
 <p><code>注意:</code> 不要在header和payload中放置敏感信息，除非信息本身已经做过脱敏处理</p>
@@ -636,7 +680,7 @@ if (!doNotTrack) {
 <p>接下来，我们先定义一个用于jwt认证的中间件.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -684,67 +728,63 @@ if (!doNotTrack) {
 </span><span class="lnt">46
 </span><span class="lnt">47
 </span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义一个JWTAuth的中间件
-func JWTAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// 通过http header中的token解析来认证
-		token := c.Request.Header.Get(&#34;token&#34;)
-		if token == &#34;&#34; {
-			c.JSON(http.StatusOK, gin.H{
-				&#34;status&#34;: -1,
-				&#34;msg&#34;:    &#34;请求未携带token，无权限访问&#34;,
-				&#34;data&#34;:   nil,
-			})
-			c.Abort()
-			return
-		}
-
-		log.Print(&#34;get token: &#34;, token)
-
-		// 初始化一个JWT对象实例，并根据结构体方法来解析token
-		j := NewJWT()
-		// 解析token中包含的相关信息(有效载荷)
-		claims, err := j.ParserToken(token)
-
-		if err != nil {
-			// token过期
-			if err == TokenExpired {
-				c.JSON(http.StatusOK, gin.H{
-					&#34;status&#34;: -1,
-					&#34;msg&#34;:    &#34;token授权已过期，请重新申请授权&#34;,
-					&#34;data&#34;:   nil,
-				})
-				c.Abort()
-				return
-			}
-			// 其他错误
-			c.JSON(http.StatusOK, gin.H{
-				&#34;status&#34;: -1,
-				&#34;msg&#34;:    err.Error(),
-				&#34;data&#34;:   nil,
-			})
-			c.Abort()
-			return
-		}
-
-		// 将解析后的有效载荷claims重新写入gin.Context引用对象中
-		c.Set(&#34;claims&#34;, claims)
-
-	}
-}
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 定义一个JWTAuth的中间件
+</span></span><span class="line"><span class="cl">func JWTAuth() gin.HandlerFunc {
+</span></span><span class="line"><span class="cl">	return func(c *gin.Context) {
+</span></span><span class="line"><span class="cl">		// 通过http header中的token解析来认证
+</span></span><span class="line"><span class="cl">		token := c.Request.Header.Get(&#34;token&#34;)
+</span></span><span class="line"><span class="cl">		if token == &#34;&#34; {
+</span></span><span class="line"><span class="cl">			c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">				&#34;status&#34;: -1,
+</span></span><span class="line"><span class="cl">				&#34;msg&#34;:    &#34;请求未携带token，无权限访问&#34;,
+</span></span><span class="line"><span class="cl">				&#34;data&#34;:   nil,
+</span></span><span class="line"><span class="cl">			})
+</span></span><span class="line"><span class="cl">			c.Abort()
+</span></span><span class="line"><span class="cl">			return
+</span></span><span class="line"><span class="cl">		}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		log.Print(&#34;get token: &#34;, token)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		// 初始化一个JWT对象实例，并根据结构体方法来解析token
+</span></span><span class="line"><span class="cl">		j := NewJWT()
+</span></span><span class="line"><span class="cl">		// 解析token中包含的相关信息(有效载荷)
+</span></span><span class="line"><span class="cl">		claims, err := j.ParserToken(token)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		if err != nil {
+</span></span><span class="line"><span class="cl">			// token过期
+</span></span><span class="line"><span class="cl">			if err == TokenExpired {
+</span></span><span class="line"><span class="cl">				c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">					&#34;status&#34;: -1,
+</span></span><span class="line"><span class="cl">					&#34;msg&#34;:    &#34;token授权已过期，请重新申请授权&#34;,
+</span></span><span class="line"><span class="cl">					&#34;data&#34;:   nil,
+</span></span><span class="line"><span class="cl">				})
+</span></span><span class="line"><span class="cl">				c.Abort()
+</span></span><span class="line"><span class="cl">				return
+</span></span><span class="line"><span class="cl">			}
+</span></span><span class="line"><span class="cl">			// 其他错误
+</span></span><span class="line"><span class="cl">			c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">				&#34;status&#34;: -1,
+</span></span><span class="line"><span class="cl">				&#34;msg&#34;:    err.Error(),
+</span></span><span class="line"><span class="cl">				&#34;data&#34;:   nil,
+</span></span><span class="line"><span class="cl">			})
+</span></span><span class="line"><span class="cl">			c.Abort()
+</span></span><span class="line"><span class="cl">			return
+</span></span><span class="line"><span class="cl">		}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		// 将解析后的有效载荷claims重新写入gin.Context引用对象中
+</span></span><span class="line"><span class="cl">		c.Set(&#34;claims&#34;, claims)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="定义jwt编码和解码逻辑">定义jwt编码和解码逻辑</h4>
 <p>根据前面提到的jwt-token的组成部分，以及<code>jwt-go</code>中相关的定义，我们可以使用如下方法进行生成token.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -814,87 +854,85 @@ func JWTAuth() gin.HandlerFunc {
 </span><span class="lnt">68
 </span><span class="lnt">69
 </span><span class="lnt">70
-</span><span class="lnt">71
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义一个jwt对象
-type JWT struct {
-	// 声明签名信息
-	SigningKey []byte
-}
-
-// 初始化jwt对象
-func NewJWT() *JWT {
-	return &amp;JWT{
-		[]byte(&#34;bgbiao.top&#34;),
-	}
-}
-
-// 自定义有效载荷(这里采用自定义的Name和Email作为有效载荷的一部分)
-type CustomClaims struct {
-	Name  string `json:&#34;name&#34;`
-	Email string `json:&#34;email&#34;`
-	// StandardClaims结构体实现了Claims接口(Valid()函数)
-	jwt.StandardClaims
-}
-
-
-// 调用jwt-go库生成token
-// 指定编码的算法为jwt.SigningMethodHS256
-func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
-	// https://gowalker.org/github.com/dgrijalva/jwt-go#Token
-	// 返回一个token的结构体指针
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(j.SigningKey)
-}
-
-
-// token解码
-func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
-	// https://gowalker.org/github.com/dgrijalva/jwt-go#ParseWithClaims
-	// 输入用户自定义的Claims结构体对象,token,以及自定义函数来解析token字符串为jwt的Token结构体指针
-	// Keyfunc是匿名函数类型: type Keyfunc func(*Token) (interface{}, error)
-	// func ParseWithClaims(tokenString string, claims Claims, keyFunc Keyfunc) (*Token, error) {}
-	token, err := jwt.ParseWithClaims(tokenString, &amp;CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return j.SigningKey, nil
-	})
-
-	if err != nil {
-		// https://gowalker.org/github.com/dgrijalva/jwt-go#ValidationError
-		// jwt.ValidationError 是一个无效token的错误结构
-		if ve, ok := err.(*jwt.ValidationError); ok {
-			// ValidationErrorMalformed是一个uint常量，表示token不可用
-			if ve.Errors&amp;jwt.ValidationErrorMalformed != 0 {
-				return nil, fmt.Errorf(&#34;token不可用&#34;)
-				// ValidationErrorExpired表示Token过期
-			} else if ve.Errors&amp;jwt.ValidationErrorExpired != 0 {
-				return nil, fmt.Errorf(&#34;token过期&#34;)
-				// ValidationErrorNotValidYet表示无效token
-			} else if ve.Errors&amp;jwt.ValidationErrorNotValidYet != 0 {
-				return nil, fmt.Errorf(&#34;无效的token&#34;)
-			} else {
-				return nil, fmt.Errorf(&#34;token不可用&#34;)
-			}
-
-		}
-	}
-
-	// 将token中的claims信息解析出来并断言成用户自定义的有效载荷结构
-	if claims, ok := token.Claims.(*CustomClaims); ok &amp;&amp; token.Valid {
-		return claims, nil
-	}
-
-	return nil, fmt.Errorf(&#34;token无效&#34;)
-
-}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 定义一个jwt对象
+</span></span><span class="line"><span class="cl">type JWT struct {
+</span></span><span class="line"><span class="cl">	// 声明签名信息
+</span></span><span class="line"><span class="cl">	SigningKey []byte
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 初始化jwt对象
+</span></span><span class="line"><span class="cl">func NewJWT() *JWT {
+</span></span><span class="line"><span class="cl">	return &amp;JWT{
+</span></span><span class="line"><span class="cl">		[]byte(&#34;bgbiao.top&#34;),
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 自定义有效载荷(这里采用自定义的Name和Email作为有效载荷的一部分)
+</span></span><span class="line"><span class="cl">type CustomClaims struct {
+</span></span><span class="line"><span class="cl">	Name  string `json:&#34;name&#34;`
+</span></span><span class="line"><span class="cl">	Email string `json:&#34;email&#34;`
+</span></span><span class="line"><span class="cl">	// StandardClaims结构体实现了Claims接口(Valid()函数)
+</span></span><span class="line"><span class="cl">	jwt.StandardClaims
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 调用jwt-go库生成token
+</span></span><span class="line"><span class="cl">// 指定编码的算法为jwt.SigningMethodHS256
+</span></span><span class="line"><span class="cl">func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
+</span></span><span class="line"><span class="cl">	// https://gowalker.org/github.com/dgrijalva/jwt-go#Token
+</span></span><span class="line"><span class="cl">	// 返回一个token的结构体指针
+</span></span><span class="line"><span class="cl">	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+</span></span><span class="line"><span class="cl">	return token.SignedString(j.SigningKey)
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// token解码
+</span></span><span class="line"><span class="cl">func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
+</span></span><span class="line"><span class="cl">	// https://gowalker.org/github.com/dgrijalva/jwt-go#ParseWithClaims
+</span></span><span class="line"><span class="cl">	// 输入用户自定义的Claims结构体对象,token,以及自定义函数来解析token字符串为jwt的Token结构体指针
+</span></span><span class="line"><span class="cl">	// Keyfunc是匿名函数类型: type Keyfunc func(*Token) (interface{}, error)
+</span></span><span class="line"><span class="cl">	// func ParseWithClaims(tokenString string, claims Claims, keyFunc Keyfunc) (*Token, error) {}
+</span></span><span class="line"><span class="cl">	token, err := jwt.ParseWithClaims(tokenString, &amp;CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+</span></span><span class="line"><span class="cl">		return j.SigningKey, nil
+</span></span><span class="line"><span class="cl">	})
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	if err != nil {
+</span></span><span class="line"><span class="cl">		// https://gowalker.org/github.com/dgrijalva/jwt-go#ValidationError
+</span></span><span class="line"><span class="cl">		// jwt.ValidationError 是一个无效token的错误结构
+</span></span><span class="line"><span class="cl">		if ve, ok := err.(*jwt.ValidationError); ok {
+</span></span><span class="line"><span class="cl">			// ValidationErrorMalformed是一个uint常量，表示token不可用
+</span></span><span class="line"><span class="cl">			if ve.Errors&amp;jwt.ValidationErrorMalformed != 0 {
+</span></span><span class="line"><span class="cl">				return nil, fmt.Errorf(&#34;token不可用&#34;)
+</span></span><span class="line"><span class="cl">				// ValidationErrorExpired表示Token过期
+</span></span><span class="line"><span class="cl">			} else if ve.Errors&amp;jwt.ValidationErrorExpired != 0 {
+</span></span><span class="line"><span class="cl">				return nil, fmt.Errorf(&#34;token过期&#34;)
+</span></span><span class="line"><span class="cl">				// ValidationErrorNotValidYet表示无效token
+</span></span><span class="line"><span class="cl">			} else if ve.Errors&amp;jwt.ValidationErrorNotValidYet != 0 {
+</span></span><span class="line"><span class="cl">				return nil, fmt.Errorf(&#34;无效的token&#34;)
+</span></span><span class="line"><span class="cl">			} else {
+</span></span><span class="line"><span class="cl">				return nil, fmt.Errorf(&#34;token不可用&#34;)
+</span></span><span class="line"><span class="cl">			}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		}
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	// 将token中的claims信息解析出来并断言成用户自定义的有效载荷结构
+</span></span><span class="line"><span class="cl">	if claims, ok := token.Claims.(*CustomClaims); ok &amp;&amp; token.Valid {
+</span></span><span class="line"><span class="cl">		return claims, nil
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	return nil, fmt.Errorf(&#34;token无效&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="定义登陆验证逻辑">定义登陆验证逻辑</h4>
 <p>接下来的部分就是普通api的具体逻辑了，比如可以在登陆时进行用户校验，成功后未该次认证请求生成token。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -966,82 +1004,82 @@ func (j *JWT) ParserToken(tokenString string) (*CustomClaims, error) {
 </span><span class="lnt">70
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义登陆逻辑
-// model.LoginReq中定义了登陆的请求体(name,passwd)
-func Login(c *gin.Context) {
-	var loginReq model.LoginReq
-	if c.BindJSON(&amp;loginReq) == nil {
-		// 登陆逻辑校验(查库，验证用户是否存在以及登陆信息是否正确)
-		isPass, user, err := model.LoginCheck(loginReq)
-		// 验证通过后为该次请求生成token
-		if isPass {
-			generateToken(c, user)
-		} else {
-			c.JSON(http.StatusOK, gin.H{
-				&#34;status&#34;: -1,
-				&#34;msg&#34;:    &#34;验证失败&#34; + err.Error(),
-				&#34;data&#34;:   nil,
-			})
-		}
-
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			&#34;status&#34;: -1,
-			&#34;msg&#34;:    &#34;用户数据解析失败&#34;,
-			&#34;data&#34;:   nil,
-		})
-	}
-}
-
-// token生成器
-// md 为上面定义好的middleware中间件
-func generateToken(c *gin.Context, user model.User) {
-	// 构造SignKey: 签名和解签名需要使用一个值
-	j := md.NewJWT()
-
-	// 构造用户claims信息(负荷)
-	claims := md.CustomClaims{
-		user.Name,
-		user.Email,
-		jwtgo.StandardClaims{
-			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
-			ExpiresAt: int64(time.Now().Unix() + 3600), // 签名过期时间
-			Issuer:    &#34;bgbiao.top&#34;,                    // 签名颁发者
-		},
-	}
-
-	// 根据claims生成token对象
-	token, err := j.CreateToken(claims)
-
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			&#34;status&#34;: -1,
-			&#34;msg&#34;:    err.Error(),
-			&#34;data&#34;:   nil,
-		})
-	}
-
-	log.Println(token)
-	// 封装一个响应数据,返回用户名和token
-	data := LoginResult{
-		Name:  user.Name,
-		Token: token,
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		&#34;status&#34;: 0,
-		&#34;msg&#34;:    &#34;登陆成功&#34;,
-		&#34;data&#34;:   data,
-	})
-	return
-
-}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 定义登陆逻辑
+</span></span><span class="line"><span class="cl">// model.LoginReq中定义了登陆的请求体(name,passwd)
+</span></span><span class="line"><span class="cl">func Login(c *gin.Context) {
+</span></span><span class="line"><span class="cl">	var loginReq model.LoginReq
+</span></span><span class="line"><span class="cl">	if c.BindJSON(&amp;loginReq) == nil {
+</span></span><span class="line"><span class="cl">		// 登陆逻辑校验(查库，验证用户是否存在以及登陆信息是否正确)
+</span></span><span class="line"><span class="cl">		isPass, user, err := model.LoginCheck(loginReq)
+</span></span><span class="line"><span class="cl">		// 验证通过后为该次请求生成token
+</span></span><span class="line"><span class="cl">		if isPass {
+</span></span><span class="line"><span class="cl">			generateToken(c, user)
+</span></span><span class="line"><span class="cl">		} else {
+</span></span><span class="line"><span class="cl">			c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">				&#34;status&#34;: -1,
+</span></span><span class="line"><span class="cl">				&#34;msg&#34;:    &#34;验证失败&#34; + err.Error(),
+</span></span><span class="line"><span class="cl">				&#34;data&#34;:   nil,
+</span></span><span class="line"><span class="cl">			})
+</span></span><span class="line"><span class="cl">		}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	} else {
+</span></span><span class="line"><span class="cl">		c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">			&#34;status&#34;: -1,
+</span></span><span class="line"><span class="cl">			&#34;msg&#34;:    &#34;用户数据解析失败&#34;,
+</span></span><span class="line"><span class="cl">			&#34;data&#34;:   nil,
+</span></span><span class="line"><span class="cl">		})
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// token生成器
+</span></span><span class="line"><span class="cl">// md 为上面定义好的middleware中间件
+</span></span><span class="line"><span class="cl">func generateToken(c *gin.Context, user model.User) {
+</span></span><span class="line"><span class="cl">	// 构造SignKey: 签名和解签名需要使用一个值
+</span></span><span class="line"><span class="cl">	j := md.NewJWT()
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	// 构造用户claims信息(负荷)
+</span></span><span class="line"><span class="cl">	claims := md.CustomClaims{
+</span></span><span class="line"><span class="cl">		user.Name,
+</span></span><span class="line"><span class="cl">		user.Email,
+</span></span><span class="line"><span class="cl">		jwtgo.StandardClaims{
+</span></span><span class="line"><span class="cl">			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
+</span></span><span class="line"><span class="cl">			ExpiresAt: int64(time.Now().Unix() + 3600), // 签名过期时间
+</span></span><span class="line"><span class="cl">			Issuer:    &#34;bgbiao.top&#34;,                    // 签名颁发者
+</span></span><span class="line"><span class="cl">		},
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	// 根据claims生成token对象
+</span></span><span class="line"><span class="cl">	token, err := j.CreateToken(claims)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	if err != nil {
+</span></span><span class="line"><span class="cl">		c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">			&#34;status&#34;: -1,
+</span></span><span class="line"><span class="cl">			&#34;msg&#34;:    err.Error(),
+</span></span><span class="line"><span class="cl">			&#34;data&#34;:   nil,
+</span></span><span class="line"><span class="cl">		})
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	log.Println(token)
+</span></span><span class="line"><span class="cl">	// 封装一个响应数据,返回用户名和token
+</span></span><span class="line"><span class="cl">	data := LoginResult{
+</span></span><span class="line"><span class="cl">		Name:  user.Name,
+</span></span><span class="line"><span class="cl">		Token: token,
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">		&#34;status&#34;: 0,
+</span></span><span class="line"><span class="cl">		&#34;msg&#34;:    &#34;登陆成功&#34;,
+</span></span><span class="line"><span class="cl">		&#34;data&#34;:   data,
+</span></span><span class="line"><span class="cl">	})
+</span></span><span class="line"><span class="cl">	return
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="定义普通待验证接口">定义普通待验证接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1072,47 +1110,45 @@ func generateToken(c *gin.Context, user model.User) {
 </span><span class="lnt">29
 </span><span class="lnt">30
 </span><span class="lnt">31
-</span><span class="lnt">32
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 定义一个普通controller函数，作为一个验证接口逻辑
-func GetDataByTime(c *gin.Context) {
-	// 上面我们在JWTAuth()中间中将&#39;claims&#39;写入到gin.Context的指针对象中，因此在这里可以将之解析出来
-	claims := c.MustGet(&#34;claims&#34;).(*md.CustomClaims)
-	if claims != nil {
-		c.JSON(http.StatusOK, gin.H{
-			&#34;status&#34;: 0,
-			&#34;msg&#34;:    &#34;token有效&#34;,
-			&#34;data&#34;:   claims,
-		})
-	}
-}
-
-
-// 在主函数中定义路由规则
-	router := gin.Default()
-	v1 := router.Group(&#34;/apis/v1/&#34;)
-	{
-		v1.POST(&#34;/register&#34;, controller.RegisterUser)
-		v1.POST(&#34;/login&#34;, controller.Login)
-	}
-
-	// secure v1
-	sv1 := router.Group(&#34;/apis/v1/auth/&#34;)
-	// 加载自定义的JWTAuth()中间件,在整个sv1的路由组中都生效
-	sv1.Use(md.JWTAuth())
-	{
-		sv1.GET(&#34;/time&#34;, controller.GetDataByTime)
-
-	}
-	router.Run(&#34;:8081&#34;)
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 定义一个普通controller函数，作为一个验证接口逻辑
+</span></span><span class="line"><span class="cl">func GetDataByTime(c *gin.Context) {
+</span></span><span class="line"><span class="cl">	// 上面我们在JWTAuth()中间中将&#39;claims&#39;写入到gin.Context的指针对象中，因此在这里可以将之解析出来
+</span></span><span class="line"><span class="cl">	claims := c.MustGet(&#34;claims&#34;).(*md.CustomClaims)
+</span></span><span class="line"><span class="cl">	if claims != nil {
+</span></span><span class="line"><span class="cl">		c.JSON(http.StatusOK, gin.H{
+</span></span><span class="line"><span class="cl">			&#34;status&#34;: 0,
+</span></span><span class="line"><span class="cl">			&#34;msg&#34;:    &#34;token有效&#34;,
+</span></span><span class="line"><span class="cl">			&#34;data&#34;:   claims,
+</span></span><span class="line"><span class="cl">		})
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">// 在主函数中定义路由规则
+</span></span><span class="line"><span class="cl">	router := gin.Default()
+</span></span><span class="line"><span class="cl">	v1 := router.Group(&#34;/apis/v1/&#34;)
+</span></span><span class="line"><span class="cl">	{
+</span></span><span class="line"><span class="cl">		v1.POST(&#34;/register&#34;, controller.RegisterUser)
+</span></span><span class="line"><span class="cl">		v1.POST(&#34;/login&#34;, controller.Login)
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	// secure v1
+</span></span><span class="line"><span class="cl">	sv1 := router.Group(&#34;/apis/v1/auth/&#34;)
+</span></span><span class="line"><span class="cl">	// 加载自定义的JWTAuth()中间件,在整个sv1的路由组中都生效
+</span></span><span class="line"><span class="cl">	sv1.Use(md.JWTAuth())
+</span></span><span class="line"><span class="cl">	{
+</span></span><span class="line"><span class="cl">		sv1.GET(&#34;/time&#34;, controller.GetDataByTime)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	}
+</span></span><span class="line"><span class="cl">	router.Run(&#34;:8081&#34;)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h4 id="验证使用jwt后的接口">验证使用JWT后的接口</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1172,71 +1208,69 @@ func GetDataByTime(c *gin.Context) {
 </span><span class="lnt">58
 </span><span class="lnt">59
 </span><span class="lnt">60
-</span><span class="lnt">61
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 运行项目
-$ go run main.go
-127.0.0.1
-13306
-root:bgbiao.top@tcp(127.0.0.1:13306)/test_api?charset=utf8mb4&amp;parseTime=True&amp;loc=Local
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
-
-[GIN-debug] [WARNING] Running in &#34;debug&#34; mode. Switch to &#34;release&#34; mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
-
-[GIN-debug] POST   /apis/v1/register         --&gt; warnning-trigger/controller.RegisterUser (3 handlers)
-[GIN-debug] POST   /apis/v1/login            --&gt; warnning-trigger/controller.Login (3 handlers)
-[GIN-debug] GET    /apis/v1/auth/time        --&gt; warnning-trigger/controller.GetDataByTime (4 handlers)
-[GIN-debug] Listening and serving HTTP on :8081
-
-# 注册用户
-$ curl -i -X POST \
-   -H &#34;Content-Type:application/json&#34; \
-   -d \
-&#39;{
-  &#34;name&#34;: &#34;hahaha1&#34;,
-  &#34;password&#34;: &#34;hahaha1&#34;,
-  &#34;email&#34;: &#34;hahaha1@bgbiao.top&#34;,
-  &#34;phone&#34;: 10000000000
-}&#39; \
- &#39;http://localhost:8081/apis/v1/register&#39;
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Sun, 15 Mar 2020 07:09:28 GMT
-Content-Length: 41
-
-{&#34;data&#34;:null,&#34;msg&#34;:&#34;success &#34;,&#34;status&#34;:0}%
-
-
-# 登陆用户以获取token
-$ curl -i -X POST \
-   -H &#34;Content-Type:application/json&#34; \
-   -d \
-&#39;{
-  &#34;name&#34;:&#34;hahaha1&#34;,
-  &#34;password&#34;:&#34;hahaha1&#34;
-}&#39; \
- &#39;http://localhost:8081/apis/v1/login&#39;
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Date: Sun, 15 Mar 2020 07:10:41 GMT
-Content-Length: 290
-
-{&#34;data&#34;:{&#34;token&#34;:&#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&#34;,&#34;name&#34;:&#34;hahaha1&#34;},&#34;msg&#34;:&#34;登陆成功&#34;,&#34;status&#34;:0}
-
-
-# 访问需要认证的接口
-# 因为我们对/apis/v1/auth/的分组路由中加载了jwt的middleware，因此该分组下的api都需要使用jwt-token认证
-$ curl http://localhost:8081/apis/v1/auth/time
-{&#34;data&#34;:null,&#34;msg&#34;:&#34;请求未携带token，无权限访问&#34;,&#34;status&#34;:-1}%
-
-# 使用token认证
-$ curl http://localhost:8081/apis/v1/auth/time -H &#39;token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&#39;
-{&#34;data&#34;:{&#34;userName&#34;:&#34;hahaha1&#34;,&#34;email&#34;:&#34;hahaha1@bgbiao.top&#34;,&#34;exp&#34;:1584259841,&#34;iss&#34;:&#34;bgbiao.top&#34;,&#34;nbf&#34;:1584255241},&#34;msg&#34;:&#34;token有效&#34;,&#34;status&#34;:0}%
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 运行项目
+</span></span><span class="line"><span class="cl">$ go run main.go
+</span></span><span class="line"><span class="cl">127.0.0.1
+</span></span><span class="line"><span class="cl">13306
+</span></span><span class="line"><span class="cl">root:bgbiao.top@tcp(127.0.0.1:13306)/test_api?charset=utf8mb4&amp;parseTime=True&amp;loc=Local
+</span></span><span class="line"><span class="cl">[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">[GIN-debug] [WARNING] Running in &#34;debug&#34; mode. Switch to &#34;release&#34; mode in production.
+</span></span><span class="line"><span class="cl"> - using env:	export GIN_MODE=release
+</span></span><span class="line"><span class="cl"> - using code:	gin.SetMode(gin.ReleaseMode)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">[GIN-debug] POST   /apis/v1/register         --&gt; warnning-trigger/controller.RegisterUser (3 handlers)
+</span></span><span class="line"><span class="cl">[GIN-debug] POST   /apis/v1/login            --&gt; warnning-trigger/controller.Login (3 handlers)
+</span></span><span class="line"><span class="cl">[GIN-debug] GET    /apis/v1/auth/time        --&gt; warnning-trigger/controller.GetDataByTime (4 handlers)
+</span></span><span class="line"><span class="cl">[GIN-debug] Listening and serving HTTP on :8081
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 注册用户
+</span></span><span class="line"><span class="cl">$ curl -i -X POST \
+</span></span><span class="line"><span class="cl">   -H &#34;Content-Type:application/json&#34; \
+</span></span><span class="line"><span class="cl">   -d \
+</span></span><span class="line"><span class="cl">&#39;{
+</span></span><span class="line"><span class="cl">  &#34;name&#34;: &#34;hahaha1&#34;,
+</span></span><span class="line"><span class="cl">  &#34;password&#34;: &#34;hahaha1&#34;,
+</span></span><span class="line"><span class="cl">  &#34;email&#34;: &#34;hahaha1@bgbiao.top&#34;,
+</span></span><span class="line"><span class="cl">  &#34;phone&#34;: 10000000000
+</span></span><span class="line"><span class="cl">}&#39; \
+</span></span><span class="line"><span class="cl"> &#39;http://localhost:8081/apis/v1/register&#39;
+</span></span><span class="line"><span class="cl">HTTP/1.1 200 OK
+</span></span><span class="line"><span class="cl">Content-Type: application/json; charset=utf-8
+</span></span><span class="line"><span class="cl">Date: Sun, 15 Mar 2020 07:09:28 GMT
+</span></span><span class="line"><span class="cl">Content-Length: 41
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{&#34;data&#34;:null,&#34;msg&#34;:&#34;success &#34;,&#34;status&#34;:0}%
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 登陆用户以获取token
+</span></span><span class="line"><span class="cl">$ curl -i -X POST \
+</span></span><span class="line"><span class="cl">   -H &#34;Content-Type:application/json&#34; \
+</span></span><span class="line"><span class="cl">   -d \
+</span></span><span class="line"><span class="cl">&#39;{
+</span></span><span class="line"><span class="cl">  &#34;name&#34;:&#34;hahaha1&#34;,
+</span></span><span class="line"><span class="cl">  &#34;password&#34;:&#34;hahaha1&#34;
+</span></span><span class="line"><span class="cl">}&#39; \
+</span></span><span class="line"><span class="cl"> &#39;http://localhost:8081/apis/v1/login&#39;
+</span></span><span class="line"><span class="cl">HTTP/1.1 200 OK
+</span></span><span class="line"><span class="cl">Content-Type: application/json; charset=utf-8
+</span></span><span class="line"><span class="cl">Date: Sun, 15 Mar 2020 07:10:41 GMT
+</span></span><span class="line"><span class="cl">Content-Length: 290
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">{&#34;data&#34;:{&#34;token&#34;:&#34;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&#34;,&#34;name&#34;:&#34;hahaha1&#34;},&#34;msg&#34;:&#34;登陆成功&#34;,&#34;status&#34;:0}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 访问需要认证的接口
+</span></span><span class="line"><span class="cl"># 因为我们对/apis/v1/auth/的分组路由中加载了jwt的middleware，因此该分组下的api都需要使用jwt-token认证
+</span></span><span class="line"><span class="cl">$ curl http://localhost:8081/apis/v1/auth/time
+</span></span><span class="line"><span class="cl">{&#34;data&#34;:null,&#34;msg&#34;:&#34;请求未携带token，无权限访问&#34;,&#34;status&#34;:-1}%
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用token认证
+</span></span><span class="line"><span class="cl">$ curl http://localhost:8081/apis/v1/auth/time -H &#39;token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImhhaGFoYTEiLCJlbWFpbCI6ImhhaGFoYTFAYmdiaWFvLnRvcCIsImV4cCI6MTU4NDI1OTg0MSwiaXNzIjoiYmdiaWFvLnRvcCIsIm5iZiI6MTU4NDI1NTI0MX0.HNXSKISZTqzjKd705BOSARmgI8FGGe4Sv-Ma3_iK1Xw&#39;
+</span></span><span class="line"><span class="cl">{&#34;data&#34;:{&#34;userName&#34;:&#34;hahaha1&#34;,&#34;email&#34;:&#34;hahaha1@bgbiao.top&#34;,&#34;exp&#34;:1584259841,&#34;iss&#34;:&#34;bgbiao.top&#34;,&#34;nbf&#34;:1584255241},&#34;msg&#34;:&#34;token有效&#34;,&#34;status&#34;:0}%
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://github.com/BGBiao/gin-jwt-token">gin-jwt-go源码</a></p>
 <hr>
@@ -1390,6 +1424,27 @@ $ curl http://localhost:8081/apis/v1/auth/time -H &#39;token: eyJhbGciOiJIUzI1Ni
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

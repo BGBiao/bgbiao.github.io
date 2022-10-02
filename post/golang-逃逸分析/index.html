@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Golang中的逃逸分析 - BGBiao的SRE人生</title>
+  <title>Golang中的逃逸分析 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/golang-%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" />
@@ -65,13 +65,13 @@
 <meta property="og:description" content="背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/golang-%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-01-16T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-01-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="Golang中的逃逸分析">
-<meta itemprop="description" content="背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具"><meta itemprop="datePublished" content="2020-01-16T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="4238">
+<meta itemprop="description" content="背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具"><meta itemprop="datePublished" content="2020-01-16T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="4231">
 <meta itemprop="keywords" content="golang,逃逸分析," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Golang中的逃逸分析"/>
 <meta name="twitter:description" content="背景:说实话，使用Golang来作为日常的cmdline程序开发也有一两年了，之前作为一名Ops来说，会使用Golang去开发一些常用的工具"/>
@@ -131,7 +131,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -170,22 +170,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -347,7 +365,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -388,22 +406,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -461,7 +505,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/golang/"> golang </a>
             
           </div>
-        <span class="more-meta"> 4238 words </span>
+        <span class="more-meta"> 4231 words </span>
           <span class="more-meta"> 9 min read </span>
 
         
@@ -540,7 +584,7 @@ if (!doNotTrack) {
 <p><strong>1.示例-参数泄露</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -569,81 +613,79 @@ if (!doNotTrack) {
 </span><span class="lnt">27
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">#</span> <span class="nx">测试代码</span>
-<span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="p">.</span><span class="k">go</span>
-<span class="kn">package</span> <span class="nx">main</span>
-<span class="kn">import</span> <span class="p">(</span>
-    <span class="nx">_</span> <span class="s">&#34;fmt&#34;</span>
-<span class="p">)</span>
-<span class="c1">// 定义一个简单的结构体
-</span><span class="c1"></span><span class="kd">type</span> <span class="nx">user</span> <span class="kd">struct</span> <span class="p">{</span>
-    <span class="nx">name</span>    <span class="kt">string</span>
-    <span class="nx">age</span>     <span class="kt">int</span>
-    <span class="nx">webSite</span> <span class="kt">string</span>
-<span class="p">}</span>
-<span class="c1">// 获取用户信息
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">GetUserInfo</span><span class="p">(</span><span class="nx">u</span> <span class="o">*</span><span class="nx">user</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">u</span>
-<span class="p">}</span>
-<span class="c1">// 获取用户名称
-</span><span class="c1"></span><span class="kd">func</span> <span class="nf">GetName</span><span class="p">(</span><span class="nx">u</span> <span class="o">*</span><span class="nx">user</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">u</span><span class="p">.</span><span class="nx">name</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// 初始化user结构体的指针对象
-</span><span class="c1"></span>    <span class="nx">user</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">user</span><span class="p">{</span><span class="s">&#34;BGBiao&#34;</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="s">&#34;https://bgbiao.top&#34;</span><span class="p">}</span>
-    <span class="nf">GetUserInfo</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
-    <span class="nf">GetName</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="err">#</span> <span class="nx">测试代码</span>
+</span></span><span class="line"><span class="cl"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="p">.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 定义一个简单的结构体
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">user</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span>    <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">age</span>     <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">webSite</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 获取用户信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">GetUserInfo</span><span class="p">(</span><span class="nx">u</span> <span class="o">*</span><span class="nx">user</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">u</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 获取用户名称
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">GetName</span><span class="p">(</span><span class="nx">u</span> <span class="o">*</span><span class="nx">user</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">u</span><span class="p">.</span><span class="nx">name</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 初始化user结构体的指针对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">user</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">user</span><span class="p">{</span><span class="s">&#34;BGBiao&#34;</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="s">&#34;https://bgbiao.top&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">GetUserInfo</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">GetName</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>使用<code>逃逸分析</code>来进行内存分析</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
-# command-line-arguments
-./taoyi.go:21:18: leaking param: u to result ~r1 level=0
-./taoyi.go:25:14: leaking param: u to result ~r1 level=1
-./taoyi.go:31:31: main &amp;user literal does not escape
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
+</span></span><span class="line"><span class="cl"># command-line-arguments
+</span></span><span class="line"><span class="cl">./taoyi.go:21:18: leaking param: u to result ~r1 level=0
+</span></span><span class="line"><span class="cl">./taoyi.go:25:14: leaking param: u to result ~r1 level=1
+</span></span><span class="line"><span class="cl">./taoyi.go:31:31: main &amp;user literal does not escape
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>由上述输出的<code>leaking param</code>可以看到，在<code>GetUserInfo</code>和<code>GetName</code>函数中的<code>指针变量u</code>是一个泄露参数，在两个函数中均没有对<code>u</code>进行变量操作，就直接返回了变量内容，因此最后的该变量<code>user</code>并没有发生逃逸，<code>&amp;user</code>对象还是作用在了<code>main()</code>函数中。</p>
 <p><strong>2.示例-未知类型</strong></p>
 <p>这个时候，我们把上面的代码稍微改动一下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">....
-....
-func main() {
-    user := &amp;user{&#34;BGBiao&#34;,18,&#34;https://bgbiao.top&#34;}
-    fmt.Println(GetUserInfo(user))
-    fmt.Println(GetName(user))
-}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">func main() {
+</span></span><span class="line"><span class="cl">    user := &amp;user{&#34;BGBiao&#34;,18,&#34;https://bgbiao.top&#34;}
+</span></span><span class="line"><span class="cl">    fmt.Println(GetUserInfo(user))
+</span></span><span class="line"><span class="cl">    fmt.Println(GetName(user))
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>再次进行逃逸分析:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -654,63 +696,59 @@ func main() {
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
-# command-line-arguments
-./taoyi.go:21:18: leaking param: u to result ~r1 level=0
-./taoyi.go:25:14: leaking param: u to result ~r1 level=1
-./taoyi.go:31:31: &amp;user literal escapes to heap
-./taoyi.go:32:16: main ... argument does not escape
-./taoyi.go:32:28: GetUserInfo(user) escapes to heap
-./taoyi.go:33:16: main ... argument does not escape
-./taoyi.go:33:24: GetName(user) escapes to heap
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
+</span></span><span class="line"><span class="cl"># command-line-arguments
+</span></span><span class="line"><span class="cl">./taoyi.go:21:18: leaking param: u to result ~r1 level=0
+</span></span><span class="line"><span class="cl">./taoyi.go:25:14: leaking param: u to result ~r1 level=1
+</span></span><span class="line"><span class="cl">./taoyi.go:31:31: &amp;user literal escapes to heap
+</span></span><span class="line"><span class="cl">./taoyi.go:32:16: main ... argument does not escape
+</span></span><span class="line"><span class="cl">./taoyi.go:32:28: GetUserInfo(user) escapes to heap
+</span></span><span class="line"><span class="cl">./taoyi.go:33:16: main ... argument does not escape
+</span></span><span class="line"><span class="cl">./taoyi.go:33:24: GetName(user) escapes to heap
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>由上可以发现我们的指针对象<code>&amp;user</code>在该程序中发生了逃逸，具体是在<code>GetUserInfo(user)</code>和<code>GetName(user)</code>发生了逃逸.</p>
 <p>这是为什么呢？怎么加了个<code>fmt.Println</code>之后对象就发生了逃逸呢?</p>
 <p>其实主要原因为<code>fmt.Println</code>函数的原因:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">func Println(a ...interface{}) (n int, err error)
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">func Println(a ...interface{}) (n int, err error)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>我们可以看到<code>fmt.Println(a)</code>函数中入参为<code>interface{}</code>类型，在编译阶段编译器无法确定其具体的类型。因此会产生逃逸，最终分配到堆上(最本质的原因是interface{}类型一般情况下底层会进行<code>reflect</code>，而使用的<code>reflect.TypeOf(arg).Kind()</code>获取接口类型对象的底层数据类型时发生了堆逃逸，最终就会反映为当入参是空接口类型时发生了逃逸)。</p>
 <p><strong>3.示例-指针</strong></p>
 <p>此时，我们再小改点代码:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">// 返回结构体对象的指针，此时就会产生逃逸
-func GetUserInfo(u user) (*user) {
-    return &amp;u
-}
-
-func main() {
-    user := user{&#34;BGBiao&#34;,18,&#34;https://bgbiao.top&#34;}
-    GetUserInfo(user)
-}
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 返回结构体对象的指针，此时就会产生逃逸
+</span></span><span class="line"><span class="cl">func GetUserInfo(u user) (*user) {
+</span></span><span class="line"><span class="cl">    return &amp;u
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">func main() {
+</span></span><span class="line"><span class="cl">    user := user{&#34;BGBiao&#34;,18,&#34;https://bgbiao.top&#34;}
+</span></span><span class="line"><span class="cl">    GetUserInfo(user)
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>逃逸分析:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -759,66 +797,64 @@ func main() {
 </span><span class="lnt">47
 </span><span class="lnt">48
 </span><span class="lnt">49
-</span><span class="lnt">50
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
-# command-line-arguments
-./taoyi.go:21:18: moved to heap: u
-
-# 查看汇编代码(可以看到有个CALL	runtime.newobject(SB)的系统调用)
-$ go tool compile -S taoyi.go | grep taoyi.go:21
-	0x0000 00000 (taoyi.go:21)	TEXT	&#34;&#34;.GetUserInfo(SB), ABIInternal, $40-48
-	0x0000 00000 (taoyi.go:21)	MOVQ	(TLS), CX
-	0x0009 00009 (taoyi.go:21)	CMPQ	SP, 16(CX)
-	0x000d 00013 (taoyi.go:21)	JLS	147
-	0x0013 00019 (taoyi.go:21)	SUBQ	$40, SP
-	0x0017 00023 (taoyi.go:21)	MOVQ	BP, 32(SP)
-	0x001c 00028 (taoyi.go:21)	LEAQ	32(SP), BP
-	0x0021 00033 (taoyi.go:21)	FUNCDATA	$0, gclocals·fb57040982f53920ad6a8ad662a1594f(SB)
-	0x0021 00033 (taoyi.go:21)	FUNCDATA	$1, gclocals·263043c8f03e3241528dfae4e2812ef4(SB)
-	0x0021 00033 (taoyi.go:21)	FUNCDATA	$2, gclocals·9fb7f0986f647f17cb53dda1484e0f7a(SB)
-	0x0021 00033 (taoyi.go:21)	PCDATA	$0, $1
-	0x0021 00033 (taoyi.go:21)	PCDATA	$1, $0
-	0x0021 00033 (taoyi.go:21)	LEAQ	type.&#34;&#34;.user(SB), AX
-	0x0028 00040 (taoyi.go:21)	PCDATA	$0, $0
-	0x0028 00040 (taoyi.go:21)	MOVQ	AX, (SP)
-	0x002c 00044 (taoyi.go:21)	CALL	runtime.newobject(SB)
-	0x0031 00049 (taoyi.go:21)	PCDATA	$0, $1
-	0x0031 00049 (taoyi.go:21)	MOVQ	8(SP), AX
-	0x0036 00054 (taoyi.go:21)	PCDATA	$0, $-2
-	0x0036 00054 (taoyi.go:21)	PCDATA	$1, $-2
-	0x0036 00054 (taoyi.go:21)	CMPL	runtime.writeBarrier(SB), $0
-	0x003d 00061 (taoyi.go:21)	JNE	104
-	0x003f 00063 (taoyi.go:21)	MOVQ	&#34;&#34;.u+48(SP), CX
-	0x0044 00068 (taoyi.go:21)	MOVQ	CX, (AX)
-	0x0047 00071 (taoyi.go:21)	MOVUPS	&#34;&#34;.u+56(SP), X0
-	0x004c 00076 (taoyi.go:21)	MOVUPS	X0, 8(AX)
-	0x0050 00080 (taoyi.go:21)	MOVUPS	&#34;&#34;.u+72(SP), X0
-	0x0055 00085 (taoyi.go:21)	MOVUPS	X0, 24(AX)
-	0x0068 00104 (taoyi.go:21)	PCDATA	$0, $-2
-	0x0068 00104 (taoyi.go:21)	PCDATA	$1, $-2
-	0x0068 00104 (taoyi.go:21)	MOVQ	AX, &#34;&#34;.&amp;u+24(SP)
-	0x006d 00109 (taoyi.go:21)	LEAQ	type.&#34;&#34;.user(SB), CX
-	0x0074 00116 (taoyi.go:21)	MOVQ	CX, (SP)
-	0x0078 00120 (taoyi.go:21)	MOVQ	AX, 8(SP)
-	0x007d 00125 (taoyi.go:21)	LEAQ	&#34;&#34;.u+48(SP), CX
-	0x0082 00130 (taoyi.go:21)	MOVQ	CX, 16(SP)
-	0x0087 00135 (taoyi.go:21)	CALL	runtime.typedmemmove(SB)
-	0x0091 00145 (taoyi.go:21)	JMP	89
-	0x0093 00147 (taoyi.go:21)	NOP
-	0x0093 00147 (taoyi.go:21)	PCDATA	$1, $-1
-	0x0093 00147 (taoyi.go:21)	PCDATA	$0, $-1
-	0x0093 00147 (taoyi.go:21)	CALL	runtime.morestack_noctxt(SB)
-	0x0098 00152 (taoyi.go:21)	JMP	0
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ go build -gcflags &#39;-m -m  -l&#39; taoyi.go
+</span></span><span class="line"><span class="cl"># command-line-arguments
+</span></span><span class="line"><span class="cl">./taoyi.go:21:18: moved to heap: u
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看汇编代码(可以看到有个CALL	runtime.newobject(SB)的系统调用)
+</span></span><span class="line"><span class="cl">$ go tool compile -S taoyi.go | grep taoyi.go:21
+</span></span><span class="line"><span class="cl">	0x0000 00000 (taoyi.go:21)	TEXT	&#34;&#34;.GetUserInfo(SB), ABIInternal, $40-48
+</span></span><span class="line"><span class="cl">	0x0000 00000 (taoyi.go:21)	MOVQ	(TLS), CX
+</span></span><span class="line"><span class="cl">	0x0009 00009 (taoyi.go:21)	CMPQ	SP, 16(CX)
+</span></span><span class="line"><span class="cl">	0x000d 00013 (taoyi.go:21)	JLS	147
+</span></span><span class="line"><span class="cl">	0x0013 00019 (taoyi.go:21)	SUBQ	$40, SP
+</span></span><span class="line"><span class="cl">	0x0017 00023 (taoyi.go:21)	MOVQ	BP, 32(SP)
+</span></span><span class="line"><span class="cl">	0x001c 00028 (taoyi.go:21)	LEAQ	32(SP), BP
+</span></span><span class="line"><span class="cl">	0x0021 00033 (taoyi.go:21)	FUNCDATA	$0, gclocals·fb57040982f53920ad6a8ad662a1594f(SB)
+</span></span><span class="line"><span class="cl">	0x0021 00033 (taoyi.go:21)	FUNCDATA	$1, gclocals·263043c8f03e3241528dfae4e2812ef4(SB)
+</span></span><span class="line"><span class="cl">	0x0021 00033 (taoyi.go:21)	FUNCDATA	$2, gclocals·9fb7f0986f647f17cb53dda1484e0f7a(SB)
+</span></span><span class="line"><span class="cl">	0x0021 00033 (taoyi.go:21)	PCDATA	$0, $1
+</span></span><span class="line"><span class="cl">	0x0021 00033 (taoyi.go:21)	PCDATA	$1, $0
+</span></span><span class="line"><span class="cl">	0x0021 00033 (taoyi.go:21)	LEAQ	type.&#34;&#34;.user(SB), AX
+</span></span><span class="line"><span class="cl">	0x0028 00040 (taoyi.go:21)	PCDATA	$0, $0
+</span></span><span class="line"><span class="cl">	0x0028 00040 (taoyi.go:21)	MOVQ	AX, (SP)
+</span></span><span class="line"><span class="cl">	0x002c 00044 (taoyi.go:21)	CALL	runtime.newobject(SB)
+</span></span><span class="line"><span class="cl">	0x0031 00049 (taoyi.go:21)	PCDATA	$0, $1
+</span></span><span class="line"><span class="cl">	0x0031 00049 (taoyi.go:21)	MOVQ	8(SP), AX
+</span></span><span class="line"><span class="cl">	0x0036 00054 (taoyi.go:21)	PCDATA	$0, $-2
+</span></span><span class="line"><span class="cl">	0x0036 00054 (taoyi.go:21)	PCDATA	$1, $-2
+</span></span><span class="line"><span class="cl">	0x0036 00054 (taoyi.go:21)	CMPL	runtime.writeBarrier(SB), $0
+</span></span><span class="line"><span class="cl">	0x003d 00061 (taoyi.go:21)	JNE	104
+</span></span><span class="line"><span class="cl">	0x003f 00063 (taoyi.go:21)	MOVQ	&#34;&#34;.u+48(SP), CX
+</span></span><span class="line"><span class="cl">	0x0044 00068 (taoyi.go:21)	MOVQ	CX, (AX)
+</span></span><span class="line"><span class="cl">	0x0047 00071 (taoyi.go:21)	MOVUPS	&#34;&#34;.u+56(SP), X0
+</span></span><span class="line"><span class="cl">	0x004c 00076 (taoyi.go:21)	MOVUPS	X0, 8(AX)
+</span></span><span class="line"><span class="cl">	0x0050 00080 (taoyi.go:21)	MOVUPS	&#34;&#34;.u+72(SP), X0
+</span></span><span class="line"><span class="cl">	0x0055 00085 (taoyi.go:21)	MOVUPS	X0, 24(AX)
+</span></span><span class="line"><span class="cl">	0x0068 00104 (taoyi.go:21)	PCDATA	$0, $-2
+</span></span><span class="line"><span class="cl">	0x0068 00104 (taoyi.go:21)	PCDATA	$1, $-2
+</span></span><span class="line"><span class="cl">	0x0068 00104 (taoyi.go:21)	MOVQ	AX, &#34;&#34;.&amp;u+24(SP)
+</span></span><span class="line"><span class="cl">	0x006d 00109 (taoyi.go:21)	LEAQ	type.&#34;&#34;.user(SB), CX
+</span></span><span class="line"><span class="cl">	0x0074 00116 (taoyi.go:21)	MOVQ	CX, (SP)
+</span></span><span class="line"><span class="cl">	0x0078 00120 (taoyi.go:21)	MOVQ	AX, 8(SP)
+</span></span><span class="line"><span class="cl">	0x007d 00125 (taoyi.go:21)	LEAQ	&#34;&#34;.u+48(SP), CX
+</span></span><span class="line"><span class="cl">	0x0082 00130 (taoyi.go:21)	MOVQ	CX, 16(SP)
+</span></span><span class="line"><span class="cl">	0x0087 00135 (taoyi.go:21)	CALL	runtime.typedmemmove(SB)
+</span></span><span class="line"><span class="cl">	0x0091 00145 (taoyi.go:21)	JMP	89
+</span></span><span class="line"><span class="cl">	0x0093 00147 (taoyi.go:21)	NOP
+</span></span><span class="line"><span class="cl">	0x0093 00147 (taoyi.go:21)	PCDATA	$1, $-1
+</span></span><span class="line"><span class="cl">	0x0093 00147 (taoyi.go:21)	PCDATA	$0, $-1
+</span></span><span class="line"><span class="cl">	0x0093 00147 (taoyi.go:21)	CALL	runtime.morestack_noctxt(SB)
+</span></span><span class="line"><span class="cl">	0x0098 00152 (taoyi.go:21)	JMP	0
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>由以上输出可以看到在<code>GetUserInfo(u user)</code>函数中的对象u已经被移到<code>堆</code>上了，这是因为该函数返回的是<code>指针对象</code>，引用对象被返回到方法之外了(此时该引用对象可以在外部被调用和修改)，因此编译器会把该对象分配到堆上(否则方法结束后，局部变量被回收岂不是很惨)。</p>
 <p><strong>4.示例-综合案例</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -830,30 +866,28 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
-</span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
-<span class="kn">package</span> <span class="nx">main</span>
-
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">name</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span>
-    <span class="o">*</span><span class="nx">name</span> <span class="p">=</span> <span class="s">&#34;BGBiao&#34;</span>
-
-<span class="p">}</span>
-
-<span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
-<span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="nx">name</span> <span class="p">=</span> <span class="s">&#34;BGBiao&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="mf">2.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>在上面第三个示例中我们提到，当返回对象是<code>指针类型</code>(引用对象)时，就会发现逃逸，但上面的示例其实告诉我们虽然<code>*name</code>是一个指针类型，但是并未发生逃逸，这是因为<code>该引用类型未被外部使用</code>.</p>
 <p>但是又如第二个示例中所说，如果我们在上面的示例中增加<code>fmt.Println(name)</code>后，会发现该实例又会出现逃逸.</p>
 <p><code>注意</code>:虽然当使用fmt.Println的时候又会出现逃逸，但是当使用fmt.Println(*name)和fmt.Println(name)，也是不同的。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -867,30 +901,28 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo1</span><span class="p">.</span><span class="k">go</span>
-<span class="kn">package</span> <span class="nx">main</span>
-<span class="kn">import</span> <span class="p">(</span><span class="s">&#34;fmt&#34;</span><span class="p">)</span>
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">name</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span>
-    <span class="o">*</span><span class="nx">name</span> <span class="p">=</span> <span class="s">&#34;BGBiao&#34;</span>
-    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="o">*</span><span class="nx">name</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span>
-<span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="o">...</span> <span class="nx">argument</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">:</span> <span class="o">*</span><span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo1</span><span class="p">.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span><span class="s">&#34;fmt&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="nx">name</span> <span class="p">=</span> <span class="s">&#34;BGBiao&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="o">*</span><span class="nx">name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="o">...</span> <span class="nx">argument</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">:</span> <span class="o">*</span><span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>由上述输出可看到，当使用引用类型来获取底层的值时，在<code>fmt.Println</code>的入参处<code>*name</code>发生了逃逸.</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -904,25 +936,23 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
 </span><span class="lnt">12
 </span><span class="lnt">13
 </span><span class="lnt">14
-</span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo2</span><span class="p">.</span><span class="k">go</span>
-<span class="kn">package</span> <span class="nx">main</span>
-<span class="kn">import</span> <span class="p">(</span><span class="s">&#34;fmt&#34;</span><span class="p">)</span>
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">name</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span>
-    <span class="o">*</span><span class="nx">name</span> <span class="p">=</span> <span class="s">&#34;BGBiao&#34;</span>
-    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span>
-<span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="o">...</span> <span class="nx">argument</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
-<span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="err">$</span> <span class="nx">cat</span> <span class="nx">demo2</span><span class="p">.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span><span class="s">&#34;fmt&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="nx">name</span> <span class="p">=</span> <span class="s">&#34;BGBiao&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">$</span> <span class="k">go</span> <span class="nx">build</span> <span class="o">-</span><span class="nx">gcflags</span> <span class="err">&#39;</span><span class="o">-</span><span class="nx">m</span> <span class="o">-</span><span class="nx">m</span>  <span class="o">-</span><span class="nx">l</span><span class="err">&#39;</span> <span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span>
+</span></span><span class="line"><span class="cl"><span class="err">#</span> <span class="nx">command</span><span class="o">-</span><span class="nx">line</span><span class="o">-</span><span class="nx">arguments</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nb">new</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">main</span> <span class="o">...</span> <span class="nx">argument</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">escape</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="o">/</span><span class="nx">taoyi</span><span class="o">-</span><span class="nx">demo</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">15</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span> <span class="nx">name</span> <span class="nx">escapes</span> <span class="nx">to</span> <span class="nx">heap</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>而这次我们使用<code>fmt.Println(name)</code>来输出底层值，就会发现变量<code>name</code>在初始化的时候就会出现逃逸<code>new(string)</code>，</p>
 <h3 id="总结">总结</h3>
@@ -1092,6 +1122,27 @@ $ go tool compile -S taoyi.go | grep taoyi.go:21
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

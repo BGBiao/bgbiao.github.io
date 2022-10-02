@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>GPU环境下玩转Docker(二) - BGBiao的SRE人生</title>
+  <title>GPU环境下玩转Docker(二) - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/" />
@@ -69,16 +69,16 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2017-10-26T10:07:46&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2017-10-26T10:07:46+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="GPU环境下玩转Docker(二)">
 <meta itemprop="description" content="
 前言:
 在一节中,我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。
-"><meta itemprop="datePublished" content="2017-10-26T10:07:46&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="3864">
+"><meta itemprop="datePublished" content="2017-10-26T10:07:46+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="3857">
 <meta itemprop="keywords" content="Docker,GPU,NVIDIA,NVIDIA-Docker," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="GPU环境下玩转Docker(二)"/>
 <meta name="twitter:description" content="
@@ -141,7 +141,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -180,22 +180,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -357,7 +375,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -398,22 +416,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -471,7 +515,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 3864 words </span>
+        <span class="more-meta"> 3857 words </span>
           <span class="more-meta"> 8 min read </span>
 
         
@@ -518,7 +562,7 @@ if (!doNotTrack) {
 <h4 id="快速部署安装">快速部署安装</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -592,87 +636,83 @@ if (!doNotTrack) {
 </span><span class="lnt">72
 </span><span class="lnt">73
 </span><span class="lnt">74
-</span><span class="lnt">75
-</span><span class="lnt">76
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 安装 nvidia-docker and nvidia-docker-plugin
-$ wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.1/nvidia-docker-1.0.1-1.x86_64.rpm
-$ rpm -i /tmp/nvidia-docker*.rpm &amp;&amp; rm /tmp/nvidia-docker*.rpm
-$ systemctl start nvidia-docker
-
-# 测试docker容器内部可以识别宿主机的GPU环境
-# nvidia-docker run --rm idockerhub.xxb.com/nvidia-docker/cuda8.0-runtime:centos6-17-10-19 nvidia-smi
-Thu Oct 19 08:07:09 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
-| N/A   28C    P8    18W / 250W |      0MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   1  Tesla M40           On   | 0000:05:00.0     Off |                    0 |
-| N/A   31C    P8    17W / 250W |      0MiB / 11443MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   2  Tesla M40 24GB      On   | 0000:06:00.0     Off |                    0 |
-| N/A   26C    P8    18W / 250W |      0MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   3  Tesla M40           On   | 0000:07:00.0     Off |                    0 |
-| N/A   27C    P8    16W / 250W |      0MiB / 11443MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
-
-# 绑定GPU核心到docker容器内部(可以看到该容器内部其实只绑定了一块宿主机上的第一块GPU卡)实现GPU隔离
-# NV_GPU=0 nvidia-docker run --rm idockerhub.xxb.com/nvidia-docker/cuda8.0-runtime:centos6-17-10-19 nvidia-smi
-Wed Oct 25 07:17:03 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
-| N/A   23C    P8    17W / 250W |      0MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
-
-# NV_GPU=&#34;0,2&#34; nvidia-docker run --rm -ti idockerhub.xxb.com/nvidia-docker/cuda8.0-runtime:centos6-17-10-19 nvidia-smi
-Wed Oct 25 08:37:25 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
-| N/A   34C    P0    59W / 250W |  21802MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-|   1  Tesla M40 24GB      On   | 0000:06:00.0     Off |                    0 |
-| N/A   34C    P0    57W / 250W |  21800MiB / 22939MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-+-----------------------------------------------------------------------------+
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 安装 nvidia-docker and nvidia-docker-plugin
+</span></span><span class="line"><span class="cl">$ wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.1/nvidia-docker-1.0.1-1.x86_64.rpm
+</span></span><span class="line"><span class="cl">$ rpm -i /tmp/nvidia-docker*.rpm &amp;&amp; rm /tmp/nvidia-docker*.rpm
+</span></span><span class="line"><span class="cl">$ systemctl start nvidia-docker
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 测试docker容器内部可以识别宿主机的GPU环境
+</span></span><span class="line"><span class="cl"># nvidia-docker run --rm idockerhub.xxb.com/nvidia-docker/cuda8.0-runtime:centos6-17-10-19 nvidia-smi
+</span></span><span class="line"><span class="cl">Thu Oct 19 08:07:09 2017
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
+</span></span><span class="line"><span class="cl">|-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+</span></span><span class="line"><span class="cl">| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+</span></span><span class="line"><span class="cl">|===============================+======================+======================|
+</span></span><span class="line"><span class="cl">|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   28C    P8    18W / 250W |      0MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   1  Tesla M40           On   | 0000:05:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   31C    P8    17W / 250W |      0MiB / 11443MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   2  Tesla M40 24GB      On   | 0000:06:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   26C    P8    18W / 250W |      0MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   3  Tesla M40           On   | 0000:07:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   27C    P8    16W / 250W |      0MiB / 11443MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| Processes:                                                       GPU Memory |
+</span></span><span class="line"><span class="cl">|  GPU       PID  Type  Process name                               Usage      |
+</span></span><span class="line"><span class="cl">|=============================================================================|
+</span></span><span class="line"><span class="cl">|  No running processes found                                                 |
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 绑定GPU核心到docker容器内部(可以看到该容器内部其实只绑定了一块宿主机上的第一块GPU卡)实现GPU隔离
+</span></span><span class="line"><span class="cl"># NV_GPU=0 nvidia-docker run --rm idockerhub.xxb.com/nvidia-docker/cuda8.0-runtime:centos6-17-10-19 nvidia-smi
+</span></span><span class="line"><span class="cl">Wed Oct 25 07:17:03 2017
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
+</span></span><span class="line"><span class="cl">|-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+</span></span><span class="line"><span class="cl">| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+</span></span><span class="line"><span class="cl">|===============================+======================+======================|
+</span></span><span class="line"><span class="cl">|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   23C    P8    17W / 250W |      0MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| Processes:                                                       GPU Memory |
+</span></span><span class="line"><span class="cl">|  GPU       PID  Type  Process name                               Usage      |
+</span></span><span class="line"><span class="cl">|=============================================================================|
+</span></span><span class="line"><span class="cl">|  No running processes found                                                 |
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># NV_GPU=&#34;0,2&#34; nvidia-docker run --rm -ti idockerhub.xxb.com/nvidia-docker/cuda8.0-runtime:centos6-17-10-19 nvidia-smi
+</span></span><span class="line"><span class="cl">Wed Oct 25 08:37:25 2017
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| NVIDIA-SMI 375.39                 Driver Version: 375.39                    |
+</span></span><span class="line"><span class="cl">|-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+</span></span><span class="line"><span class="cl">| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+</span></span><span class="line"><span class="cl">|===============================+======================+======================|
+</span></span><span class="line"><span class="cl">|   0  Tesla M40 24GB      On   | 0000:04:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   34C    P0    59W / 250W |  21802MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">|   1  Tesla M40 24GB      On   | 0000:06:00.0     Off |                    0 |
+</span></span><span class="line"><span class="cl">| N/A   34C    P0    57W / 250W |  21800MiB / 22939MiB |      0%      Default |
+</span></span><span class="line"><span class="cl">+-------------------------------+----------------------+----------------------+
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span><span class="line"><span class="cl">| Processes:                                                       GPU Memory |
+</span></span><span class="line"><span class="cl">|  GPU       PID  Type  Process name                               Usage      |
+</span></span><span class="line"><span class="cl">|=============================================================================|
+</span></span><span class="line"><span class="cl">+-----------------------------------------------------------------------------+
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意1：上述输出的表格中可用看到，使用nvidia-docker工具创建的容器内部其实是可以识别到宿主机的GPU设备的</code></p>
 <p><code>注意2：CPU和GPU其实很类似，无法智能识别需要几块卡设备，只能通过NV_GPU方式来给容器绑定GPU卡(类似于cpu set的方式)；需要管理员动态的调整需要分配的具体GPU卡设备</code></p>
@@ -680,7 +720,7 @@ Wed Oct 25 08:37:25 2017
 <p>2.1 <strong>使用官方的gpu版本的tensorflow镜像测试GPU设备</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -753,91 +793,89 @@ Wed Oct 25 08:37:25 2017
 </span><span class="lnt">71
 </span><span class="lnt">72
 </span><span class="lnt">73
-</span><span class="lnt">74
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># nvidia-docker run -it --rm -v /usr/lib64/libcuda.so.1:/usr/local/nvidia/lib64/libcuda.so.1 idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
-
-root@6b4ad215279e:/notebooks# python
-Python 2.7.12 (default, Nov 19 2016, 06:48:10)
-[GCC 5.4.0 20160609] on linux2
-Type &#34;help&#34;, &#34;copyright&#34;, &#34;credits&#34; or &#34;license&#34; for more information.
-&gt;&gt;&gt; import tensorflow as tf
-&gt;&gt;&gt; a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name=&#39;a&#39;)
-&gt;&gt;&gt; b = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[3, 2], name=&#39;b&#39;)
-&gt;&gt;&gt; c = tf.matmul(a, b)
-&gt;&gt;&gt; sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-2017-10-19 08:01:39.862500: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-19 08:01:39.862600: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-19 08:01:39.862646: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-19 08:01:39.862676: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-19 08:01:39.862711: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-19 08:01:40.388656: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
-name: Tesla M40 24GB
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:04:00.0
-Total memory: 22.40GiB
-Free memory: 22.29GiB
-2017-10-19 08:01:40.682810: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x1e2dac0 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
-2017-10-19 08:01:40.684222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 1 with properties:
-name: Tesla M40
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:05:00.0
-Total memory: 11.17GiB
-Free memory: 11.07GiB
-2017-10-19 08:01:40.995170: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x329a280 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
-2017-10-19 08:01:40.998560: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 2 with properties:
-name: Tesla M40 24GB
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:06:00.0
-Total memory: 22.40GiB
-Free memory: 22.29GiB
-2017-10-19 08:01:41.289133: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x329dc00 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
-2017-10-19 08:01:41.290444: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 3 with properties:
-name: Tesla M40
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:07:00.0
-Total memory: 11.17GiB
-Free memory: 11.07GiB
-2017-10-19 08:01:41.294062: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0 1 2 3
-2017-10-19 08:01:41.294083: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y Y Y Y
-2017-10-19 08:01:41.294093: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 1:   Y Y Y Y
-2017-10-19 08:01:41.294156: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 2:   Y Y Y Y
-2017-10-19 08:01:41.294178: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 3:   Y Y Y Y
-2017-10-19 08:01:41.294215: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0)
-2017-10-19 08:01:41.294229: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:1) -&gt; (device: 1, name: Tesla M40, pci bus id: 0000:05:00.0)
-2017-10-19 08:01:41.294239: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:2) -&gt; (device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
-2017-10-19 08:01:41.294248: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:3) -&gt; (device: 3, name: Tesla M40, pci bus id: 0000:07:00.0)
-Device mapping:
-/job:localhost/replica:0/task:0/gpu:0 -&gt; device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0
-/job:localhost/replica:0/task:0/gpu:1 -&gt; device: 1, name: Tesla M40, pci bus id: 0000:05:00.0
-/job:localhost/replica:0/task:0/gpu:2 -&gt; device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0
-/job:localhost/replica:0/task:0/gpu:3 -&gt; device: 3, name: Tesla M40, pci bus id: 0000:07:00.0
-2017-10-19 08:01:41.875931: I tensorflow/core/common_runtime/direct_session.cc:300] Device mapping:
-/job:localhost/replica:0/task:0/gpu:0 -&gt; device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0
-/job:localhost/replica:0/task:0/gpu:1 -&gt; device: 1, name: Tesla M40, pci bus id: 0000:05:00.0
-/job:localhost/replica:0/task:0/gpu:2 -&gt; device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0
-/job:localhost/replica:0/task:0/gpu:3 -&gt; device: 3, name: Tesla M40, pci bus id: 0000:07:00.0
-
-&gt;&gt;&gt; print(sess.run(c))
-MatMul: (MatMul): /job:localhost/replica:0/task:0/gpu:0
-2017-10-19 08:01:51.333248: I tensorflow/core/common_runtime/simple_placer.cc:872] MatMul: (MatMul)/job:localhost/replica:0/task:0/gpu:0
-b: (Const): /job:localhost/replica:0/task:0/gpu:0
-2017-10-19 08:01:51.333346: I tensorflow/core/common_runtime/simple_placer.cc:872] b: (Const)/job:localhost/replica:0/task:0/gpu:0
-a: (Const): /job:localhost/replica:0/task:0/gpu:0
-2017-10-19 08:01:51.333408: I tensorflow/core/common_runtime/simple_placer.cc:872] a: (Const)/job:localhost/replica:0/task:0/gpu:0
-[[ 22.  28.]
- [ 49.  64.]]
-&gt;&gt;&gt;
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># nvidia-docker run -it --rm -v /usr/lib64/libcuda.so.1:/usr/local/nvidia/lib64/libcuda.so.1 idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">root@6b4ad215279e:/notebooks# python
+</span></span><span class="line"><span class="cl">Python 2.7.12 (default, Nov 19 2016, 06:48:10)
+</span></span><span class="line"><span class="cl">[GCC 5.4.0 20160609] on linux2
+</span></span><span class="line"><span class="cl">Type &#34;help&#34;, &#34;copyright&#34;, &#34;credits&#34; or &#34;license&#34; for more information.
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt; import tensorflow as tf
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt; a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name=&#39;a&#39;)
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt; b = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[3, 2], name=&#39;b&#39;)
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt; c = tf.matmul(a, b)
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt; sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:39.862500: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:39.862600: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:39.862646: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:39.862676: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:39.862711: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:40.388656: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40 24GB
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:04:00.0
+</span></span><span class="line"><span class="cl">Total memory: 22.40GiB
+</span></span><span class="line"><span class="cl">Free memory: 22.29GiB
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:40.682810: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x1e2dac0 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:40.684222: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 1 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:05:00.0
+</span></span><span class="line"><span class="cl">Total memory: 11.17GiB
+</span></span><span class="line"><span class="cl">Free memory: 11.07GiB
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:40.995170: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x329a280 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:40.998560: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 2 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40 24GB
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:06:00.0
+</span></span><span class="line"><span class="cl">Total memory: 22.40GiB
+</span></span><span class="line"><span class="cl">Free memory: 22.29GiB
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.289133: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x329dc00 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.290444: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 3 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:07:00.0
+</span></span><span class="line"><span class="cl">Total memory: 11.17GiB
+</span></span><span class="line"><span class="cl">Free memory: 11.07GiB
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294062: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0 1 2 3
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294083: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294093: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 1:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294156: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 2:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294178: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 3:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294215: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0)
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294229: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:1) -&gt; (device: 1, name: Tesla M40, pci bus id: 0000:05:00.0)
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294239: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:2) -&gt; (device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.294248: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:3) -&gt; (device: 3, name: Tesla M40, pci bus id: 0000:07:00.0)
+</span></span><span class="line"><span class="cl">Device mapping:
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:0 -&gt; device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:1 -&gt; device: 1, name: Tesla M40, pci bus id: 0000:05:00.0
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:2 -&gt; device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:3 -&gt; device: 3, name: Tesla M40, pci bus id: 0000:07:00.0
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:41.875931: I tensorflow/core/common_runtime/direct_session.cc:300] Device mapping:
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:0 -&gt; device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:1 -&gt; device: 1, name: Tesla M40, pci bus id: 0000:05:00.0
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:2 -&gt; device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0
+</span></span><span class="line"><span class="cl">/job:localhost/replica:0/task:0/gpu:3 -&gt; device: 3, name: Tesla M40, pci bus id: 0000:07:00.0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt; print(sess.run(c))
+</span></span><span class="line"><span class="cl">MatMul: (MatMul): /job:localhost/replica:0/task:0/gpu:0
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:51.333248: I tensorflow/core/common_runtime/simple_placer.cc:872] MatMul: (MatMul)/job:localhost/replica:0/task:0/gpu:0
+</span></span><span class="line"><span class="cl">b: (Const): /job:localhost/replica:0/task:0/gpu:0
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:51.333346: I tensorflow/core/common_runtime/simple_placer.cc:872] b: (Const)/job:localhost/replica:0/task:0/gpu:0
+</span></span><span class="line"><span class="cl">a: (Const): /job:localhost/replica:0/task:0/gpu:0
+</span></span><span class="line"><span class="cl">2017-10-19 08:01:51.333408: I tensorflow/core/common_runtime/simple_placer.cc:872] a: (Const)/job:localhost/replica:0/task:0/gpu:0
+</span></span><span class="line"><span class="cl">[[ 22.  28.]
+</span></span><span class="line"><span class="cl"> [ 49.  64.]]
+</span></span><span class="line"><span class="cl">&gt;&gt;&gt;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意：由以上完整输出可以看到当前的容器环境内部可以正常识别到GPU设备，并可以进行GPU计算</code></p>
 <p>2.1 <strong>使用TensorFlow-gpu环境</strong></p>
 <p>官方<code>tensorflow/tensorflow:latest-gpu</code>镜像是使用<code>jupyter</code>环境来提供一个可编程的<code>TensorFlow</code>环境。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -850,24 +888,22 @@ a: (Const): /job:localhost/replica:0/task:0/gpu:0
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span><span class="lnt">14
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># nvidia-docker run -itd -p 8888:8888 -p 6006:6006 idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17
-# docker logs -f evil_ride
-[I 07:24:37.730 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
-[W 07:24:37.742 NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-[I 07:24:37.747 NotebookApp] Serving notebooks from local directory: /notebooks
-[I 07:24:37.747 NotebookApp] 0 active kernels
-[I 07:24:37.747 NotebookApp] The Jupyter Notebook is running at: http://[all ip addresses on your system]:8888/?token=b4f66281d6b1f89bd6fda85c6e88a022ef6d38308e7f284b
-[I 07:24:37.748 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[C 07:24:37.748 NotebookApp]
-
-    Copy/paste this URL into your browser when you connect for the first time,
-    to login with a token:
-        http://localhost:8888/?token=b4f66281d6b1f89bd6fda85c6e88a022ef6d38308e7f284b
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># nvidia-docker run -itd -p 8888:8888 -p 6006:6006 idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17
+</span></span><span class="line"><span class="cl"># docker logs -f evil_ride
+</span></span><span class="line"><span class="cl">[I 07:24:37.730 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
+</span></span><span class="line"><span class="cl">[W 07:24:37.742 NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
+</span></span><span class="line"><span class="cl">[I 07:24:37.747 NotebookApp] Serving notebooks from local directory: /notebooks
+</span></span><span class="line"><span class="cl">[I 07:24:37.747 NotebookApp] 0 active kernels
+</span></span><span class="line"><span class="cl">[I 07:24:37.747 NotebookApp] The Jupyter Notebook is running at: http://[all ip addresses on your system]:8888/?token=b4f66281d6b1f89bd6fda85c6e88a022ef6d38308e7f284b
+</span></span><span class="line"><span class="cl">[I 07:24:37.748 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+</span></span><span class="line"><span class="cl">[C 07:24:37.748 NotebookApp]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    Copy/paste this URL into your browser when you connect for the first time,
+</span></span><span class="line"><span class="cl">    to login with a token:
+</span></span><span class="line"><span class="cl">        http://localhost:8888/?token=b4f66281d6b1f89bd6fda85c6e88a022ef6d38308e7f284b
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>成功运行后如上述日志显示，直接访问上述链接，或者访问本机的8888端口，并将后面的token作为密码输入后即可登录jupyter环境，使用tensorflow环境。</p>
 <p><img src="http://oyep1jupk.bkt.clouddn.com/docker/nvidia-docker/tensorflow-jupyter.png" alt=""></p>
@@ -876,7 +912,7 @@ a: (Const): /job:localhost/replica:0/task:0/gpu:0
 <p>可以看到，使用TensorFlow官方的镜像文件，可以直接使用jupyter进行运行gpu计算任务。该任务运行完毕之后，运行过程中的日志信息如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -926,61 +962,61 @@ a: (Const): /job:localhost/replica:0/task:0/gpu:0
 </span><span class="lnt">48
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># docker logs -f evil_ride
-[I 07:37:01.806 NotebookApp] Adapting to protocol v5.1 for kernel 253b4ef2-b573-4256-a14b-6a840777923d
-2017-10-25 07:37:41.174144: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-25 07:37:41.174295: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-25 07:37:41.174320: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-25 07:37:41.174342: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-25 07:37:41.174366: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
-2017-10-25 07:37:41.719139: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
-name: Tesla M40 24GB
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:04:00.0
-Total memory: 22.40GiB
-Free memory: 22.29GiB
-2017-10-25 07:37:41.999138: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x1d90ab0 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
-2017-10-25 07:37:42.001131: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 1 with properties:
-name: Tesla M40
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:05:00.0
-Total memory: 11.17GiB
-Free memory: 11.07GiB
-2017-10-25 07:37:42.317011: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x3acbf10 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
-2017-10-25 07:37:42.318986: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 2 with properties:
-name: Tesla M40 24GB
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:06:00.0
-Total memory: 22.40GiB
-Free memory: 22.29GiB
-2017-10-25 07:37:42.612283: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x3acf890 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
-2017-10-25 07:37:42.614320: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 3 with properties:
-name: Tesla M40
-major: 5 minor: 2 memoryClockRate (GHz) 1.112
-pciBusID 0000:07:00.0
-Total memory: 11.17GiB
-Free memory: 11.07GiB
-2017-10-25 07:37:42.619214: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0 1 2 3
-2017-10-25 07:37:42.619252: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y Y Y Y
-2017-10-25 07:37:42.619270: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 1:   Y Y Y Y
-2017-10-25 07:37:42.619287: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 2:   Y Y Y Y
-2017-10-25 07:37:42.619351: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 3:   Y Y Y Y
-2017-10-25 07:37:42.619386: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0)
-2017-10-25 07:37:42.619410: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:1) -&gt; (device: 1, name: Tesla M40, pci bus id: 0000:05:00.0)
-2017-10-25 07:37:42.619431: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:2) -&gt; (device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
-2017-10-25 07:37:42.619464: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:3) -&gt; (device: 3, name: Tesla M40, pci bus id: 0000:07:00.0)
-2017-10-25 07:37:56.406493: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0)
-2017-10-25 07:37:56.406573: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:1) -&gt; (device: 1, name: Tesla M40, pci bus id: 0000:05:00.0)
-2017-10-25 07:37:56.406607: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:2) -&gt; (device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
-2017-10-25 07:37:56.406627: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:3) -&gt; (device: 3, name: Tesla M40, pci bus id: 0000:07:00.0)
-[I 07:39:01.292 NotebookApp] Saving file at /Untitled1.ipynb
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># docker logs -f evil_ride
+</span></span><span class="line"><span class="cl">[I 07:37:01.806 NotebookApp] Adapting to protocol v5.1 for kernel 253b4ef2-b573-4256-a14b-6a840777923d
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.174144: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.174295: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.174320: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.174342: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.174366: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn&#39;t compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.719139: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40 24GB
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:04:00.0
+</span></span><span class="line"><span class="cl">Total memory: 22.40GiB
+</span></span><span class="line"><span class="cl">Free memory: 22.29GiB
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:41.999138: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x1d90ab0 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.001131: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 1 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:05:00.0
+</span></span><span class="line"><span class="cl">Total memory: 11.17GiB
+</span></span><span class="line"><span class="cl">Free memory: 11.07GiB
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.317011: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x3acbf10 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.318986: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 2 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40 24GB
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:06:00.0
+</span></span><span class="line"><span class="cl">Total memory: 22.40GiB
+</span></span><span class="line"><span class="cl">Free memory: 22.29GiB
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.612283: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x3acf890 exists before initializing the StreamExecutor. We haven&#39;t verified StreamExecutor works with that.
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.614320: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 3 with properties:
+</span></span><span class="line"><span class="cl">name: Tesla M40
+</span></span><span class="line"><span class="cl">major: 5 minor: 2 memoryClockRate (GHz) 1.112
+</span></span><span class="line"><span class="cl">pciBusID 0000:07:00.0
+</span></span><span class="line"><span class="cl">Total memory: 11.17GiB
+</span></span><span class="line"><span class="cl">Free memory: 11.07GiB
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619214: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0 1 2 3
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619252: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619270: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 1:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619287: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 2:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619351: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 3:   Y Y Y Y
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619386: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619410: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:1) -&gt; (device: 1, name: Tesla M40, pci bus id: 0000:05:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619431: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:2) -&gt; (device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:42.619464: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:3) -&gt; (device: 3, name: Tesla M40, pci bus id: 0000:07:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:56.406493: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -&gt; (device: 0, name: Tesla M40 24GB, pci bus id: 0000:04:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:56.406573: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:1) -&gt; (device: 1, name: Tesla M40, pci bus id: 0000:05:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:56.406607: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:2) -&gt; (device: 2, name: Tesla M40 24GB, pci bus id: 0000:06:00.0)
+</span></span><span class="line"><span class="cl">2017-10-25 07:37:56.406627: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:3) -&gt; (device: 3, name: Tesla M40, pci bus id: 0000:07:00.0)
+</span></span><span class="line"><span class="cl">[I 07:39:01.292 NotebookApp] Saving file at /Untitled1.ipynb
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>由上述日志输出可以看到该任务其实是占用宿主机的4个GPU卡进行任务计算的。</p>
 <p><code>注意：因为jupyter是通过websocket和python环境进行交互的，如果需要使用反向代理之类的工具访问服务，需要反向代理工具支持websocket协议</code>。在实际部署过程中，我们使用Nginx进行反向代理，Nginx默认是在1.3版本开始支持websocket的，如果nginx版本大于1.3只需要对相应的配置文件中增加如下内容即可。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1009,84 +1045,82 @@ Free memory: 11.07GiB
 </span><span class="lnt">27
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">upstream tomcat_txxb.wp.com {
-        server 10.0.0.10:8888  weight=10 max_fails=2 fail_timeout=30s;
-                }
-location / {
-        proxy_next_upstream     http_500 http_502 http_503 http_504 error timeout invalid_header;
-        proxy_set_header        Host  $host;
-        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass              http://tomcat_txxb.wp.com;
-
-location ~ /api/kernels/ {
-        proxy_pass            http://tomcat_txxb.wp.com;
-        proxy_set_header      Host $host;
-        # websocket support
-        proxy_http_version    1.1;
-        proxy_set_header      Upgrade &#34;websocket&#34;;
-        proxy_set_header      Connection &#34;Upgrade&#34;;
-        proxy_read_timeout    86400;
-    }
-location ~ /terminals/ {
-        proxy_pass            http://tomcat_txxb.wp.com;
-        proxy_set_header      Host $host;
-        # websocket support
-        proxy_http_version    1.1;
-        proxy_set_header      Upgrade &#34;websocket&#34;;
-        proxy_set_header      Connection &#34;Upgrade&#34;;
-        proxy_read_timeout    86400;
-}
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">upstream tomcat_txxb.wp.com {
+</span></span><span class="line"><span class="cl">        server 10.0.0.10:8888  weight=10 max_fails=2 fail_timeout=30s;
+</span></span><span class="line"><span class="cl">                }
+</span></span><span class="line"><span class="cl">location / {
+</span></span><span class="line"><span class="cl">        proxy_next_upstream     http_500 http_502 http_503 http_504 error timeout invalid_header;
+</span></span><span class="line"><span class="cl">        proxy_set_header        Host  $host;
+</span></span><span class="line"><span class="cl">        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+</span></span><span class="line"><span class="cl">        proxy_pass              http://tomcat_txxb.wp.com;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">location ~ /api/kernels/ {
+</span></span><span class="line"><span class="cl">        proxy_pass            http://tomcat_txxb.wp.com;
+</span></span><span class="line"><span class="cl">        proxy_set_header      Host $host;
+</span></span><span class="line"><span class="cl">        # websocket support
+</span></span><span class="line"><span class="cl">        proxy_http_version    1.1;
+</span></span><span class="line"><span class="cl">        proxy_set_header      Upgrade &#34;websocket&#34;;
+</span></span><span class="line"><span class="cl">        proxy_set_header      Connection &#34;Upgrade&#34;;
+</span></span><span class="line"><span class="cl">        proxy_read_timeout    86400;
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">location ~ /terminals/ {
+</span></span><span class="line"><span class="cl">        proxy_pass            http://tomcat_txxb.wp.com;
+</span></span><span class="line"><span class="cl">        proxy_set_header      Host $host;
+</span></span><span class="line"><span class="cl">        # websocket support
+</span></span><span class="line"><span class="cl">        proxy_http_version    1.1;
+</span></span><span class="line"><span class="cl">        proxy_set_header      Upgrade &#34;websocket&#34;;
+</span></span><span class="line"><span class="cl">        proxy_set_header      Connection &#34;Upgrade&#34;;
+</span></span><span class="line"><span class="cl">        proxy_read_timeout    86400;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
 </div>
 </div><blockquote>
 <p>使用docker原生方式运行GPU容器环境(无非就是指定设备挂载或者将给容器开放特权来操作宿主机硬件)</p>
 </blockquote>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># export DEVICES=$(\ls /dev/nvidia* | xargs -I{} echo &#39;--device {}:{}&#39;)
-# docker run  $DEVICES -it --rm -v /usr/lib64/libcuda.so.1:/usr/local/nvidia/lib64/libcuda.so.1 -v /usr/lib64/libnvidia-fatbinaryloader.so.375.39:/usr/local/nvidia/lib64/libnvidia-fatbinaryloader.so.375.39  -v /root/gpu-example/:/tmp idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
-
-
-# docker run  --privileged -it --rm -v /usr/lib64/libcuda.so.1:/usr/local/nvidia/lib64/libcuda.so.1 -v /usr/lib64/libnvidia-fatbinaryloader.so.375.39:/usr/local/nvidia/lib64/libnvidia-fatbinaryloader.so.375.39  -v /root/gpu-example/:/tmp idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># export DEVICES=$(\ls /dev/nvidia* | xargs -I{} echo &#39;--device {}:{}&#39;)
+</span></span><span class="line"><span class="cl"># docker run  $DEVICES -it --rm -v /usr/lib64/libcuda.so.1:/usr/local/nvidia/lib64/libcuda.so.1 -v /usr/lib64/libnvidia-fatbinaryloader.so.375.39:/usr/local/nvidia/lib64/libnvidia-fatbinaryloader.so.375.39  -v /root/gpu-example/:/tmp idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># docker run  --privileged -it --rm -v /usr/lib64/libcuda.so.1:/usr/local/nvidia/lib64/libcuda.so.1 -v /usr/lib64/libnvidia-fatbinaryloader.so.375.39:/usr/local/nvidia/lib64/libnvidia-fatbinaryloader.so.375.39  -v /root/gpu-example/:/tmp idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意：当然在上述tensorflow测试过程中，只需要部分的cuda依赖库，在很多其他的业务场景下可能需要其他的依赖库，建议使用如下方式挂载全部库依赖</code></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># export CUDA_SO=&#34;$(\ls /usr/lib64/libcuda* | xargs -I{} echo &#39;-v  {}:{}&#39;)  $(\ls /usr/lib64/libnvidia* | xargs -I{} echo &#39;-v {}:{}&#39;)&#34;
-# docker run $DEVICES $CUDA_SO --rm idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># export CUDA_SO=&#34;$(\ls /usr/lib64/libcuda* | xargs -I{} echo &#39;-v  {}:{}&#39;)  $(\ls /usr/lib64/libnvidia* | xargs -I{} echo &#39;-v {}:{}&#39;)&#34;
+</span></span><span class="line"><span class="cl"># docker run $DEVICES $CUDA_SO --rm idockerhub.xxb.com/jdjr/tensorflow-gpu:17-10-17 bash
+</span></span></code></pre></td></tr></table>
 </div>
 </div><blockquote>
 <p>思考：其实从nvidia-docker的运行方式和docker原生的运行方式上来看，nvidia其实是使用自己的插件来封装了一些docker的默认参数，比如说上述的GPU设备，以及相关lib库依赖。从<code>nvidia-docker</code>的底层实现上也可以看得出来</p>
 </blockquote>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># curl -s http://localhost:3476/docker/cli
---volume-driver=nvidia-docker --volume=nvidia_driver_375.39:/usr/local/nvidia:ro --device=/dev/nvidiactl --device=/dev/nvidia-uvm --device=/dev/nvidia-uvm-tools --device=/dev/nvidia0 --device=/dev/nvidia1 --device=/dev/nvidia2 --device=/dev/nvidia3
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># curl -s http://localhost:3476/docker/cli
+</span></span><span class="line"><span class="cl">--volume-driver=nvidia-docker --volume=nvidia_driver_375.39:/usr/local/nvidia:ro --device=/dev/nvidiactl --device=/dev/nvidia-uvm --device=/dev/nvidia-uvm-tools --device=/dev/nvidia0 --device=/dev/nvidia1 --device=/dev/nvidia2 --device=/dev/nvidia3
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>也就是说<code>nvidia-docker</code>在创建容器的时候，默认是加入了上述的参数的。也就是docker原生调用过程中使用的<code>-v</code>和<code>--device</code>.其实可以查看<code>nvidia-docker</code>工具生成的容器的相关配置:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1167,94 +1201,90 @@ location ~ /terminals/ {
 </span><span class="lnt">79
 </span><span class="lnt">80
 </span><span class="lnt">81
-</span><span class="lnt">82
-</span><span class="lnt">83
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># docker inspect evil_ride
-&#34;HostConfig&#34;: {
-            &#34;Binds&#34;: [
-                &#34;nvidia_driver_375.39:/usr/local/nvidia:ro&#34;
-            ],
-            ........
-}
-
-&#34;Devices&#34;: [
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidiactl&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidiactl&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                },
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidia-uvm&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidia-uvm&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                },
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidia-uvm-tools&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidia-uvm-tools&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                },
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidia0&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidia0&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                },
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidia1&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidia1&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                },
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidia2&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidia2&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                },
-                {
-                    &#34;PathOnHost&#34;: &#34;/dev/nvidia3&#34;,
-                    &#34;PathInContainer&#34;: &#34;/dev/nvidia3&#34;,
-                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
-                }
-            ],
-
-
-        &#34;Mounts&#34;: [
-            {
-                &#34;Name&#34;: &#34;nvidia_driver_375.39&#34;,
-                &#34;Source&#34;: &#34;/var/lib/nvidia-docker/volumes/nvidia_driver/375.39&#34;,
-                &#34;Destination&#34;: &#34;/usr/local/nvidia&#34;,
-                &#34;Driver&#34;: &#34;nvidia-docker&#34;,
-                &#34;Mode&#34;: &#34;ro&#34;,
-                &#34;RW&#34;: false,
-                &#34;Propagation&#34;: &#34;rprivate&#34;
-            }
-        ],
-
-
-        &#34;Env&#34;: [
-                &#34;PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&#34;,
-                &#34;CUDA_VERSION=8.0.61&#34;,
-                &#34;NVIDIA_CUDA_VERSION=8.0.61&#34;,
-                &#34;CUDA_PKG_VERSION=8-0=8.0.61-1&#34;,
-                &#34;LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64&#34;,
-                &#34;NVIDIA_VISIBLE_DEVICES=all&#34;,
-                &#34;NVIDIA_DRIVER_CAPABILITIES=compute,utility&#34;,
-                &#34;LIBRARY_PATH=/usr/local/cuda/lib64/stubs:&#34;,
-                &#34;CUDNN_VERSION=6.0.21&#34;
-            ],
-
-
-        &#34;Labels&#34;: {
-                &#34;com.nvidia.build.id&#34;: &#34;29071360&#34;,
-                &#34;com.nvidia.build.ref&#34;: &#34;836d5387f8888c3924aff7a011f9b2cd9956d3db&#34;,
-                &#34;com.nvidia.cuda.version&#34;: &#34;8.0.61&#34;,
-                &#34;com.nvidia.cudnn.version&#34;: &#34;6.0.21&#34;,
-                &#34;com.nvidia.volumes.needed&#34;: &#34;nvidia_driver&#34;,
-                &#34;maintainer&#34;: &#34;NVIDIA CORPORATION \u003ccudatools@nvidia.com\u003e&#34;
-            }
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># docker inspect evil_ride
+</span></span><span class="line"><span class="cl">&#34;HostConfig&#34;: {
+</span></span><span class="line"><span class="cl">            &#34;Binds&#34;: [
+</span></span><span class="line"><span class="cl">                &#34;nvidia_driver_375.39:/usr/local/nvidia:ro&#34;
+</span></span><span class="line"><span class="cl">            ],
+</span></span><span class="line"><span class="cl">            ........
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;Devices&#34;: [
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidiactl&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidiactl&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                },
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidia-uvm&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidia-uvm&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                },
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidia-uvm-tools&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidia-uvm-tools&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                },
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidia0&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidia0&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                },
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidia1&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidia1&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                },
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidia2&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidia2&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                },
+</span></span><span class="line"><span class="cl">                {
+</span></span><span class="line"><span class="cl">                    &#34;PathOnHost&#34;: &#34;/dev/nvidia3&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;PathInContainer&#34;: &#34;/dev/nvidia3&#34;,
+</span></span><span class="line"><span class="cl">                    &#34;CgroupPermissions&#34;: &#34;rwm&#34;
+</span></span><span class="line"><span class="cl">                }
+</span></span><span class="line"><span class="cl">            ],
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        &#34;Mounts&#34;: [
+</span></span><span class="line"><span class="cl">            {
+</span></span><span class="line"><span class="cl">                &#34;Name&#34;: &#34;nvidia_driver_375.39&#34;,
+</span></span><span class="line"><span class="cl">                &#34;Source&#34;: &#34;/var/lib/nvidia-docker/volumes/nvidia_driver/375.39&#34;,
+</span></span><span class="line"><span class="cl">                &#34;Destination&#34;: &#34;/usr/local/nvidia&#34;,
+</span></span><span class="line"><span class="cl">                &#34;Driver&#34;: &#34;nvidia-docker&#34;,
+</span></span><span class="line"><span class="cl">                &#34;Mode&#34;: &#34;ro&#34;,
+</span></span><span class="line"><span class="cl">                &#34;RW&#34;: false,
+</span></span><span class="line"><span class="cl">                &#34;Propagation&#34;: &#34;rprivate&#34;
+</span></span><span class="line"><span class="cl">            }
+</span></span><span class="line"><span class="cl">        ],
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        &#34;Env&#34;: [
+</span></span><span class="line"><span class="cl">                &#34;PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&#34;,
+</span></span><span class="line"><span class="cl">                &#34;CUDA_VERSION=8.0.61&#34;,
+</span></span><span class="line"><span class="cl">                &#34;NVIDIA_CUDA_VERSION=8.0.61&#34;,
+</span></span><span class="line"><span class="cl">                &#34;CUDA_PKG_VERSION=8-0=8.0.61-1&#34;,
+</span></span><span class="line"><span class="cl">                &#34;LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64&#34;,
+</span></span><span class="line"><span class="cl">                &#34;NVIDIA_VISIBLE_DEVICES=all&#34;,
+</span></span><span class="line"><span class="cl">                &#34;NVIDIA_DRIVER_CAPABILITIES=compute,utility&#34;,
+</span></span><span class="line"><span class="cl">                &#34;LIBRARY_PATH=/usr/local/cuda/lib64/stubs:&#34;,
+</span></span><span class="line"><span class="cl">                &#34;CUDNN_VERSION=6.0.21&#34;
+</span></span><span class="line"><span class="cl">            ],
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        &#34;Labels&#34;: {
+</span></span><span class="line"><span class="cl">                &#34;com.nvidia.build.id&#34;: &#34;29071360&#34;,
+</span></span><span class="line"><span class="cl">                &#34;com.nvidia.build.ref&#34;: &#34;836d5387f8888c3924aff7a011f9b2cd9956d3db&#34;,
+</span></span><span class="line"><span class="cl">                &#34;com.nvidia.cuda.version&#34;: &#34;8.0.61&#34;,
+</span></span><span class="line"><span class="cl">                &#34;com.nvidia.cudnn.version&#34;: &#34;6.0.21&#34;,
+</span></span><span class="line"><span class="cl">                &#34;com.nvidia.volumes.needed&#34;: &#34;nvidia_driver&#34;,
+</span></span><span class="line"><span class="cl">                &#34;maintainer&#34;: &#34;NVIDIA CORPORATION \u003ccudatools@nvidia.com\u003e&#34;
+</span></span><span class="line"><span class="cl">            }
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:nvidia-driver的版本以及GPU型号以及nvidia-docker的版本三者是有强关联关系的</code></p>
 <table>
@@ -1424,6 +1454,27 @@ location ~ /terminals/ {
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

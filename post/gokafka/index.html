@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Kafka运维神器之gokafka - BGBiao的SRE人生</title>
+  <title>Kafka运维神器之gokafka - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="BGBiao" />
-  <meta name="description" content="Kafka运维神器  在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。
+  <meta name="description" content="Kafka运维神器 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。
 " />
 
   <meta name="keywords" content="SRE, Ops, DevOps, Kubernetes, Docker, CloudNative" />
@@ -33,7 +33,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.103.1" />
 
 
 <link rel="canonical" href="https://bgbiao.top/post/gokafka/" />
@@ -69,16 +69,16 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bgbiao.top/post/gokafka/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2020-06-26T00:00:00&#43;00:00" />
-<meta property="article:modified_time" content="2020-11-01T17:14:34&#43;08:00" />
+<meta property="article:published_time" content="2020-06-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-01T17:14:34+08:00" />
 
 <meta itemprop="name" content="Kafka运维神器之gokafka">
 <meta itemprop="description" content="Kafka运维神器
 
 在Kafka集群运维过程中，我们通常会借用一些开源工具来完成kafka的日常运维需求和相关问题排查，接下来介绍几个常用的kafka运维神器。
-"><meta itemprop="datePublished" content="2020-06-26T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-11-01T17:14:34&#43;08:00" />
-<meta itemprop="wordCount" content="2469">
+"><meta itemprop="datePublished" content="2020-06-26T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-01T17:14:34+08:00" />
+<meta itemprop="wordCount" content="2464">
 <meta itemprop="keywords" content="Golang,Kafka," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Kafka运维神器之gokafka"/>
 <meta name="twitter:description" content="Kafka运维神器
@@ -141,7 +141,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
         
       </li><li class="mobile-menu-item">
@@ -180,22 +180,40 @@ if (!doNotTrack) {
           <ul class="mobile-submenu-list">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
         
       </li><li class="mobile-menu-item">
         
@@ -357,7 +375,7 @@ if (!doNotTrack) {
         
           
           
-            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+            <a class="menu-item-link" href="https://bgbiao.top/devops/">DevOps</a>
           
 
         
@@ -398,22 +416,48 @@ if (!doNotTrack) {
           <ul class="submenu">
             
               <li>
-                <a href="https://bgbiao.top/">Golang web开发示例</a>
+                <a href="https://gowebexamples.com/">Golang web开发示例</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang SQL开发教程</a>
+                <a href="http://go-database-sql.org/">Golang SQL开发教程</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang RPCX框架</a>
+                <a href="https://rpcx.io/">Golang RPCX框架</a>
               </li>
             
               <li>
-                <a href="https://bgbiao.top/">Golang 开源书籍</a>
+                <a href="https://github.com/talkgo/read">Golang 夜读</a>
+              </li>
+            
+              <li>
+                <a href="https://books.studygolang.com/">Golang 开源书籍</a>
               </li>
             
           </ul>
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/tags/">标签</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://bgbiao.top/books/">我的书单</a>
+          
 
         
 
@@ -472,7 +516,7 @@ if (!doNotTrack) {
             <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
             
           </div>
-        <span class="more-meta"> 2469 words </span>
+        <span class="more-meta"> 2464 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -520,25 +564,23 @@ if (!doNotTrack) {
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 源码编译
-$ ./sbt clean dist
-
-# docker 安装
-$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 
-# 自定义端口
-$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 -Dhttp.port=8080 
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 源码编译
+</span></span><span class="line"><span class="cl">$ ./sbt clean dist
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># docker 安装
+</span></span><span class="line"><span class="cl">$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 
+</span></span><span class="line"><span class="cl"># 自定义端口
+</span></span><span class="line"><span class="cl">$ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2181&#34; -P      bgbiao/kafka-manager:2.0.0.2 -Dhttp.port=8080 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0rydqhj30xu0kkdhd.jpg" alt="kafka-cluster"></p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gg6v0uopt4j30v90epac2.jpg" alt="kafka-topic"></p>
@@ -551,7 +593,7 @@ $ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2
 <p><a href="https://github.com/edenhill/kafkacat">kafkacat</a>是一个非JVM的命令行生产者和消费者，可以快速的对kafka消息进行生产和消费。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -560,18 +602,18 @@ $ docker run -itd --name kafka-manager -e KAFKA_ZK_CLUSTER=&#34;zk-1:2181,zk-2:2
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># mac 安装
-$ brew install kafkacat 
-
-# docker 安装
-# 官方仅支持Debian和openSUSE系列
-# 如下镜像支持在CentOS系列的环境中使用
-$ docker pull bgbiao/kafkacat 
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># mac 安装
+</span></span><span class="line"><span class="cl">$ brew install kafkacat 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># docker 安装
+</span></span><span class="line"><span class="cl"># 官方仅支持Debian和openSUSE系列
+</span></span><span class="line"><span class="cl"># 如下镜像支持在CentOS系列的环境中使用
+</span></span><span class="line"><span class="cl">$ docker pull bgbiao/kafkacat 
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -656,90 +698,90 @@ $ docker pull bgbiao/kafkacat
 </span><span class="lnt">83
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 消费者模式
-$ kafkacat -b localhost:9092 -t mysql_users
-% Auto-selecting Consumer mode (use -P or -C to override)
-{&#34;uid&#34;:1,&#34;name&#34;:&#34;Cliff&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;St Louis&#34;,&#34;elite&#34;:&#34;P&#34;}
-{&#34;uid&#34;:2,&#34;name&#34;:&#34;Nick&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;Palo Alto&#34;,&#34;elite&#34;:&#34;G&#34;}
-[...]
-
-# 生产者模式
-# 默认是以换行符来决定一条消息(-D 可以指定分隔符)
-# 默认从stdin来读取消息
-$ kafkacat -b localhost:9092 -t new_topic -P
-test
-
-# 从文件中读取消息
-# -l参数用来指定将文件中的每一个行作为一个消息进行发送，如果没有该参数，整个文本将会以一个消息发送(对于二进制的数据比较
-有用)
-# -T 参数可以用于回显到stdout
-$ kafkacat -b localhost:9092 -t &lt;my_topic&gt; -T -P -l /tmp/msgs
-
-
-# 可以指定消息的key，使用-K参数
-$ kafkacat -b localhost:9092 -t keyed_topic -P -K:
-1:foo
-2:bar
-
-$ kafkacat -b localhost:9092 -t keyed_topic -C -f &#39;Key: %k\nValue: %s\n&#39;
-Key: 1
-Value: foo
-Key: 2
-Value: bar
-
-# 设置partition
-$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 1
-1:foo
-
-$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 2
-2:bar
-
-$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 3
-3:wibble
-
-
-# 元数据监听模式
-# 元数据的监听模式可以使用`-L`参数，会显示当前kafka集群的状态以及主题，分区，副本，以及ISR信息。
-# `-J`参数会以json格式进行输出
-$ kafkacat -b localhost:9092 -L
-
-$ kafkacat -b mybroker -L -J
-
-
-
-# docker方式简单使用
-# 从标准输入生产数据
-$ docker run --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -P &lt;&lt;EOF
-&gt; ssabdkgjf
-&gt; asfgnh
-&gt; wertnh
-&gt; waer
-&gt; awegrtn
-&gt; 2020-04-26
-&gt; end time
-&gt; EOF
-
-# 从指定topic接收数据
-$ docker run -it --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -C -f &#39;\nKey (%K bytes): %k\t\nValue (%S bytes): %s\n\Partition: %p\tOffset: %o\n--\n&#39;
-
-Key (-1 bytes):
-Value (13 bytes): test kafkacat
-Partition: 0	Offset: 11
---
-% Reached end of topic test-biao [0] at offset 12
-
-Key (-1 bytes):
-Value (18 bytes): 2020-04-26 endtime
-Partition: 1	Offset: 8
---
-% Reached end of topic test-biao [1] at offset 9
-
-Key (-1 bytes):
-Value (7 bytes): overlay
-Partition: 2	Offset: 6
---
-% Reached end of topic test-biao [2] at offset 7
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 消费者模式
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t mysql_users
+</span></span><span class="line"><span class="cl">% Auto-selecting Consumer mode (use -P or -C to override)
+</span></span><span class="line"><span class="cl">{&#34;uid&#34;:1,&#34;name&#34;:&#34;Cliff&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;St Louis&#34;,&#34;elite&#34;:&#34;P&#34;}
+</span></span><span class="line"><span class="cl">{&#34;uid&#34;:2,&#34;name&#34;:&#34;Nick&#34;,&#34;locale&#34;:&#34;en_US&#34;,&#34;address_city&#34;:&#34;Palo Alto&#34;,&#34;elite&#34;:&#34;G&#34;}
+</span></span><span class="line"><span class="cl">[...]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 生产者模式
+</span></span><span class="line"><span class="cl"># 默认是以换行符来决定一条消息(-D 可以指定分隔符)
+</span></span><span class="line"><span class="cl"># 默认从stdin来读取消息
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t new_topic -P
+</span></span><span class="line"><span class="cl">test
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 从文件中读取消息
+</span></span><span class="line"><span class="cl"># -l参数用来指定将文件中的每一个行作为一个消息进行发送，如果没有该参数，整个文本将会以一个消息发送(对于二进制的数据比较
+</span></span><span class="line"><span class="cl">有用)
+</span></span><span class="line"><span class="cl"># -T 参数可以用于回显到stdout
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t &lt;my_topic&gt; -T -P -l /tmp/msgs
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 可以指定消息的key，使用-K参数
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t keyed_topic -P -K:
+</span></span><span class="line"><span class="cl">1:foo
+</span></span><span class="line"><span class="cl">2:bar
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t keyed_topic -C -f &#39;Key: %k\nValue: %s\n&#39;
+</span></span><span class="line"><span class="cl">Key: 1
+</span></span><span class="line"><span class="cl">Value: foo
+</span></span><span class="line"><span class="cl">Key: 2
+</span></span><span class="line"><span class="cl">Value: bar
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 设置partition
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 1
+</span></span><span class="line"><span class="cl">1:foo
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 2
+</span></span><span class="line"><span class="cl">2:bar
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -t partitioned_topic -P -K: -p 3
+</span></span><span class="line"><span class="cl">3:wibble
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 元数据监听模式
+</span></span><span class="line"><span class="cl"># 元数据的监听模式可以使用`-L`参数，会显示当前kafka集群的状态以及主题，分区，副本，以及ISR信息。
+</span></span><span class="line"><span class="cl"># `-J`参数会以json格式进行输出
+</span></span><span class="line"><span class="cl">$ kafkacat -b localhost:9092 -L
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ kafkacat -b mybroker -L -J
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># docker方式简单使用
+</span></span><span class="line"><span class="cl"># 从标准输入生产数据
+</span></span><span class="line"><span class="cl">$ docker run --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -P &lt;&lt;EOF
+</span></span><span class="line"><span class="cl">&gt; ssabdkgjf
+</span></span><span class="line"><span class="cl">&gt; asfgnh
+</span></span><span class="line"><span class="cl">&gt; wertnh
+</span></span><span class="line"><span class="cl">&gt; waer
+</span></span><span class="line"><span class="cl">&gt; awegrtn
+</span></span><span class="line"><span class="cl">&gt; 2020-04-26
+</span></span><span class="line"><span class="cl">&gt; end time
+</span></span><span class="line"><span class="cl">&gt; EOF
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 从指定topic接收数据
+</span></span><span class="line"><span class="cl">$ docker run -it --rm bgbiao/kafkacat kafkacat -b kafka-broker:9092 -t test-biao -C -f &#39;\nKey (%K bytes): %k\t\nValue (%S bytes): %s\n\Partition: %p\tOffset: %o\n--\n&#39;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Key (-1 bytes):
+</span></span><span class="line"><span class="cl">Value (13 bytes): test kafkacat
+</span></span><span class="line"><span class="cl">Partition: 0	Offset: 11
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">% Reached end of topic test-biao [0] at offset 12
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Key (-1 bytes):
+</span></span><span class="line"><span class="cl">Value (18 bytes): 2020-04-26 endtime
+</span></span><span class="line"><span class="cl">Partition: 1	Offset: 8
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">% Reached end of topic test-biao [1] at offset 9
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Key (-1 bytes):
+</span></span><span class="line"><span class="cl">Value (7 bytes): overlay
+</span></span><span class="line"><span class="cl">Partition: 2	Offset: 6
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">% Reached end of topic test-biao [2] at offset 7
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>注意:</code> 如果想要把docker镜像中的<code>kafkacat</code>二进制文件拷贝出来使用，仅需要在当前环境中安装<code>librdkafka-devel</code>即可。</p>
 <h3 id="gokafka">gokafka</h3>
@@ -747,7 +789,7 @@ Partition: 2	Offset: 6
 <p><strong>快速开始</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -780,49 +822,47 @@ Partition: 2	Offset: 6
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
-</span><span class="lnt">34
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/goops-top/gokafka.git
-$ cd gokafka
-$ go build -o build/goops-kafka
-
-$ ./build/goops-kafka
-goops-kafka: A kafka tools with golang that can operate the kafka for describe,create,update and so on.
-
- Note: Without the jvm,so you must be specify the [--broker or --cluster and the Value must be in --config entry.]
-
-Usage:
-  gokafka [command]
-
-Available Commands:
-  consumer    consumer  a topic message data with specified kafka-cluster.
-  create      create the kafka topic with some base params in specify kafka-cluster.
-  describe    describe the kafka some info (cluster,topic,broker,loginfo)
-  help        Help about any command
-  init        init the gokafka some default config.
-  list        list the kafka some info (cluster,topic,broker)
-  producer    producer  a topic message data with specified kafka-cluster.
-  version     print version info of goops-kafka tool
-
-Flags:
-      --broker string    指定broker地址
-      --cluster string   指定集群
-      --config string    指定配置文件(default is $HOME/.goops-kafka)
-  -h, --help             help for gokafka
-
-Use &#34;gokafka [command] --help&#34; for more information about a command.
-
-# 使用make编译
-# 会自动生成mac和linux发行版本的二进制文件
-$ make default
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ git clone https://github.com/goops-top/gokafka.git
+</span></span><span class="line"><span class="cl">$ cd gokafka
+</span></span><span class="line"><span class="cl">$ go build -o build/goops-kafka
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ ./build/goops-kafka
+</span></span><span class="line"><span class="cl">goops-kafka: A kafka tools with golang that can operate the kafka for describe,create,update and so on.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> Note: Without the jvm,so you must be specify the [--broker or --cluster and the Value must be in --config entry.]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Usage:
+</span></span><span class="line"><span class="cl">  gokafka [command]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Available Commands:
+</span></span><span class="line"><span class="cl">  consumer    consumer  a topic message data with specified kafka-cluster.
+</span></span><span class="line"><span class="cl">  create      create the kafka topic with some base params in specify kafka-cluster.
+</span></span><span class="line"><span class="cl">  describe    describe the kafka some info (cluster,topic,broker,loginfo)
+</span></span><span class="line"><span class="cl">  help        Help about any command
+</span></span><span class="line"><span class="cl">  init        init the gokafka some default config.
+</span></span><span class="line"><span class="cl">  list        list the kafka some info (cluster,topic,broker)
+</span></span><span class="line"><span class="cl">  producer    producer  a topic message data with specified kafka-cluster.
+</span></span><span class="line"><span class="cl">  version     print version info of goops-kafka tool
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Flags:
+</span></span><span class="line"><span class="cl">      --broker string    指定broker地址
+</span></span><span class="line"><span class="cl">      --cluster string   指定集群
+</span></span><span class="line"><span class="cl">      --config string    指定配置文件(default is $HOME/.goops-kafka)
+</span></span><span class="line"><span class="cl">  -h, --help             help for gokafka
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Use &#34;gokafka [command] --help&#34; for more information about a command.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 使用make编译
+</span></span><span class="line"><span class="cl"># 会自动生成mac和linux发行版本的二进制文件
+</span></span><span class="line"><span class="cl">$ make default
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>简单使用</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -889,85 +929,81 @@ $ make default
 </span><span class="lnt">65
 </span><span class="lnt">66
 </span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 查看工具版本
-$ ./build/gokafka.mac version
-Version: 0.0.1
-GitBranch: master
-CommitId: 445f935
-Build Date: 2020-06-26T18:49:48+0800
-Go Version: go1.14
-OS/Arch: darwin/amd64
-
-# 初始化配置文件
-# gokafka 采用配置文件的方式快速管理多个kafka集群
-$ ./build/gokafka.mac  init
-gokafka config init ok.
-
-# 在用户家目录下生成集群配置文件
-$ cat ~/.goops-kafka
-
-app: gokafka
-spec:
-  clusters:
-  - name: test-kafka
-    version: V2_5_0_0
-    brokers:
-    - 10.0.0.1:9092
-    - 10.0.0.2:9092
-    - 10.0.0.3:9092
-  - name: dev-kafka
-    version: V1_0_0_0
-    brokers:
-    - 192.168.0.22:9092
-    - 192.168.0.23:9092
-    - 192.168.0.24:9092
-
-# 也可以使用--config 来指定集群配置文件
-$ ./build/gokafka.mac  --config ./kafka-cluster.yaml version
-Version: 0.0.1
-GitBranch: master
-CommitId: 445f935
-Build Date: 2020-06-26T18:53:25+0800
-Go Version: go1.14
-OS/Arch: darwin/amd64
-
-# 查看配置文件中的集群详情
-$ ./build/gokafka.mac  list cluster
-cluster:test-kafka version:V2_5_0_0 connector_brokers:[10.0.0.1:9092]
-cluster:dev-kafka version:V1_0_0_0 connector_brokers:[192.168.0.22:9092]
-
-./build/gokafka.mac  list cluster --config ./kafka-cluster.yaml
-cluster:log-kafka version:V2_5_0_0 connector_brokers:[log-kafka-1.bgbiao.cn:9092]
-
-# 注意: 当使用集群配置文件管理集群时，需要使用--cluster全局参数指定操作的目标集群
-# 当然也可以直接指定broker进行操作
-$ ./build/gokafka.mac  --cluster dev-kafka describe broker
-controller: 3
-brokers num: 3
-broker list: [2 1 3]
-id:2		 broker:192.168.0.22:9092
-id:1		 broker:192.168.0.23:9092
-id:3		 broker:192.168.0.24:9092
-
-$ ./build/gokafka.mac  --broker 10.0.0.1:9092  describe broker
-controller: 3
-brokers num: 3
-broker list: [2 1 3]
-id:2		 broker:192.168.0.22:9092
-id:1		 broker:192.168.0.23:9092
-id:3		 broker:192.168.0.24:9092
-
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 查看工具版本
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac version
+</span></span><span class="line"><span class="cl">Version: 0.0.1
+</span></span><span class="line"><span class="cl">GitBranch: master
+</span></span><span class="line"><span class="cl">CommitId: 445f935
+</span></span><span class="line"><span class="cl">Build Date: 2020-06-26T18:49:48+0800
+</span></span><span class="line"><span class="cl">Go Version: go1.14
+</span></span><span class="line"><span class="cl">OS/Arch: darwin/amd64
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 初始化配置文件
+</span></span><span class="line"><span class="cl"># gokafka 采用配置文件的方式快速管理多个kafka集群
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  init
+</span></span><span class="line"><span class="cl">gokafka config init ok.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 在用户家目录下生成集群配置文件
+</span></span><span class="line"><span class="cl">$ cat ~/.goops-kafka
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">app: gokafka
+</span></span><span class="line"><span class="cl">spec:
+</span></span><span class="line"><span class="cl">  clusters:
+</span></span><span class="line"><span class="cl">  - name: test-kafka
+</span></span><span class="line"><span class="cl">    version: V2_5_0_0
+</span></span><span class="line"><span class="cl">    brokers:
+</span></span><span class="line"><span class="cl">    - 10.0.0.1:9092
+</span></span><span class="line"><span class="cl">    - 10.0.0.2:9092
+</span></span><span class="line"><span class="cl">    - 10.0.0.3:9092
+</span></span><span class="line"><span class="cl">  - name: dev-kafka
+</span></span><span class="line"><span class="cl">    version: V1_0_0_0
+</span></span><span class="line"><span class="cl">    brokers:
+</span></span><span class="line"><span class="cl">    - 192.168.0.22:9092
+</span></span><span class="line"><span class="cl">    - 192.168.0.23:9092
+</span></span><span class="line"><span class="cl">    - 192.168.0.24:9092
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 也可以使用--config 来指定集群配置文件
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --config ./kafka-cluster.yaml version
+</span></span><span class="line"><span class="cl">Version: 0.0.1
+</span></span><span class="line"><span class="cl">GitBranch: master
+</span></span><span class="line"><span class="cl">CommitId: 445f935
+</span></span><span class="line"><span class="cl">Build Date: 2020-06-26T18:53:25+0800
+</span></span><span class="line"><span class="cl">Go Version: go1.14
+</span></span><span class="line"><span class="cl">OS/Arch: darwin/amd64
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 查看配置文件中的集群详情
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  list cluster
+</span></span><span class="line"><span class="cl">cluster:test-kafka version:V2_5_0_0 connector_brokers:[10.0.0.1:9092]
+</span></span><span class="line"><span class="cl">cluster:dev-kafka version:V1_0_0_0 connector_brokers:[192.168.0.22:9092]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">./build/gokafka.mac  list cluster --config ./kafka-cluster.yaml
+</span></span><span class="line"><span class="cl">cluster:log-kafka version:V2_5_0_0 connector_brokers:[log-kafka-1.bgbiao.cn:9092]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 注意: 当使用集群配置文件管理集群时，需要使用--cluster全局参数指定操作的目标集群
+</span></span><span class="line"><span class="cl"># 当然也可以直接指定broker进行操作
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe broker
+</span></span><span class="line"><span class="cl">controller: 3
+</span></span><span class="line"><span class="cl">brokers num: 3
+</span></span><span class="line"><span class="cl">broker list: [2 1 3]
+</span></span><span class="line"><span class="cl">id:2		 broker:192.168.0.22:9092
+</span></span><span class="line"><span class="cl">id:1		 broker:192.168.0.23:9092
+</span></span><span class="line"><span class="cl">id:3		 broker:192.168.0.24:9092
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --broker 10.0.0.1:9092  describe broker
+</span></span><span class="line"><span class="cl">controller: 3
+</span></span><span class="line"><span class="cl">brokers num: 3
+</span></span><span class="line"><span class="cl">broker list: [2 1 3]
+</span></span><span class="line"><span class="cl">id:2		 broker:192.168.0.22:9092
+</span></span><span class="line"><span class="cl">id:1		 broker:192.168.0.23:9092
+</span></span><span class="line"><span class="cl">id:3		 broker:192.168.0.24:9092
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>常用功能</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -1065,109 +1101,107 @@ id:3		 broker:192.168.0.24:9092
 </span><span class="lnt">96
 </span><span class="lnt">97
 </span><span class="lnt">98
-</span><span class="lnt">99
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback"># 1.创建topic
-# 可以指定分区和副本数
-$ ./build/gokafka.mac  --cluster dev-kafka create --topic test-bgbiao-1
-true
-
-
-# 2.查看topic
-$ ./build/gokafka.mac  --cluster dev-kafka list topic --topic-list test-bgbiao-1
-Topic:test-bgbiao-1	PartNum:3	Replicas:3	Config:
-Topic-Part:test-bgbiao-1-2	ReplicaAssign:[1 3 2]
-Topic-Part:test-bgbiao-1-1	ReplicaAssign:[2 1 3]
-Topic-Part:test-bgbiao-1-0	ReplicaAssign:[3 2 1]
-
-# 3.获取topic的分区和副本状态
-$ ./build/gokafka.mac  --cluster dev-kafka describe  topic --topic-list test-bgbiao-1
-Topic-Part:test-bgbiao-1-2	Leader:1	Replicas:[1 3 2]	ISR:[1 3 2]	OfflineRep:[]
-Topic-Part:test-bgbiao-1-1	Leader:2	Replicas:[2 1 3]	ISR:[2 1 3]	OfflineRep:[]
-Topic-Part:test-bgbiao-1-0	Leader:3	Replicas:[3 2 1]	ISR:[3 2 1]	OfflineRep:[]
-
-# 4.向topic中生产消息
-$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &#34;Hello, BGBiao.&#34;
-INFO[0000] Produce msg:Hello, BGBiao. to topic:test-bgbiao-1
-INFO[0000] topic:test-bgbiao-1 send ok with offset:0
-
-$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &#34;Nice to meet you.&#34;
-INFO[0000] Produce msg:Nice to meet you. to topic:test-bgbiao-1
-INFO[0000] topic:test-bgbiao-1 send ok with offset:0
-
-# 5.消费消息(gokafka中创建了一个默认的消费组用来预览消息)
-# 在终端进行实时消费，ctrl+c 可取消
-$ ./build/gokafka.mac  --cluster dev-kafka consumer --topic test-bgbiao-1
-INFO[0000] Sarama consumer up and running!...
-INFO[0004] part:2 offset:0
-msg: Nice to meet you.
-INFO[0004] part:1 offset:0
-msg: Hello, BGBiao.
-
-# 6.查看集群的broker列表以及controller
-$ ./build/gokafka.mac  --cluster dev-kafka describe broker
-controller: 3
-brokers num: 3
-broker list: [2 1 3]
-id:2		 broker:192.168.0.23:9092
-id:1		 broker:192.168.0.22:9092
-id:3		 broker:192.168.0.24:9092
-
-# 7.查看topic的日志大小
-$ ./build/gokafka.mac  --cluster dev-kafka describe loginfo --topic-list test-bgbiao-1
-topic:test-bgbiao-1
-172.16.32.23:9092
-logdir:/soul/data/kafka/kafka-logs
-topic-part		log-size(M)		offset-lag
-----------		-----------		----------
-test-bgbiao-1-0		0		0
-test-bgbiao-1-1		0		0
-test-bgbiao-1-2		0		0
-172.16.32.22:9092
-logdir:/soul/data/kafka/kafka-logs
-topic-part		log-size(M)		offset-lag
-----------		-----------		----------
-test-bgbiao-1-0		0		0
-test-bgbiao-1-1		0		0
-test-bgbiao-1-2		0		0
-172.16.32.24:9092
-logdir:/soul/data/kafka/kafka-logs
-topic-part		log-size(M)		offset-lag
-----------		-----------		----------
-test-bgbiao-1-0		0		0
-test-bgbiao-1-1		0		0
-test-bgbiao-1-2		0		0
-
-# 8.列出kafka集群的消费者组
-$ ./build/gokafka.mac  --cluster dev-kafka list  consumer-g | grep -i gokafka
-GoKafka
-
-# 9.查看消费者组详细信息
-# 因为上面我们停止了消费，该消费者组当前是空的
-$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list GoKafka
---------------------------------------------------------------------------------------------
-consumer-group:GoKafka consumer-state:Empty
-
-# 我们来看一个有实际消费状态的消费者组
-# 可以看到一个消费者组下的全部消费者线程以及消费者实例，消费的对应的topic列表
-$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list group-sync
---------------------------------------------------------------------------------------------
-consumer-group:group-sync consumer-state:Stable
-consumer-id					consumer-ip			topic-list
-consumer-1-a9437739-e5cb-4b41-a9d3-2640b9878965	/172.16.64.207		[sync-dev]
-consumer-1-92eb690b-d327-468b-8990-9c21e1ee405d	/172.16.32.235		[sync-dev]
-
-
-# 10. 还可以查看某个消费者组消费某个topic的日志详情
-$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-group-offset --group group-sync --topic sync-dev
-sync-dev
-topic-part:sync-dev-0 log-offsize:98
-topic-part:sync-dev-1 log-offsize:0
-topic-part:sync-dev-2 log-offsize:340
-topic-part:sync-dev-3 log-offsize:261
-
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 1.创建topic
+</span></span><span class="line"><span class="cl"># 可以指定分区和副本数
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka create --topic test-bgbiao-1
+</span></span><span class="line"><span class="cl">true
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 2.查看topic
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka list topic --topic-list test-bgbiao-1
+</span></span><span class="line"><span class="cl">Topic:test-bgbiao-1	PartNum:3	Replicas:3	Config:
+</span></span><span class="line"><span class="cl">Topic-Part:test-bgbiao-1-2	ReplicaAssign:[1 3 2]
+</span></span><span class="line"><span class="cl">Topic-Part:test-bgbiao-1-1	ReplicaAssign:[2 1 3]
+</span></span><span class="line"><span class="cl">Topic-Part:test-bgbiao-1-0	ReplicaAssign:[3 2 1]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 3.获取topic的分区和副本状态
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe  topic --topic-list test-bgbiao-1
+</span></span><span class="line"><span class="cl">Topic-Part:test-bgbiao-1-2	Leader:1	Replicas:[1 3 2]	ISR:[1 3 2]	OfflineRep:[]
+</span></span><span class="line"><span class="cl">Topic-Part:test-bgbiao-1-1	Leader:2	Replicas:[2 1 3]	ISR:[2 1 3]	OfflineRep:[]
+</span></span><span class="line"><span class="cl">Topic-Part:test-bgbiao-1-0	Leader:3	Replicas:[3 2 1]	ISR:[3 2 1]	OfflineRep:[]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 4.向topic中生产消息
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &#34;Hello, BGBiao.&#34;
+</span></span><span class="line"><span class="cl">INFO[0000] Produce msg:Hello, BGBiao. to topic:test-bgbiao-1
+</span></span><span class="line"><span class="cl">INFO[0000] topic:test-bgbiao-1 send ok with offset:0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka producer --topic test-bgbiao-1 --msg &#34;Nice to meet you.&#34;
+</span></span><span class="line"><span class="cl">INFO[0000] Produce msg:Nice to meet you. to topic:test-bgbiao-1
+</span></span><span class="line"><span class="cl">INFO[0000] topic:test-bgbiao-1 send ok with offset:0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 5.消费消息(gokafka中创建了一个默认的消费组用来预览消息)
+</span></span><span class="line"><span class="cl"># 在终端进行实时消费，ctrl+c 可取消
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka consumer --topic test-bgbiao-1
+</span></span><span class="line"><span class="cl">INFO[0000] Sarama consumer up and running!...
+</span></span><span class="line"><span class="cl">INFO[0004] part:2 offset:0
+</span></span><span class="line"><span class="cl">msg: Nice to meet you.
+</span></span><span class="line"><span class="cl">INFO[0004] part:1 offset:0
+</span></span><span class="line"><span class="cl">msg: Hello, BGBiao.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 6.查看集群的broker列表以及controller
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe broker
+</span></span><span class="line"><span class="cl">controller: 3
+</span></span><span class="line"><span class="cl">brokers num: 3
+</span></span><span class="line"><span class="cl">broker list: [2 1 3]
+</span></span><span class="line"><span class="cl">id:2		 broker:192.168.0.23:9092
+</span></span><span class="line"><span class="cl">id:1		 broker:192.168.0.22:9092
+</span></span><span class="line"><span class="cl">id:3		 broker:192.168.0.24:9092
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 7.查看topic的日志大小
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe loginfo --topic-list test-bgbiao-1
+</span></span><span class="line"><span class="cl">topic:test-bgbiao-1
+</span></span><span class="line"><span class="cl">172.16.32.23:9092
+</span></span><span class="line"><span class="cl">logdir:/soul/data/kafka/kafka-logs
+</span></span><span class="line"><span class="cl">topic-part		log-size(M)		offset-lag
+</span></span><span class="line"><span class="cl">----------		-----------		----------
+</span></span><span class="line"><span class="cl">test-bgbiao-1-0		0		0
+</span></span><span class="line"><span class="cl">test-bgbiao-1-1		0		0
+</span></span><span class="line"><span class="cl">test-bgbiao-1-2		0		0
+</span></span><span class="line"><span class="cl">172.16.32.22:9092
+</span></span><span class="line"><span class="cl">logdir:/soul/data/kafka/kafka-logs
+</span></span><span class="line"><span class="cl">topic-part		log-size(M)		offset-lag
+</span></span><span class="line"><span class="cl">----------		-----------		----------
+</span></span><span class="line"><span class="cl">test-bgbiao-1-0		0		0
+</span></span><span class="line"><span class="cl">test-bgbiao-1-1		0		0
+</span></span><span class="line"><span class="cl">test-bgbiao-1-2		0		0
+</span></span><span class="line"><span class="cl">172.16.32.24:9092
+</span></span><span class="line"><span class="cl">logdir:/soul/data/kafka/kafka-logs
+</span></span><span class="line"><span class="cl">topic-part		log-size(M)		offset-lag
+</span></span><span class="line"><span class="cl">----------		-----------		----------
+</span></span><span class="line"><span class="cl">test-bgbiao-1-0		0		0
+</span></span><span class="line"><span class="cl">test-bgbiao-1-1		0		0
+</span></span><span class="line"><span class="cl">test-bgbiao-1-2		0		0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 8.列出kafka集群的消费者组
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka list  consumer-g | grep -i gokafka
+</span></span><span class="line"><span class="cl">GoKafka
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 9.查看消费者组详细信息
+</span></span><span class="line"><span class="cl"># 因为上面我们停止了消费，该消费者组当前是空的
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list GoKafka
+</span></span><span class="line"><span class="cl">--------------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">consumer-group:GoKafka consumer-state:Empty
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 我们来看一个有实际消费状态的消费者组
+</span></span><span class="line"><span class="cl"># 可以看到一个消费者组下的全部消费者线程以及消费者实例，消费的对应的topic列表
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-g --consumer-group-list group-sync
+</span></span><span class="line"><span class="cl">--------------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">consumer-group:group-sync consumer-state:Stable
+</span></span><span class="line"><span class="cl">consumer-id					consumer-ip			topic-list
+</span></span><span class="line"><span class="cl">consumer-1-a9437739-e5cb-4b41-a9d3-2640b9878965	/172.16.64.207		[sync-dev]
+</span></span><span class="line"><span class="cl">consumer-1-92eb690b-d327-468b-8990-9c21e1ee405d	/172.16.32.235		[sync-dev]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 10. 还可以查看某个消费者组消费某个topic的日志详情
+</span></span><span class="line"><span class="cl">$ ./build/gokafka.mac  --cluster dev-kafka describe consumer-group-offset --group group-sync --topic sync-dev
+</span></span><span class="line"><span class="cl">sync-dev
+</span></span><span class="line"><span class="cl">topic-part:sync-dev-0 log-offsize:98
+</span></span><span class="line"><span class="cl">topic-part:sync-dev-1 log-offsize:0
+</span></span><span class="line"><span class="cl">topic-part:sync-dev-2 log-offsize:340
+</span></span><span class="line"><span class="cl">topic-part:sync-dev-3 log-offsize:261
+</span></span></code></pre></td></tr></table>
 </div>
 </div><hr>
 <p><img src="https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg" alt="公众号"></p>
@@ -1200,23 +1234,6 @@ topic-part:sync-dev-3 log-offsize:261
 
     
     
-<div class="post-reward">
-  <input type="checkbox" name="reward" id="reward" hidden />
-  <label class="reward-button" for="reward">Reward</label>
-  <div class="qr-code">
-    
-    
-      <label class="qr-code-image" for="reward">
-        <img class="image" src="/reward_wechat.png">
-        <span>Wechat</span>
-      </label>
-    
-      <label class="qr-code-image" for="reward">
-        <img class="image" src="/reward_wechat.png">
-        <span>Alipay</span>
-      </label>
-  </div>
-</div>
 
     <footer class="post-footer">
       <div class="post-tags">
@@ -1315,6 +1332,27 @@ topic-part:sync-dev-3 log-offsize:261
   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="36" height="36">
   <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://www.zhihu.com/people/bgbiao" rel="me noopener" class="iconfont"
+      title="zhihu"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M351.791182 562.469462l192.945407 0c0-45.367257-21.3871-71.939449-21.3871-71.939449L355.897709 490.530013c3.977591-82.182744 7.541767-187.659007 8.816806-226.835262l159.282726 0c0 0-0.86367-67.402109-18.578124-67.402109s-279.979646 0-279.979646 0 16.850783-88.141456 39.318494-127.053698c0 0-83.60514-4.510734-112.121614 106.962104S81.344656 355.077018 76.80834 367.390461c-4.536316 12.313443 24.62791 5.832845 36.941354 0 12.313443-5.832845 68.050885-25.924439 84.252893-103.69571l86.570681 0c1.165546 49.28652 4.596691 200.335724 3.515057 226.835262L109.86113 490.530013c-25.275663 18.147312-33.701566 71.939449-33.701566 71.939449L279.868105 562.469462c-8.497535 56.255235-23.417339 128.763642-44.275389 167.210279-33.05279 60.921511-50.55235 116.65793-169.802314 212.576513 0 0-19.442818 14.257725 40.829917 9.073656 60.273758-5.185093 117.305683-20.739347 156.840094-99.807147 20.553105-41.107233 41.805128-93.250824 58.386782-146.138358l-0.055259 0.185218 167.855986 193.263655c0 0 22.035876-51.847855 5.832845-108.880803L371.045711 650.610918l-42.1244 31.157627-0.045025 0.151449c11.69946-41.020252 20.11206-81.5749 22.726607-116.858498C351.665315 564.212152 351.72876 563.345412 351.791182 562.469462z"></path>
+  <path d="M584.918753 182.033893l0 668.840094 70.318532 0 28.807093 80.512708 121.875768-80.512708 153.600307 0L959.520453 182.033893 584.918753 182.033893zM887.150192 778.934538l-79.837326 0-99.578949 65.782216-23.537066-65.782216-24.855084 0L659.341766 256.673847l227.807403 0L887.149169 778.934538z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://juejin.cn/user/1556564193589431" rel="me noopener" class="iconfont"
+      title="juejin"  target="_blank"
+      >
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5875 6.77268L21.8232 3.40505L17.5875 0.00748237L17.5837 0L13.3555 3.39757L17.5837 6.76894L17.5875 6.77268ZM17.5863 17.3955H17.59L28.5161 8.77432L25.5526 6.39453L17.59 12.6808H17.5863L17.5825 12.6845L9.61993 6.40201L6.66016 8.78181L17.5825 17.3992L17.5863 17.3955ZM17.5828 23.2891L17.5865 23.2854L32.2133 11.7456L35.1768 14.1254L28.5238 19.3752L17.5865 28L0.284376 14.3574L0 14.1291L2.95977 11.7531L17.5828 23.2891Z" fill="#1E80FF"/>
 </svg>
 
     </a>

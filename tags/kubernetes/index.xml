@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kubernetes on BGBiao的SRE人生</title>
+    <title>Kubernetes on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
     <link>https://bgbiao.top/tags/kubernetes/</link>
-    <description>Recent content in Kubernetes on BGBiao的SRE人生</description>
+    <description>Recent content in Kubernetes on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
@@ -25,7 +25,7 @@
 &lt;p&gt;在查看 coredns pod 启动日志时，发现有如下对应异常:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
@@ -37,23 +37,21 @@
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
 &lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;$ kubectl  get pods -n kube-system | grep dns
-coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
-
-$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
-[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &amp;lt; 1.19
-.:53
-[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
-CoreDNS-1.8.4
-linux/amd64, go1.16.4, 053c4d5
-[INFO] 127.0.0.1:34652 - 36041 &amp;#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&amp;#34; NOERROR - 0 6.002536937s
-[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&amp;gt;127.0.0.53:53: i/o timeout
-[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&amp;gt; :53) detected for zone &amp;#34;.&amp;#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &amp;#34;HINFO 2066162189351134310.8810881223121065474.&amp;#34;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ kubectl  get pods -n kube-system | grep dns
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &amp;lt; 1.19
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.:53
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CoreDNS-1.8.4
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;linux/amd64, go1.16.4, 053c4d5
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[INFO] 127.0.0.1:34652 - 36041 &amp;#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&amp;#34; NOERROR - 0 6.002536937s
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&amp;gt;127.0.0.53:53: i/o timeout
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&amp;gt; :53) detected for zone &amp;#34;.&amp;#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &amp;#34;HINFO 2066162189351134310.8810881223121065474.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
     </item>
