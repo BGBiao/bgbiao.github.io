@@ -6,7 +6,16 @@
     <description>Recent content in Golang on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 09 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 02 Oct 2022 13:13:39 +0800</lastBuildDate><atom:link href="https://bgbiao.top/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2022 10 02 2022DevOps路线图</title>
+      <link>https://bgbiao.top/</link>
+      <pubDate>Sun, 02 Oct 2022 13:13:39 +0800</pubDate>
+      
+      <guid>https://bgbiao.top/</guid>
+      <description>前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能路线图。 公众号: CloudNativeOps</description>
+    </item>
+    
     <item>
       <title>初识 WebSocket 以及 Golang 实现</title>
       <link>https://bgbiao.top/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/</link>
