@@ -9,10 +9,10 @@
     <lastBuildDate>Sun, 02 Oct 2022 18:31:59 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/devops/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Terraform快速入门，分钟级资源交付实践</title>
-      <link>https://bgbiao.top/</link>
+      <link>https://bgbiao.top/devops/</link>
       <pubDate>Sun, 02 Oct 2022 18:31:59 +0800</pubDate>
       
-      <guid>https://bgbiao.top/</guid>
+      <guid>https://bgbiao.top/devops/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;随着公有云的不断完善和发展，Terraform 已然成为了云上基础设施管理中很重要的一环，然而在 基础设施即代码(IaC)中，Terraform 也已经是业内承认的标准，这篇文章带你快速熟悉和使用 Terraform，并通过项目一键交付腾讯云 CVM。&lt;/p&gt;
 &lt;/blockquote&gt;</description>

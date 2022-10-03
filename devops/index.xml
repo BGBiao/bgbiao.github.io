@@ -9,10 +9,10 @@
     <lastBuildDate>Sun, 02 Oct 2022 18:31:59 +0800</lastBuildDate><atom:link href="https://bgbiao.top/devops/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Terraform快速入门，分钟级资源交付实践</title>
-      <link>https://bgbiao.top/</link>
+      <link>https://bgbiao.top/devops/</link>
       <pubDate>Sun, 02 Oct 2022 18:31:59 +0800</pubDate>
       
-      <guid>https://bgbiao.top/</guid>
+      <guid>https://bgbiao.top/devops/</guid>
       <description>&lt;blockquote&gt;
 &lt;p&gt;随着公有云的不断完善和发展，Terraform 已然成为了云上基础设施管理中很重要的一环，然而在 基础设施即代码(IaC)中，Terraform 也已经是业内承认的标准，这篇文章带你快速熟悉和使用 Terraform，并通过项目一键交付腾讯云 CVM。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
@@ -20,19 +20,19 @@
     
     <item>
       <title>2022 10 02 DevOps SRE外部文档</title>
-      <link>https://bgbiao.top/</link>
+      <link>https://bgbiao.top/devops/</link>
       <pubDate>Sun, 02 Oct 2022 13:35:12 +0800</pubDate>
       
-      <guid>https://bgbiao.top/</guid>
+      <guid>https://bgbiao.top/devops/</guid>
       <description>GitOps GitOps 标准以及最佳实践 SRE Google SRE Books RoadMap of SRE SRE 中的故障指标 SRE最佳实践之-容量管理 SRE workbook Tech RoadMap: roadmap.sh 新技术栈： the-new-stack</description>
     </item>
     
     <item>
       <title>2022 10 02 2022DevOps路线图</title>
-      <link>https://bgbiao.top/</link>
+      <link>https://bgbiao.top/devops/</link>
       <pubDate>Sun, 02 Oct 2022 13:13:39 +0800</pubDate>
       
-      <guid>https://bgbiao.top/</guid>
+      <guid>https://bgbiao.top/devops/</guid>
       <description>前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能路线图。 公众号: CloudNativeOps</description>
     </item>
     
