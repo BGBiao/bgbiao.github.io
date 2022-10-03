@@ -6,25 +6,7 @@
     <description>Recent content in 成长 on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 02 Oct 2022 13:35:12 +0800</lastBuildDate><atom:link href="https://bgbiao.top/categories/%E6%88%90%E9%95%BF/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>DevOps SRE 资源网站</title>
-      <link>https://bgbiao.top/devops/</link>
-      <pubDate>Sun, 02 Oct 2022 13:35:12 +0800</pubDate>
-      
-      <guid>https://bgbiao.top/devops/</guid>
-      <description>GitOps GitOps 标准以及最佳实践 SRE Google SRE Books RoadMap of SRE SRE 中的故障指标 SRE最佳实践之-容量管理 SRE workbook Tech RoadMap: roadmap.sh 新技术栈： the-new-stack</description>
-    </item>
-    
-    <item>
-      <title>2022 10 02 2022DevOps路线图</title>
-      <link>https://bgbiao.top/devops/</link>
-      <pubDate>Sun, 02 Oct 2022 13:13:39 +0800</pubDate>
-      
-      <guid>https://bgbiao.top/devops/</guid>
-      <description>前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能路线图。 公众号: CloudNativeOps</description>
-    </item>
-    
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/categories/%E6%88%90%E9%95%BF/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>过去这一个月的所思所想</title>
       <link>https://bgbiao.top/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/</link>

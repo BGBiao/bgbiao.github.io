@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CloudNativeOps on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
+    <link>https://bgbiao.top/tags/cloudnativeops/</link>
+    <description>Recent content in CloudNativeOps on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 02 Oct 2022 13:35:12 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/cloudnativeops/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DevOps SRE 运维-全栈技能</title>
+      <link>https://bgbiao.top/devops/</link>
+      <pubDate>Sun, 02 Oct 2022 13:35:12 +0800</pubDate>
+      
+      <guid>https://bgbiao.top/devops/</guid>
+      <description>公众号: CloudNativeOps DevOps/SRE 技能图谱 前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能</description>
+    </item>
+    
+  </channel>
+</rss>
