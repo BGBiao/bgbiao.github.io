@@ -6,7 +6,7 @@
     <description>Recent content in Golang on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 02 Oct 2022 13:35:12 +0800</lastBuildDate><atom:link href="https://bgbiao.top/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/categories/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>初识 WebSocket 以及 Golang 实现</title>
       <link>https://bgbiao.top/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/</link>
@@ -205,15 +205,6 @@ google 提供了多种语言的实现：Java、c#、c++、Go 和 Python，每一
       
       <guid>https://bgbiao.top/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</guid>
       <description>&lt;p&gt;最近在使用Golang进行文件读写的过程中，遇到几个细节问题导致程序写入数据时有一定脏数据的残留，最后发现是使用os.OpenFile在进行文件操作的时候没有使用正确的flag造成的。因此专门去学习了下Golang中读写文件的几种方式方法,在此记录下一些简单的操作，防止以后遗忘。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>DevOps/SRE</title>
-      <link>https://bgbiao.top/devops/</link>
-      <pubDate>Sun, 02 Oct 2022 13:35:12 +0800</pubDate>
-      
-      <guid>https://bgbiao.top/devops/</guid>
-      <description>公众号: CloudNativeOps DevOps/SRE 技能图谱 前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能</description>
     </item>
     
   </channel>

@@ -6,7 +6,7 @@
     <description>Recent content in Kubernetes on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 02 Oct 2022 13:35:12 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bgbiao.top/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CoreDNS loop 插件异常问题</title>
       <link>https://bgbiao.top/post/coredns-loop/</link>
@@ -171,15 +171,6 @@
       <description>&lt;blockquote&gt;
 &lt;p&gt;前言: 之前在国际版环境使用Spinnaker集群进行k8s容器的部署管理，由于Spinnaker由Netflix开源，在集群安装过程中需要科学上网来安装一些包。本篇文章将简单记录下在国内如何快速搭建和配置可用的Spinnaker集群环境。并且在生产环境使用&lt;code&gt;minio&lt;/code&gt;作为持久化层，使用自定义域名，同时对接jenkine来统一对业务代码进行持续构建和管理。&lt;/p&gt;
 &lt;/blockquote&gt;</description>
-    </item>
-    
-    <item>
-      <title>DevOps/SRE</title>
-      <link>https://bgbiao.top/devops/</link>
-      <pubDate>Sun, 02 Oct 2022 13:35:12 +0800</pubDate>
-      
-      <guid>https://bgbiao.top/devops/</guid>
-      <description>公众号: CloudNativeOps DevOps/SRE 技能图谱 前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能</description>
     </item>
     
   </channel>

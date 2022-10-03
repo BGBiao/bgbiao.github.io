@@ -29,15 +29,6 @@
     </item>
     
     <item>
-      <title>DevOps/SRE</title>
-      <link>https://bgbiao.top/devops/</link>
-      <pubDate>Sun, 02 Oct 2022 13:35:12 +0800</pubDate>
-      
-      <guid>https://bgbiao.top/devops/</guid>
-      <description>公众号: CloudNativeOps DevOps/SRE 技能图谱 前言：前面我翻译了一篇关于DevOps 最佳实践工具 的文章，接下来以图形结构的方式来展现一些整个 SRE、DevOps 的技能</description>
-    </item>
-    
-    <item>
       <title>Terraform快速入门，分钟级资源交付实践</title>
       <link>https://bgbiao.top/terraform/quick-start/</link>
       <pubDate>Sun, 02 Oct 2022 18:31:59 +0800</pubDate>
