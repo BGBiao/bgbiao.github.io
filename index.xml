@@ -12,6 +12,104 @@
     
     
     <item>
+      <title>DevOps理念之持续集成</title>
+      <link>https://bgbiao.top/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/</link>
+      <pubDate>Mon, 03 Oct 2022 17:55:46 +0800</pubDate>
+      
+      <guid>https://bgbiao.top/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/</guid>
+      
+        <description>&lt;blockquote&gt;
+&lt;p&gt;注意：持续集成是能够推动实现更出色的软件交付表现和组织绩效的一组功能之一。这些能力是由 &lt;a href=&#34;https://www.devops-research.com/research.html&#34;&gt;DORA DevOps 现状研究项目&lt;/a&gt;发现的，这是一项针对提升绩效的做法和能力进行的具有学术意义的独立而严谨的调查。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;软件系统非常复杂，对一个文件进行明显简单、独立的更改可能会对整个系统造成意外的影响。&lt;/p&gt;
+&lt;p&gt;当大量开发者处理相关系统时，协调代码更新是个难题，而且不同开发者所做的更改可能并不兼容。&lt;/p&gt;
+&lt;p&gt;持续集成 (CI) 这一做法就是为了解决这些问题。&lt;/p&gt;
+&lt;p&gt;持续集成可创建快速反馈环并确保开发者以小批量方式工作，能够让团队开发高质量的软件、降低软件开发和维护费用，并提高团队工作效率。&lt;/p&gt;
+&lt;h3 id=&#34;如何实现持续集成&#34;&gt;如何实现持续集成&lt;/h3&gt;
+&lt;p&gt;当您的组织开始实现持续集成时，开发者会定期将其所有代码集成到代码库的主版本（称为主干、主版本或主线）中。&lt;/p&gt;
+&lt;p&gt;DevOps 研究和评估组织 (DORA) 的研究 (PDF) 表明，如果开发者以至少每天一次的频率将其作业合并到主干中，团队的表现会更好。&lt;/p&gt;
+&lt;p&gt;合并之前和合并之后，系统都会运行一组自动化测试，用于验证更改不会引入回归错误。如果这些自动化测试失败，团队会立即停止正在进行的工作来解决此问题。&lt;/p&gt;
+&lt;p&gt;持续集成可确保软件始终处于正常运行状态，还可确保开发者分支不会大幅度偏离主干。持续集成的优势非常明显：研究 (PDF) 显示，它可以提高部署频率、系统稳定性和软件质量。&lt;/p&gt;
+&lt;p&gt;成功实现持续集成的关键要素包括以下几项：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;每次提交都应触发软件的构建。&lt;/li&gt;
+&lt;li&gt;每次提交都应触发一系列可在几分钟内提供反馈的自动测试。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;要实现这些元素，您需要以下几项：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;自动构建流程&lt;/code&gt; 持续集成的第一步是拥有一个自动脚本，它能够创建可部署到任何环境的软件包。由持续集成构建创建的软件包应具有权威性，并可供所有下游流程使用。这些构建应进行编号且可重复。每天应至少成功运行一次构建流程。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;一套自动化测试&lt;/code&gt; 如果没有，请先编写少量涵盖系统高价值功能的单元测试和验收测试 (PDF)。确保测试可靠。这样一来，当测试失败时，您就会知道存在实际问题；当测试通过时，您便可放心 - 系统没有严重问题。然后，确保测试涵盖所有新功能。这些测试应该能够快速运行，以便尽快为开发者提供反馈。您的测试每天应至少成功运行一次。归根结底，如果您有性能和验收测试，开发者应该每天都获得反馈。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;在每次签入时运行构建和自动化测试的持续集成系统&lt;/code&gt; 该系统还应向团队显示状态。您可以采用有趣的方式来显示状态 - 例如，当构建中断时，您可以使用电喇叭或红绿灯来指示。请勿使用电子邮件通知；许多人会忽略电子邮件通知或创建隐藏通知的过滤条件。聊天系统中的通知是更好且更常用的通知方式。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;根据 Kent Beck 和极限编程社区（该术语的发源地）的定义，持续集成还包含两种可提高软件交付性能的拓展做法：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;主干开发做法，即开发者以小批量的方式处理主干 / 主线。他们以至少每天一次的频率将其工作合并到共享主干 / 主线中，而不是处理生命周期较长的功能分支&lt;/li&gt;
+&lt;li&gt;设置一份协议，规定当构建中断时，构建修复工作应该优于任何其他工作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;持续集成需要自动化单元测试。&lt;/p&gt;
+&lt;p&gt;这些测试应足够全面，让您有信心确定软件可按预期运行。测试还必须在几分钟或更短的时间内运行。如果自动化单元测试的运行时间较长，开发者就不会愿意频繁运行它们。如果测试不频繁运行，则测试失败可能是许多不同的更改所致，导致难以调试。不频繁运行的测试很难维护。&lt;/p&gt;
+&lt;p&gt;创建可维护的自动化单元测试套件非常复杂。&lt;/p&gt;
+&lt;p&gt;解决此问题的一个好方法是采用测试驱动开发 (TDD)，即开发者在实现让测试通过的代码之前，先编写最初失败的自动化测试。TDD 具有若干优势，其中一个优势是确保开发者能够编写出易于测试的模块化代码，从而降低生成的自动化测试套件的维护费用。许多组织都没有可维护的自动化单元测试套件，尽管如此，他们仍未采用 TDD。&lt;/p&gt;
+&lt;h3 id=&#34;关于持续集成的争议&#34;&gt;关于持续集成的争议&lt;/h3&gt;
+&lt;p&gt;如前所述，有时持续集成会被视作一种有争议的做法。持续集成需要开发者将大型功能和其他更改拆分为可频繁集成到主干中的小型增量步骤。&lt;/p&gt;
+&lt;p&gt;对于不习惯以这种方式工作的开发者而言，这是一个改变。此外，当团队改用小步骤时，完成大型功能可能需要更长的时间。&lt;/p&gt;
+&lt;p&gt;但总的来说，您不希望优化开发人员在分支上声明一个大型功能的速度，而是希望能尽快审核、集成、测试和部署更改。如果是独立的小型更改，并且它们所在的分支只在短时间内存在，则此流程会使软件的开发和交付更快且更稳定 (PDF)。&lt;/p&gt;
+&lt;p&gt;小批量工作还可以确保开发者定期获得来自其他开发者、测试人员、客户以及自动化性能和安全测试的关于工作对系统总体影响的反馈。这可以进而帮助您更轻松、更快速地检测、分类和修复任何问题。&lt;/p&gt;
+&lt;p&gt;尽管存在这些争议，但对于希望开始持续交付之旅的任何组织来说，帮助软件开发团队实现持续集成应该是首要任务。&lt;/p&gt;
+&lt;h3 id=&#34;常见误区&#34;&gt;常见误区&lt;/h3&gt;
+&lt;p&gt;以下是阻碍持续集成广泛采用的常见误区：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;未将所有资源放入代码库中&lt;/code&gt;: 构建和配置应用及系统所需的一切资源都应放入代码库中。这似乎不在持续集成的涵盖范围内，但它是重要的基础步骤&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;未自动化构建流程&lt;/code&gt;: 手动执行步骤可能会导致错误，并且不记录某些步骤&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;未在每次更改时触发快速测试&lt;/code&gt;: 全面的端到端测试是必要的，但快速测试（通常是单元测试）对于获得快速反馈也很重要&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;未立即修复中断的构建&lt;/code&gt;: 持续集成的一个关键目标是得到让每个人都可以开发的稳定构建。如果无法在几分钟内修复构建，则应确定并还原导致构建中断的更改&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;测试的运行时间过长&lt;/code&gt;: 测试的运行时间不应超过几分钟，根据 DORA 的研究 (PDF)，上限应为 10 分钟左右。如果构建花费的时间超过此值，您应该提高测试效率，添加更多计算资源以便并行运行它们，或者使用部署流水线模式将运行较长时间的测试拆分为单独的构建&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;未频繁合并到主干&lt;/code&gt;: 许多组织都有自动化测试和构建，但并未要求每天都要合并到主干。这会导致更难集成生命周期较长的分支，并延长开发者的反馈环&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;衡量持续集成的方法&#34;&gt;衡量持续集成的方法&lt;/h3&gt;
+&lt;p&gt;前面讨论的持续集成概念概述了衡量系统和开发环境中持续集成效果的方法，如下表所示。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;测试的因素&lt;/th&gt;
+&lt;th&gt;衡量指标&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;代码提交触发软件的构建&lt;/td&gt;
+&lt;td&gt;导致在没有人工干预的情况下软件构建的代码提交的百分比。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;代码提交触发一系列自动测试&lt;/td&gt;
+&lt;td&gt;导致在没有人工干预的情况下运行一套自动化测试的代码提交的百分比。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;每天成功执行自动构建和测试&lt;/td&gt;
+&lt;td&gt;每天成功执行的自动化构建的百分比和每天成功执行的自动化测试的百分比&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;测试人员可使用当前构建进行探索性测试&lt;/td&gt;
+&lt;td&gt;构建对测试人员的可用性或不可用性&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;开发者每天都收到来自验收和性能测试的反馈&lt;/td&gt;
+&lt;td&gt;来自验收和性能测试的反馈对开发者的可用性，即在一天之内为开发者提供反馈的测试所占的百分比&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;中断的构建立即得到修复&lt;/td&gt;
+&lt;td&gt;从构建中断到修复（通过检查解决问题或还原破坏性更改）的时间&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;通过收集这些指标，您可以针对它们优化流程和工具。这样可以得到更好的持续集成做法，并缩短开发者的反馈环。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;原文: &lt;a href=&#34;https://cloud.google.com/architecture/devops/devops-tech-continuous-integration&#34;&gt;https://cloud.google.com/architecture/devops/devops-tech-continuous-integration&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>2022年基础设施自动化和监控的17个最佳DevOps工具</title>
       <link>https://bgbiao.top/post/2022%E5%B9%B4%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E8%87%AA%E5%8A%A8%E5%8C%96%E5%92%8C%E7%9B%91%E6%8E%A7%E7%9A%8417%E4%B8%AA%E6%9C%80%E4%BD%B3devops%E5%B7%A5%E5%85%B7/</link>
       <pubDate>Fri, 16 Sep 2022 00:00:00 +0000</pubDate>
@@ -6540,706 +6638,6 @@
 &lt;/ul&gt;
 &lt;hr&gt;
 &lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>kafka常用运维操作</title>
-      <link>https://bgbiao.top/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/</link>
-      <pubDate>Mon, 04 May 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/post/kafka%E5%B8%B8%E7%94%A8%E8%BF%90%E7%BB%B4%E6%93%8D%E4%BD%9C/</guid>
-      
-        <description>&lt;blockquote&gt;
-&lt;p&gt;前言: 在kafka的集群运维操作过程中，我们需要通过一些工具来实现集群的高可用以及负载的平均操作，而对于kafka集群的SRE来说，需要掌握好如下几点，才能更好的维护和保证kafka集群服务的稳定性，可靠性和整体性能。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;code&gt;要想kafka跑的好，如下几点要知晓。&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Graceful shutdown&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;建议开启如下参数:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;controlled.shutdown.enable=true
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 只有在broker上承载的分区都具有副本时(副本大于1，且副本存活)，controller节点才会成功关闭&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Balancing leadership&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;每当Broker停止或崩溃时，该broker的分区的领导权就转移到其他副本。&lt;/p&gt;
-&lt;p&gt;这意味着，默认情况下，当broker重新启动时，它将只是所有分区的关注者，这意味着它不会用于客户端读写，这对于整个集群来说吞吐会受到1/N的降低(N表示集群节点数)&lt;/p&gt;
-&lt;p&gt;为了避免这种不平衡，kafka提供了一种优先副本的概念&lt;code&gt;preferred replicas&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;如果一个分区的副本列表是1、5、9，那么节点1比节点5或节点9更适合作为leader，因为它位于副本列表的前面。&lt;/p&gt;
-&lt;p&gt;可以使用如下命令来恢复已恢复副本的领导权:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 老版本工具
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-preferred-replica-election.sh --zookeeper zk_host:port/chroot
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 新版本工具
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;当然每次在服务器启动后执行该操作，可能很无聊，因此可以设置如下参数来自动执行:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;auto.leader.rebalance.enable=true
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Balancing Replicas Across Racks&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;机架层面的副本均衡。&lt;/p&gt;
-&lt;p&gt;机架感知特性将相同分区的副本分散到不同的机架上，这扩展了Kafka为broker失败提供的覆盖机架失败的保证，如果机架上的所有broker同时失败，就限制了数据丢失的风险。&lt;/p&gt;
-&lt;p&gt;该特性还可以应用于其他broker分组，如EC2中的可用性区域。&lt;/p&gt;
-&lt;p&gt;您可以通过向broker配置添加属性来指定broker属于特定的机架：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;broker.rack=my-rack-id
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;当创建、修改或重新分发一个主题时，将遵循机架约束，确保副本尽可能多地跨越多个机架(一个分区将跨越最小(#机架，复制因子)不同的机架)。&lt;/p&gt;
-&lt;p&gt;用于将副本副本分配给broker的算法，会确保每个broker的leader数量是恒定的，而不管broker是如何分布在机架上的。这确保了平衡的吞吐量。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; 明智的做法是为每个机架配置相同数量的broker&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Mirroring data between clusters&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;我们将在Kafka集群之间复制数据的过程称为“镜像”，以避免与单个集群中节点之间的复制混淆。&lt;/p&gt;
-&lt;p&gt;Kafka附带一个用于在Kafka集群之间镜像数据的工具，即&lt;code&gt;MirrorMaker&lt;/code&gt;，该工具可以从源集群进行消费，并生产到目标集群。&lt;/p&gt;
-&lt;p&gt;常用的场景就是在另外一个数据中心提供副本。&lt;/p&gt;
-&lt;p&gt;您可以运行许多这样的镜像进程来提高吞吐量和容错能力。&lt;/p&gt;
-&lt;p&gt;使用mirrormaker进行迁移topic到另外的集群:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-mirror-maker.sh
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      --consumer.config consumer.properties
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      --producer.config producer.properties --whitelist my-topic
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;需要注意，我们必须使用&lt;code&gt;--whitelist&lt;/code&gt;参数指定topic，该参数支持java的正则表达式结构，比如&lt;code&gt;--whitelist &#39;A|B&#39;&lt;/code&gt;，或者&lt;code&gt;--whitelist &#39;*&#39;&lt;/code&gt; .&lt;/p&gt;
-&lt;p&gt;通常在使用kafka-mirror-maker时，建议配合&lt;code&gt;auto.create.topics.enable=true&lt;/code&gt;使用，可以大批量的进行topic迁移。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Checking consumer position&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;检查消费者的位移，有时候了解消费者当前的位置时很有必要的。&lt;/p&gt;
-&lt;p&gt;kafka有一个工具，它将显示所有消费者在一个消费者组中的位置，以及他们与日志结束的距离&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 在my-group的消费者上消费my-topic的主题
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 可以查看整个消费者组的消费情况
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Managing Consumer Groups&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;ConsumerGroupCommand工具可以&lt;code&gt;list, describe, or delete&lt;/code&gt;一个消费组，消费者组可以手动删除，也可以在该组最后提交的偏移量过期时自动删除。&lt;/p&gt;
-&lt;p&gt;只有在组中没有任何活动成员时，手动删除才有效。&lt;/p&gt;
-&lt;p&gt;如下命令可以列出所有主题的所有消费者组:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;查看指定消费者组&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;当然可用试用一些额外的参数来查看更多的消费者信息：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&amp;ndash;members: 查看消费者组中活跃的消费者&lt;/li&gt;
-&lt;li&gt;&amp;ndash;members &amp;ndash;verbose: 该参数还可以查看分配给每个成员的分区&lt;/li&gt;
-&lt;li&gt;&amp;ndash;offsets: 该参数实际上可以被&lt;code&gt;--describe&lt;/code&gt;参数中的内容覆盖掉&lt;/li&gt;
-&lt;li&gt;&amp;ndash;state: 该参数可以提供组级别的信息&lt;/li&gt;
-&lt;li&gt;&amp;ndash;delete: 该参数可以手动删除一个或多个消费者组&lt;/li&gt;
-&lt;li&gt;-reset-offsets: 该参数用于重置消费者组的偏移量，此选项在同一时间支持一个消费者组，同时需要使用&lt;code&gt;--all-topics或--topic&lt;/code&gt;指定范围&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 查看消费者组成员
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CONSUMER-ID                                    HOST            CLIENT-ID       #PARTITIONS
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer1-3fc8d6f1-581a-4472-bdf3-3515b4aee8c1 /127.0.0.1      consumer1       2
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer4-117fe4d3-c6c1-4178-8ee9-eb4a3954bee0 /127.0.0.1      consumer4       1
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2       3
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer3-ecea43e4-1f01-479f-8349-f9130b75d8ee /127.0.0.1      consumer3       0
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 查看消费者组成员详细信息(分区)
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --members --verbose
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CONSUMER-ID                                    HOST            CLIENT-ID       #PARTITIONS     ASSIGNMENT
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer1-3fc8d6f1-581a-4472-bdf3-3515b4aee8c1 /127.0.0.1      consumer1       2               topic1(0), topic2(0)
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer4-117fe4d3-c6c1-4178-8ee9-eb4a3954bee0 /127.0.0.1      consumer4       1               topic3(2)
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer2-e76ea8c3-5d30-4299-9005-47eb41f3d3c4 /127.0.0.1      consumer2       3               topic2(1), topic3(0,1)
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;consumer3-ecea43e4-1f01-479f-8349-f9130b75d8ee /127.0.0.1      consumer3       0               -
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# --state参数
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group --state
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;COORDINATOR (ID)          ASSIGNMENT-STRATEGY       STATE                #MEMBERS
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;localhost:9092 (0)        range                     Stable               4
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 删除消费者组
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my-group --group my-other-group
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Deletion of requested consumer groups (&amp;#39;my-group&amp;#39;, &amp;#39;my-other-group&amp;#39;) was successful.
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;code&gt;注意:&lt;/code&gt; &lt;code&gt;--reset-offsets&lt;/code&gt;选项支持如下三个执行选项:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;显示要重置的偏移量&lt;/li&gt;
-&lt;li&gt;&amp;ndash;execute: 执行&lt;code&gt;--reset-offsets&lt;/code&gt;进程&lt;/li&gt;
-&lt;li&gt;&amp;ndash;export: 以csv格式导出执行结果&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;--reset-offsets&lt;/code&gt;参数还有如下方案可供选择:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&amp;ndash;to-datetime: 重置offset到另外一个offset (format:YYYY-MM-DDTHH:mm:SS.sss)&lt;/li&gt;
-&lt;li&gt;&amp;ndash;to-earliest: 重置offset到最早的offset&lt;/li&gt;
-&lt;li&gt;&amp;ndash;to-latest: 重置为最新的offset&lt;/li&gt;
-&lt;li&gt;&amp;ndash;shift-by: 重置offset为n&lt;/li&gt;
-&lt;li&gt;&amp;ndash;from-file: 重置到csv中定义的offset&lt;/li&gt;
-&lt;li&gt;&amp;ndash;to-current: 重置offset到当前&lt;/li&gt;
-&lt;li&gt;&amp;ndash;by-duration: 重置offset为当前时间( Format: &amp;lsquo;PnDTnHnMnS&amp;rsquo;)&lt;/li&gt;
-&lt;li&gt;&amp;ndash;to-offset: 重置offset为指定的值&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 设置消费者组的offset为最新
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --to-latest
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;TOPIC                          PARTITION  NEW-OFFSET
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;topic1                         0          0
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;如果你还是使用老的&lt;code&gt;high-level&lt;/code&gt;消费者，并且将组的元数据存储在zk中(&lt;code&gt;offsets.storage=zookeeper&lt;/code&gt;)，可以使用&lt;code&gt;--zookeeper&lt;/code&gt;来代替&lt;code&gt;bootstrap-server&lt;/code&gt;参数:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Expanding your cluster&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;集群的扩展.&lt;/p&gt;
-&lt;p&gt;将服务器添加到Kafka集群很容易，只需为它们分配一个惟一的brokerid，并在新服务器上启动Kafka.&lt;/p&gt;
-&lt;p&gt;然而，这些新服务器不会自动分配任何数据分区，因此，除非将分区移动到它们，否则在创建新主题之前，它们不会做任何工作。&lt;/p&gt;
-&lt;p&gt;因此，通常在向集群中添加机器时，您会希望将一些现有数据迁移到这些机器上。&lt;/p&gt;
-&lt;p&gt;迁移数据的过程是手动启动的，但是完全自动化。&lt;/p&gt;
-&lt;p&gt;实际上，Kafka将添加新服务器作为它正在迁移的分区的追随者，并允许它完全复制该分区中的现有数据。&lt;/p&gt;
-&lt;p&gt;当新服务器完全复制了该分区的内容并加入同步副本时，现有副本中的一个将删除其分区的数据。&lt;/p&gt;
-&lt;p&gt;可以使用分区重新分配工具在broker之间移动分区。&lt;/p&gt;
-&lt;p&gt;理想的分区分布应该确保所有broker之间的数据负载和分区大小是一致的。&lt;/p&gt;
-&lt;p&gt;分区重新分配工具不具备自动研究Kafka集群中的数据分布并移动分区以获得均匀的负载分布的能力，因此，管理员必须确定应该移动哪些主题或分区。&lt;/p&gt;
-&lt;p&gt;分区迁移工具可以运行在三种互斥模式下:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;--generate&lt;/code&gt;: 给定主题列表和broker列表，该工具生成一个候选重新分配，将指定主题的所有分区移动到新的broker，该参数仅帮助管理员方便的来生成给定主题和目标broker列表的分区重新分配计划&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;--execute&lt;/code&gt;: 该工具根据用户提供的重新分配计划开始重新分配分区(使用&lt;code&gt;--reassignment-json-file&lt;/code&gt;指定生成的迁移配置)，- &lt;code&gt;--verify&lt;/code&gt;: 该工具将验证列出的所有分区的重新分配状态，可以是成功完成、失败或正在进行&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;1.自动迁移数据到新的服务器&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;分区重新分配工具可用于将某些主题从当前broker集移到新添加的broker。 这在扩展现有集群时通常很有用，因为与一次移动一个分区相比，将整个主题移至新的broker集更容易。 用于执行此操作时，用户应提供应移至新的一组broker的主题列表和新broker的目标列表。 然后，该工具将给定主题列表中的所有分区平均分配到新的一组broker中。 在此过程中，主题的复制因子保持不变。 有效地，将输入主题列表的所有分区的副本从旧的broker集移至新添加的broker。&lt;/p&gt;
-&lt;p&gt;如下示例(topic:foo1和foo2的全部分区移动到broker 5和6上，迁移完成后，该topic的全部分区将在Broker5和6上):&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ cat topics-to-move.json
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;topics&amp;#34;: [{&amp;#34;topic&amp;#34;: &amp;#34;foo1&amp;#34;},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            {&amp;#34;topic&amp;#34;: &amp;#34;foo2&amp;#34;}],
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;version&amp;#34;:1
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 准备好json文件之后，使用分区重新分配工具生成一个候选分配
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --topics-to-move-json-file topics-to-move.json --broker-list &amp;#34;5,6&amp;#34; --generate
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Current partition replica assignment
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[1,2]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[3,4]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[1,2]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[3,4]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[2,3]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[2,3]}]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Proposed partition reassignment configuration
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[5,6]}]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 该工具生成一个将移动所有分区的候选分配(分配到哪些broker上)，此时分区移动还没有开始，它只告诉您当前的分配和建议的新分配。
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 应该保存当前的赋值，以防您想要回滚到它.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 使用生成的迁移计划进行迁移
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file expand-cluster-reassignment.json --execute
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Current partition replica assignment
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[1,2]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[3,4]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[1,2]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[3,4]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[2,3]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[2,3]}]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Save this to use as the --reassignment-json-file option during rollback
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Successfully started reassignment of partitions
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:2,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[5,6]}]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 最后使用--verify选项验证迁移状态
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 注意:使用相同的迁移计划任务expand-cluster-reassignment.json
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file expand-cluster-reassignment.json --verify
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Status of partition reassignment:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo1,0] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo1,1] is in progress
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo1,2] is in progress
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo2,0] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo2,1] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo2,2] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;code&gt;2.自定义分区分配和迁移&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;分区重分配工具还可以用于有选择地将分区的副本移动到一组特定的broker。&lt;/p&gt;
-&lt;p&gt;当我们以这种方式使用时，假设用户知道重新分配计划，并且不需要该工具来生成候选的重新分配，即直接使用用户的分配策略进行数据迁移。&lt;/p&gt;
-&lt;p&gt;示例: 迁移topic&lt;code&gt;foo1&lt;/code&gt;的partition-0到broker5和6，partition-1到broker2和3&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 自定义迁移计划
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ cat custom-reassignment.json
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6]},{&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[2,3]}]}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 使用--execute选项执行上述的迁移计划
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file custom-reassignment.json --execute
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Current partition replica assignment
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[1,2]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[3,4]}]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Save this to use as the --reassignment-json-file option during rollback
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Successfully started reassignment of partitions
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo1&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6]},
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              {&amp;#34;topic&amp;#34;:&amp;#34;foo2&amp;#34;,&amp;#34;partition&amp;#34;:1,&amp;#34;replicas&amp;#34;:[2,3]}]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# --verify来验证迁移状态
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file custom-reassignment.json --verify
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Status of partition reassignment:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo1,0] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo2,1] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Decommissioning brokers&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;分区重新分配工具还不能自动生成用于退役broker的重新分配计划，因此，管理员必须制定一个重新分配计划，将托管在代理上的所有分区的副本迁移到代理的其余部分。&lt;/p&gt;
-&lt;p&gt;这可能比较繁琐，因为重新分配需要确保所有副本不会从已退役的代理移动到另一个代理。为了简化这个过程，我们计划在将来为退役代理添加工具支持。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Increasing replication factor&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;增加现有分区的复制因子很容易，只需在定制的重新分配json文件中指定额外的副本，并使用—execute选项来增加指定分区的复制因子。&lt;/p&gt;
-&lt;p&gt;示例: 将主题foo的partition-0的副本从1增加到3。在增加复制因子之前，代理5上只存在分区的副本，作为增加复制因子的一部分，我们将在代理6和代理7上添加更多的副本。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 自定义迁移配置
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ cat increase-replication-factor.json
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6,7]}]}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 执行
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file increase-replication-factor.json --execute
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Current partition replica assignment
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5]}]}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Save this to use as the --reassignment-json-file option during rollback
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Successfully started reassignment of partitions
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{&amp;#34;version&amp;#34;:1,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;partitions&amp;#34;:[{&amp;#34;topic&amp;#34;:&amp;#34;foo&amp;#34;,&amp;#34;partition&amp;#34;:0,&amp;#34;replicas&amp;#34;:[5,6,7]}]}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 验证
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file increase-replication-factor.json --verify
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Status of partition reassignment:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [foo,0] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 查看副本数
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-topics.sh --bootstrap-server localhost:9092 --topic foo --describe
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Topic:foo   PartitionCount:1    ReplicationFactor:3 Configs:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  Topic: foo    Partition: 0    Leader: 5   Replicas: 5,6,7 Isr: 5,6,7
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Limiting Bandwidth Usage during Data Migration&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Kafka允许您对复制流量施加限制，设置用于将副本从一台机器移动到另一台机器的带宽上限。&lt;/p&gt;
-&lt;p&gt;这在重新平衡集群、引导新代理或添加或删除代理时非常有用，因为它限制了这些数据密集型操作对用户的影响&lt;/p&gt;
-&lt;p&gt;最简单的方式就是在使用&lt;code&gt;kafka-reassign-partitions.sh&lt;/code&gt;脚本时，使用限流功能，不过&lt;code&gt;kafka-configs.sh&lt;/code&gt;脚本也具有该功能。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 限制在执行重平衡时，迁移速度不能超过50MB/s.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --execute --reassignment-json-file bigger-cluster.json —throttle 50000000
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 当然，如果要改变速率的限制，可以重新运行
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181  --execute --reassignment-json-file bigger-cluster.json --throttle 700000000
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  There is an existing assignment running.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  The throttle limit was set to 700000000 B/s
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 一旦完成重平衡后，就可以再次验证
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 需要注意:当冲平衡完成后，使用--verify验证时需要删除限流，否则会影响正常复制
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181  --verify --reassignment-json-file bigger-cluster.json
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Status of partition reassignment:
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [my-topic,1] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Reassignment of partition [mytopic,0] completed successfully
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Throttle was removed.
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;查看broker的限流配置:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh --describe --zookeeper localhost:2181 --entity-type brokers
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for brokers &amp;#39;2&amp;#39; are leader.replication.throttled.rate=700000000,follower.replication.throttled.rate=700000000
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for brokers &amp;#39;1&amp;#39; are leader.replication.throttled.rate=700000000,follower.replication.throttled.rate=700000000
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;这显示了应用于复制协议的leader和follower端上的节流。默认情况下，两边分配相同的节流吞吐量值。&lt;/p&gt;
-&lt;p&gt;查看限流的副本:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh --describe --zookeeper localhost:2181 --entity-type topics
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for topic &amp;#39;my-topic&amp;#39; are leader.replication.throttled.replicas=1:102,0:101,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    follower.replication.throttled.replicas=1:101,0:102
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Setting quotas&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;配额设置。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 为user=user1, client-id=clientA配置自定义配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &amp;#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&amp;#39; --entity-type users --entity-name user1 --entity-type clients --entity-name clientA
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Updated config for entity: user-principal &amp;#39;user1&amp;#39;, client-id &amp;#39;clientA&amp;#39;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 为user=user1配置配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &amp;#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&amp;#39; --entity-type users --entity-name user1
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Updated config for entity: user-principal &amp;#39;user1&amp;#39;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 为client-id=clientA配置配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &amp;#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&amp;#39; --entity-type clients --entity-name clientA
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Updated config for entity: client-id &amp;#39;clientA&amp;#39;.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 为user=userA配置默认的配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &amp;#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&amp;#39; --entity-type users --entity-name user1 --entity-type clients --entity-default
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Updated config for entity: user-principal &amp;#39;user1&amp;#39;, default client-id.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 为user配置默认配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &amp;#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&amp;#39; --entity-type users --entity-default
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Updated config for entity: default user-principal.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 为client-id配置默认配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$  bin/kafka-configs.sh  --zookeeper localhost:2181 --alter --add-config &amp;#39;producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200&amp;#39; --entity-type clients --entity-default
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Updated config for entity: default client-id.
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 查看配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --describe --entity-type users --entity-name user1 --entity-type clients --entity-name clientA
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for user-principal &amp;#39;user1&amp;#39;, client-id &amp;#39;clientA&amp;#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --describe --entity-type users --entity-name user1
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for user-principal &amp;#39;user1&amp;#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --describe --entity-type clients --entity-name clientA
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for client-id &amp;#39;clientA&amp;#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 如果不指定entity name ，将显示所有的entity-type的配额
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --describe --entity-type users
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for user-principal &amp;#39;user1&amp;#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for default user-principal are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/kafka-configs.sh  --zookeeper localhost:2181 --describe --entity-type users --entity-type clients
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for user-principal &amp;#39;user1&amp;#39;, default client-id are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Configs for user-principal &amp;#39;user1&amp;#39;, client-id &amp;#39;clientA&amp;#39; are producer_byte_rate=1024,consumer_byte_rate=2048,request_percentage=200
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;code&gt;注意&lt;/code&gt;: 在broker的配置中增加如下配置，会默认为全部的生产者和消费者进行配额限制.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 生产者和消费者10MB/s
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;quota.producer.default=10485760
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;quota.consumer.default=10485760
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;a href=&#34;http://kafka.apache.org/24/documentation.html#operations&#34;&gt;kafka-operations&lt;/a&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/006tNbRwly1gaexte72s7j31bi0hc418.jpg&#34; alt=&#34;公众号&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://tva1.sinaimg.cn/large/007S8ZIlly1gehf9xu0tzj30p00angou.jpg&#34; alt=&#34;交流群&#34;&gt;&lt;/p&gt;</description>
       
     </item>
     

@@ -506,6 +506,59 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">Dockerfile最佳实践</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2017-11-09" class="post-time">
+        2017-11-09
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+          
+        </div>
+      <span class="more-meta"> 2906 words </span>
+      <span class="more-meta"> 6 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <p><strong>在生产环境中一般我们会对基本的环境进行自构建，从而利用images的分层特性去层层构建上层的业务镜像。</strong></p>
+<blockquote>
+<p>1.默认情况下我们会首先构建一个基本的base镜像，这个镜像可能包含了linux具体的发行版本，以及基本的软件包，比如wget，vi等。在该层面上，镜像的改动会很少，频次也会很低。</p>
+</blockquote>
+<blockquote>
+<p>2.其次我们可以在base镜像之上构建新的平台镜像，比如说ssh，java，tomcat等。在基础环境层，相比较上一层来说修改频次稍微会有点大，因为可能涉及到基本软件的版本调整或者参数调整。</p>
+</blockquote>
+<blockquote>
+<p>3.然后在可以在基本的平台镜像之上构建业务镜像，业务镜像是可以直接启动应用程序的，也就是需要启动服务进程的。该层镜像就是直接和业务代码融合的镜像，随着业务的更新，镜像也会频繁的改动上线。</p>
+</blockquote>
+    </div>
+    <div class="read-more">
+      <a href="/post/dockerfile%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/overlayfs%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6%E4%BB%A5%E5%8F%8Adocker%E7%8E%AF%E5%A2%83%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/">Overlayfs技术探究以及Docker环境中的使用</a>
     </h1>
     
@@ -805,53 +858,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/manager-your-gpus/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/">GPU环境下玩转Docker(二)</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2017-10-26" class="post-time">
-        2017-10-26
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 3857 words </span>
-      <span class="more-meta"> 8 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>前言:
-在一节中<a href="https://xxbandy.github.io/2017/10/26/GPU%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACDocker-%E4%B8%80/"></a>,我们已经在GPU物理机上准备好了GPU环境，本篇文章介绍如何使用Docker来管理GPU容器。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/gpu%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%8E%A9%E8%BD%ACdocker-%E4%BA%8C/" class="read-more-link">Read more</a>
     </div>
     
   </div>

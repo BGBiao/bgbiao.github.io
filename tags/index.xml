@@ -6,11 +6,20 @@
     <description>Recent content in Tags on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 02 Oct 2022 18:31:59 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 03 Oct 2022 17:55:46 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CloudNative</title>
+      <link>https://bgbiao.top/tags/cloudnative/</link>
+      <pubDate>Mon, 03 Oct 2022 17:55:46 +0800</pubDate>
+      
+      <guid>https://bgbiao.top/tags/cloudnative/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>DevOps</title>
       <link>https://bgbiao.top/tags/devops/</link>
-      <pubDate>Sun, 02 Oct 2022 18:31:59 +0800</pubDate>
+      <pubDate>Mon, 03 Oct 2022 17:55:46 +0800</pubDate>
       
       <guid>https://bgbiao.top/tags/devops/</guid>
       <description></description>
@@ -19,7 +28,7 @@
     <item>
       <title>SRE</title>
       <link>https://bgbiao.top/tags/sre/</link>
-      <pubDate>Sun, 02 Oct 2022 18:31:59 +0800</pubDate>
+      <pubDate>Mon, 03 Oct 2022 17:55:46 +0800</pubDate>
       
       <guid>https://bgbiao.top/tags/sre/</guid>
       <description></description>
@@ -175,15 +184,6 @@
       <pubDate>Sun, 21 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://bgbiao.top/tags/zookeeper/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>运维体系</title>
-      <link>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/</link>
-      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://bgbiao.top/tags/%E8%BF%90%E7%BB%B4%E4%BD%93%E7%B3%BB/</guid>
       <description></description>
     </item>
     

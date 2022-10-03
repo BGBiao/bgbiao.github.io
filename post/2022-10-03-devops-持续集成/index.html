@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
+  <title>DevOps理念之持续集成 - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -22,7 +22,7 @@
 
 <meta name="mobile-web-app-capable" content="yes">
 
-<meta name="author" content="BGBiao" /><meta name="description" content="test index" />
+<meta name="author" content="BGBiao" /><meta name="description" content="2022-10-03-devops-持续集成" />
 <meta name="keywords" content="BGBiao, 运维" />
 
 
@@ -34,8 +34,8 @@
 <meta name="generator" content="Hugo 0.103.1" />
 
 
-<link rel="canonical" href="https://bgbiao.top/" />
-<link href="/index.xml" rel="alternate" type="application/rss+xml" title="CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！" />
+<link rel="canonical" href="https://bgbiao.top/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" />
+
 
 
 
@@ -60,15 +60,20 @@
 <link rel="stylesheet" href="/css/custom.css">
 
 
-<meta property="og:title" content="首页" />
-<meta property="og:description" content="test index" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://bgbiao.top/" />
+<meta property="og:title" content="DevOps理念之持续集成" />
+<meta property="og:description" content="2022-10-03-devops-持续集成" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-10-03T17:55:46+08:00" />
+<meta property="article:modified_time" content="2022-10-03T17:55:46+08:00" />
 
-<meta itemprop="name" content="首页">
-<meta itemprop="description" content="test index"><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="首页"/>
-<meta name="twitter:description" content="test index"/>
+<meta itemprop="name" content="DevOps理念之持续集成">
+<meta itemprop="description" content="2022-10-03-devops-持续集成"><meta itemprop="datePublished" content="2022-10-03T17:55:46+08:00" />
+<meta itemprop="dateModified" content="2022-10-03T17:55:46+08:00" />
+<meta itemprop="wordCount" content="2664">
+<meta itemprop="keywords" content="SRE,DevOps,CloudNative," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="DevOps理念之持续集成"/>
+<meta name="twitter:description" content="2022-10-03-devops-持续集成"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -486,451 +491,226 @@ if (!doNotTrack) {
     <main id="main" class="main bg-llight">
       <div class="content-wrapper">
         <div id="content" class="content container">
-          
-<section id="posts" class="posts">
-  
-  
+          <article class="post bg-white">
     
-  
-  
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
+    <header class="post-header">
+      <h1 class="post-title">DevOps理念之持续集成</h1>
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+      <div class="post-meta">
+        <time datetime="2022-10-03" class="post-time">
+          2022-10-03
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/devops/"> DevOps </a>
+            
+          </div>
+        <span class="more-meta"> 2664 words </span>
+          <span class="more-meta"> 6 min read </span>
 
-        </span>
-      
-      <a class="post-link" href="/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/">NVIDIA-DIGITS测试使用</a>
-    </h1>
+        
+        
+
+        
+        
+      </div>
+    </header>
+
     
-    <div class="post-meta">
-      <time datetime="2018-01-02" class="post-time">
-        2018-01-02
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 1737 words </span>
-      <span class="more-meta"> 4 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
     
-    <div class="post-summary">
-      <h3 id="digits简介">DIGITS简介</h3>
-<p><a href="https://github.com/NVIDIA/DIGITS">DIGITS</a>: Deep Learning GPU Training System1，是由英伟达（NVIDIA）公司开发的第一个交互式深度学习GPU训练系统。目的在于整合现有的Deep Learning开发工具，实现深度神经网络（Deep Neural Network，DNN）设计、训练和可视化等任务变得简单化。DIGITS是基于浏览器的接口，因而通过实时的网络行为的可视化，可以快速设计最优的DNN。DIGITS是开源软件，可在GitHub上找到，因而开发人员可以扩展和自定义DIGITS。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/nvidia-digits%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/" class="read-more-link">Read more</a>
-    </div>
-    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#如何实现持续集成">如何实现持续集成</a></li>
+        <li><a href="#关于持续集成的争议">关于持续集成的争议</a></li>
+        <li><a href="#常见误区">常见误区</a></li>
+        <li><a href="#衡量持续集成的方法">衡量持续集成的方法</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
   </div>
-</article>
+</div>
 
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/golang%E4%B8%ADgbk%E5%92%8Cutf-8%E6%A0%BC%E5%BC%8F%E7%94%BB%E5%83%8F%E8%BD%AC%E6%8D%A2/">Golang中GBK和UTF-8格式互相转换</a>
-    </h1>
     
-    <div class="post-meta">
-      <time datetime="2017-12-24" class="post-time">
-        2017-12-24
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
-          
-        </div>
-      <span class="more-meta"> 298 words </span>
-      <span class="more-meta"> 1 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
+    <div class="post-content">
       <blockquote>
-<p>背景: 刚开始学习<code>Golang</code>的时候，做一些简单数据处理发现总是会出现乱码，通常是因为字符集的问题，这里记录下如何在<code>GBK</code>和<code>UTF-8</code>之间进行格式转换</p>
+<p>注意：持续集成是能够推动实现更出色的软件交付表现和组织绩效的一组功能之一。这些能力是由 <a href="https://www.devops-research.com/research.html">DORA DevOps 现状研究项目</a>发现的，这是一项针对提升绩效的做法和能力进行的具有学术意义的独立而严谨的调查。</p>
+</blockquote>
+<p>软件系统非常复杂，对一个文件进行明显简单、独立的更改可能会对整个系统造成意外的影响。</p>
+<p>当大量开发者处理相关系统时，协调代码更新是个难题，而且不同开发者所做的更改可能并不兼容。</p>
+<p>持续集成 (CI) 这一做法就是为了解决这些问题。</p>
+<p>持续集成可创建快速反馈环并确保开发者以小批量方式工作，能够让团队开发高质量的软件、降低软件开发和维护费用，并提高团队工作效率。</p>
+<h3 id="如何实现持续集成">如何实现持续集成</h3>
+<p>当您的组织开始实现持续集成时，开发者会定期将其所有代码集成到代码库的主版本（称为主干、主版本或主线）中。</p>
+<p>DevOps 研究和评估组织 (DORA) 的研究 (PDF) 表明，如果开发者以至少每天一次的频率将其作业合并到主干中，团队的表现会更好。</p>
+<p>合并之前和合并之后，系统都会运行一组自动化测试，用于验证更改不会引入回归错误。如果这些自动化测试失败，团队会立即停止正在进行的工作来解决此问题。</p>
+<p>持续集成可确保软件始终处于正常运行状态，还可确保开发者分支不会大幅度偏离主干。持续集成的优势非常明显：研究 (PDF) 显示，它可以提高部署频率、系统稳定性和软件质量。</p>
+<p>成功实现持续集成的关键要素包括以下几项：</p>
+<ul>
+<li>每次提交都应触发软件的构建。</li>
+<li>每次提交都应触发一系列可在几分钟内提供反馈的自动测试。</li>
+</ul>
+<p>要实现这些元素，您需要以下几项：</p>
+<ul>
+<li><code>自动构建流程</code> 持续集成的第一步是拥有一个自动脚本，它能够创建可部署到任何环境的软件包。由持续集成构建创建的软件包应具有权威性，并可供所有下游流程使用。这些构建应进行编号且可重复。每天应至少成功运行一次构建流程。</li>
+<li><code>一套自动化测试</code> 如果没有，请先编写少量涵盖系统高价值功能的单元测试和验收测试 (PDF)。确保测试可靠。这样一来，当测试失败时，您就会知道存在实际问题；当测试通过时，您便可放心 - 系统没有严重问题。然后，确保测试涵盖所有新功能。这些测试应该能够快速运行，以便尽快为开发者提供反馈。您的测试每天应至少成功运行一次。归根结底，如果您有性能和验收测试，开发者应该每天都获得反馈。</li>
+<li><code>在每次签入时运行构建和自动化测试的持续集成系统</code> 该系统还应向团队显示状态。您可以采用有趣的方式来显示状态 - 例如，当构建中断时，您可以使用电喇叭或红绿灯来指示。请勿使用电子邮件通知；许多人会忽略电子邮件通知或创建隐藏通知的过滤条件。聊天系统中的通知是更好且更常用的通知方式。</li>
+</ul>
+<p>根据 Kent Beck 和极限编程社区（该术语的发源地）的定义，持续集成还包含两种可提高软件交付性能的拓展做法：</p>
+<ul>
+<li>主干开发做法，即开发者以小批量的方式处理主干 / 主线。他们以至少每天一次的频率将其工作合并到共享主干 / 主线中，而不是处理生命周期较长的功能分支</li>
+<li>设置一份协议，规定当构建中断时，构建修复工作应该优于任何其他工作。</li>
+</ul>
+<p>持续集成需要自动化单元测试。</p>
+<p>这些测试应足够全面，让您有信心确定软件可按预期运行。测试还必须在几分钟或更短的时间内运行。如果自动化单元测试的运行时间较长，开发者就不会愿意频繁运行它们。如果测试不频繁运行，则测试失败可能是许多不同的更改所致，导致难以调试。不频繁运行的测试很难维护。</p>
+<p>创建可维护的自动化单元测试套件非常复杂。</p>
+<p>解决此问题的一个好方法是采用测试驱动开发 (TDD)，即开发者在实现让测试通过的代码之前，先编写最初失败的自动化测试。TDD 具有若干优势，其中一个优势是确保开发者能够编写出易于测试的模块化代码，从而降低生成的自动化测试套件的维护费用。许多组织都没有可维护的自动化单元测试套件，尽管如此，他们仍未采用 TDD。</p>
+<h3 id="关于持续集成的争议">关于持续集成的争议</h3>
+<p>如前所述，有时持续集成会被视作一种有争议的做法。持续集成需要开发者将大型功能和其他更改拆分为可频繁集成到主干中的小型增量步骤。</p>
+<p>对于不习惯以这种方式工作的开发者而言，这是一个改变。此外，当团队改用小步骤时，完成大型功能可能需要更长的时间。</p>
+<p>但总的来说，您不希望优化开发人员在分支上声明一个大型功能的速度，而是希望能尽快审核、集成、测试和部署更改。如果是独立的小型更改，并且它们所在的分支只在短时间内存在，则此流程会使软件的开发和交付更快且更稳定 (PDF)。</p>
+<p>小批量工作还可以确保开发者定期获得来自其他开发者、测试人员、客户以及自动化性能和安全测试的关于工作对系统总体影响的反馈。这可以进而帮助您更轻松、更快速地检测、分类和修复任何问题。</p>
+<p>尽管存在这些争议，但对于希望开始持续交付之旅的任何组织来说，帮助软件开发团队实现持续集成应该是首要任务。</p>
+<h3 id="常见误区">常见误区</h3>
+<p>以下是阻碍持续集成广泛采用的常见误区：</p>
+<ul>
+<li><code>未将所有资源放入代码库中</code>: 构建和配置应用及系统所需的一切资源都应放入代码库中。这似乎不在持续集成的涵盖范围内，但它是重要的基础步骤</li>
+<li><code>未自动化构建流程</code>: 手动执行步骤可能会导致错误，并且不记录某些步骤</li>
+<li><code>未在每次更改时触发快速测试</code>: 全面的端到端测试是必要的，但快速测试（通常是单元测试）对于获得快速反馈也很重要</li>
+<li><code>未立即修复中断的构建</code>: 持续集成的一个关键目标是得到让每个人都可以开发的稳定构建。如果无法在几分钟内修复构建，则应确定并还原导致构建中断的更改</li>
+<li><code>测试的运行时间过长</code>: 测试的运行时间不应超过几分钟，根据 DORA 的研究 (PDF)，上限应为 10 分钟左右。如果构建花费的时间超过此值，您应该提高测试效率，添加更多计算资源以便并行运行它们，或者使用部署流水线模式将运行较长时间的测试拆分为单独的构建</li>
+<li><code>未频繁合并到主干</code>: 许多组织都有自动化测试和构建，但并未要求每天都要合并到主干。这会导致更难集成生命周期较长的分支，并延长开发者的反馈环</li>
+</ul>
+<h3 id="衡量持续集成的方法">衡量持续集成的方法</h3>
+<p>前面讨论的持续集成概念概述了衡量系统和开发环境中持续集成效果的方法，如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th>测试的因素</th>
+<th>衡量指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代码提交触发软件的构建</td>
+<td>导致在没有人工干预的情况下软件构建的代码提交的百分比。</td>
+</tr>
+<tr>
+<td>代码提交触发一系列自动测试</td>
+<td>导致在没有人工干预的情况下运行一套自动化测试的代码提交的百分比。</td>
+</tr>
+<tr>
+<td>每天成功执行自动构建和测试</td>
+<td>每天成功执行的自动化构建的百分比和每天成功执行的自动化测试的百分比</td>
+</tr>
+<tr>
+<td>测试人员可使用当前构建进行探索性测试</td>
+<td>构建对测试人员的可用性或不可用性</td>
+</tr>
+<tr>
+<td>开发者每天都收到来自验收和性能测试的反馈</td>
+<td>来自验收和性能测试的反馈对开发者的可用性，即在一天之内为开发者提供反馈的测试所占的百分比</td>
+</tr>
+<tr>
+<td>中断的构建立即得到修复</td>
+<td>从构建中断到修复（通过检查解决问题或还原破坏性更改）的时间</td>
+</tr>
+</tbody>
+</table>
+<p>通过收集这些指标，您可以针对它们优化流程和工具。这样可以得到更好的持续集成做法，并缩短开发者的反馈环。</p>
+<blockquote>
+<p>原文: <a href="https://cloud.google.com/architecture/devops/devops-tech-continuous-integration">https://cloud.google.com/architecture/devops/devops-tech-continuous-integration</a></p>
 </blockquote>
     </div>
-    <div class="read-more">
-      <a href="/post/golang%E4%B8%ADgbk%E5%92%8Cutf-8%E6%A0%BC%E5%BC%8F%E7%94%BB%E5%83%8F%E8%BD%AC%E6%8D%A2/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2022-10-03
+      
+    </span>
+  </p>
   
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
 
-        </span>
-      
-      <a class="post-link" href="/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/">Golang正则模块使用</a>
-    </h1>
+
     
-    <div class="post-meta">
-      <time datetime="2017-12-24" class="post-time">
-        2017-12-24
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+    
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/sre/">SRE</a>
+          <a href="https://bgbiao.top/tags/devops/">DevOps</a>
+          <a href="https://bgbiao.top/tags/cloudnative/">CloudNative</a>
           
         </div>
-      <span class="more-meta"> 743 words </span>
-      <span class="more-meta"> 2 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <p>最近在开发过程中会遇到一些字符串匹配相关的内容，正好去大概学习了下Golang中的<code>regexp</code>模块。因为目前正则模块对我来说更多的就是去匹配并处理字符串的，因此目前主要关注几个返回为<code>string</code>类型的方法。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/golang%E6%AD%A3%E5%88%99%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/2022%E5%B9%B4%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E8%87%AA%E5%8A%A8%E5%8C%96%E5%92%8C%E7%9B%91%E6%8E%A7%E7%9A%8417%E4%B8%AA%E6%9C%80%E4%BD%B3devops%E5%B7%A5%E5%85%B7/">
+            <span class="next-text nav-default">2022年基础设施自动化和监控的17个最佳DevOps工具</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
 </svg>
 
-        </span>
-      
-      <a class="post-link" href="/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/">Golang读写文件操作</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2017-12-17" class="post-time">
-        2017-12-17
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/golang/"> golang </a>
-          
-        </div>
-      <span class="more-meta"> 6665 words </span>
-      <span class="more-meta"> 14 min read </span>
-      
-      
-      
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
     </div>
-  </header>
   
-  <div class="post-content">
+
+  
+
+  
+
+  
+
     
-    <div class="post-summary">
-      <p>最近在使用Golang进行文件读写的过程中，遇到几个细节问题导致程序写入数据时有一定脏数据的残留，最后发现是使用os.OpenFile在进行文件操作的时候没有使用正确的flag造成的。因此专门去学习了下Golang中读写文件的几种方式方法,在此记录下一些简单的操作，防止以后遗忘。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/golang%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
 
   
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/">开源OCR引擎tesseract的构建使用</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2017-12-09" class="post-time">
-        2017-12-09
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 3144 words </span>
-      <span class="more-meta"> 7 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <h3 id="简介">简介</h3>
-<h4 id="ocr">OCR</h4>
-<p>光学字符识别(OCR,Optical Character Recognition)是指对文本资料进行扫描，然后对图像文件进行分析处理，获取文字及版面信息的过程。OCR技术非常专业，一般多是印刷、打印行业的从业人员使用。而在人工智能快速发展阶段，该技术也被大量运用在一些常见的业务场景来提高业务流程效率，比如像一些文件扫描，身份证识别，图片识别等相关业务场景。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/%E5%BC%80%E6%BA%90ocr%E5%BC%95%E6%93%8Etesseract%E7%9A%84%E6%9E%84%E5%BB%BA%E4%BD%BF%E7%94%A8/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7%E6%8A%80%E5%B7%A7/">效率工具技巧</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2017-11-28" class="post-time">
-        2017-11-28
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E6%95%88%E7%8E%87/"> 效率 </a>
-          
-        </div>
-      <span class="more-meta"> 82 words </span>
-      <span class="more-meta"> 1 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      
-    </div>
-    <div class="read-more">
-      <a href="/post/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7%E6%8A%80%E5%B7%A7/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/">CPU虚拟化技术探究</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2017-11-09" class="post-time">
-        2017-11-09
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 2448 words </span>
-      <span class="more-meta"> 5 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <p>KVM虚拟机CPU的软件调优首先需要对NUMA技术有一定了解，调优的主要手段就是虚拟机对物理机CPU逻辑内核的手工绑定。
-内存方面的调优手段主要是KSM，即相同内存页合并、内存气球技术以及大页内存的使用。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/kvm%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%A9%B6/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/">如何更加优雅的使用Docker</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2017-11-09" class="post-time">
-        2017-11-09
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 4149 words </span>
-      <span class="more-meta"> 9 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>在使用docker过程中，我们经常发现管理维护是一个很复杂过程，因为我们在使用docker commands的过程中，我们只会去使用我们认为简单并且熟悉的命令，然而docker本身其实是提供给我们很多便捷且人性化的工具的，如果掌握这些使用技巧，也许你的维护管理工作将会事半功倍，并且给人看起来会很牛逼的样子。</p>
-</blockquote>
-    </div>
-    <div class="read-more">
-      <a href="/post/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%8A%A0%E4%BC%98%E9%9B%85%E7%9A%84%E4%BD%BF%E7%94%A8docker/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-</section>
-
-
-
-
-
-
-  
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-  <nav class="pagination">
-    <ul>
-      
-      <li >
-        <a href="/">1</a>
-      </li>
-      
-      <li >
-        <a href="/page/2.html">2</a>
-      </li>
-      
-      <li >
-        <a href="/page/3.html">3</a>
-      </li>
-      
-      <li >
-        <a href="/page/4.html">4</a>
-      </li>
-      
-      <li >
-        <a href="/page/5.html">5</a>
-      </li>
-      
-      <li >
-        <a href="/page/6.html">6</a>
-      </li>
-      
-      <li >
-        <a href="/page/7.html">7</a>
-      </li>
-      
-      <li  class="active" >
-        <a href="/page/8.html">8</a>
-      </li>
-      
-      <li >
-        <a href="/page/9.html">9</a>
-      </li>
-      
-      <li >
-        <a href="/page/10.html">10</a>
-      </li>
-      
-    </ul>
-  </nav>
-
-  
-  
-
-
-
-
 
         </div>
       </div>

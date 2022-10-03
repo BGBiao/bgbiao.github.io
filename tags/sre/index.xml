@@ -6,7 +6,22 @@
     <description>Recent content in SRE on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 02 Oct 2022 18:31:59 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/sre/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 03 Oct 2022 17:55:46 +0800</lastBuildDate><atom:link href="https://bgbiao.top/tags/sre/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DevOps理念之持续集成</title>
+      <link>https://bgbiao.top/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/</link>
+      <pubDate>Mon, 03 Oct 2022 17:55:46 +0800</pubDate>
+      
+      <guid>https://bgbiao.top/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;注意：持续集成是能够推动实现更出色的软件交付表现和组织绩效的一组功能之一。这些能力是由 &lt;a href=&#34;https://www.devops-research.com/research.html&#34;&gt;DORA DevOps 现状研究项目&lt;/a&gt;发现的，这是一项针对提升绩效的做法和能力进行的具有学术意义的独立而严谨的调查。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;软件系统非常复杂，对一个文件进行明显简单、独立的更改可能会对整个系统造成意外的影响。&lt;/p&gt;
+&lt;p&gt;当大量开发者处理相关系统时，协调代码更新是个难题，而且不同开发者所做的更改可能并不兼容。&lt;/p&gt;
+&lt;p&gt;持续集成 (CI) 这一做法就是为了解决这些问题。&lt;/p&gt;
+&lt;p&gt;持续集成可创建快速反馈环并确保开发者以小批量方式工作，能够让团队开发高质量的软件、降低软件开发和维护费用，并提高团队工作效率。&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>从零构建 SRE 体系</title>
       <link>https://bgbiao.top/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/</link>
