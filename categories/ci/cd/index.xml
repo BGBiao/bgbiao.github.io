@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CI/CD on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
+    <link>https://bgbiao.top/categories/ci/cd/</link>
+    <description>Recent content in CI/CD on CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language><atom:link href="https://bgbiao.top/categories/ci/cd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2022 10 04 Devops 持续交付</title>
+      <link>https://bgbiao.top/post/2022-10-04-devops-%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98/</link>
+      <pubDate>Mon, 03 Oct 2022 18:14:55 +0800</pubDate>
+      
+      <guid>https://bgbiao.top/post/2022-10-04-devops-%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98/</guid>
+      <description>原文: https://cloud.google.com/architecture/devops/devops-tech-continuous-delivery</description>
+    </item>
+    
+  </channel>
+</rss>

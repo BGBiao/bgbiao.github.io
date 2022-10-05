@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
+  <title>你知道如何洞察 Go 程序的内在状态吗？（文末有彩蛋） - CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -22,7 +22,7 @@
 
 <meta name="mobile-web-app-capable" content="yes">
 
-<meta name="author" content="BGBiao" /><meta name="description" content="test index" />
+<meta name="author" content="BGBiao" /><meta name="description" content="2022-10-05-Go-metrics" />
 <meta name="keywords" content="BGBiao, 运维" />
 
 
@@ -34,8 +34,8 @@
 <meta name="generator" content="Hugo 0.103.1" />
 
 
-<link rel="canonical" href="https://bgbiao.top/" />
-<link href="/index.xml" rel="alternate" type="application/rss+xml" title="CloudNativeOps - SRE，DevOps、Kubernetes 云原生运维。成长之路，一起前行！" />
+<link rel="canonical" href="https://bgbiao.top/post/2022-10-05-go-metrics/" />
+
 
 
 
@@ -60,15 +60,20 @@
 <link rel="stylesheet" href="/css/custom.css">
 
 
-<meta property="og:title" content="首页" />
-<meta property="og:description" content="test index" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://bgbiao.top/" />
+<meta property="og:title" content="你知道如何洞察 Go 程序的内在状态吗？（文末有彩蛋）" />
+<meta property="og:description" content="2022-10-05-Go-metrics" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bgbiao.top/post/2022-10-05-go-metrics/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-10-05T15:40:38+08:00" />
+<meta property="article:modified_time" content="2022-10-05T15:40:38+08:00" />
 
-<meta itemprop="name" content="首页">
-<meta itemprop="description" content="test index"><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="首页"/>
-<meta name="twitter:description" content="test index"/>
+<meta itemprop="name" content="你知道如何洞察 Go 程序的内在状态吗？（文末有彩蛋）">
+<meta itemprop="description" content="2022-10-05-Go-metrics"><meta itemprop="datePublished" content="2022-10-05T15:40:38+08:00" />
+<meta itemprop="dateModified" content="2022-10-05T15:40:38+08:00" />
+<meta itemprop="wordCount" content="2303">
+<meta itemprop="keywords" content="Golang,SRE,DevOps,CloudNative," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="你知道如何洞察 Go 程序的内在状态吗？（文末有彩蛋）"/>
+<meta name="twitter:description" content="2022-10-05-Go-metrics"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -486,49 +491,52 @@ if (!doNotTrack) {
     <main id="main" class="main bg-llight">
       <div class="content-wrapper">
         <div id="content" class="content container">
-          
-<section id="posts" class="posts">
-  
-  
+          <article class="post bg-white">
     
-  
-  
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
+    <header class="post-header">
+      <h1 class="post-title">你知道如何洞察 Go 程序的内在状态吗？（文末有彩蛋）</h1>
       
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
+      <div class="post-meta">
+        <time datetime="2022-10-05" class="post-time">
+          2022-10-05
+        </time>
+        <div class="post-category">
+            <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
+            <a href="https://bgbiao.top/categories/golang/"> Golang </a>
+            
+          </div>
+        <span class="more-meta"> 2303 words </span>
+          <span class="more-meta"> 5 min read </span>
 
-        </span>
-      
-      <a class="post-link" href="/post/2022-10-05-go-metrics/">你知道如何洞察 Go 程序的内在状态吗？（文末有彩蛋）</a>
-    </h1>
+        
+        
+
+        
+        
+      </div>
+    </header>
+
     
-    <div class="post-meta">
-      <time datetime="2022-10-05" class="post-time">
-        2022-10-05
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
-          
-        </div>
-      <span class="more-meta"> 2303 words </span>
-      <span class="more-meta"> 5 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
     
-    <div class="post-summary">
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#golang-下的-expvar-和-expvarmon-介绍">Golang 下的 expvar 和 expvarmon 介绍</a></li>
+        <li><a href="#为程序增加-prometheus-格式的-metrics">为程序增加 Prometheus 格式的 metrics</a></li>
+        <li><a href="#附录">附录</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
       <h3 id="golang-下的-expvar-和-expvarmon-介绍">Golang 下的 expvar 和 expvarmon 介绍</h3>
 <p>Go 语言内置 <a href="https://pkg.go.dev/expvar">expvar</a>，基于 <a href="https://pkg.go.dev/expvar">expvar</a> 提供的对基础度量的支持能力，我们可以自定义各种度量（metrics）。</p>
 <p>该包提供了一种标准化接口用于公共变量，例如针对 <code>server</code> 中的操作计数器。</p>
@@ -570,250 +578,96 @@ if (!doNotTrack) {
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
+</div><p>接下来，我们就会发现直接对外暴露了一个 <code>/debug/vars</code> 的 <code>HTTP EndPoint</code> ，直接访问会出现如下信息。</p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1h6tcg5kijuj32rc0isdws.jpg" alt="expvar-endpoint"></p>
+<p>通过 expvar 包，我们可以很清晰知道程序的命令行参数，以及当前的内存状态。</p>
+<p>而在 <a href="https://github.com/gin-gonic/gin">gin</a> 框架下，我们可以通过如下方式快速的导入。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">router := gin.Default()
+</span></span><span class="line"><span class="cl">router.GET(&#34;/debug/vars&#34;, gin.WrapH(expvar.Handler()))
+</span></span></code></pre></td></tr></table>
 </div>
-    </div>
-    <div class="read-more">
-      <a href="/post/2022-10-05-go-metrics/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/2022-10-04-devops-%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98/">2022 10 04 Devops 持续交付</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2022-10-03" class="post-time">
-        2022-10-03
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/devops/"> DevOps </a>
-          <a href="https://bgbiao.top/categories/ci/cd/"> CI/CD </a>
-          
-        </div>
-      <span class="more-meta"> 4 words </span>
-      <span class="more-meta"> 1 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      原文: https://cloud.google.com/architecture/devops/devops-tech-continuous-delivery
-    </div>
-    <div class="read-more">
-      <a href="/post/2022-10-04-devops-%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/">DevOps理念之持续集成</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2022-10-03" class="post-time">
-        2022-10-03
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/devops/"> DevOps </a>
-          
-        </div>
-      <span class="more-meta"> 2664 words </span>
-      <span class="more-meta"> 6 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>注意：持续集成是能够推动实现更出色的软件交付表现和组织绩效的一组功能之一。这些能力是由 <a href="https://www.devops-research.com/research.html">DORA DevOps 现状研究项目</a>发现的，这是一项针对提升绩效的做法和能力进行的具有学术意义的独立而严谨的调查。</p>
+</div><p>但是我们可以看到，<code>expvar</code> 默认注册的内存状态信息返回了一个 json，且 HTTP 这种方式是一个静态指标，对于使用者而言，无法直观的查看状态的变化。</p>
+<p>这个时候，我们就可以使用 GitHub 上的 <a href="https://github.com/divan/expvarmon">expvarmon</a> 包来进行实时监控程序状态了，该工具可以在命令行终端以图形化的方式实时展示特定的指标数据的变化，我们可以执行如下命令安装并实时查看应用指标变化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># install
+</span></span><span class="line"><span class="cl">$ go install github.com/divan/expvarmon@latest
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># monitor
+</span></span><span class="line"><span class="cl">$  expvarmon -ports=&#34;http://localhost:8081/debug/vars&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当正常连接到 <code>expvar</code> 暴露出来的 endpoint 之后，我们就可以看到如下图。</p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1h6tbweckm2j32qq0j20zb.jpg" alt="golang-expvarmon"></p>
+<p>expvarmon 还可以通过不同的参数来支持多种模式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">./expvarmon -ports=&#34;80&#34;
+</span></span><span class="line"><span class="cl">./expvarmon -ports=&#34;23000-23010,http://example.com:80-81&#34; -i=1m
+</span></span><span class="line"><span class="cl">./expvarmon -ports=&#34;80,remoteapp:80&#34; -vars=&#34;mem:memstats.Alloc,duration:Response.Mean,Counter&#34;
+</span></span><span class="line"><span class="cl">./expvarmon -ports=&#34;1234-1236&#34; -vars=&#34;Goroutines&#34; -self
+</span></span><span class="line"><span class="cl">./expvarmon -ports=&#34;https://user:pass@my.remote.app.com:443&#34; -vars=&#34;Goroutines&#34; -self
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1h6tctsd61zj30m80dwgou.jpg" alt="Multiple apps mode"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1h6tctsd61zj30m80dwgou.jpg" alt="Single app mode"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1h6tcuf0svpj31hc0u0tg4.jpg" alt="Arbitrary number of services and variables"></p>
+<h3 id="为程序增加-prometheus-格式的-metrics">为程序增加 Prometheus 格式的 metrics</h3>
+<p>在传统的单体结构中，我们习惯使用各种命令行工具，比如 <code>top</code>，<code>htop</code>，<code>sar</code> 等工具来洞察系统内部的基础信息，而在分布式或者云原生环境中，对于众多微服务的指标性监控，基本上都会采用 <code>Prometheus + Grafana</code> 这一套架构中。</p>
+<p>因此，当我们的服务正式上线后，SRE 同学一般需要强制要求业务团队提供基础的 metrics 指标才能允许上线，否则当灾难来临时，整个业务团队和 SRE 团队将会变的更佳被动，从而可能错失重要客户和大单。</p>
+<blockquote>
+<p>所以在运维领域也会经常听到 &ldquo;无监控，不运维！&rdquo;</p>
 </blockquote>
-<p>软件系统非常复杂，对一个文件进行明显简单、独立的更改可能会对整个系统造成意外的影响。</p>
-<p>当大量开发者处理相关系统时，协调代码更新是个难题，而且不同开发者所做的更改可能并不兼容。</p>
-<p>持续集成 (CI) 这一做法就是为了解决这些问题。</p>
-<p>持续集成可创建快速反馈环并确保开发者以小批量方式工作，能够让团队开发高质量的软件、降低软件开发和维护费用，并提高团队工作效率。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/2022-10-03-devops-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/2022%E5%B9%B4%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E8%87%AA%E5%8A%A8%E5%8C%96%E5%92%8C%E7%9B%91%E6%8E%A7%E7%9A%8417%E4%B8%AA%E6%9C%80%E4%BD%B3devops%E5%B7%A5%E5%85%B7/">2022年基础设施自动化和监控的17个最佳DevOps工具</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2022-09-16" class="post-time">
-        2022-09-16
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91/"> 运维开发 </a>
-          <a href="https://bgbiao.top/categories/kubernetes/"> Kubernetes </a>
-          
-        </div>
-      <span class="more-meta"> 2873 words </span>
-      <span class="more-meta"> 6 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <p>让我们从基础设施代码(IaC)和配置管理开始。</p>
-<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h68dklrpemj212w0m474k.jpg" alt=""></p>
-    </div>
-    <div class="read-more">
-      <a href="/post/2022%E5%B9%B4%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E8%87%AA%E5%8A%A8%E5%8C%96%E5%92%8C%E7%9B%91%E6%8E%A7%E7%9A%8417%E4%B8%AA%E6%9C%80%E4%BD%B3devops%E5%B7%A5%E5%85%B7/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/">初识 WebSocket 以及 Golang 实现</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2022-09-09" class="post-time">
-        2022-09-09
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/golang/"> Golang </a>
-          
-        </div>
-      <span class="more-meta"> 4048 words </span>
-      <span class="more-meta"> 9 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <h2 id="初识-websocket-以及-golang-实现">初识 WebSocket 以及 Golang 实现</h2>
-<h3 id="一-websocket-介绍">一、 WebSocket 介绍</h3>
-<p><strong>1.1 WebSocket 的诞生背景</strong></p>
-<p>在网络冲浪中，我们接触到最多的协议必定是 HTTP/HTTPS 协议，这两种协议的工作原理可简述为：客户端通过浏览器发送一个请求，服务器在接受到请求后进行处理并将得到的结果返回给客户端，由客户端处理结果。可见其主要为一种 “拉取” 信息的形式。</p>
-<p>随着时代的发展，出现了一些需要实时发送信息的场景，比如体育实况更新、金融证券的实时信息、实时数据监控等。而如何实现 “推送” 信息的形式呢？在 WebSocket 还未诞生的时候，采用的是轮询技术来实现信息的推送：每间隔一定的时间，浏览器自动发送一个 HTTP 请求，以此主动拉取服务器的最新消息。使用轮询技术，需要不停向服务器发送 HTTP 请求，这样会占用很多的带宽和服务器资源，并且还是不能实现服务器主动向客户端推送数据。</p>
-<p>在上述背景下，一种全双工的通信协议 WebSocket 应运而生，它实现了服务端主动向客户端推送数据，使得客户端与服务器间的信息交互更为便捷。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/websocket%E4%BB%A5%E5%8F%8Agolang%E5%AE%9E%E7%8E%B0/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/coredns-loop/">CoreDNS loop 插件异常问题</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2022-03-06" class="post-time">
-        2022-03-06
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
-          
-        </div>
-      <span class="more-meta"> 2101 words </span>
-      <span class="more-meta"> 5 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <p>关键技术:</p>
-<ul>
-<li><a href="https://kubernetes.io/">Kubernetes</a>: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施</li>
-<li><a href="https://coredns.io">CoreDNS</a>: DNS and Service Discovery ，当前公认的云原生基础设施之名字服务系统</li>
-<li><a href="https://coredns.io/plugins/loop/">CoreDNS-plugins-loop</a>: CoreDNS loop 插件文档</li>
-</ul>
-<h3 id="背景">背景</h3>
-<p>最近有遇到一个客户集群，发现集群中的 CoreDNS 老是异常(loop 插件检测到有回路后进行 panic)，因此怀疑是 K8S 集群在交付或者初始化过程中做了一些额外的动作，为了查明真相我们对客户环境进行一次排查和状况模拟，顺便来一起学习一下在 CoreDNS 中 loop 插件的相关知识。</p>
-<h3 id="问题现象">问题现象</h3>
-<p>在查看 coredns pod 启动日志时，发现有如下对应异常:</p>
+<p>接下来，我们来看看如何为程序提供 <code>prometheus</code> 格式的 metrics，来暴露业务服务的整体情况。</p>
+<p>Prometheus 提供了 <a href="https://pkg.go.dev/github.com/prometheus/client_golang/prometheus">promtheus-go</a> 库来帮助我们暴露程序的内部指标。</p>
+<p>对于  <a href="https://github.com/gin-gonic/gin">gin</a> 框架的使用者而言，我们只需要增加如下代码，即可在程序中暴露对应的 metrics 指标。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ cat main.go
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">import &#34;github.com/prometheus/client_golang/prometheus/promhttp&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">router := gin.New()
+</span></span><span class="line"><span class="cl">router.GET(&#34;/metrics&#34;, gin.WrapH(promhttp.Handler()))
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当程序正常运行后，我们可以看到程序新增了 <code>/metrics</code> 的 endpoint。</p>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6gy1h6terp96p9j31c0044t9w.jpg" alt="Gin-Metrics"></p>
+<p>此时，当我们访问 <code>http://host:port/metrics</code>  时，将会看到如下内容：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -828,206 +682,232 @@ if (!doNotTrack) {
 </span><span class="lnt">10
 </span><span class="lnt">11
 </span><span class="lnt">12
+</span><span class="lnt">13
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ kubectl  get pods -n kube-system | grep dns
-</span></span><span class="line"><span class="cl">coredns-bdbc5564-8qldp              0/1     CrashLoopBackOff   8          22m
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ curl localhost:9091/metrics
+</span></span><span class="line"><span class="cl"># HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+</span></span><span class="line"><span class="cl"># TYPE go_gc_duration_seconds summary
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds{quantile=&#34;0&#34;} 9.7131e-05
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds{quantile=&#34;0.25&#34;} 0.000113391
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds{quantile=&#34;0.5&#34;} 0.000190793
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds{quantile=&#34;0.75&#34;} 0.000437726
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds{quantile=&#34;1&#34;} 0.000745738
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds_sum 0.001584779
+</span></span><span class="line"><span class="cl">go_gc_duration_seconds_count 5
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">$ kubectl  logs -n kube-system coredns-bdbc5564-8qldp
-</span></span><span class="line"><span class="cl">[INFO] plugin/kubernetes: Watching Endpoints instead of EndpointSlices in k8s versions &lt; 1.19
-</span></span><span class="line"><span class="cl">.:53
-</span></span><span class="line"><span class="cl">[INFO] plugin/reload: Running configuration MD5 = 045400f7bc8c9f6aaf8ca5dade224266
-</span></span><span class="line"><span class="cl">CoreDNS-1.8.4
-</span></span><span class="line"><span class="cl">linux/amd64, go1.16.4, 053c4d5
-</span></span><span class="line"><span class="cl">[INFO] 127.0.0.1:34652 - 36041 &#34;HINFO IN 2066162189351134310.8810881223121065474. udp 57 false 512&#34; NOERROR - 0 6.002536937s
-</span></span><span class="line"><span class="cl">[ERROR] plugin/errors: 2 2066162189351134310.8810881223121065474. HINFO: read udp 127.0.0.1:48503-&gt;127.0.0.53:53: i/o timeout
-</span></span><span class="line"><span class="cl">[FATAL] plugin/loop: Loop (127.0.0.1:48066 -&gt; :53) detected for zone &#34;.&#34;, see https://coredns.io/plugins/loop#troubleshooting. Query: &#34;HINFO 2066162189351134310.8810881223121065474.&#34;
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">....
 </span></span></code></pre></td></tr></table>
 </div>
-</div>
-    </div>
-    <div class="read-more">
-      <a href="/post/coredns-loop/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/">从零构建 SRE 体系</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2021-12-12" class="post-time">
-        2021-12-12
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
-          
-        </div>
-      <span class="more-meta"> 4595 words </span>
-      <span class="more-meta"> 10 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <blockquote>
-<p>前言: 该文章为19年 Ernese Norelus 发表在 <a href="https://medium.com/">medium</a> 上的<a href="https://medium.com/ibm-garage/building-sre-from-scratch-485e23985bbd">Building SRE from Scratch</a>，现在看来也依然不会觉得过时，一起再来回顾一下。</p>
-</blockquote>
-<p>首先从一张构建 SRE 体系图开始，从为什么构建 SRE、SRE 目标以及如何实现 SRE。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/%E4%BB%8E0%E6%9E%84%E5%BB%BAsre%E4%BD%93%E7%B3%BB/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/kubernetes-helm-jaeger/">一分钟构建高可用的分布式追踪系统-Jaeger</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2021-05-30" class="post-time">
-        2021-05-30
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/kubernetes/"> kubernetes </a>
-          
-        </div>
-      <span class="more-meta"> 3642 words </span>
-      <span class="more-meta"> 8 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      <p>关键技术:</p>
+</div><p>可以看到，我们只增加了几行代码，已经有一些指标数据以 Prometheus 格式输出，这是因为 Go 客户端库默认在我们暴露的全局默认指标注册表中注册了一些关于 promhttp 处理器和运行时间相关的默认指标，根据不同指标名称的前缀可以看出：</p>
 <ul>
-<li><a href="https://kubernetes.io/">Kubernetes</a>: 分布式的容器编排与调度系统，当前公认的云原生技术基础设施</li>
-<li><a href="https://www.jaegertracing.io/">Jaeger</a>: 开源端到端的分布式追踪系统</li>
-<li><a href="https://helm.sh/">Helm</a>: Kubernetes 中的包管理器</li>
+<li><code>go_前缀</code>：是关于 Go 运行时相关的指标，比如垃圾回收时间、goroutine 数量等，这些都是 Go 客户端库特有的，其他语言的客户端库可能会暴露各自语言的其他运行时指标。</li>
+<li><code>promhttp_前缀</code>：来自 promhttp 工具包的相关指标，用于跟踪对指标请求的处理。</li>
 </ul>
+<p>那么需要如何定义自定义指标呢，首先我们需要知道，在 Prometheus 的世界里，指标数据的类型以及结构：</p>
+<ul>
+<li><code>Gauges</code>: 表示指标值是可以上升或下降的，在 prometheus 的 sdk 中 暴露了 <code>Set ()、Inc ()、Dec ()、Add () 和 Sub ()</code> 这些函数来更改指标值</li>
+<li><code>Counters</code>: 代表一种样本数据单调递增的指标，即只增不减，除非监控系统发生了重置。所以该对象下面只有 <code>Inc () 和 Add ()</code> 两个函数，而要实际计算趋势的时候，我们一般会使用的 <code>rate ()</code> 函数会自动处理</li>
+<li><code>Histograms</code>: Prometheus 中的直方图是累积值，即每个区间的数值总计，每一个后续的 bucket 都包含前一个 bucket 的观察计数，所有 bucket 的下限都从 0 开始的。直方图会自动对数值的分布进行分类和计数，所以它只有一个 <code>Observe ()</code> 方法，每当你在代码中处理要跟踪的数据时，就会调用这个方法</li>
+<li><code>Summaries</code>: 与 Histogram 类似类型，用于表示一段时间内的数据采样结果（通常是请求持续时间或响应大小等），但它直接存储了分位数（通过客户端计算，然后展示出来），而不是通过区间计算</li>
+<li><code>Labels</code>: 我们都知道，在prometheus 中，每一个指标项对应到不同的 label 上会形成唯一的一个metrics 来描述具体的指标，比如 <code>/api/user</code> 的请求，使用了label 之后即可能存在 <code>http_request_user_counter{method=&quot;GET&quot;}</code> 和 <code>http_request_user_counter{method=&quot;POST&quot;}</code> 两个指标</li>
+</ul>
+<p><code>备注: 当然 label 的设计也需要合理，不然当业务比较复杂时，label 会使得整个 指标呈指数级别增长。</code></p>
+<p>这里，我们以 <code>Guages</code> 类型指标来作为示例 【其他类型指标都是类似的方式】。</p>
+<p>对于 <code>Guages</code> 指标而言，我们仅需要在代码中额外增加如下代码，便可以在给 <code>metrics</code> 中增加一个自定义的 <code>temperature_celsius</code> 指标。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 创建一个没有任何 label 标签的 guage 指标
+</span></span><span class="line"><span class="cl">  temp := prometheus.NewGauge(prometheus.GaugeOpts{
+</span></span><span class="line"><span class="cl">    Name: &#34;temperature_celsius&#34;,
+</span></span><span class="line"><span class="cl">    Help: &#34;The current temperature in degrees Celsius.&#34;,
+</span></span><span class="line"><span class="cl">  })
+</span></span><span class="line"><span class="cl">// 在默认的注册表中注册该指标
+</span></span><span class="line"><span class="cl">  prometheus.MustRegister(temp)
+</span></span><span class="line"><span class="cl">// 设置 gauge 的值为 88
+</span></span><span class="line"><span class="cl">  temp.Set(88)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当程序成功运行时，我们可以看到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ curl http://localhost:8081/metrics
+</span></span><span class="line"><span class="cl">.....
+</span></span><span class="line"><span class="cl">.....
+</span></span><span class="line"><span class="cl"># HELP temperature_celsius The current temperature in degrees Celsius.
+</span></span><span class="line"><span class="cl"># TYPE temperature_celsius gauge
+</span></span><span class="line"><span class="cl">temperature_celsius 88
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要注意的是，注册时有两个函数:</p>
+<ul>
+<li>prometheus.MustRegister 函数来将指标注册到全局默认注册中</li>
+<li>prometheus.NewRegistry 函数来创建和使用自己的非全局的注册</li>
+</ul>
+<p>创建一个非全局的注册表，并明确地将其传递给程序中需要注册指标的地方，这也一种更加推荐的做法。</p>
+<p>而如果需要使用 带有 label 的指标，我们只需要将初始化类型的方法由 <code>prometheus.NewType</code> 更改为 <code>prometheus.NewTypeVec</code>。</p>
+<p>比如上面我们 guage 类型的带 label 的指标，将更改为如下方式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	temp := prometheus.NewGaugeVec(
+</span></span><span class="line"><span class="cl">		prometheus.GaugeOpts{
+</span></span><span class="line"><span class="cl">			Name: &#34;temperature_celsius&#34;,
+</span></span><span class="line"><span class="cl">			Help: &#34;The current temperature in degrees Celsius.&#34;,
+</span></span><span class="line"><span class="cl">		},
+</span></span><span class="line"><span class="cl">		[]string{&#34;cpuType&#34;},
+</span></span><span class="line"><span class="cl">	)
+</span></span><span class="line"><span class="cl">	prometheus.MustRegister(temp)
+</span></span><span class="line"><span class="cl">	temp.With(prometheus.Labels{&#34;cpuType&#34;: &#34;AMD&#34;}).Set(88)
+</span></span><span class="line"><span class="cl">	temp.WithLabelValues(&#34;Intel&#34;).Set(66)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当我们再次访问 metrics 的时候，就会出现如下指标：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ curl http://localhost:8081/metrics
+</span></span><span class="line"><span class="cl">.....
+</span></span><span class="line"><span class="cl">.....
+</span></span><span class="line"><span class="cl"># HELP temperature_celsius The current temperature in degrees Celsius.
+</span></span><span class="line"><span class="cl"># TYPE temperature_celsius gauge
+</span></span><span class="line"><span class="cl">temperature_celsius{cpuType=&#34;AMD&#34;} 88
+</span></span><span class="line"><span class="cl">temperature_celsius{cpuType=&#34;Intel&#34;} 66
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>而对于其他类型指标的添加，也和 Guage 类似，有需要的小伙伴可以去 <a href="https://pkg.go.dev/github.com/prometheus/client_golang/prometheus">prometheus-go-doc</a> 中查看相关文档。</p>
+<p>也希望不论是作为业务开发者或者 SRE 相关从业者，在我们的业务准备上线前，都可以确保提供了一些强指标来暴露服务的整体状态，一起为业务的稳定性、可靠性保驾护航。</p>
+<h3 id="附录">附录</h3>
+<blockquote>
+<p>Golang 开发者学习路线。</p>
+</blockquote>
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1h6ug4yx4bsj30u01b0th4.jpg" alt=""></p>
     </div>
-    <div class="read-more">
-      <a href="/post/kubernetes-helm-jaeger/" class="read-more-link">Read more</a>
-    </div>
+
     
-  </div>
-</article>
-
-  
-</section>
-
-
-
-
-
-
-  
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-
-  
-  
-  <nav class="pagination">
-    <ul>
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">BGBiao</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2022-10-05
       
-      <li  class="active" >
-        <a href="/">1</a>
-      </li>
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content">原创文章，如需转载请注明文章作者和出处<BGBiao>。谢谢！</span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          <a href="https://bgbiao.top/tags/golang/">Golang</a>
+          <a href="https://bgbiao.top/tags/sre/">SRE</a>
+          <a href="https://bgbiao.top/tags/devops/">DevOps</a>
+          <a href="https://bgbiao.top/tags/cloudnative/">CloudNative</a>
+          
+        </div>
+
       
-      <li >
-        <a href="/page/2.html">2</a>
-      </li>
-      
-      <li >
-        <a href="/page/3.html">3</a>
-      </li>
-      
-      <li >
-        <a href="/page/4.html">4</a>
-      </li>
-      
-      <li >
-        <a href="/page/5.html">5</a>
-      </li>
-      
-      <li >
-        <a href="/page/6.html">6</a>
-      </li>
-      
-      <li >
-        <a href="/page/7.html">7</a>
-      </li>
-      
-      <li >
-        <a href="/page/8.html">8</a>
-      </li>
-      
-      <li >
-        <a href="/page/9.html">9</a>
-      </li>
-      
-      <li >
-        <a href="/page/10.html">10</a>
-      </li>
-      
-      <li >
-        <a href="/page/11.html">11</a>
-      </li>
-      
-    </ul>
-  </nav>
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/2022-10-04-devops-%E6%8C%81%E7%BB%AD%E4%BA%A4%E4%BB%98/">
+            <span class="next-text nav-default">2022 10 04 Devops 持续交付</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
 
   
   
 
+  
+  
 
+  
 
+  
+  
+    <div class="post bg-white">
+      <script src="https://utteranc.es/client.js"
+            repo= "BGBiao/comments-bgbiao.top"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async>
+      </script>
+    </div>
+  
 
+  
+
+  
+
+  
+
+    
+
+  
 
         </div>
       </div>
