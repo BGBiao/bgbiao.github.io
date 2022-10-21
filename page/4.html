@@ -506,6 +506,54 @@ if (!doNotTrack) {
 
         </span>
       
+      <a class="post-link" href="/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/">kafka生产规划和运维</a>
+    </h1>
+    
+    <div class="post-meta">
+      <time datetime="2020-04-25" class="post-time">
+        2020-04-25
+      </time>
+      <div class="post-category">
+          <a href="https://bgbiao.top/categories/%E8%BF%90%E7%BB%B4/"> 运维 </a>
+          
+        </div>
+      <span class="more-meta"> 25308 words </span>
+      <span class="more-meta"> 51 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      <blockquote>
+<p>前言: 通常对于初创企业或者初创业务团队来说，对于开源组件的使用都会显的比较随意，而这种情况会随着业务量级的增长或时间的推移导致开源服务的滥用，进而造成的结果就是服务整体的稳定性和可靠性相对较差，且是边际效应递减的，如果此时不对整体业务以及开源服务进行规划和改造，那么风险和成本将是同比增长的。在我过去的工作经历中，经历过类似服务的有<code>Redis集群</code>，<code>ElasticSearch</code>集群，虽然整体改造后并不一定将成本降到最低，但是可以将服务的可用性和可靠性提高很多，而且根据业务场景以及使用方式来规划集群后会使得整体的边际成本呈递减状态。</p>
+</blockquote>
+<p>笔者目前所处的团队所管理的kafka集群也处于该种状态，集群当前规模大约为20+ECS，总数据量大约400T，其中承接的Topic服务主要分为<code>日志收集</code>、<code>数据管道</code>、<code>流式计算</code>、<code>业务事件存储</code>几种大场景，我们需要知道，以上几种使用场景对于kafka集群的的<code>可用性</code>，<code>可靠性</code>，<code>数据一致性</code>要求其实是不同的，如果将所有场景耦合到同一个集群，在数据量较大的情况下，任何的小异常点都可能造成整体服务受到影响，并且整个集群的恢复周期会很长，如果业务没有及时的降级策略很可能影响核心业务的处理。</p>
+<p>鉴于以前对开源分布式服务的规划和改造经验，本篇文章将根据官方文档以及经验来分享一些关于Kafka生产集群规划和运维管理相关的知识.</p>
+    </div>
+    <div class="read-more">
+      <a href="/post/kafka%E7%94%9F%E4%BA%A7%E8%A7%84%E5%88%92%E5%92%8C%E8%BF%90%E7%BB%B4/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+        <span class="post-pinned">
+          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  width="32" height="32">
+  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
+</svg>
+
+        </span>
+      
       <a class="post-link" href="/post/jvm%E7%9A%84%E5%88%9D%E5%A7%8B%E5%A0%86/">你还记得你JVM的的初始堆大小吗</a>
     </h1>
     
@@ -812,50 +860,6 @@ if (!doNotTrack) {
     </div>
     <div class="read-more">
       <a href="/post/golang-gorm%E7%9A%84%E4%BD%BF%E7%94%A8/" class="read-more-link">Read more</a>
-    </div>
-    
-  </div>
-</article>
-
-  
-    <article class="post bg-white">
-  <header class="post-header">
-    <h1 class="post-title">
-      
-        <span class="post-pinned">
-          <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-  width="32" height="32">
-  <path d="M682.666667 512V170.666667h42.666666V85.333333H298.666667v85.333334h42.666666v341.333333l-85.333333 85.333333v85.333334h221.866667v256h68.266666v-256H768v-85.333334l-85.333333-85.333333z"></path>
-</svg>
-
-        </span>
-      
-      <a class="post-link" href="/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/">过去这一个月的所思所想</a>
-    </h1>
-    
-    <div class="post-meta">
-      <time datetime="2020-03-01" class="post-time">
-        2020-03-01
-      </time>
-      <div class="post-category">
-          <a href="https://bgbiao.top/categories/%E6%88%90%E9%95%BF/"> 成长 </a>
-          
-        </div>
-      <span class="more-meta"> 1880 words </span>
-      <span class="more-meta"> 4 min read </span>
-      
-      
-      
-    </div>
-  </header>
-  
-  <div class="post-content">
-    
-    <div class="post-summary">
-      这一个月以来，受疫情的影响，一直在家办公，可能对外人而言，觉得在家办公会相对比较轻松，能够除工作外做更多的事情，但这一个月下来，我却有颇多的
-    </div>
-    <div class="read-more">
-      <a href="/post/%E7%96%AB%E6%83%85%E5%9C%A8%E5%AE%B6%E8%BF%99%E4%B8%AA%E6%9C%88/" class="read-more-link">Read more</a>
     </div>
     
   </div>
